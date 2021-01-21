@@ -23,6 +23,7 @@
 #' @param standardizeX Logical flag for X variable standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.
 #' @param standardizeRtX Logical flag for transformed X variable standardization. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.
 #' @param rotation Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.
+#' @param eta_star Optional arg to input a specific eta term rather than estimate it from the data.
 #' @param ... Not used.
 #' @importFrom zeallot %<-%
 #' @export
@@ -50,6 +51,7 @@ plmm <- function(X,
                  standardizeX = TRUE,
                  standardizeRtX = FALSE,
                  rotation = TRUE,
+                 eta_star,
                  ...) {
 
   # Coersion
@@ -114,6 +116,8 @@ plmm <- function(X,
   ## Calculate eta
   if (rotation){
     c(S, U, eta) %<-% plmm_null(X_for_K, yy)
+    # still compute U and S but override eta-hat with eta_star if supplied
+    if (!missing(eta_star)) eta <- eta_star
     W <- diag((eta * S + (1 - eta))^(-1/2))
   } else {
     # no rotation option for testing

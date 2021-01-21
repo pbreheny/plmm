@@ -27,6 +27,7 @@ plmm(
   standardizeX = TRUE,
   standardizeRtX = FALSE,
   rotation = TRUE,
+  eta_star,
   ...
 )
 }
@@ -74,6 +75,8 @@ plmm(
 \item{standardizeRtX}{Logical flag for transformed X variable standardization. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.}
 
 \item{rotation}{Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.}
+
+\item{eta_star}{Optional arg to input a specific eta term rather than estimate it from the data.}
 
 \item{...}{Not used.}
 }
