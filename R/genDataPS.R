@@ -15,6 +15,7 @@
 #' @param standardizeX Should the generated X matrix be standardized? Defaults to TRUE.
 #' @param structureX_other If \code{structureX == "other"}, an matrix or SnpMatrix object with subjects in rows and SNPs in columns to be used to generate pseudophenotypes must be supplied here.
 #' @param sampleCols A logical flag for whether the columns of the resultant X matrix should be scrambled. This may be desirable if the causal SNPs should change from one simulation to the next. Defaults to TRUE.
+#' @param B0 Optional. Additional intercept value.
 #' @export
 
 genDataPS <- function(n = 200, p = 1000, p1 = floor(p/2), nJ = rep(50, 4),
@@ -28,7 +29,8 @@ genDataPS <- function(n = 200, p = 1000, p1 = floor(p/2), nJ = rep(50, 4),
                       xi = 0,
                       standardizeX = TRUE,
                       structureX_other = NULL,
-                      sampleCols = TRUE){
+                      sampleCols = TRUE,
+                      B0){
 
   # structureX <- match.arg(structureX)
   if (structureX == "other" & is.null(structureX_other)) stop("A matrix or SnpMatrix object must be supplied to the argument `structureX_other` if structureX == `other`")
@@ -84,6 +86,10 @@ genDataPS <- function(n = 200, p = 1000, p1 = floor(p/2), nJ = rep(50, 4),
   gamma <- (gamma_unscaled - stats::weighted.mean(gamma_unscaled, ww))/env_sd * scaleZgamma
   # Gen Y
   y <- Xbeta + env + scaleEps * drop(ncvreg::std(as.matrix(stats::rnorm(n))))
+
+  # adding a manual intercept shift
+  # probably figure out new SNR later
+  if (!missing(B0)) y <- y + B0
 
   # name things
   w <- 1 + floor(log10(p))
