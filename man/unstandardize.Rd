@@ -4,7 +4,7 @@
 \alias{unstandardize}
 \title{Unstandardize coefficient values}
 \usage{
-unstandardize(b, X, intercept = TRUE, centerY = FALSE, a = NULL)
+unstandardize(b, X, intercept = TRUE)
 }
 \arguments{
 \item{b}{p x nlambda matrix of standardized coefficient path values.}
@@ -12,10 +12,6 @@ unstandardize(b, X, intercept = TRUE, centerY = FALSE, a = NULL)
 \item{X}{Design matrix which \emph{includes} the intercept column if present. May include clinical covariates and other non-SNP data. Must include the attributes 'center', 'scale', and 'nonsingular' corresponding to non-intercept variables.}
 
 \item{intercept}{Logical flag for whether an intercept row is included in b, that is, a coefficient which accounts for the mean of the original y value on its rotated scale.}
-
-\item{centerY}{Logical flag for whether the outcome variable, y, should be centered and an intercept coefficient estimated based on its mean. Defaults to FALSE.}
-
-\item{a}{Mean out outcome variable to be used in unstandardization. Required if centerY = TRUE. Defaults to NULL.}
 }
 \description{
 This function allows you to unstandardize coefficient values based on attributes of X.

@@ -145,8 +145,8 @@ if (nrow(X) > ncol(X)){
   ols_soln <- lm(tmp$y ~ -1 + tmp$X)
   expect_equivalent(as.numeric(coef(plmm6)), coef(ols_soln), tol = 1e-3)
 }
-
 # this should also match the results for plmm5 of test_plmm - only in the case that lambda = 0
+
 
 # X
 # this generates X unstandardized, X rotated
@@ -177,3 +177,32 @@ if (nrow(X) > ncol(X)){
   ols_soln <- lm(tmp$y ~ -1 + tmp$X)
   expect_equivalent(as.numeric(coef(plmm7)), coef(ols_soln), tol = 1e-3)
 }
+
+
+### another way to check this with a standardized X - do the re-standardization on the lm side
+plmm8 <- plmm(ncvreg::std(X),
+              y,
+              penalty = "lasso",
+              alpha = 1,
+              lambda = 0, # compare to ols solutions
+              standardizeX = FALSE,
+              standardizeRtX = TRUE,
+              rotation = TRUE,
+              returnX = TRUE)
+
+if (nrow(X) > ncol(X)){
+  xxx <- ncvreg::std(plmm8$X[,-1])
+  x0 <- plmm8$X[,1]
+  m <- attr(xxx, "center")
+  s <- attr(xxx, "scale")
+  b <- coef(lm(plmm8$y ~ 0 + x0 + xxx))
+  bb <- b[-1]/s
+  b0 <- b[1] - crossprod(m, bb)
+  expect_equivalent(coef(plmm8), c(b0, bb), tol = 1e-2)
+}
+
+
+
+
+
+

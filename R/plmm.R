@@ -23,6 +23,7 @@
 #' @param standardizeX Logical flag for X variable standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.
 #' @param standardizeRtX Logical flag for transformed X variable standardization. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.
 #' @param rotation Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.
+#' @param eta_centerY Logical flag to indicate whether eta should be estimated using a centerd outcome variable, y. Defaults to FALSE.
 #' @param eta_star Optional arg to input a specific eta term rather than estimate it from the data.
 #' @param ... Not used.
 #' @importFrom zeallot %<-%
@@ -51,6 +52,7 @@ plmm <- function(X,
                  standardizeX = TRUE,
                  standardizeRtX = FALSE,
                  rotation = TRUE,
+                 eta_centerY = FALSE,
                  eta_star,
                  ...) {
 
@@ -75,7 +77,6 @@ plmm <- function(X,
   if (!is.double(penalty.factor)) penalty.factor <- as.double(penalty.factor)
 
   # Error checking
-  if (intercept & centerRtY) stop('It looks like you are fitting the intercept twice', call.=FALSE)
   if (gamma <= 1 & penalty=="MCP") stop("gamma must be greater than 1 for the MC penalty", call.=FALSE)
   if (gamma <= 2 & penalty=="SCAD") stop("gamma must be greater than 2 for the SCAD penalty", call.=FALSE)
   if (nlambda < 2) stop("nlambda must be at least 2", call.=FALSE)
@@ -103,19 +104,16 @@ plmm <- function(X,
   ns <- attr(XX, "nonsingular")
   penalty.factor <- penalty.factor[ns]
 
-  ## Center y
-  # if (centerY){
-  #   yy <- y - mean(y)
-  # } else {
-  #   yy <- y
-  # }
-
   p <- ncol(XX)
   n <- length(yy)
 
   ## Calculate eta
   if (rotation){
-    c(S, U, eta) %<-% plmm_null(X_for_K, yy)
+    if (eta_centerY){
+      c(S, U, eta) %<-% plmm_null(X_for_K, yy - mean(yy))
+    } else{
+      c(S, U, eta) %<-% plmm_null(X_for_K, yy)
+    }
     # still compute U and S but override eta-hat with eta_star if supplied
     if (!missing(eta_star)) eta <- eta_star
     W <- diag((eta * S + (1 - eta))^(-1/2))
@@ -195,13 +193,13 @@ plmm <- function(X,
   convex.min <- if (convex) convexMin(b, SUXX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', penalty.factor) else NULL
 
   # unstandardize rotation
-  bb <- unstandardize(b[, ind, drop = FALSE], SUXX, intercept, centerRtY, mean(SUy))
+  bb <- unstandardize(b[, ind, drop = FALSE], SUXX, intercept)
 
   # unstandardize original scale
   beta <- unstandardize(bb, XX, intercept)
 
   varnames <- if (is.null(colnames(X))) paste("V", 1:ncol(X), sep="") else colnames(X)
-  if (intercept | centerRtY) varnames <- c("(Intercept)", varnames)
+  if (intercept) varnames <- c("(Intercept)", varnames)
   dimnames(beta) <- list(varnames, lamNames(lambda))
 
   ## Output
