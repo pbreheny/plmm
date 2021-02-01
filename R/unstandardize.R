@@ -7,18 +7,20 @@
 #' @export
 
 unstandardize <- function(b, X, intercept = TRUE) {
-  bbb <- matrix(0, nrow = nrow(b), ncol = ncol(b))
+  beta <- matrix(0, nrow = nrow(b), ncol = ncol(b))
   if (intercept){
     ns <- attr(X, 'nonsingular')
     a <- b[1, , drop = FALSE]
-    bb <- b[-1, , drop=FALSE]
-    bbb[1 + ns,] <- bb / attr(X, 'scale')[ns]
-    bbb[1,] <- a - crossprod(attr(X, 'center')[ns], bb)
+    b <- b[-1, , drop=FALSE]
+    bb <- b / attr(X, 'scale')[ns]
+    beta[1 + ns,] <- bb
+    beta[1,] <- a - crossprod(attr(X, 'center')[ns], bb)
   } else {
     ns <- attr(X, 'nonsingular')
     center <- attr(X, 'center')[ns]
     scale <- attr(X, 'scale')[ns]
-    bbb[ns, ] <- b/attr(X, 'scale')[ns]
+    bb <- b / attr(X, 'scale')[ns]
+    beta[ns, ] <- bb
   }
-  return(bbb)
+  return(beta)
 }
