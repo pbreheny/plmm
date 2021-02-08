@@ -28,7 +28,8 @@ plmm(
   standardizeRtX = FALSE,
   rotation = TRUE,
   eta_centerY = FALSE,
-  eta_star,
+  eta_star = NULL,
+  V = NULL,
   ...
 )
 }
@@ -71,15 +72,17 @@ plmm(
 
 \item{centerRtY}{Logical flag for whether the rotated outcome variable, SUy, should be centered and an intercept coefficient estimated based on its mean. Defaults to FALSE.}
 
-\item{standardizeX}{Logical flag for X variable standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.}
+\item{standardizeX}{Logical flag for X matrix standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.}
 
-\item{standardizeRtX}{Logical flag for transformed X variable standardization. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.}
+\item{standardizeRtX}{Logical flag for transformed X matrix scaling (or rescaling). The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.}
 
 \item{rotation}{Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.}
 
 \item{eta_centerY}{Logical flag to indicate whether eta should be estimated using a centerd outcome variable, y. Defaults to FALSE.}
 
 \item{eta_star}{Optional arg to input a specific eta term rather than estimate it from the data.}
+
+\item{V}{Optional arg to input a specified covariance structure for y, used to rotate the data, into the model.}
 
 \item{...}{Not used.}
 }

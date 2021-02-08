@@ -78,26 +78,26 @@ glm3 <- glmnet::glmnet(ncvreg::std(cbind(X0, X)), y, "gaussian",
 expect_equivalent(coef(plmm3), as.matrix(coef(glm3)), tol = 1e-1)
 expect_equivalent(coef(plmm3)[-c(1:(1 + ncol(X0))), 1], rep(0, ncol(X)))
 
-# X
-plmm4 <- plmm(cbind(X0, X),
-              y,
-              X_for_K = X,
-              penalty = "lasso",
-              penalty.factor = rep(c(0, 1), times = c(ncol(X0), ncol(X))),
-              alpha = 1,
-              nlambda = 5,
-              standardizeX = TRUE,
-              standardizeRtX = FALSE,
-              rotation = FALSE,
-              returnX = FALSE)
-
-glm4 <- glmnet::glmnet(cbind(X0, X), y, "gaussian",
-                       standardize = TRUE, lambda = plmm4$lambda,
-                       penalty.factor = rep(c(0, 1), times = c(ncol(X0), ncol(X))))
-
-# expect_equivalent(coef(plmm4), as.matrix(coef(glm4)), tol = 1e-3)
-expect_equivalent(coef(plmm4), as.matrix(coef(glm4)), tol = 1e-1)
-expect_equivalent(coef(plmm4)[-c(1:(1 + ncol(X0))), 1], rep(0, ncol(X)))
+# # X
+# plmm4 <- plmm(cbind(X0, X),
+#               y,
+#               X_for_K = X,
+#               penalty = "lasso",
+#               penalty.factor = rep(c(0, 1), times = c(ncol(X0), ncol(X))),
+#               alpha = 1,
+#               nlambda = 5,
+#               standardizeX = TRUE,
+#               standardizeRtX = FALSE,
+#               rotation = FALSE,
+#               returnX = FALSE)
+#
+# glm4 <- glmnet::glmnet(cbind(X0, X), y, "gaussian",
+#                        standardize = TRUE, lambda = plmm4$lambda,
+#                        penalty.factor = rep(c(0, 1), times = c(ncol(X0), ncol(X))))
+#
+# # expect_equivalent(coef(plmm4), as.matrix(coef(glm4)), tol = 1e-3)
+# expect_equivalent(coef(plmm4), as.matrix(coef(glm4)), tol = 1e-1)
+# expect_equivalent(coef(plmm4)[-c(1:(1 + ncol(X0))), 1], rep(0, ncol(X)))
 
 
 ### rotation checks ---------------------------------------------------------###

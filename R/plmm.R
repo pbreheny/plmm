@@ -20,11 +20,12 @@
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
 #' @param intercept Logical flag for whether an intercept should be included.
 #' @param centerRtY Logical flag for whether the rotated outcome variable, SUy, should be centered and an intercept coefficient estimated based on its mean. Defaults to FALSE.
-#' @param standardizeX Logical flag for X variable standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.
-#' @param standardizeRtX Logical flag for transformed X variable standardization. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.
+#' @param standardizeX Logical flag for X matrix standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.
+#' @param standardizeRtX Logical flag for transformed X matrix scaling (or rescaling). The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.
 #' @param rotation Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.
 #' @param eta_centerY Logical flag to indicate whether eta should be estimated using a centerd outcome variable, y. Defaults to FALSE.
 #' @param eta_star Optional arg to input a specific eta term rather than estimate it from the data.
+#' @param V Optional arg to input a specified covariance structure for y, used to rotate the data, into the model.
 #' @param ... Not used.
 #' @importFrom zeallot %<-%
 #' @export
@@ -53,11 +54,12 @@ plmm <- function(X,
                  standardizeRtX = FALSE,
                  rotation = TRUE,
                  eta_centerY = FALSE,
-                 eta_star,
+                 eta_star = NULL,
+                 V = NULL,
                  ...) {
 
   # Coersion
-  S <- U <- eta <- NULL
+  SUX <- SUy <- eta <- NULL
   penalty <- match.arg(penalty)
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   if (!inherits(X, "matrix")) {
@@ -85,6 +87,15 @@ plmm <- function(X,
   if (length(init)!=ncol(X)) stop("Dimensions of init and X do not match", call.=FALSE)
   if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
   if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
+  if (!is.null(V)){
+    if (!inherits(V, "matrix")) {
+      tmp <- try(V <- stats::model.matrix(~0+., data=V), silent=TRUE)
+      if (inherits(tmp, "try-error")) stop("V must be a matrix or able to be coerced to a matrix", call.=FALSE)
+    }
+    if (typeof(V)=="integer") storage.mode(X) <- "double"
+    if (typeof(V)=="character") stop("V must be a numeric matrix", call.=FALSE)
+    if (dim(V)[1] != nrow(X) || dim(V)[2] != nrow(X)) stop("Dimensions of V and X do not match", call.=FALSE)
+  }
 
   ## Deprecation support
   dots <- list(...)
@@ -100,53 +111,31 @@ plmm <- function(X,
     attributes(XX)$scale <- rep(1, ncol(XX))
     attributes(XX)$nonsingular <- 1:ncol(XX)
   }
-  yy <- y
   ns <- attr(XX, "nonsingular")
   penalty.factor <- penalty.factor[ns]
 
   p <- ncol(XX)
-  n <- length(yy)
-
-  ## Calculate eta
-  if (rotation){
-    if (eta_centerY){
-      c(S, U, eta) %<-% plmm_null(X_for_K, yy - mean(yy))
-    } else{
-      c(S, U, eta) %<-% plmm_null(X_for_K, yy)
-    }
-    # still compute U and S but override eta-hat with eta_star if supplied
-    if (!missing(eta_star)) eta <- eta_star
-    W <- diag((eta * S + (1 - eta))^(-1/2))
-  } else {
-    # no rotation option for testing
-    U <- diag(n)
-    W <- diag(n)
-  }
+  n <- nrow(XX)
 
   ## Rotate data
-  if (intercept){
-    SUX <- W %*% crossprod(U, cbind(1, XX))
-    penalty.factor <- c(0, penalty.factor)
-  } else {
-    SUX <- W %*% crossprod(U, XX)
-  }
-  SUy <- drop(W %*% crossprod(U, yy))
+  c(SUX, SUy, eta) %<-% rotate_data(XX, y, X_for_K, intercept, rotation, eta_centerY, eta_star, V)
+  if (intercept) penalty.factor <- c(0, penalty.factor)
 
   ## Re-standardize rotated SUX
   if (standardizeRtX){
     if (intercept){
-      SUXX_noInt <- ncvreg::std(SUX[,-1, drop = FALSE]) # how sure am I that the rotated intercept should not be standardized?
+      SUXX_noInt <- scale(SUX[,-1, drop = FALSE], center = FALSE) * (n - 1) / n
+      attributes(SUXX_noInt)$nonsingular <- ns
       SUXX <- cbind(SUX[,1, drop = FALSE], SUXX_noInt)
     } else {
-      SUXX_noInt <- ncvreg::std(SUX)
+      SUXX_noInt <- scale(SUX, center = FALSE) * (n - 1) / n
+      attributes(SUXX_noInt)$nonsingular <- ns
       SUXX <- SUXX_noInt
     }
-    attributes(SUXX)$center <- attr(SUXX_noInt, 'center')
     attributes(SUXX)$scale <- attr(SUXX_noInt, 'scale')
     attributes(SUXX)$nonsingular <- attr(SUXX_noInt, 'nonsingular')
   } else {
     SUXX <- SUX
-    attributes(SUXX)$center <- rep(0, ncol(SUX))
     attributes(SUXX)$scale <- rep(1, ncol(SUX))
     attributes(SUXX)$nonsingular <- ns
   }
@@ -168,7 +157,7 @@ plmm <- function(X,
   }
 
   ## Placeholders for results
-  if (intercept) init <- c(mean(yy), init) # add initial value for intercept
+  if (intercept) init <- c(mean(y), init) # add initial value for intercept
   b <- matrix(NA, ncol(SUXX), nlambda)
   iter <- integer(nlambda)
   converged <- logical(nlambda)
@@ -192,10 +181,10 @@ plmm <- function(X,
   if (warn & sum(iter) == max.iter) warning("Maximum number of iterations reached")
   convex.min <- if (convex) convexMin(b, SUXX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', penalty.factor) else NULL
 
-  # unstandardize rotation
-  bb <- unstandardize(b[, ind, drop = FALSE], SUXX, intercept)
+  # unscale transformed data
+  bb <- unscale(b[, ind, drop = FALSE], SUXX, intercept)
 
-  # unstandardize original scale
+  # unstandardize original data
   beta <- unstandardize(bb, XX, intercept)
 
   varnames <- if (is.null(colnames(X))) paste("V", 1:ncol(X), sep="") else colnames(X)
