@@ -20,9 +20,10 @@ preprocess <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", imp
   obj <- snpStats::read.plink(file.path(dataDir, prefix), na.strings = na.strings)
 
   # Only keep polygenic SNPs and those on chr1:22
-  genotypes <- obj$genotypes[, snpStats::col.summary(obj$genotypes)$P.AA != 1 &
-                               snpStats::col.summary(obj$genotypes)$P.AB != 1 &
-                               snpStats::col.summary(obj$genotypes)$P.BB != 1 & obj$map$chromosome %in% 1:22]
+  genotypes <- obj$genotypes[, !(snpStats::col.summary(obj$genotypes)$P.AA %in% c(NA, 1)) &
+                               !(snpStats::col.summary(obj$genotypes)$P.AB %in% c(NA, 1)) &
+                               !(snpStats::col.summary(obj$genotypes)$P.BB %in% c(NA, 1)) &
+                               obj$map$chromosome %in% 1:22]
 
   cat("\nRemoving ", dim(obj$geno)[2] - dim(genotypes)[2], "SNPs that are monomorphic or outside of chromosomes 1-22.\n")
 
