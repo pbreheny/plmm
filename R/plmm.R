@@ -118,7 +118,7 @@ plmm <- function(X,
   n <- nrow(XX)
 
   ## Rotate data
-  c(SUX, SUy, eta) %<-% rotate_data(XX, y, X_for_K, intercept, rotation, eta_centerY, eta_star, V)
+  c(SUX, SUy, eta, V) %<-% rotate_data(XX, y, X_for_K, intercept, rotation, eta_centerY, eta_star, V)
   if (intercept) penalty.factor <- c(0, penalty.factor)
 
   ## Re-standardize rotated SUX
