@@ -43,18 +43,10 @@ cv.plmm <- function(X, y, X_for_K = X, cv_rotated = TRUE, ..., cluster, nfolds=1
   cv.args$centerY <- FALSE
   cv.args$centerRtY <- FALSE
   cv.args$rotation <- FALSE
-  if (cv_rotated){
-    # fit and predict using the rotated data
-    XX <- fit$X
-    yy <- fit$y
-    cv.args$intercept <- FALSE
-    cv.args$standardizeX <- FALSE
-  } else {
-    # fit and predict using the original data
-    XX <- X
-    yy <- y
-    cv.args$intercept <- TRUE
-  }
+  XX <- fit$X
+  yy <- fit$y
+  cv.args$intercept <- FALSE
+  cv.args$standardizeX <- FALSE
   cv.args$penalty.factor <- rep(c(0, 1), times = c(ncol(XX) - ncol(X_for_K), ncol(X_for_K)))
 
   n <- length(y)
@@ -69,12 +61,17 @@ cv.plmm <- function(X, y, X_for_K = X, cv_rotated = TRUE, ..., cluster, nfolds=1
     nfolds <- max(fold)
   }
 
-
   if (!missing(cluster)) {
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
-    parallel::clusterExport(cluster, c("XX", "y", "fold", "cv.args"), envir=environment())
-    parallel::clusterCall(cluster, function() library(penalizedLMM))
-    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=XX, y=yy, fold=fold, cv.args=cv.args)
+    if (cv_rotated){
+      parallel::clusterExport(cluster, c("XX", "y", "fold", "cv.args"), envir=environment())
+      parallel::clusterCall(cluster, function() library(penalizedLMM))
+      fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=XX, y=yy, fold=fold, cv.args=cv.args)
+    } else {
+      parallel::clusterExport(cluster, c("XX", "y", "X_unrotated", "y_unrotated", "fold", "cv.args"), envir=environment())
+      parallel::clusterCall(cluster, function() library(penalizedLMM))
+      fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf_predict_unrotated, XX=XX, y=yy, X_unrotated=X, y_unrotated=y, fold=fold, cv.args=cv.args)
+    }
   }
 
   for (i in 1:nfolds) {
@@ -82,7 +79,11 @@ cv.plmm <- function(X, y, X_for_K = X, cv_rotated = TRUE, ..., cluster, nfolds=1
       res <- fold.results[[i]]
     } else {
       if (trace) cat("Starting CV fold #", i, sep="","\n")
-      res <- cvf(i, XX, yy, fold, cv.args)
+      if (cv_rotated){
+        res <- cvf(i, XX, yy, fold, cv.args)
+      } else {
+        res <- cvf_predict_unrotated(i, XX, yy, X, y, fold, cv.args)
+      }
     }
     E[fold==i, 1:res$nl] <- res$loss
     Y[fold==i, 1:res$nl] <- res$yhat

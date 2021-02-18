@@ -21,6 +21,8 @@ y <- X %*% B + X0 %*% c(1) + rnorm(nn)
 # rotation = TRUE
 # returnX = TRUE
 
+# NEED TO TEST CV_ROTATED = FALSE METHOD
+
 ### cv.plmm fit should match plmm fit ---------------------------------------###
 
 plmm0 <- plmm(X,

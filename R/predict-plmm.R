@@ -22,7 +22,6 @@ predict.plmm <- function(object, X, type=c("response", "coefficients", "vars", "
   # beta <- beta[-1, , drop=FALSE]
   if (type=="nvars") return(apply(beta[-1, , drop=FALSE] !=0, 2, sum)) # don't count intercept
   if (type=="vars") return(drop(apply(beta[-1, , drop=FALSE]!=0, 2, FUN=which))) # don't count intercept
-  # eta <- sweep(X %*% beta, 2, alpha, "+")
   eta <- X %*% beta
   if (type=="response") return(drop(eta))
 }
