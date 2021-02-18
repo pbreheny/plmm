@@ -17,5 +17,6 @@ cvf <- function(i, XX, y, fold, cv.args) {
   y2 <- y[fold==i]
   yhat <- matrix(predict.plmm(fit.i, X=X2, type="response", lambda=fit.i$lambda), length(y2))
   loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(y2, yhat[,ll]))
+  if (max(loss) > 1e10) browser()
   list(loss=loss, nl=length(fit.i$lambda), yhat=yhat)
 }
