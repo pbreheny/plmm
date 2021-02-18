@@ -8,6 +8,7 @@ cv.plmm(
   X,
   y,
   X_for_K = X,
+  cv_rotated = TRUE,
   ...,
   cluster,
   nfolds = 10,
@@ -21,6 +22,7 @@ cv.plmm(
   X,
   y,
   X_for_K = X,
+  cv_rotated = TRUE,
   ...,
   cluster,
   nfolds = 10,
@@ -36,6 +38,8 @@ cv.plmm(
 \item{y}{Continuous outcome vector.}
 
 \item{X_for_K}{X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
+
+\item{cv_rotated}{Logical flag for whether cross-validation should be done by fitting and predicting using the rotated data (TRUE), or original (FALSE). Defaults to TRUE.}
 
 \item{...}{Additional arguments to plmm}
 

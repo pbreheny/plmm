@@ -24,9 +24,9 @@ rotate_data <- function(X, y, X_for_K, intercept, rotation = TRUE, eta_centerY =
       eta <- NA
     } else if (is.null(V)){
       if (eta_centerY){
-        c(d, U, eta, V) %<-% plmm_null(X_for_K, y - mean(y))
+        c(d, U, eta) %<-% plmm_null(X_for_K, y - mean(y))
       } else{
-        c(d, U, eta, V) %<-% plmm_null(X_for_K, y)
+        c(d, U, eta) %<-% plmm_null(X_for_K, y)
       }
       # still compute U and d but override eta-hat with eta_star if supplied
       if (!is.null(eta_star)) eta <- eta_star
@@ -34,7 +34,7 @@ rotate_data <- function(X, y, X_for_K, intercept, rotation = TRUE, eta_centerY =
     }
   } else {
     # no rotation option for testing
-    V <- diag(nrow(X))
+    d <- diag(nrow(X))
     U <- diag(nrow(X))
     W <- diag(nrow(X))
     eta <- NA
@@ -50,6 +50,7 @@ rotate_data <- function(X, y, X_for_K, intercept, rotation = TRUE, eta_centerY =
   val <- list(X = SUX,
               y = SUy,
               eta = eta,
-              V = V)
+              U = U,
+              d = d)
   return(val)
 }

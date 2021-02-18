@@ -14,5 +14,5 @@ plmm_null<-function(X, y){
   Uy <- crossprod(U, y)
   opt <- stats::optimize(f=plmm_nll, c(0.01, 0.99), Uy=Uy, S=d)
   eta <- opt$minimum
-  return(list(d=d, U=U, eta=eta, V = V))
+  return(list(d=d, U=U, eta=eta))
 }

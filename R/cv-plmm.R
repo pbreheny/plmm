@@ -4,6 +4,7 @@
 #' @param X Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
 #' @param y Continuous outcome vector.
 #' @param X_for_K X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.
+#' @param cv_rotated Logical flag for whether cross-validation should be done by fitting and predicting using the rotated data (TRUE), or original (FALSE). Defaults to TRUE.
 #' @param ... Additional arguments to plmm
 #' @param cluster cv.plmm can be run in parallel across a cluster using the parallel package. The cluster must be set up in advance using the makeCluster function from that package. The cluster must then be passed to cv.plmm.
 #' @param nfolds The number of cross-validation folds. Default is 10.
@@ -14,7 +15,7 @@
 #' @export
 
 
-cv.plmm <- function(X, y, X_for_K = X, ..., cluster, nfolds=10, seed, fold,
+cv.plmm <- function(X, y, X_for_K = X, cv_rotated = TRUE, ..., cluster, nfolds=10, seed, fold,
                     returnY=FALSE, trace=FALSE) {
 
   # Coercion
@@ -31,11 +32,30 @@ cv.plmm <- function(X, y, X_for_K = X, ..., cluster, nfolds=10, seed, fold,
   fit.args <- c(list(X = X, y = y, X_for_K = X_for_K), list(...))
   fit.args$returnX <- TRUE
   fit <- do.call('plmm', fit.args)
-  # fit <- plmm(X=X, y=y, X_for_K=X_for_K, fit.args)
 
-  # Extract rotated X and y and do CV on the rotated objects - this is not what ggmix does (?)
-  XX <- fit$X
-  yy <- fit$y
+  cv.args <- fit.args
+  cv.args$X <- NULL
+  cv.args$y <- NULL
+  cv.args$X_for_K <- NULL
+  cv.args$lambda <- fit$lambda
+  cv.args$warn <- FALSE
+  cv.args$convex <- FALSE
+  cv.args$centerY <- FALSE
+  cv.args$centerRtY <- FALSE
+  cv.args$rotation <- FALSE
+  if (cv_rotated){
+    # fit and predict using the rotated data
+    XX <- fit$X
+    yy <- fit$y
+    cv.args$intercept <- FALSE
+    cv.args$standardizeX <- FALSE
+  } else {
+    # fit and predict using the original data
+    XX <- X
+    yy <- y
+    cv.args$intercept <- TRUE
+  }
+  cv.args$penalty.factor <- rep(c(0, 1), times = c(ncol(XX) - ncol(X_for_K), ncol(X_for_K)))
 
   n <- length(y)
   E <- Y <- matrix(NA, nrow=n, ncol=length(fit$lambda))
@@ -49,17 +69,7 @@ cv.plmm <- function(X, y, X_for_K = X, ..., cluster, nfolds=10, seed, fold,
     nfolds <- max(fold)
   }
 
-  cv.args <- list(...)
-  cv.args$penalty.factor <- rep(c(0, 1), times = c(ncol(XX) - ncol(X_for_K), ncol(X_for_K)))
-  cv.args$lambda <- fit$lambda
-  cv.args$warn <- FALSE
-  cv.args$convex <- FALSE
-  cv.args$rotation <- FALSE
-  cv.args$intercept <- FALSE
-  cv.args$centerY <- FALSE
-  cv.args$centerRtY <- FALSE
-  cv.args$standardizeX <- FALSE # is this right? Do I need to do something special with standardization?
-  cv.args$standardizeRtX <- FALSE
+
   if (!missing(cluster)) {
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
     parallel::clusterExport(cluster, c("XX", "y", "fold", "cv.args"), envir=environment())
@@ -92,9 +102,7 @@ cv.plmm <- function(X, y, X_for_K = X, ..., cluster, nfolds=10, seed, fold,
   ## Return lambda 1se idx
   l.se <- cve[min] - cvse[min]
   u.se <- cve[min] + cvse[min]
-  # cve.se <- cve[cve >= l.se & cve <= u.se]
   within1se <- which(cve >= l.se & cve <= u.se)
-  # within1se <- which(cve %in% cve.se)
   min1se <- which.max(lambda %in% lambda[within1se])
 
   # Bias correction

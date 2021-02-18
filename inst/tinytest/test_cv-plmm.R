@@ -35,6 +35,8 @@ plmm0 <- plmm(X,
 
 cv_plmm0 <- cv.plmm(X,
                    y,
+                   X,
+                   cv_rotated = TRUE,
                    penalty = "lasso",
                    alpha = 1,
                    lambda = plmm0$lambda,
@@ -43,7 +45,6 @@ cv_plmm0 <- cv.plmm(X,
                    rotation = TRUE,
                    returnX = TRUE,
                    nfolds = 4)
-
 
 cv_plmm1 <- cv.plmm(X,
                     y,
