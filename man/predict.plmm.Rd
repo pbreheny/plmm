@@ -6,23 +6,41 @@
 \usage{
 \method{predict}{plmm}(
   object,
-  X,
-  type = c("response", "coefficients", "vars", "nvars"),
+  newX,
+  type = c("response", "individual", "coefficients", "vars", "nvars"),
   lambda,
   which = 1:length(object$lambda),
+  X,
+  y,
+  eigenvectors,
+  eigenvalues,
+  eta,
+  covariance,
   ...
 )
 }
 \arguments{
 \item{object}{An object of class "plmm."}
 
-\item{X}{Design matrix used for computing predicted values if requested.}
+\item{newX}{Design matrix used for computing predicted values if requested.}
 
-\item{type}{a character argument indicating what should be returned.}
+\item{type}{A character argument indicating what should be returned.}
 
 \item{lambda}{A numeric vector of lambda values.}
 
 \item{which}{Vector of lambda indices for which coefficients to return.}
+
+\item{X}{Optional argument. Original design matrix (not including intercept column) from object fit. Required if \code{type == 'individual'}.}
+
+\item{y}{Optional argument. Original continuous outcome vector from object fit. Required if \code{type == 'individual'}.}
+
+\item{eigenvectors}{Optional argument. Eigenvectors from the similarity matrix from object fit.  Required if \code{type == 'individual'}.}
+
+\item{eigenvalues}{Optional argument. Eigenvalues from the similarity matrix from object fit. Required if \code{type == 'individual'}.}
+
+\item{eta}{Optional argument. Estimated $eta$ value from object fit. Required if \code{type == 'individual'}.}
+
+\item{covariance}{Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'individual'}.}
 
 \item{...}{Additional arguments.}
 }

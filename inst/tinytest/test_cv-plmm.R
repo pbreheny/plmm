@@ -21,8 +21,6 @@ y <- X %*% B + X0 %*% c(1) + rnorm(nn)
 # rotation = TRUE
 # returnX = TRUE
 
-# NEED TO TEST CV_ROTATED = FALSE METHOD
-
 ### cv.plmm fit should match plmm fit ---------------------------------------###
 
 plmm0 <- plmm(X,
@@ -38,7 +36,7 @@ plmm0 <- plmm(X,
 cv_plmm0 <- cv.plmm(X,
                    y,
                    X,
-                   cv_rotated = TRUE,
+                   type = 'response',
                    penalty = "lasso",
                    alpha = 1,
                    lambda = plmm0$lambda,
@@ -47,6 +45,19 @@ cv_plmm0 <- cv.plmm(X,
                    rotation = TRUE,
                    returnX = TRUE,
                    nfolds = 4)
+
+cv_plmm00 <- cv.plmm(X,
+                    y,
+                    X,
+                    type = 'individual',
+                    penalty = "lasso",
+                    alpha = 1,
+                    lambda = plmm0$lambda,
+                    standardizeX = TRUE,
+                    standardizeRtX = FALSE,
+                    rotation = TRUE,
+                    returnX = TRUE,
+                    nfolds = 4)
 
 cv_plmm1 <- cv.plmm(X,
                     y,
@@ -61,11 +72,13 @@ cv_plmm1 <- cv.plmm(X,
                     seed = 7)
 
 expect_equivalent(coef(plmm0), coef(cv_plmm0$fit), tol = 1e-5) # same overall fit?
+expect_equivalent(coef(plmm0), coef(cv_plmm00$fit), tol = 1e-5) # same overall fit?
 expect_equivalent(plmm0$lambda, cv_plmm1$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
 
-# cl <- parallel::makeCluster(4)
+# cl <- parallel::makeCluster(2)
 # cv_plmm2 <- cv.plmm(X,
 #                     y,
+#                     type = 'response',
 #                     penalty = "lasso",
 #                     alpha = 1,
 #                     nlambda = 5,

@@ -218,7 +218,6 @@ plmm <- function(X,
     val$y <- SUy
     val$eigenvectors <- U
     val$eigenvalues <- d
-    val$XX <- XX
   }
   return(val)
 }

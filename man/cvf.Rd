@@ -4,7 +4,7 @@
 \alias{cvf}
 \title{Cross-validation internal function for cv.plmm}
 \usage{
-cvf(i, XX, y, fold, cv.args)
+cvf(i, XX, y, fold, cv.args, predict.args)
 }
 \arguments{
 \item{i}{Fold number to be excluded from fit.}
@@ -16,6 +16,8 @@ cvf(i, XX, y, fold, cv.args)
 \item{fold}{n-length vector of fold-assignments.}
 
 \item{cv.args}{List of additional arguments to be passed to plmm.}
+
+\item{predict.args}{List of arguments required for prediction. Varies according to prediction type (response vs. individual).}
 }
 \description{
 Internal function for cv.plmm which calls plmm on a fold subset of the original data.

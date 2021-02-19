@@ -1,10 +1,10 @@
 #' Cross-validation for plmm
 #'
 #' Performs k-fold cross validation for lasso-, MCP-, or SCAD-penalized penalized linear mixed models over a grid of values for the regularization parameter lambda.
-#' @param X Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
-#' @param y Continuous outcome vector.
+#' @param X Design matrix for model fitting. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
+#' @param y Continuous outcome vector for model fitting.
 #' @param X_for_K X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.
-#' @param cv_rotated Logical flag for whether cross-validation should be done by fitting and predicting using the rotated data (TRUE), or original (FALSE). Defaults to TRUE.
+#' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
 #' @param ... Additional arguments to plmm
 #' @param cluster cv.plmm can be run in parallel across a cluster using the parallel package. The cluster must be set up in advance using the makeCluster function from that package. The cluster must then be passed to cv.plmm.
 #' @param nfolds The number of cross-validation folds. Default is 10.
@@ -15,10 +15,11 @@
 #' @export
 
 
-cv.plmm <- function(X, y, X_for_K = X, cv_rotated = TRUE, ..., cluster, nfolds=10, seed, fold,
+cv.plmm <- function(X, y, X_for_K = X, type = c('response', 'individual'), ..., cluster, nfolds=10, seed, fold,
                     returnY=FALSE, trace=FALSE) {
 
   # Coercion
+  type <- match.arg(type)
   if (!is.matrix(X)) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
@@ -28,26 +29,31 @@ cv.plmm <- function(X, y, X_for_K = X, cv_rotated = TRUE, ..., cluster, nfolds=1
     tmp <- try(y <- as.double(y), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("y must be numeric or able to be coerced to numeric", call.=FALSE)
   }
+  XX <- X # for cluster
 
   fit.args <- c(list(X = X, y = y, X_for_K = X_for_K), list(...))
-  fit.args$returnX <- TRUE
   fit <- do.call('plmm', fit.args)
 
   cv.args <- fit.args
+  predict.args <- list()
   cv.args$X <- NULL
   cv.args$y <- NULL
   cv.args$X_for_K <- NULL
-  cv.args$lambda <- fit$lambda
-  cv.args$warn <- FALSE
-  cv.args$convex <- FALSE
-  cv.args$centerY <- FALSE
-  cv.args$centerRtY <- FALSE
-  cv.args$rotation <- FALSE
-  XX <- fit$X
-  yy <- fit$y
-  cv.args$intercept <- FALSE
-  cv.args$standardizeX <- FALSE
-  cv.args$penalty.factor <- rep(c(0, 1), times = c(ncol(XX) - ncol(X_for_K), ncol(X_for_K)))
+  cv.args$lambda <- predict.args$lambda <- fit$lambda
+  cv.args$eta_star <- fit$eta
+  if (type == 'individual') cv.args$returnX <- TRUE
+  predict.args$type <- type
+
+  # cv.args$warn <- FALSE
+  # cv.args$convex <- FALSE
+  # cv.args$centerY <- FALSE
+  # cv.args$centerRtY <- FALSE
+  # cv.args$rotation <- FALSE
+  # XX <- fit$X
+  # yy <- fit$y
+  # cv.args$intercept <- FALSE
+  # cv.args$standardizeX <- FALSE
+  # cv.args$penalty.factor <- rep(c(0, 1), times = c(ncol(XX) - ncol(X_for_K), ncol(X_for_K)))
 
   n <- length(y)
   E <- Y <- matrix(NA, nrow=n, ncol=length(fit$lambda))
@@ -63,15 +69,9 @@ cv.plmm <- function(X, y, X_for_K = X, cv_rotated = TRUE, ..., cluster, nfolds=1
 
   if (!missing(cluster)) {
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
-    if (cv_rotated){
-      parallel::clusterExport(cluster, c("XX", "y", "fold", "cv.args"), envir=environment())
-      parallel::clusterCall(cluster, function() library(penalizedLMM))
-      fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=XX, y=yy, fold=fold, cv.args=cv.args)
-    } else {
-      parallel::clusterExport(cluster, c("XX", "y", "X_unrotated", "y_unrotated", "fold", "cv.args"), envir=environment())
-      parallel::clusterCall(cluster, function() library(penalizedLMM))
-      fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf_predict_unrotated, XX=XX, y=yy, X_unrotated=X, y_unrotated=y, fold=fold, cv.args=cv.args)
-    }
+    parallel::clusterExport(cluster, c("XX", "y", "fold", "cv.args", "predict.args"), envir=environment())
+    parallel::clusterCall(cluster, function() library(penalizedLMM))
+    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=XX, y=y, fold=fold, cv.args=cv.args, predict.args=predict.args)
   }
 
   for (i in 1:nfolds) {
@@ -79,11 +79,7 @@ cv.plmm <- function(X, y, X_for_K = X, cv_rotated = TRUE, ..., cluster, nfolds=1
       res <- fold.results[[i]]
     } else {
       if (trace) cat("Starting CV fold #", i, sep="","\n")
-      if (cv_rotated){
-        res <- cvf(i, XX, yy, fold, cv.args)
-      } else {
-        res <- cvf_predict_unrotated(i, XX, yy, X, y, fold, cv.args)
-      }
+      res <- cvf(i, X, y, fold, cv.args, predict.args)
     }
     E[fold==i, 1:res$nl] <- res$loss
     Y[fold==i, 1:res$nl] <- res$yhat

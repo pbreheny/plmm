@@ -28,6 +28,7 @@ rotate_data <- function(X, y, X_for_K, intercept, rotation = TRUE, eta_centerY =
       } else{
         c(d, U, eta) %<-% plmm_null(X_for_K, y)
       }
+      # print(eta)
       # still compute U and d but override eta-hat with eta_star if supplied
       if (!is.null(eta_star)) eta <- eta_star
       W <- diag((eta * d + (1 - eta))^(-1/2))
