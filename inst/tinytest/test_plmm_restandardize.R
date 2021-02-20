@@ -19,11 +19,11 @@ plmm1 <- plmm(ncvreg::std(X),
               returnX = TRUE)
 
 if (nrow(X) > ncol(X)){
-  xxx <- scale(plmm1$X[,-1], center = FALSE) * (nn - 1) / nn
-  x0 <- plmm1$X[,1]
+  xxx <- scale(plmm1$SUX[,-1], center = FALSE) * (nn - 1) / nn
+  x0 <- plmm1$SUX[,1]
   m <- attr(xxx, "center")
   s <- attr(xxx, "scale")
-  b <- coef(lm(plmm1$y ~ 0 + x0 + xxx))
+  b <- coef(lm(plmm1$SUy ~ 0 + x0 + xxx))
   bb <- b[-1]/s
   b0 <- b[1]
   expect_equivalent(coef(plmm1), c(b0, bb), tol = 1e-3)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot-cv-plmm.R
 \name{plot.cv.plmm}
 \alias{plot.cv.plmm}
-\title{Plot method for "cv.plmm" class}
+\title{Plot method for cv.plmm class}
 \usage{
 \method{plot}{cv.plmm}(
   x,
@@ -15,7 +15,7 @@
 )
 }
 \arguments{
-\item{x}{An object of class "cv.plmm"}
+\item{x}{An object of class cv.plmm}
 
 \item{log.l}{Logical to indicate the plot should be returned on the natural log scale. Defaults to \code{log.l = FALSE}.}
 
@@ -30,5 +30,5 @@
 \item{...}{Additional arguments.}
 }
 \description{
-Plot method for "cv.plmm" class
+Plot method for cv.plmm class
 }

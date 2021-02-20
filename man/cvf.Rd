@@ -4,20 +4,22 @@
 \alias{cvf}
 \title{Cross-validation internal function for cv.plmm}
 \usage{
-cvf(i, XX, y, fold, cv.args, predict.args)
+cvf(i, XX, XX_for_K = XX, y, fold, type, cv.args)
 }
 \arguments{
 \item{i}{Fold number to be excluded from fit.}
 
-\item{XX}{Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.}
+\item{XX}{Design matrix. May include clinical covariates and other non-SNP data. If this is the case, XX_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.}
 
-\item{y}{Continuous outcome vector.}
+\item{XX_for_K}{X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
+
+\item{y}{Original continuous outcome vector.}
 
 \item{fold}{n-length vector of fold-assignments.}
 
-\item{cv.args}{List of additional arguments to be passed to plmm.}
+\item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP).}
 
-\item{predict.args}{List of arguments required for prediction. Varies according to prediction type (response vs. individual).}
+\item{cv.args}{List of additional arguments to be passed to plmm.}
 }
 \description{
 Internal function for cv.plmm which calls plmm on a fold subset of the original data.

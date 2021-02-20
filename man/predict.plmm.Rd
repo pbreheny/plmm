@@ -2,7 +2,7 @@
 % Please edit documentation in R/predict-plmm.R
 \name{predict.plmm}
 \alias{predict.plmm}
-\title{Predict method for "plmm" class}
+\title{Predict method for plmm class}
 \usage{
 \method{predict}{plmm}(
   object,
@@ -10,17 +10,17 @@
   type = c("response", "individual", "coefficients", "vars", "nvars"),
   lambda,
   which = 1:length(object$lambda),
-  X,
+  XX,
   y,
-  eigenvectors,
-  eigenvalues,
+  U,
+  S,
   eta,
   covariance,
   ...
 )
 }
 \arguments{
-\item{object}{An object of class "plmm."}
+\item{object}{An object of class plmm.}
 
 \item{newX}{Design matrix used for computing predicted values if requested.}
 
@@ -30,20 +30,20 @@
 
 \item{which}{Vector of lambda indices for which coefficients to return.}
 
-\item{X}{Optional argument. Original design matrix (not including intercept column) from object fit. Required if \code{type == 'individual'}.}
+\item{XX}{Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'individual'}.}
 
-\item{y}{Optional argument. Original continuous outcome vector from object fit. Required if \code{type == 'individual'}.}
+\item{y}{Optional argument. Original continuous outcome vector from object. Required if \code{type == 'individual'}.}
 
-\item{eigenvectors}{Optional argument. Eigenvectors from the similarity matrix from object fit.  Required if \code{type == 'individual'}.}
+\item{U}{Optional argument. Eigenvectors from the similarity matrix from object. Required if \code{type == 'individual'}.}
 
-\item{eigenvalues}{Optional argument. Eigenvalues from the similarity matrix from object fit. Required if \code{type == 'individual'}.}
+\item{S}{Optional argument. Eigenvalues from the similarity matrix from object. Required if \code{type == 'individual'}.}
 
-\item{eta}{Optional argument. Estimated $eta$ value from object fit. Required if \code{type == 'individual'}.}
+\item{eta}{Optional argument. Estimated $eta$ value from object. Required if \code{type == 'individual'}.}
 
 \item{covariance}{Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'individual'}.}
 
 \item{...}{Additional arguments.}
 }
 \description{
-Predict method for "plmm" class
+Predict method for plmm class
 }

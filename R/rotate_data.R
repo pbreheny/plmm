@@ -14,28 +14,28 @@
 
 rotate_data <- function(X, y, X_for_K, intercept, rotation = TRUE, eta_centerY = FALSE, eta_star = NULL, V = NULL){
   # Coersion
-  d <- U <- UU <- eta <- NULL
+  S <- U <- UU <- eta <- NULL
 
-  ## Calculate U, d, eta
+  ## Calculate U, S, eta
   if (rotation){
     if (!is.null(V) && dim(V)[1] == nrow(X)){
-      c(d, U, UU) %<-% svd(V)
-      W <- diag(1/sqrt(d))
+      c(S, U, UU) %<-% svd(V)
+      W <- diag(1/sqrt(S))
       eta <- NA
     } else if (is.null(V)){
       if (eta_centerY){
-        c(d, U, eta) %<-% plmm_null(X_for_K, y - mean(y))
+        c(S, U, eta) %<-% plmm_null(X_for_K, y - mean(y))
       } else{
-        c(d, U, eta) %<-% plmm_null(X_for_K, y)
+        c(S, U, eta) %<-% plmm_null(X_for_K, y)
       }
       # print(eta)
-      # still compute U and d but override eta-hat with eta_star if supplied
+      # still compute U and S but override eta-hat with eta_star if supplied
       if (!is.null(eta_star)) eta <- eta_star
-      W <- diag((eta * d + (1 - eta))^(-1/2))
+      W <- diag((eta * S + (1 - eta))^(-1/2))
     }
   } else {
     # no rotation option for testing
-    d <- diag(nrow(X))
+    S <- diag(nrow(X))
     U <- diag(nrow(X))
     W <- diag(nrow(X))
     eta <- NA
@@ -48,10 +48,10 @@ rotate_data <- function(X, y, X_for_K, intercept, rotation = TRUE, eta_centerY =
     SUX <- W %*% crossprod(U, X)
   }
   SUy <- drop(W %*% crossprod(U, y))
-  val <- list(X = SUX,
-              y = SUy,
+  val <- list(SUX = SUX,
+              SUy = SUy,
               eta = eta,
               U = U,
-              d = d)
+              S = S)
   return(val)
 }

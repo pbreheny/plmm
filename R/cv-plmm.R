@@ -29,31 +29,16 @@ cv.plmm <- function(X, y, X_for_K = X, type = c('response', 'individual'), ..., 
     tmp <- try(y <- as.double(y), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("y must be numeric or able to be coerced to numeric", call.=FALSE)
   }
-  XX <- X # for cluster
 
   fit.args <- c(list(X = X, y = y, X_for_K = X_for_K), list(...))
   fit <- do.call('plmm', fit.args)
 
-  cv.args <- fit.args
-  predict.args <- list()
-  cv.args$X <- NULL
-  cv.args$y <- NULL
-  cv.args$X_for_K <- NULL
-  cv.args$lambda <- predict.args$lambda <- fit$lambda
+  cv.args <- list(...)
+  cv.args$warn <- FALSE
+  cv.args$convex <- FALSE
+  cv.args$lambda <- fit$lambda
   cv.args$eta_star <- fit$eta
   if (type == 'individual') cv.args$returnX <- TRUE
-  predict.args$type <- type
-
-  # cv.args$warn <- FALSE
-  # cv.args$convex <- FALSE
-  # cv.args$centerY <- FALSE
-  # cv.args$centerRtY <- FALSE
-  # cv.args$rotation <- FALSE
-  # XX <- fit$X
-  # yy <- fit$y
-  # cv.args$intercept <- FALSE
-  # cv.args$standardizeX <- FALSE
-  # cv.args$penalty.factor <- rep(c(0, 1), times = c(ncol(XX) - ncol(X_for_K), ncol(X_for_K)))
 
   n <- length(y)
   E <- Y <- matrix(NA, nrow=n, ncol=length(fit$lambda))
@@ -69,9 +54,9 @@ cv.plmm <- function(X, y, X_for_K = X, type = c('response', 'individual'), ..., 
 
   if (!missing(cluster)) {
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
-    parallel::clusterExport(cluster, c("XX", "y", "fold", "cv.args", "predict.args"), envir=environment())
+    parallel::clusterExport(cluster, c("X", "X_for_K", "y", "fold", "type", "cv.args"), envir=environment())
     parallel::clusterCall(cluster, function() library(penalizedLMM))
-    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=XX, y=y, fold=fold, cv.args=cv.args, predict.args=predict.args)
+    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=X, XX_for_K=X_for_K, y=y, fold=fold, type=type, cv.args=cv.args)
   }
 
   for (i in 1:nfolds) {
@@ -79,8 +64,9 @@ cv.plmm <- function(X, y, X_for_K = X, type = c('response', 'individual'), ..., 
       res <- fold.results[[i]]
     } else {
       if (trace) cat("Starting CV fold #", i, sep="","\n")
-      res <- cvf(i, X, y, fold, cv.args, predict.args)
+      res <- cvf(i, X, X_for_K, y, fold, type, cv.args)
     }
+    # browser()
     E[fold==i, 1:res$nl] <- res$loss
     Y[fold==i, 1:res$nl] <- res$yhat
   }

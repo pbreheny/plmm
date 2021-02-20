@@ -115,7 +115,7 @@ plmm5 <- plmm(ncvreg::std(X),
               returnX = TRUE)
 
 if (nrow(X) > ncol(X)){
-  ols_soln <- as.numeric(solve(t(plmm5$X) %*% plmm5$X) %*% t(plmm5$X) %*% plmm5$y)
+  ols_soln <- as.numeric(solve(t(plmm5$SUX) %*% plmm5$SUX) %*% t(plmm5$SUX) %*% plmm5$SUy)
   expect_equivalent(coef(plmm5), ols_soln, tol = 1e-3)
 }
 
@@ -149,7 +149,7 @@ plmm7 <- plmm(ncvreg::std(cbind(X0, X)),
               returnX = TRUE)
 
 if (nrow(cbind(X0, X)) > ncol(cbind(X0, X))){
-  ols_soln <- as.numeric(solve(t(plmm7$X) %*% plmm7$X) %*% t(plmm7$X) %*% plmm7$y)
+  ols_soln <- as.numeric(solve(t(plmm7$SUX) %*% plmm7$SUX) %*% t(plmm7$SUX) %*% plmm7$SUy)
   expect_equivalent(coef(plmm7), ols_soln, tol = 1e-3)
 }
 

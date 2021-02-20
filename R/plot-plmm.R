@@ -1,6 +1,6 @@
-#' Plot method for "plmm" class
+#' Plot method for plmm class
 #'
-#' @param x An object of class "plmm"
+#' @param x An object of class plmm
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. \code{alpha=1} is equivalent to MCP/SCAD penalty, while \code{alpha=0} would be equivalent to ridge regression. However, \code{alpha=0} is not supported; alpha may be arbitrarily small, but not exactly 0.
 #' @param log.l Logical to indicate the plot should be returned on the natural log scale. Defaults to \code{log.l = FALSE}.
 #' @param shade Logical to indicate whether a local nonconvex region should be shaded. Defaults to TRUE.

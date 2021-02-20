@@ -1,6 +1,6 @@
-#' Plot method for "cv.plmm" class
+#' Plot method for cv.plmm class
 #'
-#' @param x An object of class "cv.plmm"
+#' @param x An object of class cv.plmm
 #' @param log.l Logical to indicate the plot should be returned on the natural log scale. Defaults to \code{log.l = FALSE}.
 #' @param type Type of plot to return. Defaults to "cve."
 #' @param selected Logical to indicate which variables should be plotted. Defaults to TRUE.

@@ -59,7 +59,7 @@ plmm <- function(X,
                  ...) {
 
   # Coersion
-  U <- d <- SUX <- SUy <- eta <- NULL
+  U <- S <- SUX <- SUy <- eta <- NULL
   penalty <- match.arg(penalty)
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   if (!inherits(X, "matrix")) {
@@ -118,7 +118,7 @@ plmm <- function(X,
   n <- nrow(XX)
 
   ## Rotate data
-  c(SUX, SUy, eta, U, d) %<-% rotate_data(XX, y, X_for_K, intercept, rotation, eta_centerY, eta_star, V)
+  c(SUX, SUy, eta, U, S) %<-% rotate_data(XX, y, X_for_K, intercept, rotation, eta_centerY, eta_star, V)
   if (intercept) penalty.factor <- c(0, penalty.factor)
 
   ## Re-standardize rotated SUX
@@ -214,10 +214,10 @@ plmm <- function(X,
     }
   }
   if (returnX) {
-    val$X <- SUX
-    val$y <- SUy
-    val$eigenvectors <- U
-    val$eigenvalues <- d
+    val$SUX <- SUX
+    val$SUy <- SUy
+    val$U <- U
+    val$S <- S
   }
   return(val)
 }

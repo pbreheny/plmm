@@ -2,12 +2,12 @@
 % Please edit documentation in R/plot-plmm.R
 \name{plot.plmm}
 \alias{plot.plmm}
-\title{Plot method for "plmm" class}
+\title{Plot method for plmm class}
 \usage{
 \method{plot}{plmm}(x, alpha = 1, log.l = FALSE, shade = TRUE, col, ...)
 }
 \arguments{
-\item{x}{An object of class "plmm"}
+\item{x}{An object of class plmm}
 
 \item{alpha}{Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. \code{alpha=1} is equivalent to MCP/SCAD penalty, while \code{alpha=0} would be equivalent to ridge regression. However, \code{alpha=0} is not supported; alpha may be arbitrarily small, but not exactly 0.}
 
@@ -20,5 +20,5 @@
 \item{...}{Additional arguments.}
 }
 \description{
-Plot method for "plmm" class
+Plot method for plmm class
 }
