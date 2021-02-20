@@ -56,7 +56,7 @@ cv.plmm <- function(X, y, X_for_K = X, type = c('response', 'individual'), ..., 
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
     parallel::clusterExport(cluster, c("X", "X_for_K", "y", "fold", "type", "cv.args"), envir=environment())
     parallel::clusterCall(cluster, function() library(penalizedLMM))
-    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=X, XX_for_K=X_for_K, y=y, fold=fold, type=type, cv.args=cv.args)
+    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf2, XX=X, XX_for_K=X_for_K, y=y, fold=fold, type=type, cv.args=cv.args)
   }
 
   for (i in 1:nfolds) {
@@ -64,7 +64,7 @@ cv.plmm <- function(X, y, X_for_K = X, type = c('response', 'individual'), ..., 
       res <- fold.results[[i]]
     } else {
       if (trace) cat("Starting CV fold #", i, sep="","\n")
-      res <- cvf(i, X, X_for_K, y, fold, type, cv.args)
+      res <- cvf2(i, X, X_for_K, y, fold, type, cv.args)
     }
     # browser()
     E[fold==i, 1:res$nl] <- res$loss

@@ -4,8 +4,8 @@
 # devtools::load_all(".")
 
 
-nn <- 50
-pp <- 4
+nn <- 5
+pp <- 3
 p1 <- 1
 set.seed(7)
 X <- matrix(rnorm(nn * pp), nrow = nn, ncol = pp)
@@ -57,7 +57,7 @@ cv_plmm00 <- cv.plmm(X,
                     standardizeRtX = FALSE,
                     rotation = TRUE,
                     returnX = TRUE,
-                    nfolds = 4)
+                    nfolds = 2)
 
 cv_plmm1 <- cv.plmm(X,
                     y,
@@ -74,20 +74,24 @@ cv_plmm1 <- cv.plmm(X,
 expect_equivalent(coef(plmm0), coef(cv_plmm0$fit), tol = 1e-5) # same overall fit?
 expect_equivalent(coef(plmm0), coef(cv_plmm00$fit), tol = 1e-5) # same overall fit?
 expect_equivalent(plmm0$lambda, cv_plmm1$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
-#
-# cl <- parallel::makeCluster(2)
-# cv_plmm2 <- cv.plmm(X,
-#                     y,
-#                     type = 'individual',
-#                     penalty = "lasso",
-#                     alpha = 1,
-#                     nlambda = 5,
-#                     standardizeX = TRUE,
-#                     rotation = TRUE,
-#                     returnX = TRUE,
-#                     fold =cv_plmm1$fold,
-#                     cluster = cl)
-# parallel::stopCluster(cl)
+
+
+# still can't get parallel working for individual keep getting the error "requires numeric/complex matrix/vector arguments"
+# matrix multiplication works in folds but not parallel (?)
+
+cl <- parallel::makeCluster(2)
+cv_plmm2 <- cv.plmm(X,
+                    y,
+                    type = 'response',
+                    penalty = "lasso",
+                    alpha = 1,
+                    nlambda = 5,
+                    standardizeX = TRUE,
+                    rotation = TRUE,
+                    returnX = TRUE,
+                    fold =cv_plmm1$fold,
+                    cluster = cl)
+parallel::stopCluster(cl)
 #
 # cv_plmm2 <- cv.plmm(X,
 #                     y,
@@ -102,11 +106,11 @@ expect_equivalent(plmm0$lambda, cv_plmm1$lambda, tol = 1e-5) # are they both com
 #                     fold =cv_plmm1$fold,
 #                     seed = 7)
 #
-# ### make sure parallel method is equivalent to regular plmm
-# expect_equivalent(coef(plmm0), coef(cv_plmm2$fit), tol = 1e-5) # same overall fit?
-# expect_equivalent(plmm0$lambda, cv_plmm2$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
-#
-# ### make sure parallel method is equivalent to cv-plmm
-# expect_equivalent(coef(cv_plmm1$fit), coef(cv_plmm2$fit), tol = 1e-5) # same overall fit?
-# expect_equivalent(cv_plmm1$lambda, cv_plmm2$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
-# expect_equivalent(cv_plmm1$cve, cv_plmm2$cve, tol = 1e-3) #  slight differences if in loop or parallel
+### make sure parallel method is equivalent to regular plmm
+expect_equivalent(coef(plmm0), coef(cv_plmm2$fit), tol = 1e-5) # same overall fit?
+expect_equivalent(plmm0$lambda, cv_plmm2$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
+
+### make sure parallel method is equivalent to cv-plmm
+expect_equivalent(coef(cv_plmm1$fit), coef(cv_plmm2$fit), tol = 1e-5) # same overall fit?
+expect_equivalent(cv_plmm1$lambda, cv_plmm2$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
+expect_equivalent(cv_plmm1$cve, cv_plmm2$cve, tol = 1e-3) #  slight differences if in loop or parallel

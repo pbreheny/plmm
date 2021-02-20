@@ -28,7 +28,6 @@ predict.plmm <- function(object, newX, type=c("response", "individual", "coeffic
      stop('Original XX, y, U, S, eta, and covariance must be supplied if type is individual')
    }
    # can't just use the rotated y and x here - need to scale by inverse of V, not sqrt(V)
-   # make sure this vector is the correct length if singular
    ranef <- covariance %*% U %*% diag((1 + eta * (S - 1))^(-1)) %*% t(U) %*% (y - cbind(1, XX) %*% beta)
    # print(eta)
    blup <- Xbeta + ranef
