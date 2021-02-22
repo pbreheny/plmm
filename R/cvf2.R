@@ -12,12 +12,17 @@
 
 cvf2 <- function(i, XX, XX_for_K=XX, y, fold, type, cv.args) {
   cv.args$X <- XX[fold!=i, , drop=FALSE]
-  cv.args$X_for_K <- XX_for_K[fold!=i, , drop=FALSE]
   cv.args$y <- y[fold!=i]
+  cv.args$X_for_K <- XX_for_K[fold!=i, , drop=FALSE]
+
+  # if V is supplied this overrides the estimation of a similarity matrix from X_for_K
+  if (!is.null(cv.args$V)){
+    V <- cv.args$V
+    cv.args$V <- V[fold!=i, fold!=i, drop=FALSE]
+  }
   fit.i <- do.call("plmm", cv.args)
 
   X2 <- XX[fold==i, , drop=FALSE]
-  X_for_K2 <- XX_for_K[fold==i, , drop=FALSE]
   y2 <- y[fold==i]
 
   beta <- coef.plmm(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
@@ -29,11 +34,18 @@ cvf2 <- function(i, XX, XX_for_K=XX, y, fold, type, cv.args) {
     y1 <- matrix(rep(cv.args$y, ncol(beta)), nrow(X1))
     U <- fit.i$U
     S <- fit.i$S
-    eta <- fit.i$eta
-    covariance <- tcrossprod(ncvreg::std(X_for_K2), ncvreg::std(cv.args$X_for_K))/ncol(X_for_K2)
     D_inv <- diag(nrow(U))
-    diag(D_inv) <- (1 + eta * (S - 1))^(-1)
-    # test <- t(as.matrix(U)) %*% as.matrix((y1 - X1 %*% beta)) # issues with U and covariance in parallel
+    # if V is supplied use this to compute covariance, D-inv, otherwise estimate using X_for_K
+    if (!is.null(cv.args$V)){
+      diag(D_inv) <- (S)^(-1)
+      covariance <- V[fold == i, fold != i, drop = FALSE]
+    } else {
+      eta <- fit.i$eta
+      diag(D_inv) <- (1 + eta * (S - 1))^(-1)
+      X_for_K2 <- XX_for_K[fold==i, , drop=FALSE]
+      covariance <- tcrossprod(ncvreg::std(X_for_K2), ncvreg::std(cv.args$X_for_K))/ncol(X_for_K2)
+    }
+     # test <- t(as.matrix(U)) %*% as.matrix((y1 - X1 %*% beta)) # issues with U and covariance in parallel
     ranef <- covariance %*% U %*% D_inv %*% t(U) %*% (y1 - X1 %*% beta)
     yhat <- Xbeta + ranef
   }
