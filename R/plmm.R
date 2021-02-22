@@ -110,8 +110,10 @@ plmm <- function(X,
     attributes(XX)$center <- rep(0, ncol(XX))
     attributes(XX)$scale <- rep(1, ncol(XX))
     attributes(XX)$nonsingular <- 1:ncol(XX)
+    # X_ns <- attr(XX, "nonsingular") # shouldn't need this value in this scenario
   }
   ns <- attr(XX, "nonsingular")
+
   penalty.factor <- penalty.factor[ns]
 
   p <- ncol(XX)
@@ -121,23 +123,30 @@ plmm <- function(X,
   c(SUX, SUy, eta, U, S) %<-% rotate_data(XX, y, X_for_K, intercept, rotation, eta_centerY, eta_star, V)
   if (intercept) penalty.factor <- c(0, penalty.factor)
 
+  # if (ncol(X) != ncol(XX)) browser()
+
   ## Re-standardize rotated SUX
   if (standardizeRtX){
     if (intercept){
       SUXX_noInt <- scale(SUX[,-1, drop = FALSE], center = FALSE) * (n - 1) / n
-      attributes(SUXX_noInt)$nonsingular <- ns
+      attributes(SUXX_noInt)$nonsingular <- attributes(ncvreg::std(SUX[,-1, drop = FALSE]))$nonsingular
       SUXX <- cbind(SUX[,1, drop = FALSE], SUXX_noInt)
     } else {
       SUXX_noInt <- scale(SUX, center = FALSE) * (n - 1) / n
-      attributes(SUXX_noInt)$nonsingular <- ns
+      attributes(SUXX_noInt)$nonsingular <- attributes(ncvreg::std(SUX))$nonsingular
       SUXX <- SUXX_noInt
     }
     attributes(SUXX)$scale <- attr(SUXX_noInt, 'scale')
     attributes(SUXX)$nonsingular <- attr(SUXX_noInt, 'nonsingular')
   } else {
     SUXX <- SUX
-    attributes(SUXX)$scale <- rep(1, ncol(SUX))
-    attributes(SUXX)$nonsingular <- ns
+    if (intercept){
+      attributes(SUXX)$scale <- rep(1, ncol(SUX) - 1)
+      attributes(SUXX)$nonsingular <- 1:(ncol(SUX) - 1)
+    } else {
+      attributes(SUXX)$scale <- rep(1, ncol(SUX))
+      attributes(SUXX)$nonsingular <- 1:ncol(SUX)
+    }
   }
 
   ## Re-center rotated y
@@ -182,10 +191,10 @@ plmm <- function(X,
   convex.min <- if (convex) convexMin(b, SUXX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', penalty.factor) else NULL
 
   # unscale transformed data
-  bb <- unscale(b[, ind, drop = FALSE], SUXX, intercept)
+  bb <- unscale(b[, ind, drop = FALSE], SUX, SUXX, intercept)
 
   # unstandardize original data
-  beta <- unstandardize(bb, XX, intercept)
+  beta <- unstandardize(bb, X, XX, intercept)
 
   varnames <- if (is.null(colnames(X))) paste("V", 1:ncol(X), sep="") else colnames(X)
   if (intercept) varnames <- c("(Intercept)", varnames)

@@ -4,12 +4,14 @@
 \alias{unscale}
 \title{Unscale coefficient values}
 \usage{
-unscale(b, X, intercept = TRUE)
+unscale(b, X, XX, intercept = TRUE)
 }
 \arguments{
-\item{b}{p x nlambda matrix of coefficient path values.}
+\item{b}{p x nlambda matrix of standardized coefficient path values.}
 
-\item{X}{Design matrix which \emph{includes} the intercept column if present. May include clinical covariates and other non-SNP data. Must include the attributes 'center', 'scale', and 'nonsingular' corresponding to non-intercept variables.}
+\item{X}{Unscaled, rotated design matrix \emph{with} an intercept column if present. Necessary for properly defining the dimensions of beta in cases where singular columns are present.}
+
+\item{XX}{Scaled, rotated design matrix. Must include the attributes 'center', 'scale', and 'nonsingular' corresponding to non-intercept variables.}
 
 \item{intercept}{Logical flag for whether an intercept row is included in b, that is, a coefficient which accounts for the mean of the original y value on its rotated scale.}
 }
