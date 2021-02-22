@@ -13,6 +13,7 @@ unscale <- function(b, X, intercept = TRUE) {
     beta[1,] <- b[1, , drop = FALSE]
     b <- b[-1, , drop=FALSE]
     bb <- b / attr(X, 'scale')[ns]
+    if (dim(beta[1 + ns,, drop = FALSE])[1] != dim(bb)[1]) browser()
     beta[1 + ns,] <- bb
   } else {
     ns <- attr(X, 'nonsingular')

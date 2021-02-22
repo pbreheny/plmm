@@ -13,6 +13,7 @@ unstandardize <- function(b, X, intercept = TRUE) {
     a <- b[1, , drop = FALSE]
     b <- b[-1, , drop=FALSE]
     bb <- b / attr(X, 'scale')[ns]
+    if (dim(beta[1 + ns,, drop = FALSE])[1] != dim(bb)[1]) browser()
     beta[1 + ns,] <- bb
     beta[1,] <- a - crossprod(attr(X, 'center')[ns], bb)
   } else {
