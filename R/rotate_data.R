@@ -20,8 +20,8 @@ rotate_data <- function(X, y, X_for_K, intercept, rotation = TRUE, eta_centerY =
   if (rotation){
     if (!is.null(V) && dim(V)[1] == nrow(X)){
       c(S, U, UU) %<-% svd(V)
-      W <- diag(1/sqrt(S))
-      eta <- NA
+      # W <- diag(1/sqrt(S))
+      eta <- 1
     } else if (is.null(V)){
       if (eta_centerY){
         c(S, U, eta) %<-% plmm_null(X_for_K, y - mean(y))
@@ -31,8 +31,8 @@ rotate_data <- function(X, y, X_for_K, intercept, rotation = TRUE, eta_centerY =
       # print(eta)
       # still compute U and S but override eta-hat with eta_star if supplied
       if (!is.null(eta_star)) eta <- eta_star
-      W <- diag((eta * S + (1 - eta))^(-1/2))
     }
+    W <- diag((eta * S + (1 - eta))^(-1/2)) # if V is supplied and eta = 1 this is just diag(1/sqrt(S))
   } else {
     # no rotation option for testing
     S <- diag(nrow(X))
