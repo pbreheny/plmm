@@ -4,6 +4,6 @@
 #' @param yhat Predicted response vector
 #' @export
 loss.plmm <- function(y, yhat) {
-  val <- (y-yhat)^2
-  val
+  val <- (y - yhat)^2
+  return(val)
 }

@@ -13,6 +13,7 @@ X0 <- matrix(c(rnorm(nn * 1)), nrow = nn, ncol = 1)
 B <- rep(c(1, 0), times = c(p1, pp - p1))
 y <- X %*% B + X0 %*% c(1) + rnorm(nn)
 V <- matrix(rnorm(nn * pp), nn, nn)
+V <- crossprod(V) # make this symmetric
 diag(V) <- 1
 
 
@@ -45,7 +46,8 @@ cv_plmm0 <- cv.plmm(X,
                     standardizeRtX = FALSE,
                     rotation = TRUE,
                     returnX = TRUE,
-                    nfolds = 4)
+                    nfolds = 4,
+                    loss_V = FALSE)
 
 cv_plmm00 <- cv.plmm(X,
                      y,
