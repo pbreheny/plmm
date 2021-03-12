@@ -137,14 +137,17 @@ plmm <- function(X,
     }
     attributes(SUXX)$scale <- attr(SUXX_noInt, 'scale')
     attributes(SUXX)$nonsingular <- attr(SUXX_noInt, 'nonsingular')
+    xtx <- rep(1, ncol(SUXX))
   } else {
     SUXX <- SUX
     if (intercept){
       attributes(SUXX)$scale <- rep(1, ncol(SUX) - 1)
       attributes(SUXX)$nonsingular <- 1:(ncol(SUX) - 1)
+      xtx <- c(1, apply(SUXX[,-1], 2, varp))
     } else {
       attributes(SUXX)$scale <- rep(1, ncol(SUX))
       attributes(SUXX)$nonsingular <- 1:ncol(SUX)
+      xtx <- apply(SUXX, 2, varp)
     }
   }
 
@@ -158,6 +161,7 @@ plmm <- function(X,
   }
 
   ## Placeholders for results
+
   if (intercept) init <- c(mean(y), init) # add initial value for intercept
   b <- matrix(NA, ncol(SUXX), nlambda)
   iter <- integer(nlambda)
@@ -166,7 +170,7 @@ plmm <- function(X,
   # think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
-    res <- ncvreg::ncvfit(SUXX, SUy, init, drop(SUy - SUXX %*% init), rep(1, ncol(SUXX)), penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
+    res <- ncvreg::ncvfit(SUXX, SUy, init, drop(SUy - SUXX %*% init), xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
     b[, ll] <- init <- res$beta
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)

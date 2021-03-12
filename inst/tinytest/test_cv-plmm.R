@@ -4,7 +4,7 @@
 # devtools::load_all(".")
 
 
-nn <- 5
+nn <- 50
 pp <- 3
 p1 <- 1
 set.seed(7)
@@ -151,7 +151,7 @@ cv_plmm0 <- cv.plmm(X,
                    standardizeRtX = FALSE,
                    rotation = TRUE,
                    returnX = TRUE,
-                   nfolds = 4)
+                   nfolds = 2)
 
 cv_plmm00 <- cv.plmm(X,
                     y,
@@ -177,7 +177,7 @@ cv_plmm1 <- cv.plmm(X,
                     standardizeRtX = FALSE,
                     rotation = TRUE,
                     returnX = TRUE,
-                    nfolds = 4,
+                    nfolds = 2,
                     seed = 7)
 
 expect_equivalent(coef(plmm0), coef(cv_plmm0$fit), tol = 1e-5) # same overall fit?
