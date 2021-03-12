@@ -4,33 +4,20 @@
 \alias{rotate_data}
 \title{Compute transformed X and y for subsequent plmm rescaling and fitting}
 \usage{
-rotate_data(
-  X,
-  y,
-  X_for_K,
-  intercept,
-  rotation = TRUE,
-  eta_centerY = FALSE,
-  eta_star = NULL,
-  V = NULL
-)
+rotate_data(X, y, V, eta_star, intercept, rotation = TRUE)
 }
 \arguments{
-\item{X}{Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.}
+\item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
 
 \item{y}{Continuous outcome vector.}
 
-\item{X_for_K}{X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
+\item{V}{Similarity matrix. This may be a known value supplied to plmm as V, or estimated based on X_for_K}
+
+\item{eta_star}{Optional arg to input a specific eta term rather than estimate it from the data. If v is a known matrix, this should be 1.}
 
 \item{intercept}{Logical flag for whether an intercept should be included.}
 
 \item{rotation}{Logical flag to indicate whether the rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.}
-
-\item{eta_centerY}{Optional logical flag to indicate whether eta should be estimated using a centerd outcome variable, y. Defaults to FALSE.}
-
-\item{eta_star}{Optional arg to input a specific eta term rather than estimate it from the data.}
-
-\item{V}{Optional arg to input a specified covariance structure for y, used to rotate the data, into the model.}
 }
 \description{
 This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.

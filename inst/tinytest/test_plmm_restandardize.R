@@ -10,6 +10,7 @@ y <- X %*% B + X0 %*% c(1) + rnorm(nn)
 
 plmm1 <- plmm(ncvreg::std(X),
               y,
+              tcrossprod(ncvreg::std(X))/ncol(X),
               penalty = "lasso",
               alpha = 1,
               lambda = 0, # compare to ols solutions

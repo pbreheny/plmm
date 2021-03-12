@@ -3,7 +3,7 @@
 #' Performs k-fold cross validation for lasso-, MCP-, or SCAD-penalized penalized linear mixed models over a grid of values for the regularization parameter lambda.
 #' @param X Design matrix for model fitting. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
 #' @param y Continuous outcome vector for model fitting.
-#' @param X_for_K X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.
+#' @param V Known or estimated similarity matrix.
 #' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
 #' @param ... Additional arguments to plmm
 #' @param cluster cv.plmm can be run in parallel across a cluster using the parallel package. The cluster must be set up in advance using the makeCluster function from that package. The cluster must then be passed to cv.plmm.
@@ -15,22 +15,22 @@
 #' @export
 
 
-cv.plmm <- function(X, y, X_for_K = X, type = c('response', 'individual'), ..., cluster, nfolds=10, seed, fold,
+cv.plmm <- function(X, y, V, type = c('response', 'individual'), ..., cluster, nfolds=10, seed, fold,
                     returnY=FALSE, trace=FALSE) {
 
-  # Coercion
-  type <- match.arg(type)
-  if (!is.matrix(X)) {
+  # Coersion
+  if (missing(V)) stop('Similarity matrix must be provided.')
+  if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
   }
-  if (storage.mode(X)=="integer") storage.mode(X) <- "double"
-  if (!is.double(y)) {
-    tmp <- try(y <- as.double(y), silent=TRUE)
-    if (inherits(tmp, "try-error")) stop("y must be numeric or able to be coerced to numeric", call.=FALSE)
+  if (typeof(X)=="integer") storage.mode(X) <- "double"
+  if (typeof(X)=="character") stop("X must be a numeric matrix", call.=FALSE)
+  if (is.matrix(y)) {
+    y <- drop(y)
   }
 
-  fit.args <- c(list(X = X, y = y, X_for_K = X_for_K), list(...))
+  fit.args <- c(list(X = X, y = y, V = V), list(...))
   fit <- do.call('plmm', fit.args)
 
   cv.args <- list(...)
@@ -54,9 +54,9 @@ cv.plmm <- function(X, y, X_for_K = X, type = c('response', 'individual'), ..., 
 
   if (!missing(cluster)) {
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
-    parallel::clusterExport(cluster, c("X", "X_for_K", "y", "fold", "type", "cv.args"), envir=environment())
+    parallel::clusterExport(cluster, c("X", "y", "V", "fold", "type", "cv.args"), envir=environment())
     parallel::clusterCall(cluster, function() library(penalizedLMM))
-    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf2, XX=X, XX_for_K=X_for_K, y=y, fold=fold, type=type, cv.args=cv.args)
+    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=X, y=y, V=V, fold=fold, type=type, cv.args=cv.args)
   }
 
   for (i in 1:nfolds) {
@@ -64,7 +64,7 @@ cv.plmm <- function(X, y, X_for_K = X, type = c('response', 'individual'), ..., 
       res <- fold.results[[i]]
     } else {
       if (trace) cat("Starting CV fold #", i, sep="","\n")
-      res <- cvf2(i, X, X_for_K, y, fold, type, cv.args)
+      res <- cvf(i, X, y, V, fold, type, cv.args)
     }
     # browser()
     E[fold==i, 1:res$nl] <- res$loss

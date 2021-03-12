@@ -7,7 +7,7 @@
 cv.plmm(
   X,
   y,
-  X_for_K = X,
+  V,
   type = c("response", "individual"),
   ...,
   cluster,
@@ -23,7 +23,7 @@ cv.plmm(
 
 \item{y}{Continuous outcome vector for model fitting.}
 
-\item{X_for_K}{X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
+\item{V}{Known or estimated similarity matrix.}
 
 \item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.}
 

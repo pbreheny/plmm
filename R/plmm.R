@@ -1,9 +1,10 @@
 #' Fit a linear mixed model with non-convex regularization
 #'
 #' This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
-#' @param X Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
+#' @param X Design matrix. May include clinical covariates and other non-SNP data.
 #' @param y Continuous outcome vector.
-#' @param X_for_K X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.
+#' @param V Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (typically computed as XX^T).
+#' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If V is a known covariance matrix that is full rank, this should be 1.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for SCAD.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
@@ -19,13 +20,9 @@
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
 #' @param intercept Logical flag for whether an intercept should be included.
-#' @param centerRtY Logical flag for whether the rotated outcome variable, SUy, should be centered and an intercept coefficient estimated based on its mean. Defaults to FALSE.
 #' @param standardizeX Logical flag for X matrix standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.
 #' @param standardizeRtX Logical flag for transformed X matrix scaling (or rescaling). The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.
 #' @param rotation Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.
-#' @param eta_centerY Logical flag to indicate whether eta should be estimated using a centerd outcome variable, y. Defaults to FALSE.
-#' @param eta_star Optional arg to input a specific eta term rather than estimate it from the data.
-#' @param V Optional arg to input a specified covariance structure for y, used to rotate the data, into the model.
 #' @param ... Not used.
 #' @importFrom zeallot %<-%
 #' @export
@@ -33,7 +30,8 @@
 
 plmm <- function(X,
                  y,
-                 X_for_K = X,
+                 V,
+                 eta_star,
                  penalty = c("MCP", "SCAD", "lasso"),
                  gamma,
                  alpha = 1,
@@ -49,18 +47,15 @@ plmm <- function(X,
                  init = rep(0, ncol(X)),
                  returnX = TRUE,
                  intercept = TRUE,
-                 centerRtY = FALSE,
                  standardizeX = TRUE,
                  standardizeRtX = FALSE,
                  rotation = TRUE,
-                 eta_centerY = FALSE,
-                 eta_star = NULL,
-                 V = NULL,
                  ...) {
 
   # Coersion
   U <- S <- SUX <- SUy <- eta <- NULL
   penalty <- match.arg(penalty)
+  if (missing(V)) stop('Similarity matrix must be provided.')
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
@@ -87,7 +82,7 @@ plmm <- function(X,
   if (length(init)!=ncol(X)) stop("Dimensions of init and X do not match", call.=FALSE)
   if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
   if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
-  if (!is.null(V)){
+  if (!missing(V)){
     if (!inherits(V, "matrix")) {
       tmp <- try(V <- stats::model.matrix(~0+., data=V), silent=TRUE)
       if (inherits(tmp, "try-error")) stop("V must be a matrix or able to be coerced to a matrix", call.=FALSE)
@@ -104,7 +99,6 @@ plmm <- function(X,
   ## Standardize X
   if (standardizeX){
     XX <- ncvreg::std(X)
-    X_for_K <- ncvreg::std(X_for_K)
   } else {
     XX <- X
     attributes(XX)$center <- rep(0, ncol(XX))
@@ -120,10 +114,15 @@ plmm <- function(X,
   n <- nrow(XX)
 
   ## Rotate data
-  c(SUX, SUy, eta, U, S) %<-% rotate_data(XX, y, X_for_K, intercept, rotation, eta_centerY, eta_star, V)
-  if (intercept) penalty.factor <- c(0, penalty.factor)
+  if (!missing(eta_star)){
+    c(SUX, SUy, eta, U, S) %<-% rotate_data(X = XX, y = y, V = V, eta_star = eta_star,
+                                            intercept = intercept, rotation = rotation)
+  } else {
+    c(SUX, SUy, eta, U, S) %<-% rotate_data(X = XX, y = y, V = V,
+                                            intercept = intercept, rotation = rotation)
+  }
 
-  # if (ncol(X) != ncol(XX)) browser()
+  if (intercept) penalty.factor <- c(0, penalty.factor)
 
   ## Re-standardize rotated SUX
   if (standardizeRtX){
@@ -149,16 +148,9 @@ plmm <- function(X,
     }
   }
 
-  ## Re-center rotated y
-  if (centerRtY){
-    SUyy <- SUy - mean(SUy)
-  } else {
-    SUyy <- SUy
-  }
-
   ## Set up lambda
   if (missing(lambda)) {
-    lambda <- setup_lambda(SUXX, SUyy, alpha, lambda.min, nlambda, penalty.factor)
+    lambda <- setup_lambda(SUXX, SUy, alpha, lambda.min, nlambda, penalty.factor)
     user.lambda <- FALSE
   } else {
     nlambda <- length(lambda)
@@ -174,7 +166,7 @@ plmm <- function(X,
   # think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
-    res <- ncvreg::ncvfit(SUXX, SUyy, init, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
+    res <- ncvreg::ncvfit(SUXX, SUy, init, drop(SUy - SUXX %*% init), rep(1, ncol(SUXX)), penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
     b[, ll] <- init <- res$beta
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)

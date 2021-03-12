@@ -1,4 +1,8 @@
 
+# library(tinytest)
+# library(parallel)
+# devtools::load_all(".")
+
 nn <- 50
 pp <- 4
 p1 <- 1
@@ -7,6 +11,7 @@ X <- matrix(rnorm(nn * pp), nrow = nn, ncol = pp)
 X0 <- matrix(c(rnorm(nn * 1)), nrow = nn, ncol = 1)
 B <- rep(c(1, 0), times = c(p1, pp - p1))
 y <- X %*% B + X0 %*% c(1) + rnorm(nn)
+V <- tcrossprod(ncvreg::std(X))/ncol(X)
 
 dont_run <- FALSE
 
@@ -15,6 +20,7 @@ dont_run <- FALSE
 # std(X)
 plmm1 <- plmm(ncvreg::std(X),
               y,
+              V = V,
               penalty = "lasso",
               alpha = 1,
               nlambda = 5,
@@ -34,6 +40,7 @@ expect_equivalent(coef(plmm1)[-1, 1], rep(0, ncol(X))) # make sure setup lambda 
 # X
 plmm2 <- plmm(X,
               y,
+              V,
               penalty = "lasso",
               alpha = 1,
               nlambda = 5,
@@ -60,7 +67,7 @@ expect_equivalent(coef(plmm2)[-1, 1], rep(0, ncol(X)))
 # std(X)
 plmm3 <- plmm(ncvreg::std(cbind(X0, X)),
               y,
-              X_for_K = ncvreg::std(X),
+              V = V,
               penalty = "lasso",
               penalty.factor = rep(c(0, 1), times = c(ncol(X0), ncol(X))),
               alpha = 1,
@@ -106,6 +113,7 @@ expect_equivalent(coef(plmm3)[-c(1:(1 + ncol(X0))), 1], rep(0, ncol(X)))
 # std(X)
 plmm5 <- plmm(ncvreg::std(X),
               y,
+              V,
               penalty = "lasso",
               alpha = 1,
               lambda = 0, # compare to ols solutions
@@ -122,6 +130,7 @@ if (nrow(X) > ncol(X)){
 # X
 plmm6 <- plmm(X,
               y,
+              V,
               penalty = "lasso",
               alpha = 1,
               lambda = 0, # compare to ols solutions
@@ -140,6 +149,7 @@ if (nrow(X) > ncol(X)){
 # std(X)
 plmm7 <- plmm(ncvreg::std(cbind(X0, X)),
               y,
+              V,
               penalty = "lasso",
               alpha = 1,
               lambda = 0, # compare to ols solutions
@@ -156,6 +166,7 @@ if (nrow(cbind(X0, X)) > ncol(cbind(X0, X))){
 # X
 plmm8 <- plmm(cbind(X0, X),
               y,
+              V,
               penalty = "lasso",
               alpha = 1,
               lambda = 0, # compare to ols solutions
@@ -174,6 +185,7 @@ if (nrow(cbind(X0, X)) > ncol(cbind(X0, X))){
 
 plmm9 <- plmm(ncvreg::std(X),
               y,
+              V,
               penalty = "MCP",
               alpha = 1,
               nlambda = 5,
@@ -189,6 +201,7 @@ expect_equivalent(coef(plmm9), coef(ncv9), tol = 1e-12)
 # enet
 plmm10 <- plmm(ncvreg::std(X),
               y,
+              V,
               penalty = "MCP",
               alpha = 0.5,
               nlambda = 5,
@@ -205,6 +218,7 @@ expect_equivalent(coef(plmm10), coef(ncv10), tol = 1e-12)
 
 plmm11 <- plmm(ncvreg::std(X),
               y,
+              V,
               penalty = "SCAD",
               alpha = 1,
               nlambda = 5,
@@ -219,6 +233,7 @@ expect_equivalent(coef(plmm11), coef(ncv11), tol = 1e-12)
 # enet
 plmm12 <- plmm(ncvreg::std(X),
                y,
+               V,
                penalty = "SCAD",
                alpha = 0.5,
                nlambda = 5,

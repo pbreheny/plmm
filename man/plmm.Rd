@@ -7,7 +7,8 @@
 plmm(
   X,
   y,
-  X_for_K = X,
+  V,
+  eta_star,
   penalty = c("MCP", "SCAD", "lasso"),
   gamma,
   alpha = 1,
@@ -23,22 +24,20 @@ plmm(
   init = rep(0, ncol(X)),
   returnX = TRUE,
   intercept = TRUE,
-  centerRtY = FALSE,
   standardizeX = TRUE,
   standardizeRtX = FALSE,
   rotation = TRUE,
-  eta_centerY = FALSE,
-  eta_star = NULL,
-  V = NULL,
   ...
 )
 }
 \arguments{
-\item{X}{Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.}
+\item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
 
 \item{y}{Continuous outcome vector.}
 
-\item{X_for_K}{X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
+\item{V}{Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (typically computed as XX^T).}
+
+\item{eta_star}{Optional argument to input a specific eta term rather than estimate it from the data. If V is a known covariance matrix that is full rank, this should be 1.}
 
 \item{penalty}{The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".}
 
@@ -70,19 +69,11 @@ plmm(
 
 \item{intercept}{Logical flag for whether an intercept should be included.}
 
-\item{centerRtY}{Logical flag for whether the rotated outcome variable, SUy, should be centered and an intercept coefficient estimated based on its mean. Defaults to FALSE.}
-
 \item{standardizeX}{Logical flag for X matrix standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.}
 
 \item{standardizeRtX}{Logical flag for transformed X matrix scaling (or rescaling). The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.}
 
 \item{rotation}{Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.}
-
-\item{eta_centerY}{Logical flag to indicate whether eta should be estimated using a centerd outcome variable, y. Defaults to FALSE.}
-
-\item{eta_star}{Optional arg to input a specific eta term rather than estimate it from the data.}
-
-\item{V}{Optional arg to input a specified covariance structure for y, used to rotate the data, into the model.}
 
 \item{...}{Not used.}
 }

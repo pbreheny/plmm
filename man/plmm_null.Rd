@@ -4,12 +4,12 @@
 \alias{plmm_null}
 \title{Estimate eta using a null Gaussian penalizedLMM model}
 \usage{
-plmm_null(X, y)
+plmm_null(K, y)
 }
 \arguments{
-\item{X}{Design matrix.}
+\item{K}{Estimated or known similarity matrix.}
 
-\item{y}{Continuous outcome vector.}
+\item{y}{Continuous outcome vector. If not supplied, V is treated as known and eta is not estimated.}
 }
 \description{
 This function allows you to estimate eta (the signal to noise ratio, or narrow-sense variability) under the assumption of a null model.
