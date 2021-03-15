@@ -107,6 +107,7 @@ plmm <- function(X,
     # X_ns <- attr(XX, "nonsingular") # shouldn't need this value in this scenario
   }
   ns <- attr(XX, "nonsingular")
+  init <- init[ns] # remove any singular values
 
   penalty.factor <- penalty.factor[ns]
 
@@ -115,11 +116,9 @@ plmm <- function(X,
 
   ## Rotate data
   if (!missing(eta_star)){
-    c(SUX, SUy, eta, U, S) %<-% rotate_data(X = XX, y = y, V = V, eta_star = eta_star,
-                                            intercept = intercept, rotation = rotation)
+    c(SUX, SUy, eta, U, S) %<-% rotate_data(XX, y, V, intercept, rotation, eta_star)
   } else {
-    c(SUX, SUy, eta, U, S) %<-% rotate_data(X = XX, y = y, V = V,
-                                            intercept = intercept, rotation = rotation)
+    c(SUX, SUy, eta, U, S) %<-% rotate_data(XX, y, V, intercept, rotation)
   }
 
   if (intercept) penalty.factor <- c(0, penalty.factor)
@@ -127,29 +126,32 @@ plmm <- function(X,
   ## Re-standardize rotated SUX
   if (standardizeRtX){
     if (intercept){
-      SUXX_noInt <- scale(SUX[,-1, drop = FALSE], center = FALSE) * (n - 1) / n
+      # SUXX_noInt <- scale(SUX[,-1, drop = FALSE], center = FALSE) * (n - 1) / n
+      SUXX_noInt <- scale_varp(SUX[,-1, drop = FALSE])
       attributes(SUXX_noInt)$nonsingular <- attributes(ncvreg::std(SUX[,-1, drop = FALSE]))$nonsingular
       SUXX <- cbind(SUX[,1, drop = FALSE], SUXX_noInt)
     } else {
-      SUXX_noInt <- scale(SUX, center = FALSE) * (n - 1) / n
+      # SUXX_noInt <- scale(SUX, center = FALSE) * (n - 1) / n
+      SUXX_noInt <- scale_varp(SUX)
       attributes(SUXX_noInt)$nonsingular <- attributes(ncvreg::std(SUX))$nonsingular
       SUXX <- SUXX_noInt
     }
     attributes(SUXX)$scale <- attr(SUXX_noInt, 'scale')
     attributes(SUXX)$nonsingular <- attr(SUXX_noInt, 'nonsingular')
-    xtx <- rep(1, ncol(SUXX))
+    # xtx <- rep(1, ncol(SUXX))
   } else {
     SUXX <- SUX
     if (intercept){
       attributes(SUXX)$scale <- rep(1, ncol(SUX) - 1)
       attributes(SUXX)$nonsingular <- 1:(ncol(SUX) - 1)
-      xtx <- c(1, apply(SUXX[,-1], 2, varp))
+      # xtx <- c(1, apply(SUXX[,-1], 2, varp))
     } else {
       attributes(SUXX)$scale <- rep(1, ncol(SUX))
       attributes(SUXX)$nonsingular <- 1:ncol(SUX)
-      xtx <- apply(SUXX, 2, varp)
+      # xtx <- apply(SUXX, 2, varp)
     }
   }
+  xtx <- apply(SUXX, 2, function(x) mean(x^2, na.rm = TRUE)) # population var without mean 0
 
   ## Set up lambda
   if (missing(lambda)) {
@@ -162,7 +164,8 @@ plmm <- function(X,
 
   ## Placeholders for results
 
-  if (intercept) init <- c(mean(y), init) # add initial value for intercept
+  if (intercept) init <- c(0, init) # add initial value for intercept
+  # resid <- drop(SUy - SUXX %*% init)
   b <- matrix(NA, ncol(SUXX), nlambda)
   iter <- integer(nlambda)
   converged <- logical(nlambda)
@@ -171,6 +174,14 @@ plmm <- function(X,
   for (ll in 1:nlambda){
     lam <- lambda[ll]
     res <- ncvreg::ncvfit(SUXX, SUy, init, drop(SUy - SUXX %*% init), xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
+
+    # res <- ncvreg::ncvfit(X = SUXX, y = SUy, init = init, xtx = xtx, penalty = penalty,
+    #                       gamma = gamma, alpha = alpha, lambda = lam, eps = eps, max.iter = max.iter,
+    #                       penalty.factor = penalty.factor, warn = warn)
+    # res <- ncvreg::ncvfit(X = SUXX, y = SUy, init = init, penalty = penalty,
+    #                       gamma = gamma, alpha = alpha, lambda = lam, eps = eps, max.iter = max.iter,
+    #                       penalty.factor = penalty.factor, warn = warn)
+
     b[, ll] <- init <- res$beta
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)

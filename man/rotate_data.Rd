@@ -4,7 +4,7 @@
 \alias{rotate_data}
 \title{Compute transformed X and y for subsequent plmm rescaling and fitting}
 \usage{
-rotate_data(X, y, V, eta_star, intercept, rotation = TRUE)
+rotate_data(X, y, V, intercept = TRUE, rotation = TRUE, eta_star)
 }
 \arguments{
 \item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
@@ -13,11 +13,11 @@ rotate_data(X, y, V, eta_star, intercept, rotation = TRUE)
 
 \item{V}{Similarity matrix. This may be a known value supplied to plmm as V, or estimated based on X_for_K}
 
-\item{eta_star}{Optional arg to input a specific eta term rather than estimate it from the data. If v is a known matrix, this should be 1.}
-
 \item{intercept}{Logical flag for whether an intercept should be included.}
 
 \item{rotation}{Logical flag to indicate whether the rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.}
+
+\item{eta_star}{Optional arg to input a specific eta term rather than estimate it from the data. If v is a known matrix, this should be 1.}
 }
 \description{
 This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.

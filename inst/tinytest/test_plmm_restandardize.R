@@ -20,7 +20,7 @@ plmm1 <- plmm(ncvreg::std(X),
               returnX = TRUE)
 
 if (nrow(X) > ncol(X)){
-  xxx <- scale(plmm1$SUX[,-1], center = FALSE) * (nn - 1) / nn
+  xxx <- scale_varp(plmm1$SUX[,-1])
   x0 <- plmm1$SUX[,1]
   m <- attr(xxx, "center")
   s <- attr(xxx, "scale")
