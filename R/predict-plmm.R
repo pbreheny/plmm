@@ -12,6 +12,7 @@
 #' @param eta Optional argument. Estimated $eta$ value from object. Required if \code{type == 'individual'}.
 #' @param covariance Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'individual'}.
 #' @param ... Additional arguments.
+#' @export
 #'
 #' @examples
 #' \dontrun{
