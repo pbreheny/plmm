@@ -36,7 +36,6 @@ expect_equivalent(coef(plmm1), coef(ncv1), tol = 1e-3)
 expect_equivalent(coef(plmm1), as.matrix(coef(glm1)), tol = 1e-3)
 expect_equivalent(coef(plmm1)[-1, 1], rep(0, ncol(X))) # make sure setup lambda is working correctly
 
-
 # X
 plmm2 <- plmm(X,
               y,

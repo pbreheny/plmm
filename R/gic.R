@@ -18,7 +18,9 @@ gic.default <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S, eta){
 }
 
 #' @export
-gic.plmm <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S, eta){
+gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), SUX, SUy, S, eta){
+
+  #need to deal with situations where dim SUX != dim X because of singularity
 
   n <- p <- NULL
 
@@ -37,20 +39,27 @@ gic.plmm <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S, eta){
     S <- fit$S
   }
 
+  c(n, p) %<-% dim(SUX[,-1]) # this assumes there is an intercept column
   eta <- fit$eta
   ll <- plmm_nll_nonnull(fit, SUX, SUy, S, eta)
-  df <- predict.plmm(fit, type='nvars') + 2 # +1 for intercept, +1 for sigma2
-  c(n, p) %<-% dim(SUX)
+  sj <- predict.plmm(fit, type='nvars')
+  df <- sj + 2 # +1 for intercept, +1 for sigma2
+  ts <-  choose(p, sj)
 
   if (ic == "bic"){
     an <- log(n)
+    gam <- 0
   } else if (ic == "hdbic"){
     an <- log(log(n))*log(p)
+    gam <- 0
+  } else if (ic == 'ebic'){
+    an <- log(n)
+    gam <- 1 #c(0, 1)
   } else {
     stop("IC not implemented.")
   }
 
-  gic <- (-2)*ll+an*df
+  gic <- (-2)*ll + an*df + 2*gam*log(ts)
 
   return(list(fit = fit,
               lambda = fit$lambda,
