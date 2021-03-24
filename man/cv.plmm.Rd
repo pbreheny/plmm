@@ -9,6 +9,7 @@ cv.plmm(
   y,
   V,
   type = c("response", "individual"),
+  intercept = TRUE,
   ...,
   cluster,
   nfolds = 10,
@@ -26,6 +27,8 @@ cv.plmm(
 \item{V}{Known or estimated similarity matrix.}
 
 \item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.}
+
+\item{intercept}{Logical for whether intercept should be included.}
 
 \item{...}{Additional arguments to plmm}
 

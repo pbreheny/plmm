@@ -16,6 +16,7 @@
   S,
   eta,
   covariance,
+  intercept = TRUE,
   ...
 )
 }
@@ -42,7 +43,9 @@
 
 \item{covariance}{Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'individual'}.}
 
-\item{...}{Additional arguments.}
+\item{intercept}{optional logical argument}
+
+\item{...}{Additional optional arguments}
 }
 \description{
 Predict method for plmm class

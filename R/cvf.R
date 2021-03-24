@@ -8,10 +8,11 @@
 #' @param fold n-length vector of fold-assignments.
 #' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP).
 #' @param cv.args List of additional arguments to be passed to plmm.
+#' @param ... Optional arguments
 #' @importFrom zeallot %<-%
 #' @export
 
-cvf <- function(i, XX, y, V, fold, type, cv.args) {
+cvf <- function(i, XX, y, V, fold, type, cv.args, ...) {
   d <- u <- uu <- NULL
   cv.args$X <- XX[fold!=i, , drop=FALSE]
   cv.args$y <- y[fold!=i]
@@ -22,8 +23,7 @@ cvf <- function(i, XX, y, V, fold, type, cv.args) {
   y2 <- y[fold==i]
 
   beta <- coef.plmm(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
-  # Xbeta <- cbind(1, X2) %*% beta
-  Xbeta <- predict.plmm(fit.i, newX = X2, type = 'response', lambda = fit.i$lambda)
+  Xbeta <- predict.plmm(fit.i, newX = X2, type = 'response', lambda = fit.i$lambda, intercept = cv.args$intercept)
   yhat <- matrix(drop(Xbeta), length(y2))
 
 
@@ -33,7 +33,7 @@ cvf <- function(i, XX, y, V, fold, type, cv.args) {
   if (type == 'individual'){
     yhat <- predict.plmm(fit.i, newX = X2, type = 'individual', lambda = fit.i$lambda,
                          XX = cv.args$X, y = cv.args$y, U = fit.i$U, S = fit.i$S,
-                         eta = fit.i$eta, covariance = V[fold == i, fold != i, drop = FALSE])
+                         eta = fit.i$eta, covariance = V[fold == i, fold != i, drop = FALSE], intercept = cv.args$intercept)
   }
   loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(y2, yhat[,ll]))
   list(loss=loss, nl=length(fit.i$lambda), yhat=yhat)
