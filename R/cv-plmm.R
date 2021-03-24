@@ -97,7 +97,7 @@ cv.plmm <- function(X, y, V, type = c('response', 'individual'), intercept = TRU
   val <- list(cve=cve, cvse=cvse, fold=fold, lambda=lambda, fit=fit,
               min=min, lambda.min=lambda[min],
               min1se = min1se, lambda.1se = lambda[min1se],
-              null.dev=mean(loss.plmm(y, rep(mean(y), n))), Bias=Bias)
+              null.dev=mean(loss.plmm(y, rep(mean(y), n))), Bias=Bias, Loss = E)
   if (returnY) val$Y <- Y
   structure(val, class="cv.plmm")
 }
