@@ -42,9 +42,11 @@ gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), SUX, SUy, S, eta){
   c(n, p) %<-% dim(SUX[,-1]) # this assumes there is an intercept column
   eta <- fit$eta
   ll <- plmm_nll_nonnull(fit, SUX, SUy, S, eta)
-  sj <- predict.plmm(fit, type='nvars')
-  df <- sj + 2 # +1 for intercept, +1 for sigma2
-  ts <-  choose(p, sj)
+  j <- predict.plmm(fit, type='nvars')
+  jj <- pmin(j, p/2) # dont' give smaller penalties for larger models
+  df <- j + 2 # +1 for intercept, +1 for sigma2
+  # ts <-  choose(p, j) # no penalty if selecting all bc this value is small
+  # limit this to select at most half the vars?
 
   if (ic == "bic"){
     an <- log(n)
@@ -54,12 +56,12 @@ gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), SUX, SUy, S, eta){
     gam <- 0
   } else if (ic == 'ebic'){
     an <- log(n)
-    gam <- 1 #c(0, 1)
+    gam <- 1
   } else {
     stop("IC not implemented.")
   }
 
-  gic <- (-2)*ll + an*df + 2*gam*log(ts)
+  gic <- (-2)*ll + an*df + 2*gam*(lgamma(p+1) - lgamma(j+1) - lgamma(p-j+1))
 
   return(list(fit = fit,
               lambda = fit$lambda,
