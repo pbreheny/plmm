@@ -25,7 +25,7 @@ plmm(
   returnX = TRUE,
   intercept = TRUE,
   standardizeX = TRUE,
-  standardizeRtX = FALSE,
+  standardizeRtX = TRUE,
   rotation = TRUE,
   ...
 )

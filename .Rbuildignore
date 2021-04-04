@@ -5,4 +5,5 @@ xxx_lmm_ncvreg_test\.R$
 xxx_tests\.R$
 xxx_cv-plmm\.R$
 xxx_lamSelect\.R
-maybe_rm\*
+maybe_rm
+xxx

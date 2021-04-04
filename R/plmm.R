@@ -48,7 +48,7 @@ plmm <- function(X,
                  returnX = TRUE,
                  intercept = TRUE,
                  standardizeX = TRUE,
-                 standardizeRtX = FALSE,
+                 standardizeRtX = TRUE,
                  rotation = TRUE,
                  ...) {
 
@@ -234,6 +234,7 @@ plmm <- function(X,
     val$SUy <- SUy
     val$U <- U
     val$S <- S
+    val$XX <- XX
   }
   return(val)
 }
