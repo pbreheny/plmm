@@ -57,6 +57,7 @@ plmm <- function(X,
   penalty <- match.arg(penalty)
   if (missing(V)) stop('Similarity matrix must be provided.')
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
+  if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
@@ -126,19 +127,16 @@ plmm <- function(X,
   ## Re-standardize rotated SUX
   if (standardizeRtX){
     if (intercept){
-      # SUXX_noInt <- scale(SUX[,-1, drop = FALSE], center = FALSE) * (n - 1) / n
       SUXX_noInt <- scale_varp(SUX[,-1, drop = FALSE])
       attributes(SUXX_noInt)$nonsingular <- attributes(ncvreg::std(SUX[,-1, drop = FALSE]))$nonsingular
       SUXX <- cbind(SUX[,1, drop = FALSE], SUXX_noInt)
     } else {
-      # SUXX_noInt <- scale(SUX, center = FALSE) * (n - 1) / n
       SUXX_noInt <- scale_varp(SUX)
       attributes(SUXX_noInt)$nonsingular <- attributes(ncvreg::std(SUX))$nonsingular
       SUXX <- SUXX_noInt
     }
     attributes(SUXX)$scale <- attr(SUXX_noInt, 'scale')
     attributes(SUXX)$nonsingular <- attr(SUXX_noInt, 'nonsingular')
-    # xtx <- rep(1, ncol(SUXX))
   } else {
     SUXX <- SUX
     if (intercept){
@@ -148,7 +146,6 @@ plmm <- function(X,
     } else {
       attributes(SUXX)$scale <- rep(1, ncol(SUX))
       attributes(SUXX)$nonsingular <- 1:ncol(SUX)
-      # xtx <- apply(SUXX, 2, varp)
     }
   }
   xtx <- apply(SUXX, 2, function(x) mean(x^2, na.rm = TRUE)) # population var without mean 0
@@ -165,7 +162,7 @@ plmm <- function(X,
   ## Placeholders for results
 
   if (intercept) init <- c(0, init) # add initial value for intercept
-  # resid <- drop(SUy - SUXX %*% init)
+  resid <- drop(SUy - SUXX %*% init)
   b <- matrix(NA, ncol(SUXX), nlambda)
   iter <- integer(nlambda)
   converged <- logical(nlambda)
@@ -173,19 +170,12 @@ plmm <- function(X,
   # think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
-    res <- ncvreg::ncvfit(SUXX, SUy, init, drop(SUy - SUXX %*% init), xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
-
-    # res <- ncvreg::ncvfit(X = SUXX, y = SUy, init = init, xtx = xtx, penalty = penalty,
-    #                       gamma = gamma, alpha = alpha, lambda = lam, eps = eps, max.iter = max.iter,
-    #                       penalty.factor = penalty.factor, warn = warn)
-    # res <- ncvreg::ncvfit(X = SUXX, y = SUy, init = init, penalty = penalty,
-    #                       gamma = gamma, alpha = alpha, lambda = lam, eps = eps, max.iter = max.iter,
-    #                       penalty.factor = penalty.factor, warn = warn)
-
+    res <- ncvreg::ncvfit(SUXX, SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
     b[, ll] <- init <- res$beta
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
     loss[ll] <- res$loss
+    resid <- res$resid
   }
 
   ## Eliminate saturated lambda values, if any

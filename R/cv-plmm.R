@@ -21,6 +21,7 @@ cv.plmm <- function(X, y, V, type = c('response', 'individual'), intercept = TRU
 
   # Coersion
   if (missing(V)) stop('Similarity matrix must be provided.')
+  if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)

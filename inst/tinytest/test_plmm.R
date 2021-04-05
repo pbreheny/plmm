@@ -37,6 +37,8 @@ expect_equivalent(coef(plmm1), coef(ncv1), tol = 1e-3)
 expect_equivalent(coef(plmm1), as.matrix(coef(glm1)), tol = 1e-3)
 expect_equivalent(coef(plmm1)[-1, 1], rep(0, ncol(X))) # make sure setup lambda is working correctly
 
+###--------------------------------------------------------------------------###
+
 # X
 plmm2 <- plmm(X,
               y,
@@ -55,6 +57,54 @@ glm2 <- glmnet::glmnet(X, y, "gaussian", standardize = TRUE, lambda = plmm2$lamb
 expect_equivalent(coef(plmm2), coef(ncv2), tol = 1e-3)
 expect_equivalent(coef(plmm2), as.matrix(coef(glm2)), tol = 1e-3)
 expect_equivalent(coef(plmm2)[-1, 1], rep(0, ncol(X)))
+
+### make sure class raw works -----------------------------------------------###
+library(snpStats)
+data(testdata)
+Autosomes <- Autosomes[1:50, 1:100]
+# Autosomes cannot have missing values
+to_impute <- which(snpStats::col.summary(Autosomes)$Call.rate < 1)
+miss <- Autosomes[, to_impute]
+
+imputed_mean <- apply(methods::as(miss, "numeric"), 2, function(s){
+  these <- which(is.na(s))
+  s[these] <- mean(s, na.rm = TRUE)
+  s <- snpStats::mean2g(s)
+  return(s)
+})
+
+Autosomes2 <- Autosomes
+Autosomes2@.Data[, to_impute] <- imputed_mean
+Autosomes <- Autosomes2
+
+yy <- rnorm(nrow(Autosomes))
+VV <- diag(nrow(Autosomes))
+
+# X
+plmm_raw <- plmm(Autosomes,
+              yy,
+              VV,
+              penalty = "lasso",
+              alpha = 1,
+              nlambda = 5,
+              standardizeX = TRUE,
+              standardizeRtX = FALSE,
+              rotation = FALSE,
+              returnX = FALSE)
+
+plmm_num <- plmm(as(Autosomes, 'numeric'),
+                 yy,
+                 VV,
+                 penalty = "lasso",
+                 alpha = 1,
+                 nlambda = 5,
+                 standardizeX = TRUE,
+                 standardizeRtX = FALSE,
+                 rotation = FALSE,
+                 returnX = FALSE)
+
+expect_equivalent(coef(plmm_raw), coef(plmm_num), tol = 1e-2)
+expect_equivalent(plmm_raw$lambda, plmm_num$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
 
 ### no rotation + unpenalized covar checks-----------------------------------###
 ### first var (after int) should be included because unpenalized

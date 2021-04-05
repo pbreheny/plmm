@@ -85,47 +85,60 @@ expect_equivalent(coef(plmm0), coef(cv_plmm0$fit), tol = 1e-5) # same overall fi
 expect_equivalent(coef(plmm0), coef(cv_plmm00$fit), tol = 1e-5) # same overall fit?
 expect_equivalent(plmm0$lambda, cv_plmm1$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
 
-# still can't get parallel working for individual keep getting the error "requires numeric/complex matrix/vector arguments"
-# matrix multiplication works in folds but not parallel (?)
+### make sure class raw works -----------------------------------------------###
+library(snpStats)
+data(testdata)
+Autosomes <- Autosomes[1:50, 1:100]
+# Autosomes cannot have missing values
+to_impute <- which(snpStats::col.summary(Autosomes)$Call.rate < 1)
+miss <- Autosomes[, to_impute]
 
-# cl <- parallel::makeCluster(2)
-# cv_plmm2 <- cv.plmm(X,
-#                     y,
-#                     V,
-#                     eta_start = 1,
-#                     type = 'response',
-#                     penalty = "lasso",
-#                     alpha = 1,
-#                     nlambda = 5,
-#                     standardizeX = TRUE,
-#                     rotation = TRUE,
-#                     returnX = TRUE,
-#                     fold =cv_plmm1$fold,
-#                     cluster = cl)
-# parallel::stopCluster(cl)
-#
-# cv_plmm2 <- cv.plmm(X,
-#                     y,
-#                     type = 'response',
-#                     penalty = "lasso",
-#                     alpha = 1,
-#                     nlambda = 5,
-#                     standardizeX = TRUE,
-#                     standardizeRtX = FALSE,
-#                     rotation = TRUE,
-#                     returnX = TRUE,
-#                     fold =cv_plmm1$fold,
-#                     seed = 7)
-#
-### make sure parallel method is equivalent to regular plmm
-# expect_equivalent(coef(plmm0), coef(cv_plmm2$fit), tol = 1e-5) # same overall fit?
-# expect_equivalent(plmm0$lambda, cv_plmm2$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
-#
-# ### make sure parallel method is equivalent to cv-plmm
-# expect_equivalent(coef(cv_plmm1$fit), coef(cv_plmm2$fit), tol = 1e-5) # same overall fit?
-# expect_equivalent(cv_plmm1$lambda, cv_plmm2$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
-# expect_equivalent(cv_plmm1$cve, cv_plmm2$cve, tol = 1e-3) #  slight differences if in loop or parallel
+imputed_mean <- apply(methods::as(miss, "numeric"), 2, function(s){
+  these <- which(is.na(s))
+  s[these] <- mean(s, na.rm = TRUE)
+  s <- snpStats::mean2g(s)
+  return(s)
+})
 
+Autosomes2 <- Autosomes
+Autosomes2@.Data[, to_impute] <- imputed_mean
+Autosomes <- Autosomes2
+
+yy <- rnorm(nrow(Autosomes))
+VV <- diag(nrow(Autosomes))
+
+cv_plmm_num <- cv.plmm(as(Autosomes, 'numeric'),
+                       yy,
+                       VV,
+                       eta_star = 1,
+                       type = 'individual',
+                       penalty = "lasso",
+                       alpha = 1,
+                       nlambda = 5,
+                       standardizeX = TRUE,
+                       standardizeRtX = TRUE,
+                       rotation = TRUE,
+                       returnX = TRUE,
+                       nfolds = 2,
+                       seed = 7)
+
+cv_plmm_raw <- cv.plmm(Autosomes,
+                       yy,
+                       VV,
+                       eta_star = 1,
+                       type = 'individual',
+                       penalty = "lasso",
+                       alpha = 1,
+                       nlambda = 5,
+                       standardizeX = TRUE,
+                       standardizeRtX = TRUE,
+                       rotation = TRUE,
+                       returnX = TRUE,
+                       nfolds = 2,
+                       seed = 7)
+
+expect_equivalent(coef(cv_plmm_num$fit), coef(cv_plmm_raw$fit), tol = 1e-2)
+expect_equivalent(cv_plmm_num$lambda, cv_plmm_raw$lambda, tol = 1e-5) # are they both computing lambda sequences the same way
 
 ### cv.plmm fit should match plmm fit ---------------------------------------###
 ### estimating eta
