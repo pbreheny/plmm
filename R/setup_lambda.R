@@ -18,18 +18,10 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor) {
   ind <- which(penalty.factor != 0)
 
   if (length(ind) != p) {
-    fit <- stats::glm(y ~ -1 + X[, -ind, drop = FALSE], family='gaussian')
+    fit <- stats::glm(y ~ 1 + X[, -ind, drop = FALSE], family='gaussian')
   } else {
     fit <- stats::glm(y ~ 1, family='gaussian')
   }
-
-#   if (intercept){
-#     # rotated X intercept is not a column of ones so need to regress this as an unpenalized covariate w/o intercept
-#     fit <- stats::glm(y ~ -1 + X[, -ind, drop = FALSE], family='gaussian')
-#   } else {
-#     fit <- stats::glm(y ~ X[, -ind, drop = FALSE], family='gaussian')
-#   }
-
 
   zmax <- max((t(X[, ind]) %*% fit$residuals) / penalty.factor[ind]) / n ### this first part can by xty again
   lambda.max <- zmax/alpha

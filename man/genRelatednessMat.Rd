@@ -12,5 +12,7 @@ genRelatednessMat(X, ...)
 \item{...}{Optional arguments in the case that a character prefix is specified.}
 }
 \description{
-This function allows you to simulate an environmental confounding effect. This is used by \code{genDataPS()}, which scales the generated vector in order to comply with the user specified desired variance in the outcome attributable to the environmental effect.
+This function allows you to generate an n by n genetic relatedness matrix. If a numeric matrix is supplied, the RRM (Hayes, 2009) is used
+and is computed XX'/p. If a character argument which describes the location and prefix of PLINK bed/bim/bam files is supplied,
+a GRM is computed using the GCTA method of SNPrelate, unless another method is specified as an optional argument.
 }
