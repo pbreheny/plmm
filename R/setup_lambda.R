@@ -18,7 +18,7 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor) {
   ind <- which(penalty.factor != 0)
 
   if (length(ind) != p) {
-    fit <- stats::glm(y ~ 1 + X[, -ind, drop = FALSE], family='gaussian')
+    fit <- stats::glm(y ~ -1 + X[, -ind, drop = FALSE], family='gaussian')
   } else {
     fit <- stats::glm(y ~ 1, family='gaussian')
   }
