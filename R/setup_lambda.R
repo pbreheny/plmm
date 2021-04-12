@@ -23,7 +23,7 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor) {
     fit <- stats::glm(y ~ 1, family='gaussian')
   }
 
-  zmax <- max((t(X[, ind]) %*% fit$residuals) / penalty.factor[ind]) / n ### this first part can by xty again
+  zmax <- max(abs((t(X[, ind]) %*% fit$residuals)) / penalty.factor[ind]) / n ### this first part can by xty again
   lambda.max <- zmax/alpha
 
   if (lambda.min == 0) {
