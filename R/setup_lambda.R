@@ -32,7 +32,7 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor) {
     lambda <- exp(seq(log(lambda.max), log(lambda.min*lambda.max), len = nlambda))
   }
 
-  if (length(ind)!= p) lambda[1] <- lambda[1] * 1.000001
+  if (length(ind)!= p) lambda[1] <- lambda[1] * 1.0001
   lambda
 
 }
