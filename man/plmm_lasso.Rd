@@ -4,12 +4,14 @@
 \alias{plmm_lasso}
 \title{Fit a penalizedLMM with lasso regularization using penalizedLMM}
 \usage{
-plmm_lasso(X, y, p1, ...)
+plmm_lasso(X, y, V, p1, ...)
 }
 \arguments{
 \item{X}{Design matrix.}
 
 \item{y}{Continuous outcome vector.}
+
+\item{V}{RRM to use}
 
 \item{p1}{Number of causal SNPs. Lambda will be selected such that <= p1 variables enter the model.}
 

@@ -3,6 +3,7 @@
 #' This function allows you to fit a linear mixed model via penalized maximum likelihood with null model variance component estimation.
 #' @param X Design matrix.
 #' @param y Continuous outcome vector.
+#' @param V RRM to use
 #' @param p1 Number of causal SNPs. Lambda will be selected such that <= p1 variables enter the model.
 #' @param ... Additional optional arguments
 #' @importFrom zeallot %<-%
@@ -10,10 +11,11 @@
 
 
 
-plmm_lasso <- function(X, y, p1, ...) {
+plmm_lasso <- function(X, y, V, p1, ...) {
   args.list <- list(...)
   args.list$X <- X
   args.list$y <- y
+  args.list$V <- V
   args.list$penalty <- 'lasso'
   fit <- do.call('plmm', args.list)
   sel <- predict.plmm(fit, type = "nvar")
