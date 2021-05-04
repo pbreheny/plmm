@@ -4,16 +4,29 @@
 #' @param X Design matrix.
 #' @param y Continuous outcome vector.
 #' @param p1 Number of causal SNPs. Lambda will be selected such that <= p1 variables enter the model.
-#' @param standardize Should standardization be performed within \code{glmnet()}? Defaults to FALSE.
+#' @param ... Additional optional arguments
+#' @importFrom glmnet glmnet
 #' @export
 
-lasso <- function(X, y, p1, standardize = FALSE) {
-  fit <- glmnet::glmnet(X, y, standardize = standardize)
+lasso <- function(X, y, p1, ...) {
+  args.list <- list(...)
+  args.list$x <- X
+  args.list$y <- y
+  fit <- do.call('glmnet', args.list)
   sel <- sapply(stats::predict(fit, type='nonzero'), length)
-  coef <- coef(fit, min(fit$lambda[sel <= p1]))[,1]
+  if (!(p1 %in% sel)){
+    args.list$nlambda <- length(fit$lambda)
+    while (!(p1 %in% sel)){
+      nlambda <- args.list$nlambda
+      args.list$nlambda <- (nlambda + 10)
+      fit <- do.call('glmnet', args.list)
+      sel <- sapply(stats::predict(fit, type='nonzero'), length)
+    }
+  }
+  coef <- coef(fit, min(fit$lambda[sel == p1]))[-1, 1]
   names(coef) <- colnames(X)
   return(list(fit = fit,
-              nonzero = length(which(coef != 0)) - 1,
+              nonzero = length(which(coef != 0)),
               coef = coef,
               delta = NA,
               eta = NA))

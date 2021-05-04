@@ -4,7 +4,7 @@
 \alias{lasso_pca10}
 \title{Fit a linear model with lasso regularization and PC adjutment}
 \usage{
-lasso_pca10(X, y, p1, standardize = FALSE)
+lasso_pca10(X, y, p1, ...)
 }
 \arguments{
 \item{X}{Design matrix.}
@@ -13,7 +13,7 @@ lasso_pca10(X, y, p1, standardize = FALSE)
 
 \item{p1}{Number of causal SNPs. Lambda will be selected such that <= p1 variables enter the model.}
 
-\item{standardize}{Should standardization be performed within \code{glmnet()}? Defaults to FALSE.}
+\item{...}{Additional optional arguments}
 }
 \description{
 This function allows you to fit a linear model via lasso-penalized maximum likelihood, adjusted for the first 10 principal components (unpenalized), with the same output values as those of lmm_lasso_eta. Primarily used for simulation and comparison with lmm_lasso_eta.

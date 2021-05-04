@@ -19,13 +19,20 @@ plmm_lasso <- function(X, y, V, p1, ...) {
   args.list$penalty <- 'lasso'
   fit <- do.call('plmm', args.list)
   sel <- predict.plmm(fit, type = "nvar")
-  coef <- coef(fit, min(fit$lambda[sel <= p1]))[-1]
-  coef_pred <- coef(fit, min(fit$lambda[sel <= p1]))
+  if (!(p1 %in% sel)){
+    args.list$nlambda <- length(fit$lambda)
+    while (!(p1 %in% sel)){
+      nlambda <- args.list$nlambda
+      args.list$nlambda <- (nlambda + 10)
+      fit <- do.call('plmm', args.list)
+      sel <- predict.plmm(fit, type = "nvar")
+    }
+  }
+  coef <- coef(fit, min(fit$lambda[sel == p1]))[-1]
   names(coef) <- colnames(X)
   return(list(fit = fit,
               nonzero = length(which(coef != 0)),
               coef = coef,
-              coef_pred = coef_pred,
               delta = (1/fit$eta) - 1,
               eta = fit$eta))
 }
