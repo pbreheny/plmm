@@ -12,13 +12,21 @@ genGammaUnscaled <- function(structureGamma, J){
 
 #' @export
 genGammaUnscaled.default <- function(structureGamma, J){
-  warning("No valid structure specified - defaulting to 'linear_concordant'")
+  warning("No valid structure specified - defaulting to 'dichotomous_discordant'")
   gamma_unscaled <- 1:J
   return(gamma_unscaled)
 }
 
 #' @export
-genGammaUnscaled.character <- function(structureGamma, J){
+genGammaUnscaled.character <- function(structureGamma = c('dichotomous_discordant',
+                                                          'dichotomous_concordant',
+                                                          'linear_discordant',
+                                                          'linear_concordant',
+                                                          'exponential_discordant',
+                                                          'exponential_concordant',
+                                                          'halfandhalf_discordant',
+                                                          'halfandhalf_concordant'), J){
+  structureGamma <- match.arg(structureGamma)
   dat <- strsplit(structureGamma, "_")[[1]]
   if (dat[1] == 'dichotomous'){
 

@@ -12,7 +12,7 @@ genDataPS(
   structureX = "indep_subpops",
   Fst = NULL,
   inbr = "heterogeneous",
-  structureGamma = c("halfandhalf_decreasing_heterogeneous"),
+  structureGamma = c("dichotomous_discordant"),
   eta = 0.8,
   xi = 0,
   standardizeX = TRUE,
@@ -36,7 +36,7 @@ genDataPS(
 
 \item{inbr}{Indicates whether the desired inbreeding is homogeneous or heterogeneous. Defaults to heterogeneous.}
 
-\item{structureGamma}{The desired structure of the environmental confounding effect. Defaults to halfandhalf_decreasing_heterogeneous.}
+\item{structureGamma}{The desired structure of the environmental confounding effect. Defaults to 'dichotomous_discordant'}
 
 \item{eta}{The desired proportion of variance in the outcome that is attributable to causal SNP effects. In other words, SNR.}
 

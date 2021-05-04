@@ -9,7 +9,7 @@
 #' @param structureX Type of structure to simulate.
 #' @param Fst The desired final FST of the admixed individuals. Ranges from 0 to 1. A high Fst implies greater differentiation among populations. Defaults to 0.1 if structureX = 1d_linear and 0.2 if structureX = indep_subpops. Otherwise defaults to NULL.
 #' @param inbr Indicates whether the desired inbreeding is homogeneous or heterogeneous. Defaults to heterogeneous.
-#' @param structureGamma The desired structure of the environmental confounding effect. Defaults to halfandhalf_decreasing_heterogeneous.
+#' @param structureGamma The desired structure of the environmental confounding effect. Defaults to 'dichotomous_discordant'
 #' @param eta The desired proportion of variance in the outcome that is attributable to causal SNP effects. In other words, SNR.
 #' @param xi The desired proportion of the non-signal variance in the outcome that is attributable to unobserved environmental confounding effects.
 #' @param standardizeX Should the generated X matrix be standardized? Defaults to TRUE.
@@ -24,7 +24,7 @@ genDataPS <- function(n = 200, p = 1000, p1 = floor(p/2), nJ = rep(50, 4),
                       Fst = NULL,
                       # inbr = c("heterogeneous", "homogeneous"),
                       inbr = "heterogeneous",
-                      structureGamma = c("halfandhalf_decreasing_heterogeneous"),
+                      structureGamma = c("dichotomous_discordant"),
                       eta = 0.8,
                       xi = 0,
                       standardizeX = TRUE,
