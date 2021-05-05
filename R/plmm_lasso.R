@@ -20,11 +20,11 @@ plmm_lasso <- function(X, y, V, p1, ...) {
   fit <- do.call('plmm', args.list)
   sel <- predict.plmm(fit, type = "nvar")
   if (!(p1 %in% sel)){
-    args.list$nlambda <- length(fit$lambda)
+    args.list$lambda.min <- ifelse(nrow(X) > ncol(X), 0.001, 0.05)
+    lams <- seq(from = (args.list$lambda.min + 1e-4), to = .999, length.out = 100)
     iter <- 1
-    while (!(p1 %in% sel)){
-      nlambda <- args.list$nlambda
-      args.list$nlambda <- (nlambda + 10)
+    while (!(p1 %in% sel) & iter <= 100){
+      args.list$lambda.min <- lams[iter]
       fit <- do.call('plmm', args.list)
       sel <- predict.plmm(fit, type = "nvar")
       iter <- iter + 1

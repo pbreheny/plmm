@@ -15,11 +15,11 @@ lasso <- function(X, y, p1, ...) {
   fit <- do.call('glmnet', args.list)
   sel <- sapply(stats::predict(fit, type='nonzero'), length)
   if (!(p1 %in% sel)){
-    args.list$nlambda <- length(fit$lambda)
+    args.list$lambda.min.ratio <- ifelse(nrow(X) < ncol(X), 0.01, 1e-04)
+    lams <- seq(from = (args.list$lambda.min.ratio + 1e-4), to = .999, length.out = 100)
     iter <- 1
-    while (!(p1 %in% sel) & iter < 10){
-      nlambda <- args.list$nlambda
-      args.list$nlambda <- (nlambda + 10)
+    while (!(p1 %in% sel) & iter <= 100){
+      args.list$lambda.min.ratio <- lams[iter]
       fit <- do.call('glmnet', args.list)
       sel <- sapply(stats::predict(fit, type='nonzero'), length)
       iter <- iter + 1
