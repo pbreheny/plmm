@@ -21,14 +21,16 @@ plmm_lasso <- function(X, y, V, p1, ...) {
   sel <- predict.plmm(fit, type = "nvar")
   if (!(p1 %in% sel)){
     args.list$nlambda <- length(fit$lambda)
+    iter <- 1
     while (!(p1 %in% sel)){
       nlambda <- args.list$nlambda
       args.list$nlambda <- (nlambda + 10)
       fit <- do.call('plmm', args.list)
       sel <- predict.plmm(fit, type = "nvar")
+      iter <- iter + 1
     }
   }
-  coef <- coef(fit, min(fit$lambda[sel == p1]))[-1]
+  coef <- coef(fit, min(fit$lambda[sel <= p1]))[-1]
   names(coef) <- colnames(X)
   return(list(fit = fit,
               nonzero = length(which(coef != 0)),

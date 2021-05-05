@@ -16,14 +16,16 @@ lasso <- function(X, y, p1, ...) {
   sel <- sapply(stats::predict(fit, type='nonzero'), length)
   if (!(p1 %in% sel)){
     args.list$nlambda <- length(fit$lambda)
-    while (!(p1 %in% sel)){
+    iter <- 1
+    while (!(p1 %in% sel) & iter < 10){
       nlambda <- args.list$nlambda
       args.list$nlambda <- (nlambda + 10)
       fit <- do.call('glmnet', args.list)
       sel <- sapply(stats::predict(fit, type='nonzero'), length)
+      iter <- iter + 1
     }
   }
-  coef <- coef(fit, min(fit$lambda[sel == p1]))[-1, 1]
+  coef <- coef(fit, min(fit$lambda[sel <= p1]))[-1, 1]
   names(coef) <- colnames(X)
   return(list(fit = fit,
               nonzero = length(which(coef != 0)),

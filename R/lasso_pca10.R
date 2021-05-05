@@ -24,14 +24,16 @@ lasso_pca10 <- function(X, y, p1, ...){
   sel <- sapply(stats::predict(fit, type='nonzero'), length) - 10 # remove unpenalized effects
   if (!(p1 %in% sel)){
     args.list$nlambda <- length(fit$lambda)
+    iter <- 1
     while (!(p1 %in% sel)){
       nlambda <- args.list$nlambda
       args.list$nlambda <- (args.list$nlambda + 10)
       fit <- do.call('glmnet', args.list)
       sel <- sapply(stats::predict(fit, type='nonzero'), length) - 10
+      iter <- iter + 1
     }
   }
-  coef <- coef(fit, min(fit$lambda[sel == p1]))[-c(1:11),1]
+  coef <- coef(fit, min(fit$lambda[sel <= p1]))[-c(1:11),1]
   names(coef) <- colnames(X)
   return(list(fit = fit,
               nonzero = length(which(coef != 0)),
