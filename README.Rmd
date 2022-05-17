@@ -1,0 +1,14 @@
+---
+title: "README"
+author: "Tabitha K. Peter"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## penalizedLMM
+
+This package contains functions that fit penalized linear mixed models to correct for unobserved confounding effects. Documentation for this package is in progress. 
