@@ -7,3 +7,6 @@ xxx_cv-plmm\.R$
 xxx_lamSelect\.R
 maybe_rm
 xxx
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
