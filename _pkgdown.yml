@@ -1,4 +1,11 @@
 url: ~
+home: 
+  title: penalizedLMM
+  description: A package for fitting penalized linear mixed models
 template:
   bootstrap: 5
+  bootswatch: solar
+  theme: arrow-dark
+  bslib:
+    pkgdown-nav-height: 100px
 
