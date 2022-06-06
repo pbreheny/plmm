@@ -1,11 +1,26 @@
 url: ~
-home: 
-  title: penalizedLMM
-  description: A package for fitting penalized linear mixed models
 template:
-  bootstrap: 5
-  bootswatch: solar
-  theme: arrow-dark
+  params:
+    bootstrap: 5
+    bootswatch: solar
+    theme: arrow-dark
   bslib:
     pkgdown-nav-height: 100px
 
+reference:
+  - title: Generating data
+    contents:
+    - genDataPS
+    - genGammaUnscaled
+    - genRelatednessMat
+    - genXps
+  - title: Model fitting 
+    contents:
+    - lasso
+    - lasso_pca10
+    - lmm_ggmix
+    - lmm_lasso
+    - plmm
+    - plmm_lasso
+    - plmm_mcp
+    - plmm_scad

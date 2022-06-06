@@ -1,14 +1,14 @@
 Package: penalizedLMM
 Title: Fit nonconvex-penalized linear mixed models to account for the presence of unobserved confounding effects
 Version: 0.0.0.9000
+Date: 2022-06-06
 Authors@R: c(
-    person("Anna C.","Reisetter",role = c("aut", "cre"), email = "anna-reisetter@uiowa.edu",
-    comment = c(ORCID = "https://orcid.org/0000-0001-8332-4585")),
-
-    person("Tabitha K.", "Peter",role = "ctb"),
-
-    person("Patrick J.","Breheny",role = "aut", 
-        comment = c(ORCID = "http://orcid.org/0000-0002-0650-1119"))   
+    person("Anna C.","Reisetter", role = c("aut", "cre"),
+        email = "anna-reisetter@uiowa.edu",
+        comment = c(ORCID = "0000-0001-8332-4585")), 
+    person("Patrick J.", "Breheny", role = "aut", 
+        comment = c(ORCID = "0000-0002-0650-1119"))
+    person("Tabitha K.", "Peter", role = "ctb")
 )
 Description: Fit a penalized linear mixed model that corrects for unobserved confounding factors. penalizedLMM infers and corrects for the presence of unobserved confounding effects such as population stratification and environmental heterogeneity. It then fits a linear model via lasso penalized maximum likelihood. Originally designed for the multivariate analysis of SNP data, penalizedLMM eliminates the need for LD pruning and subpopulation-specific analyses. Functions for the appropriate processing of PLINK files are also supplied. 
 Depends: R (>= 3.5.0)
@@ -17,7 +17,6 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-biocViews:
 Suggests: snpStats, popkin, ggmix, tinytest, graphics, grDevices, parallel, MASS
 Imports: 
     stats,
