@@ -3,4 +3,4 @@ xxx/
 xxx*\.R$
 *\.rds$
 .Rhistory
-
+admixture_data.R # this is my scratch work for generating the example data set 
