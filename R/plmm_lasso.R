@@ -7,6 +7,13 @@
 #' @param p1 Number of causal SNPs. Lambda will be selected such that <= p1 variables enter the model.
 #' @param ... Additional optional arguments
 #' @importFrom zeallot %<-%
+#' @examples
+#' RRM <- genRelatednessMat(X = scale(admix$X))
+#' fit <- plmm_lasso(X = admix$X,
+#'                   y = admix$y,
+#'                    p1 = 10)
+#'
+#' 
 #' @export
 
 
@@ -38,5 +45,7 @@ plmm_lasso <- function(X, y, V, p1, ...) {
               delta = (1/fit$eta) - 1,
               eta = fit$eta))
 }
+
+
 
 

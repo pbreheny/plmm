@@ -1,12 +1,1 @@
-^penalizedLMM\.Rproj$
-^\.Rproj\.user$
-xxx_sanity_check\.R$
-xxx_lmm_ncvreg_test\.R$
-xxx_tests\.R$
-xxx_cv-plmm\.R$
-xxx_lamSelect\.R
-maybe_rm
-xxx
-^_pkgdown\.yml$
-^docs$
-^pkgdown$
+^data-raw$
