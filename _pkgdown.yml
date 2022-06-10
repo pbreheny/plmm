@@ -1,11 +1,11 @@
 url: ~
+
 template:
-  params:
     bootstrap: 5
-    bootswatch: solar
+    bootswatch: superhero
     theme: arrow-dark
-  bslib:
-    pkgdown-nav-height: 100px
+    bslib:
+      pkgdown-nav-height: 100px
 
 reference:
   - title: Generating data
@@ -14,8 +14,10 @@ reference:
     - genGammaUnscaled
     - genRelatednessMat
     - genXps
+    
   - title: Model fitting 
     contents:
+    - convexMin
     - lasso
     - lasso_pca10
     - lmm_ggmix
@@ -23,4 +25,40 @@ reference:
     - plmm
     - plmm_lasso
     - plmm_mcp
+    - plmm_nll
+    - plmm_nll_nonnull
+    - plmm_null
     - plmm_scad
+    - setup_lambda
+    
+  - title: Coefficient methods
+    contents:
+    - coef.cv.plmm
+    - coef.plmm
+    
+  - title: Methods for `plmm` class
+    contents:
+    - cvf
+    - cv.plmm
+    - gic
+    - loss.plmm
+    
+  - title: Data (pre)processing 
+    contents:
+    - preprocess
+    - rotate_data
+    - scale_varp
+    - unscale
+    - unstandardize
+    - varp
+    
+  - title: Plots and formatting
+    contents:
+    - lamNames
+    - plot.cv.plmm
+    - plot.plmm
+    
+  - title: Prediction
+    contents: 
+    - predict.plmm
+    

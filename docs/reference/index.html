@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-dark"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="generating-data">Generating data<a class="anchor" aria-label="anchor" href="#generating-data"></a></h2>
       
       
 
@@ -46,31 +46,6 @@
       
 
       <dl><dt>
-          
-          <code><a href="coef.cv.plmm.html">coef(<i>&lt;cv.plmm&gt;</i>)</a></code> 
-        </dt>
-        <dd>Coef method for "cv.plmm" class</dd>
-      </dl><dl><dt>
-          
-          <code><a href="coef.plmm.html">coef(<i>&lt;plmm&gt;</i>)</a></code> 
-        </dt>
-        <dd>Coef method for "plmm" class</dd>
-      </dl><dl><dt>
-          
-          <code><a href="convexMin.html">convexMin()</a></code> 
-        </dt>
-        <dd>Calculate index for which objective function ceases to be locally convex</dd>
-      </dl><dl><dt>
-          
-          <code><a href="cv.plmm.html">cv.plmm()</a></code> 
-        </dt>
-        <dd>Cross-validation for plmm</dd>
-      </dl><dl><dt>
-          
-          <code><a href="cvf.html">cvf()</a></code> 
-        </dt>
-        <dd>Cross-validation internal function for cv.plmm</dd>
-      </dl><dl><dt>
           
           <code><a href="genDataPS.html">genDataPS()</a></code> 
         </dt>
@@ -90,16 +65,22 @@
           <code><a href="genXps.html">genXps()</a></code> 
         </dt>
         <dd>Generate and X matrix with population structure</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      <h2 id="model-fitting">Model fitting<a class="anchor" aria-label="anchor" href="#model-fitting"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
-          <code><a href="gic.html">gic()</a></code> 
+          <code><a href="convexMin.html">convexMin()</a></code> 
         </dt>
-        <dd>General information criterion method of selecting lambda for "plmm" class</dd>
-      </dl><dl><dt>
-          
-          <code><a href="lamNames.html">lamNames()</a></code> 
-        </dt>
-        <dd>Generate nicely formatted lambda vec</dd>
+        <dd>Calculate index for which objective function ceases to be locally convex</dd>
       </dl><dl><dt>
           
           <code><a href="lasso.html">lasso()</a></code> 
@@ -120,11 +101,6 @@
           <code><a href="lmm_lasso.html">lmm_lasso()</a></code> 
         </dt>
         <dd>Fit a penalizedLMM with lasso regularization</dd>
-      </dl><dl><dt>
-          
-          <code><a href="loss.plmm.html">loss.plmm()</a></code> 
-        </dt>
-        <dd>Loss method for "plmm" class</dd>
       </dl><dl><dt>
           
           <code><a href="plmm.html">plmm()</a></code> 
@@ -162,20 +138,73 @@
         <dd>Fit a penalizedLMM with SCAD regularization using penalizedLMM</dd>
       </dl><dl><dt>
           
-          <code><a href="plot.cv.plmm.html">plot(<i>&lt;cv.plmm&gt;</i>)</a></code> 
+          <code><a href="setup_lambda.html">setup_lambda()</a></code> 
         </dt>
-        <dd>Plot method for cv.plmm class</dd>
+        <dd>Compute sequence of lambda values</dd>
+      </dl></div><div class="section level2">
+      <h2 id="coefficient-methods">Coefficient methods<a class="anchor" aria-label="anchor" href="#coefficient-methods"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="coef.cv.plmm.html">coef(<i>&lt;cv.plmm&gt;</i>)</a></code> 
+        </dt>
+        <dd>Coef method for "cv.plmm" class</dd>
       </dl><dl><dt>
           
-          <code><a href="plot.plmm.html">plot(<i>&lt;plmm&gt;</i>)</a></code> 
+          <code><a href="coef.plmm.html">coef(<i>&lt;plmm&gt;</i>)</a></code> 
         </dt>
-        <dd>Plot method for plmm class</dd>
+        <dd>Coef method for "plmm" class</dd>
+      </dl></div><div class="section level2">
+      <h2 id="methods-for-plmm-class">Methods for `plmm` class<a class="anchor" aria-label="anchor" href="#methods-for-plmm-class"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="cvf.html">cvf()</a></code> 
+        </dt>
+        <dd>Cross-validation internal function for cv.plmm</dd>
       </dl><dl><dt>
           
-          <code><a href="predict.plmm.html">predict(<i>&lt;plmm&gt;</i>)</a></code> 
+          <code><a href="cv.plmm.html">cv.plmm()</a></code> 
         </dt>
-        <dd>Predict method for plmm class</dd>
+        <dd>Cross-validation for plmm</dd>
       </dl><dl><dt>
+          
+          <code><a href="gic.html">gic()</a></code> 
+        </dt>
+        <dd>General information criterion method of selecting lambda for "plmm" class</dd>
+      </dl><dl><dt>
+          
+          <code><a href="loss.plmm.html">loss.plmm()</a></code> 
+        </dt>
+        <dd>Loss method for "plmm" class</dd>
+      </dl></div><div class="section level2">
+      <h2 id="data-pre-processing">Data (pre)processing<a class="anchor" aria-label="anchor" href="#data-pre-processing"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
           
           <code><a href="preprocess.html">preprocess()</a></code> 
         </dt>
@@ -192,11 +221,6 @@
         <dd>Calculate scale by the population standard deviation, without centering</dd>
       </dl><dl><dt>
           
-          <code><a href="setup_lambda.html">setup_lambda()</a></code> 
-        </dt>
-        <dd>Compute sequence of lambda values</dd>
-      </dl><dl><dt>
-          
           <code><a href="unscale.html">unscale()</a></code> 
         </dt>
         <dd>Unscale coefficient values</dd>
@@ -210,12 +234,55 @@
           <code><a href="varp.html">varp()</a></code> 
         </dt>
         <dd>Calculate the population variance</dd>
+      </dl></div><div class="section level2">
+      <h2 id="plots-and-formatting">Plots and formatting<a class="anchor" aria-label="anchor" href="#plots-and-formatting"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="lamNames.html">lamNames()</a></code> 
+        </dt>
+        <dd>Generate nicely formatted lambda vec</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot.cv.plmm.html">plot(<i>&lt;cv.plmm&gt;</i>)</a></code> 
+        </dt>
+        <dd>Plot method for cv.plmm class</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plot.plmm.html">plot(<i>&lt;plmm&gt;</i>)</a></code> 
+        </dt>
+        <dd>Plot method for plmm class</dd>
+      </dl></div><div class="section level2">
+      <h2 id="prediction">Prediction<a class="anchor" aria-label="anchor" href="#prediction"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="predict.plmm.html">predict(<i>&lt;plmm&gt;</i>)</a></code> 
+        </dt>
+        <dd>Predict method for plmm class</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Anna C. Reisetter.</p>
+  <p></p><p>Developed by Anna C. Reisetter, Patrick J. Breheny.</p>
 </div>
 
 <div class="pkgdown-footer-right">
