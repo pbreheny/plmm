@@ -1,3 +1,8 @@
 ^data-raw$
+^pkgdown$
+^docs$
+^index.Rmd$
+^\.github$
+^\.version\.json$
 ^.*\.Rproj$
 ^\.Rproj\.user$

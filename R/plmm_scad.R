@@ -8,6 +8,9 @@
 #' @param X_for_K X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.
 #' @importFrom zeallot %<-%
 #' @export
+#' 
+#' @examples 
+#' 
 
 
 
