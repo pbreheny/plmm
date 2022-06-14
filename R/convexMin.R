@@ -8,6 +8,9 @@
 #' @param family Only "gaussian" currently supported.
 #' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
 #' @export
+#' 
+#' @examples 
+#' 
 
 # from ncvreg
 convexMin <- function(b, X, penalty, gamma, l2, family = "gaussian", penalty.factor) {
@@ -16,8 +19,10 @@ convexMin <- function(b, X, penalty, gamma, l2, family = "gaussian", penalty.fac
   l <- ncol(b)
 
   if (penalty=="MCP") {
+    if(is.null(gamma)){gamma <- 3} # TODO: verify that this is appropriate
     k <- 1/gamma
   } else if (penalty=="SCAD") {
+    if(is.null(gamma)){gamma <- 3.7} # TODO: verify that this is appropriate
     k <- 1/(gamma-1)
   } else if (penalty=="lasso") {
     return(NULL)

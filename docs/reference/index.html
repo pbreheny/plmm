@@ -66,7 +66,105 @@
         </dt>
         <dd>Generate and X matrix with population structure</dd>
       </dl></div><div class="section level2">
-      <h2 id="model-fitting">Model fitting<a class="anchor" aria-label="anchor" href="#model-fitting"></a></h2>
+      <h2 id="fitting-penalized-linear-mixed-models-plmms-">Fitting penalized linear mixed models (PLMMs)<a class="anchor" aria-label="anchor" href="#fitting-penalized-linear-mixed-models-plmms-"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="plmm.html">plmm()</a></code> 
+        </dt>
+        <dd>Fit a linear mixed model with non-convex regularization</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plmm_lasso.html">plmm_lasso()</a></code> 
+        </dt>
+        <dd>Fit a penalizedLMM with lasso regularization using penalizedLMM</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plmm_mcp.html">plmm_mcp()</a></code> 
+        </dt>
+        <dd>Fit a penalizedLMM with MCP regularization using penalizedLMM</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plmm_nll.html">plmm_nll()</a></code> 
+        </dt>
+        <dd>Evaluate the negative log-likelihood of a null Gaussian penalizedLMM model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plmm_nll_nonnull.html">plmm_nll_nonnull()</a></code> 
+        </dt>
+        <dd>Evaluate the negative log-likelihood of a non-null Gaussian plmm model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plmm_null.html">plmm_null()</a></code> 
+        </dt>
+        <dd>Estimate eta using a null Gaussian penalizedLMM model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="plmm_scad.html">plmm_scad()</a></code> 
+        </dt>
+        <dd>Fit a penalizedLMM with SCAD regularization using penalizedLMM</dd>
+      </dl></div><div class="section level2">
+      <h2 id="loss-information-and-cross-validation-for-plmms">Loss, information, and cross-validation for PLMMs<a class="anchor" aria-label="anchor" href="#loss-information-and-cross-validation-for-plmms"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="cvf.html">cvf()</a></code> 
+        </dt>
+        <dd>Cross-validation internal function for cv.plmm</dd>
+      </dl><dl><dt>
+          
+          <code><a href="cv.plmm.html">cv.plmm()</a></code> 
+        </dt>
+        <dd>Cross-validation for plmm</dd>
+      </dl><dl><dt>
+          
+          <code><a href="gic.html">gic()</a></code> 
+        </dt>
+        <dd>General information criterion method of selecting lambda for "plmm" class</dd>
+      </dl><dl><dt>
+          
+          <code><a href="loss.plmm.html">loss.plmm()</a></code> 
+        </dt>
+        <dd>Loss method for "plmm" class</dd>
+      </dl></div><div class="section level2">
+      <h2 id="coefficient-methods-for-plmms">Coefficient methods for PLMMs<a class="anchor" aria-label="anchor" href="#coefficient-methods-for-plmms"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="coef.cv.plmm.html">coef(<i>&lt;cv.plmm&gt;</i>)</a></code> 
+        </dt>
+        <dd>Coef method for "cv.plmm" class</dd>
+      </dl><dl><dt>
+          
+          <code><a href="coef.plmm.html">coef(<i>&lt;plmm&gt;</i>)</a></code> 
+        </dt>
+        <dd>Coef method for "plmm" class</dd>
+      </dl></div><div class="section level2">
+      <h2 id="other-model-fitting-methods-and-some-helper-functions-">Other model fitting methods (and some helper functions)<a class="anchor" aria-label="anchor" href="#other-model-fitting-methods-and-some-helper-functions-"></a></h2>
       
       
 
@@ -103,98 +201,11 @@
         <dd>Fit a penalizedLMM with lasso regularization</dd>
       </dl><dl><dt>
           
-          <code><a href="plmm.html">plmm()</a></code> 
-        </dt>
-        <dd>Fit a linear mixed model with non-convex regularization</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm_lasso.html">plmm_lasso()</a></code> 
-        </dt>
-        <dd>Fit a penalizedLMM with lasso regularization using penalizedLMM</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm_mcp.html">plmm_mcp()</a></code> 
-        </dt>
-        <dd>Fit a penalizedLMM with MCP regularization using penalizedLMM</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm_nll.html">plmm_nll()</a></code> 
-        </dt>
-        <dd>Evaluate the negative log-likelihood of a null Gaussian penalizedLMM model</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm_nll_nonnull.html">plmm_nll_nonnull()</a></code> 
-        </dt>
-        <dd>Evaluate the negative log-likelihood of a non-null Gaussian plmm model</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm_null.html">plmm_null()</a></code> 
-        </dt>
-        <dd>Estimate eta using a null Gaussian penalizedLMM model</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm_scad.html">plmm_scad()</a></code> 
-        </dt>
-        <dd>Fit a penalizedLMM with SCAD regularization using penalizedLMM</dd>
-      </dl><dl><dt>
-          
           <code><a href="setup_lambda.html">setup_lambda()</a></code> 
         </dt>
         <dd>Compute sequence of lambda values</dd>
       </dl></div><div class="section level2">
-      <h2 id="coefficient-methods">Coefficient methods<a class="anchor" aria-label="anchor" href="#coefficient-methods"></a></h2>
-      
-      
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
-          
-          <code><a href="coef.cv.plmm.html">coef(<i>&lt;cv.plmm&gt;</i>)</a></code> 
-        </dt>
-        <dd>Coef method for "cv.plmm" class</dd>
-      </dl><dl><dt>
-          
-          <code><a href="coef.plmm.html">coef(<i>&lt;plmm&gt;</i>)</a></code> 
-        </dt>
-        <dd>Coef method for "plmm" class</dd>
-      </dl></div><div class="section level2">
-      <h2 id="methods-for-plmm-class">Methods for `plmm` class<a class="anchor" aria-label="anchor" href="#methods-for-plmm-class"></a></h2>
-      
-      
-
-      
-    </div><div id="" class="section level2">
-      
-      
-      
-
-      <dl><dt>
-          
-          <code><a href="cvf.html">cvf()</a></code> 
-        </dt>
-        <dd>Cross-validation internal function for cv.plmm</dd>
-      </dl><dl><dt>
-          
-          <code><a href="cv.plmm.html">cv.plmm()</a></code> 
-        </dt>
-        <dd>Cross-validation for plmm</dd>
-      </dl><dl><dt>
-          
-          <code><a href="gic.html">gic()</a></code> 
-        </dt>
-        <dd>General information criterion method of selecting lambda for "plmm" class</dd>
-      </dl><dl><dt>
-          
-          <code><a href="loss.plmm.html">loss.plmm()</a></code> 
-        </dt>
-        <dd>Loss method for "plmm" class</dd>
-      </dl></div><div class="section level2">
-      <h2 id="data-pre-processing">Data (pre)processing<a class="anchor" aria-label="anchor" href="#data-pre-processing"></a></h2>
+      <h2 id="data-pre-processing-and-wrangling">Data (pre)processing and wrangling<a class="anchor" aria-label="anchor" href="#data-pre-processing-and-wrangling"></a></h2>
       
       
 
@@ -235,7 +246,7 @@
         </dt>
         <dd>Calculate the population variance</dd>
       </dl></div><div class="section level2">
-      <h2 id="plots-and-formatting">Plots and formatting<a class="anchor" aria-label="anchor" href="#plots-and-formatting"></a></h2>
+      <h2 id="plotting-and-formatting">Plotting and formatting<a class="anchor" aria-label="anchor" href="#plotting-and-formatting"></a></h2>
       
       
 
@@ -276,6 +287,22 @@
           <code><a href="predict.plmm.html">predict(<i>&lt;plmm&gt;</i>)</a></code> 
         </dt>
         <dd>Predict method for plmm class</dd>
+      </dl></div><div class="section level2">
+      <h2 id="data-sets">Data sets<a class="anchor" aria-label="anchor" href="#data-sets"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="admix.html">admix</a></code> 
+        </dt>
+        <dd>Semi-simulated SNP data</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
