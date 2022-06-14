@@ -7,9 +7,9 @@
 #' @param ... Additional optional arguments
 #' @importFrom glmnet glmnet
 #' @export
-#' 
+#'
 #' @examples 
-#' fit <- (admix$X, admix$y, p1 = 5)
+#' fit <- lasso(admix$X, admix$y, p1 = 5)
 
 lasso <- function(X, y, p1, ...) {
   args.list <- list(...)

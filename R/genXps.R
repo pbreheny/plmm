@@ -1,5 +1,5 @@
 
-#' Generate and X matrix with population structure
+#' Generate an X matrix with population structure
 #'
 #' This function allows you to simulate structured genetic data (SNP).
 #' @param n Number of observations/samples to simulate.
@@ -13,6 +13,9 @@
 #' @param structureX_other If \code{structureX == "other"}, an matrix or SnpMatrix object with subjects in rows and SNPs in columns to be used to generate pseudophenotypes must be supplied here.
 #' @param sampleCols A logical flag for whether the columns of the resultant X matrix should be scrambled. This may be desirable if the causal SNPs should change from one simulation to the next. Defaults to TRUE.
 #' @export
+#' 
+#' @examples 
+#' sim_X <- genXps(n = 200, nJ = rep(100, 2), p = 1000, structureX = "indep_subpops", inbr = "heterogeneous")
 
 genXps <- function(n, nJ, p,
                    structureX = c("admixture", "indep_subpops", "1d_linear", "1d_circular", "independent", "other"),

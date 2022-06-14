@@ -2,12 +2,12 @@
 #' Generate data with population structure
 #'
 #' This function allows you to simulate structured genetic data (SNP) with an unobserved environmental confounding effect.
-#' @param n Number of observations/samples to simulate.
-#' @param p Number of SNPs to simulate.
+#' @param n Number of observations/samples to simulate. Defaults to 200. 
+#' @param p Number of SNPs to simulate. Defaults to 1000. 
 #' @param p1 Number of SNPs that are causal. Defaults to floor(p/2).
-#' @param nJ Number of observations in each subpopulation. The length of nJ corresponds to the number of subpopulations.
+#' @param nJ Number of observations in each subpopulation. The length of nJ corresponds to the number of subpopulations. Defaults to rep(50, 4). 
 #' @param structureX Type of structure to simulate.
-#' @param Fst The desired final FST of the admixed individuals. Ranges from 0 to 1. A high Fst implies greater differentiation among populations. Defaults to 0.1 if structureX = 1d_linear and 0.2 if structureX = indep_subpops. Otherwise defaults to NULL.
+#' @param Fst The desired final FST of the admixed individuals. Ranges from 0 to 1. A high FST implies greater differentiation among populations. Defaults to 0.1 if structureX = 1d_linear and 0.2 if structureX = indep_subpops. Otherwise defaults to NULL.
 #' @param inbr Indicates whether the desired inbreeding is homogeneous or heterogeneous. Defaults to heterogeneous.
 #' @param structureGamma The desired structure of the environmental confounding effect. Defaults to 'dichotomous_discordant'
 #' @param eta The desired proportion of variance in the outcome that is attributable to causal SNP effects. In other words, SNR.
@@ -16,7 +16,15 @@
 #' @param structureX_other If \code{structureX == "other"}, an matrix or SnpMatrix object with subjects in rows and SNPs in columns to be used to generate pseudophenotypes must be supplied here.
 #' @param sampleCols A logical flag for whether the columns of the resultant X matrix should be scrambled. This may be desirable if the causal SNPs should change from one simulation to the next. Defaults to TRUE.
 #' @param B0 Optional. Additional intercept value.
+#' 
+#' @return A list with 7 elements: a matrix of SNP data (X), a single-column matrix of outcome values (y), a single column matrix 'env', a vector of coefficients (beta), a matrix of Z values allocating environmental effects among subjects (Z), a vector of numeric values representing environmental effects (gamma), and the type of structure used in the SNP data (structureX)
+#' 
 #' @export
+#' 
+#' @examples 
+#' sim_dat <- genDataPS(structureX = "1d_linear")
+#' example_fit <- plmm(sim_dat$X, sim_dat$y, V = sim_dat$X%*%t(sim_dat$X))
+
 
 genDataPS <- function(n = 200, p = 1000, p1 = floor(p/2), nJ = rep(50, 4),
                       # structureX = c("admixture", "indep_subpops", "1d_linear", "1d_circular", "independent", "other"),

@@ -11,7 +11,7 @@
 #' 
 #' @examples
 #' RRM <- genRelatednessMat(X = scale(admix$X))
-#' fit <- plmm_lasso(X = admix$X, y = admix$y, p1 = 10)
+#' fit <- plmm_lasso(X = admix$X, y = admix$y, V = RRM, p1 = 10)
 
 plmm_lasso <- function(X, y, V, p1, ...) {
   args.list <- list(...)

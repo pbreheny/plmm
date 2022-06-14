@@ -7,6 +7,10 @@
 #' @param ... Optional arguments in the case that a character prefix is specified.
 #' @importFrom SNPRelate snpgdsBED2GDS snpgdsGRM snpgdsOpen snpgdsClose
 #' @export
+#' 
+#' @examples 
+#' RRM <- genRelatednessMat(X = scale(admix$X))
+
 genRelatednessMat <- function(X, ...){
   UseMethod("genRelatednessMat")
 }

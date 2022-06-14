@@ -62,3 +62,7 @@ reference:
     contents: 
     - predict.plmm
     
+  - title: Data sets
+  contents:
+    - admix
+    

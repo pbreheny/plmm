@@ -5,6 +5,10 @@
 #' @param structureGamma A character argument describing the desired structure.
 #' @param J Number of subpopulations.
 #' @export
+#' 
+#' @examples 
+#' genGammaUnscaled(structureGamma = "linear_concordant", J = 3)
+
 
 genGammaUnscaled <- function(structureGamma, J){
   UseMethod("genGammaUnscaled")

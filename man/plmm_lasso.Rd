@@ -20,3 +20,7 @@ plmm_lasso(X, y, V, p1, ...)
 \description{
 This function allows you to fit a linear mixed model via penalized maximum likelihood with null model variance component estimation.
 }
+\examples{
+RRM <- genRelatednessMat(X = scale(admix$X))
+fit <- plmm_lasso(X = admix$X, y = admix$y, V = RRM, p1 = 10)
+}
