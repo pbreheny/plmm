@@ -16,3 +16,6 @@ This function allows you to generate an n by n genetic relatedness matrix. If a 
 and is computed XX'/p. If a character argument which describes the location and prefix of PLINK bed/bim/bam files is supplied,
 a GRM is computed using the GCTA method of SNPrelate, unless another method is specified as an optional argument.
 }
+\examples{
+RRM <- genRelatednessMat(X = scale(admix$X))
+}

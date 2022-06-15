@@ -14,3 +14,6 @@ genGammaUnscaled(structureGamma, J)
 \description{
 This function allows you to simulate an environmental confounding effect. This is used by \code{genDataPS()}, which scales the generated vector in order to comply with the user specified desired variance in the outcome attributable to the environmental effect.
 }
+\examples{
+genGammaUnscaled(structureGamma = "linear_concordant", J = 3)
+}

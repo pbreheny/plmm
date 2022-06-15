@@ -2,7 +2,7 @@
 % Please edit documentation in R/genXps.R
 \name{genXps}
 \alias{genXps}
-\title{Generate and X matrix with population structure}
+\title{Generate an X matrix with population structure}
 \usage{
 genXps(
   n,
@@ -41,4 +41,7 @@ genXps(
 }
 \description{
 This function allows you to simulate structured genetic data (SNP).
+}
+\examples{
+sim_X <- genXps(n = 200, nJ = rep(100, 2), p = 1000, structureX = "indep_subpops", inbr = "heterogeneous")
 }

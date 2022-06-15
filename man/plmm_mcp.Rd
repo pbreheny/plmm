@@ -15,7 +15,7 @@ plmm_mcp(X, y, p1, standardize = FALSE, X_for_K = NULL)
 
 \item{standardize}{Should standardization be performed within \code{glmnet()}? Defaults to FALSE.}
 
-\item{X_for_K}{X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
+\item{X_for_K}{X matrix used to compute the similarity matrix, K. Defaults to XX^T. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
 }
 \description{
 This function allows you to fit a linear mixed model via penalized maximum likelihood with null model variance component estimation.

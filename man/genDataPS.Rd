@@ -22,17 +22,17 @@ genDataPS(
 )
 }
 \arguments{
-\item{n}{Number of observations/samples to simulate.}
+\item{n}{Number of observations/samples to simulate. Defaults to 200.}
 
-\item{p}{Number of SNPs to simulate.}
+\item{p}{Number of SNPs to simulate. Defaults to 1000.}
 
 \item{p1}{Number of SNPs that are causal. Defaults to floor(p/2).}
 
-\item{nJ}{Number of observations in each subpopulation. The length of nJ corresponds to the number of subpopulations.}
+\item{nJ}{Number of observations in each subpopulation. The length of nJ corresponds to the number of subpopulations. Defaults to rep(50, 4).}
 
 \item{structureX}{Type of structure to simulate.}
 
-\item{Fst}{The desired final FST of the admixed individuals. Ranges from 0 to 1. A high Fst implies greater differentiation among populations. Defaults to 0.1 if structureX = 1d_linear and 0.2 if structureX = indep_subpops. Otherwise defaults to NULL.}
+\item{Fst}{The desired final FST of the admixed individuals. Ranges from 0 to 1. A high FST implies greater differentiation among populations. Defaults to 0.1 if structureX = 1d_linear and 0.2 if structureX = indep_subpops. Otherwise defaults to NULL.}
 
 \item{inbr}{Indicates whether the desired inbreeding is homogeneous or heterogeneous. Defaults to heterogeneous.}
 
@@ -50,6 +50,13 @@ genDataPS(
 
 \item{B0}{Optional. Additional intercept value.}
 }
+\value{
+A list with 7 elements: a matrix of SNP data (X), a single-column matrix of outcome values (y), a single column matrix 'env', a vector of coefficients (beta), a matrix of Z values allocating environmental effects among subjects (Z), a vector of numeric values representing environmental effects (gamma), and the type of structure used in the SNP data (structureX)
+}
 \description{
 This function allows you to simulate structured genetic data (SNP) with an unobserved environmental confounding effect.
+}
+\examples{
+sim_dat <- genDataPS(structureX = "1d_linear")
+example_fit <- plmm(sim_dat$X, sim_dat$y, V = sim_dat$X\%*\%t(sim_dat$X))
 }

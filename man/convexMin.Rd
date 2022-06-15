@@ -24,3 +24,6 @@ convexMin(b, X, penalty, gamma, l2, family = "gaussian", penalty.factor)
 \description{
 Calculate index for which objective function ceases to be locally convex
 }
+\examples{
+
+}
