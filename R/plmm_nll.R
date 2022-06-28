@@ -5,6 +5,14 @@
 #' @param Uy The the continuous outcome, y, rotated by the eigenvectors of the similarity matrix, K.
 #' @param S The eigenvalues of the similarity matrix, K.
 #' @export
+#' 
+#' @examples 
+#' admix$V <- admix$X%*%t(admix$X) # create an estimated covariance matrix 
+#' # NB: this is an estimate of K 
+#' ev <- eigen(admix$V)
+#' U <- ev$vectors
+#' fit <- plmm(X = admix$X, y = admix$y, V = admix$V, penalty = "MCP")
+#' (plmm_nll(eta = fit$eta, Uy = U%*%admix$y, S = ev$values ))
 
 plmm_nll <- function(eta, Uy, S){
 

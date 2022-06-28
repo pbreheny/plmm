@@ -3,7 +3,7 @@
 #' Performs k-fold cross validation for lasso-, MCP-, or SCAD-penalized penalized linear mixed models over a grid of values for the regularization parameter lambda.
 #' @param X Design matrix for model fitting. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
 #' @param y Continuous outcome vector for model fitting.
-#' @param V Known or estimated similarity matrix.
+#' @param K Known or estimated similarity matrix.
 #' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
 #' @param intercept Logical for whether intercept should be included.
 #' @param ... Additional arguments to plmm
@@ -16,11 +16,11 @@
 #' @export
 
 
-cv.plmm <- function(X, y, V, type = c('response', 'individual'), intercept = TRUE, ..., cluster, nfolds=10, seed, fold,
+cv.plmm <- function(X, y, K, type = c('response', 'individual'), intercept = TRUE, ..., cluster, nfolds=10, seed, fold,
                     returnY=FALSE, trace=FALSE) {
 
   # Coersion
-  if (missing(V)) stop('Similarity matrix must be provided.')
+  if (missing(K)) stop('Similarity matrix must be provided.')
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
@@ -32,7 +32,7 @@ cv.plmm <- function(X, y, V, type = c('response', 'individual'), intercept = TRU
     y <- drop(y)
   }
 
-  fit.args <- c(list(X = X, y = y, V = V, intercept = intercept), list(...))
+  fit.args <- c(list(X = X, y = y, K = K, intercept = intercept), list(...))
   fit <- do.call('plmm', fit.args)
 
   cv.args <- list(...)
@@ -57,9 +57,9 @@ cv.plmm <- function(X, y, V, type = c('response', 'individual'), intercept = TRU
 
   if (!missing(cluster)) {
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
-    parallel::clusterExport(cluster, c("X", "y", "V", "fold", "type", "cv.args"), envir=environment())
+    parallel::clusterExport(cluster, c("X", "y", "K", "fold", "type", "cv.args"), envir=environment())
     parallel::clusterCall(cluster, function() library(penalizedLMM))
-    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=X, y=y, V=V, fold=fold, type=type, cv.args=cv.args)
+    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=X, y=y, K=K, fold=fold, type=type, cv.args=cv.args)
   }
 
   for (i in 1:nfolds) {
@@ -67,7 +67,7 @@ cv.plmm <- function(X, y, V, type = c('response', 'individual'), intercept = TRU
       res <- fold.results[[i]]
     } else {
       if (trace) cat("Starting CV fold #", i, sep="","\n")
-      res <- cvf(i, X, y, V, fold, type, cv.args)
+      res <- cvf(i, X, y, K, fold, type, cv.args)
     }
     # browser()
     E[fold==i, 1:res$nl] <- res$loss

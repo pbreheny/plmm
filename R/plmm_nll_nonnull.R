@@ -6,6 +6,22 @@
 #' @param S Eigenvalues from similarity matrix used for model fitting.
 #' @param eta Estimated $eta$ value from object fit.
 #' @export
+#' 
+#' @examples 
+#' admix$K <- (1/nrow(admix$X))*tcrossprod(admix$X, admix$X) # create an estimated covariance matrix 
+#' # NB: this is an estimate of K 
+#' K_svd <- svd(K)
+#' U <- K_svd$u
+#' D <- K_svd$d
+#' # WORK IN PROGRESS #FIXME need to iron out this example
+#' # See pp. 16-18 in A.R.'s thesis 
+#' ev <- eigen(admix$V)
+#' U <- ev$vectors
+#' S <- ev$values
+#' UX <- U%*%admix$X
+#' Uy <- U%*%admix$y
+#' fit <- plmm(X = admix$X, y = admix$y, V = admix$V, penalty = "MCP")
+#' (plmm_nll_nonnull(fit = my_fit, SUX = S%*%UX, SUy = S%*%admix$y, S = S, eta = my_fit$eta))
 
 plmm_nll_nonnull <- function(fit, SUX, SUy, S, eta){
 

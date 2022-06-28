@@ -3,8 +3,8 @@
 #' This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
 #' @param X Design matrix. May include clinical covariates and other non-SNP data.
 #' @param y Continuous outcome vector.
-#' @param V Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (typically computed as XX^T).
-#' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If V is a known covariance matrix that is full rank, this should be 1.
+#' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).
+#' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for SCAD.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
@@ -19,25 +19,34 @@
 #' @param init Initial values for coefficients. Default is TRUE. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
-#' @param intercept Logical flag for whether an intercept should be included.
+#' @param intercept Logical flag for whether an intercept should be included. Defaults to TRUE. 
 #' @param standardizeX Logical flag for X matrix standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.
 #' @param standardizeRtX Logical flag for transformed X matrix scaling (or rescaling). The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.
 #' @param rotation Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.
 #' @param ... Not used.
+#' 
+#' # TODO: add return lines 
+#' 
 #' @importFrom zeallot %<-%
 #' @export
+#' 
+#' @examples 
+#' admix$K <- tcrossprod(admix$X,admix$X)/ncol(admix$X) # create an estimated covariance matrix 
+#' fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
+#' summary(fit)
 
 
 plmm <- function(X,
                  y,
-                 V,
+                 K,
                  eta_star,
                  penalty = c("MCP", "SCAD", "lasso"),
                  gamma,
                  alpha = 1,
                  lambda.min = ifelse(n>p, 0.001, 0.05),
+                 # lambda.min = NULL,
                  nlambda = 100,
-                 lambda,
+                 lambda = NULL,
                  eps = 1e-04,
                  max.iter = 10000,
                  convex = TRUE,
@@ -55,8 +64,12 @@ plmm <- function(X,
   # Coersion
   U <- S <- SUX <- SUy <- eta <- NULL
   penalty <- match.arg(penalty)
-  if (missing(V)) stop('Similarity matrix must be provided.')
+  
+  # Set defaults 
+  if(missing(K)){K <- tcrossprod(X, X)/ncol(X)} 
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
+  
+  # Check types 
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
@@ -83,14 +96,14 @@ plmm <- function(X,
   if (length(init)!=ncol(X)) stop("Dimensions of init and X do not match", call.=FALSE)
   if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
   if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
-  if (!missing(V)){
-    if (!inherits(V, "matrix")) {
-      tmp <- try(V <- stats::model.matrix(~0+., data=V), silent=TRUE)
-      if (inherits(tmp, "try-error")) stop("V must be a matrix or able to be coerced to a matrix", call.=FALSE)
+  if (!missing(K)){
+    if (!inherits(K, "matrix")) {
+      tmp <- try(K <- stats::model.matrix(~0+., data=K), silent=TRUE)
+      if (inherits(tmp, "try-error")) stop("K must be a matrix or able to be coerced to a matrix", call.=FALSE)
     }
-    if (typeof(V)=="integer") storage.mode(X) <- "double"
-    if (typeof(V)=="character") stop("V must be a numeric matrix", call.=FALSE)
-    if (dim(V)[1] != nrow(X) || dim(V)[2] != nrow(X)) stop("Dimensions of V and X do not match", call.=FALSE)
+    if (typeof(K)=="integer") storage.mode(X) <- "double" # change K to X 
+    if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
+    if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
   }
 
   ## Deprecation support
@@ -99,60 +112,70 @@ plmm <- function(X,
 
   ## Standardize X
   if (standardizeX){
-    XX <- ncvreg::std(X)
+    std_X <- ncvreg::std(X)
   } else {
-    XX <- X
-    attributes(XX)$center <- rep(0, ncol(XX))
-    attributes(XX)$scale <- rep(1, ncol(XX))
-    attributes(XX)$nonsingular <- 1:ncol(XX)
-    # X_ns <- attr(XX, "nonsingular") # shouldn't need this value in this scenario
+    std_X <- X
+    attributes(std_X)$center <- rep(0, ncol(std_X))
+    attributes(std_X)$scale <- rep(1, ncol(std_X))
+    attributes(std_X)$nonsingular <- 1:ncol(std_X)
+    # X_ns <- attr(std_X, "nonsingular") # shouldn't need this value in this scenario
   }
-  ns <- attr(XX, "nonsingular")
+  
+  # identify nonsingular values in the standardized X matrix  
+  ns <- attr(std_X, "nonsingular")
   init <- init[ns] # remove any singular values
 
+  # only penalize non-singular values 
   penalty.factor <- penalty.factor[ns]
 
-  p <- ncol(XX)
-  n <- nrow(XX)
+  p <- ncol(std_X)
+  n <- nrow(std_X)
 
   ## Rotate data
   if (!missing(eta_star)){
-    c(SUX, SUy, eta, U, S) %<-% rotate_data(XX, y, V, intercept, rotation, eta_star)
+    c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, intercept, rotation, eta_star)
   } else {
-    c(SUX, SUy, eta, U, S) %<-% rotate_data(XX, y, V, intercept, rotation)
+    c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, intercept, rotation)
   }
 
+  # make sure to *not* penalize the intercept term 
   if (intercept) penalty.factor <- c(0, penalty.factor)
 
   ## Re-standardize rotated SUX
   if (standardizeRtX){
     if (intercept){
-      SUXX_noInt <- scale_varp(SUX[,-1, drop = FALSE])
-      attributes(SUXX_noInt)$nonsingular <- attributes(ncvreg::std(SUX[,-1, drop = FALSE]))$nonsingular
-      SUXX <- cbind(SUX[,1, drop = FALSE], SUXX_noInt)
+      std_SUX_noInt <- scale_varp(SUX[,-1, drop = FALSE])
+      attributes(std_SUX_noInt)$nonsingular <- attributes(ncvreg::std(SUX[,-1, drop = FALSE]))$nonsingular
+      std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt)
     } else {
-      SUXX_noInt <- scale_varp(SUX)
-      attributes(SUXX_noInt)$nonsingular <- attributes(ncvreg::std(SUX))$nonsingular
-      SUXX <- SUXX_noInt
+      std_SUX_noInt <- scale_varp(SUX)
+      attributes(std_SUX_noInt)$nonsingular <- attributes(ncvreg::std(SUX))$nonsingular
+      std_SUX <- std_SUX_noInt
     }
-    attributes(SUXX)$scale <- attr(SUXX_noInt, 'scale')
-    attributes(SUXX)$nonsingular <- attr(SUXX_noInt, 'nonsingular')
+    attributes(std_SUX)$scale <- attr(std_SUX_noInt, 'scale')
+    attributes(std_SUX)$nonsingular <- attr(std_SUX_noInt, 'nonsingular')
   } else {
-    SUXX <- SUX
+    std_SUX <- SUX
     if (intercept){
-      attributes(SUXX)$scale <- rep(1, ncol(SUX) - 1)
-      attributes(SUXX)$nonsingular <- 1:(ncol(SUX) - 1)
+      attributes(std_SUX)$scale <- rep(1, ncol(SUX) - 1)
+      attributes(std_SUX)$nonsingular <- 1:(ncol(SUX) - 1)
       # xtx <- c(1, apply(SUXX[,-1], 2, varp))
     } else {
-      attributes(SUXX)$scale <- rep(1, ncol(SUX))
-      attributes(SUXX)$nonsingular <- 1:ncol(SUX)
+      attributes(std_SUX)$scale <- rep(1, ncol(SUX))
+      attributes(std_SUX)$nonsingular <- 1:ncol(SUX)
     }
   }
-  xtx <- apply(SUXX, 2, function(x) mean(x^2, na.rm = TRUE)) # population var without mean 0
+  xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) # population var without mean 0
+  # TODO: rename this 'xtx' to something more descriptive 
 
+  # PCIK UP HERE June 22, 2022
+  # TODO: figure out what about this following call to setup_lambda() throws errors 
+  # in plmm_mcp() 
   ## Set up lambda
   if (missing(lambda)) {
-    lambda <- setup_lambda(SUXX, SUy, alpha, lambda.min, nlambda, penalty.factor)
+    lambda <- setup_lambda(X = std_SUX, y = SUy, alpha = alpha,
+                           lambda.min = lambda.min, nlambda = nlambda,
+                           penalty.factor = penalty.factor)
     user.lambda <- FALSE
   } else {
     nlambda <- length(lambda)
@@ -162,15 +185,15 @@ plmm <- function(X,
   ## Placeholders for results
 
   if (intercept) init <- c(0, init) # add initial value for intercept
-  resid <- drop(SUy - SUXX %*% init)
-  b <- matrix(NA, ncol(SUXX), nlambda)
+  resid <- drop(SUy - std_SUX %*% init)
+  b <- matrix(NA, ncol(std_SUX), nlambda)
   iter <- integer(nlambda)
   converged <- logical(nlambda)
   loss <- numeric(nlambda)
   # think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
-    res <- ncvreg::ncvfit(SUXX, SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
+    res <- ncvreg::ncvfit(std_SUX, SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
     b[, ll] <- init <- res$beta
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
@@ -185,15 +208,15 @@ plmm <- function(X,
   lambda <- lambda[ind]
   loss <- loss[ind]
   if (warn & sum(iter) == max.iter) warning("Maximum number of iterations reached")
-  convex.min <- if (convex) convexMin(b, SUXX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', penalty.factor) else NULL
+  convex.min <- if (convex) convexMin(b, std_SUX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', penalty.factor) else NULL
 
   # unscale transformed data
-  bb <- unscale(b[, ind, drop = FALSE], SUX, SUXX, intercept)
+  bb <- unscale(b[, ind, drop = FALSE], SUX, std_SUX, intercept)
 
   # unstandardize original data
-  beta <- unstandardize(bb, X, XX, intercept)
+  beta <- unstandardize(bb, X, std_X, intercept)
 
-  varnames <- if (is.null(colnames(X))) paste("V", 1:ncol(X), sep="") else colnames(X)
+  varnames <- if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)
   if (intercept) varnames <- c("(Intercept)", varnames)
   dimnames(beta) <- list(varnames, lamNames(lambda))
 
@@ -224,7 +247,7 @@ plmm <- function(X,
     val$SUy <- SUy
     val$U <- U
     val$S <- S
-    val$XX <- XX
+    val$std_X <- std_X
   }
   return(val)
 }

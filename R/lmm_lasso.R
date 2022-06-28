@@ -5,18 +5,18 @@
 #' @param y Continuous outcome vector.
 #' @param p1 Number of causal SNPs. Lambda will be selected such that <= p1 variables enter the model.
 #' @param standardize Should standardization be performed within \code{glmnet()}? Defaults to FALSE.
-#' @param X_for_K X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.
+#' @param K Matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects. Default is \eqn{\frac{1}{p} XX^T}
 #' @importFrom zeallot %<-%
 #' @export
 
 
 
-lmm_lasso <- function(X, y, p1, standardize = FALSE, X_for_K = NULL) {
+lmm_lasso <- function(X, y, p1, standardize = FALSE, K = NULL) {
   S <- U <- eta <- NULL
-  if (is.null(X_for_K)){
+  if (is.null(K)){
     c(S, U, eta) %<-% plmm_null(X, y)
   } else {
-    c(S, U, eta) %<-% plmm_null(X_for_K, y)
+    c(S, U, eta) %<-% plmm_null(K, y)
   }
   W <- diag((eta * S + (1 - eta))^(-1/2))
   SUX <- W %*% crossprod(U, cbind(1, X))

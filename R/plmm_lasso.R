@@ -3,7 +3,7 @@
 #' This function allows you to fit a linear mixed model via penalized maximum likelihood with null model variance component estimation.
 #' @param X Design matrix.
 #' @param y Continuous outcome vector.
-#' @param V RRM to use
+#' @param K Similarity matrix. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.
 #' @param p1 Number of causal SNPs. Lambda will be selected such that <= p1 variables enter the model.
 #' @param ... Additional optional arguments
 #' @importFrom zeallot %<-%
@@ -11,13 +11,13 @@
 #' 
 #' @examples
 #' RRM <- genRelatednessMat(X = scale(admix$X))
-#' fit <- plmm_lasso(X = admix$X, y = admix$y, V = RRM, p1 = 10)
+#' fit <- plmm_lasso(X = admix$X, y = admix$y, K = RRM, p1 = 10)
 
-plmm_lasso <- function(X, y, V, p1, ...) {
+plmm_lasso <- function(X, y, K, p1, ...) {
   args.list <- list(...)
   args.list$X <- X
   args.list$y <- y
-  args.list$V <- V
+  args.list$K <- K
   args.list$penalty <- 'lasso'
   fit <- do.call('plmm', args.list)
   sel <- predict.plmm(fit, type = "nvar")
