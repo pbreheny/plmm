@@ -4,7 +4,7 @@
 \alias{lmm_lasso}
 \title{Fit a penalizedLMM with lasso regularization}
 \usage{
-lmm_lasso(X, y, p1, standardize = FALSE, X_for_K = NULL)
+lmm_lasso(X, y, p1, standardize = FALSE, K = NULL)
 }
 \arguments{
 \item{X}{Design matrix.}
@@ -15,7 +15,7 @@ lmm_lasso(X, y, p1, standardize = FALSE, X_for_K = NULL)
 
 \item{standardize}{Should standardization be performed within \code{glmnet()}? Defaults to FALSE.}
 
-\item{X_for_K}{X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
+\item{K}{Matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects. Default is \eqn{\frac{1}{p} XX^T}}
 }
 \description{
 This function allows you to fit a linear mixed model via lasso-penalized maximum likelihood.

@@ -12,3 +12,7 @@ varp(x)
 \description{
 This function allows you to calculate the population variance; we assume our sample is the population.
 }
+\examples{
+v <- rnorm(5)
+varp(v)
+}

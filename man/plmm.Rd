@@ -7,12 +7,12 @@
 plmm(
   X,
   y,
-  V,
+  K,
   eta_star,
   penalty = c("MCP", "SCAD", "lasso"),
   gamma,
   alpha = 1,
-  lambda.min = ifelse(n > p, 0.001, 0.05),
+  lambda.min,
   nlambda = 100,
   lambda,
   eps = 1e-04,
@@ -35,9 +35,9 @@ plmm(
 
 \item{y}{Continuous outcome vector.}
 
-\item{V}{Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (typically computed as XX^T).}
+\item{K}{Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).}
 
-\item{eta_star}{Optional argument to input a specific eta term rather than estimate it from the data. If V is a known covariance matrix that is full rank, this should be 1.}
+\item{eta_star}{Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.}
 
 \item{penalty}{The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".}
 
@@ -67,7 +67,7 @@ plmm(
 
 \item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
 
-\item{intercept}{Logical flag for whether an intercept should be included.}
+\item{intercept}{Logical flag for whether an intercept should be included. Defaults to TRUE.}
 
 \item{standardizeX}{Logical flag for X matrix standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.}
 
@@ -75,8 +75,13 @@ plmm(
 
 \item{rotation}{Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.}
 
-\item{...}{Not used.}
+\item{...}{Not used.TODO: add return lines}
 }
 \description{
 This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
+}
+\examples{
+admix$K <- tcrossprod(admix$X,admix$X)/ncol(admix$X) # create an estimated covariance matrix 
+fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
+summary(fit)
 }

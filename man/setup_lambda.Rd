@@ -4,7 +4,15 @@
 \alias{setup_lambda}
 \title{Compute sequence of lambda values}
 \usage{
-setup_lambda(X, y, alpha, lambda.min, nlambda, penalty.factor)
+setup_lambda(
+  X,
+  y,
+  alpha,
+  lambda.min,
+  nlambda,
+  penalty.factor,
+  intercept = TRUE
+)
 }
 \arguments{
 \item{X}{Design matrix which \emph{includes} the intercept column if present. May include clinical covariates and other non-SNP data.}
@@ -13,12 +21,21 @@ setup_lambda(X, y, alpha, lambda.min, nlambda, penalty.factor)
 
 \item{alpha}{Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.}
 
-\item{lambda.min}{The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.}
+\item{lambda.min}{The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise. A value of lambda.min = 0 is not supported.}
 
-\item{nlambda}{The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.}
+\item{nlambda}{The desired number of lambda values in the sequence to be generated.}
 
 \item{penalty.factor}{A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.}
+
+\item{intercept}{Logical: does X contain an intercept column? Defaults to TRUE.}
 }
 \description{
 This function allows you compute a sequence of lambda values for plmm models.
+}
+\examples{
+RRM <- genRelatednessMat(X = scale(admix$X))
+fit <- plmm_lasso(X = admix$X, y = admix$y, V = RRM, p1 = 10)
+(setup_lambda(admix$X, admix$y, alpha = 0.1, nlambda = 10, penalty.factor = fit$fit$penalty.factor)) # use default lambda.min
+(setup_lambda(admix$X, admix$y, alpha = 0.1, nlambda = 10, penalty.factor = fit$fit$penalty.factor)) # user-specified lambda.min
+
 }

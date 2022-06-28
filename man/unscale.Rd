@@ -4,17 +4,22 @@
 \alias{unscale}
 \title{Unscale coefficient values}
 \usage{
-unscale(b, X, XX, intercept = TRUE)
+unscale(b, X, scaled_X, intercept = TRUE)
 }
 \arguments{
 \item{b}{p x nlambda matrix of standardized coefficient path values.}
 
 \item{X}{Unscaled, rotated design matrix \emph{with} an intercept column if present. Necessary for properly defining the dimensions of beta in cases where singular columns are present.}
 
-\item{XX}{Scaled, rotated design matrix. Must include the attributes 'center', 'scale', and 'nonsingular' corresponding to non-intercept variables.}
+\item{scaled_X}{Scaled, rotated design matrix. Must include the attributes 'center', 'scale', and 'nonsingular' corresponding to non-intercept variables.}
 
 \item{intercept}{Logical flag for whether an intercept row is included in b, that is, a coefficient which accounts for the mean of the original y value on its rotated scale.}
 }
 \description{
 This function allows you to unscale coefficient values based on attributes of X.
+}
+\examples{
+admix$K <- (admix$X\%*\%t(admix$X))/ncol(admix$X) # create an estimated covariance matrix 
+fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
+unscaled_betas <- unscale(b = fit$beta, X = admix$X, scaled_X = fit$SUX, intercept = TRUE)
 }

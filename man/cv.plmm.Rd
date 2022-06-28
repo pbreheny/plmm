@@ -7,7 +7,7 @@
 cv.plmm(
   X,
   y,
-  V,
+  K,
   type = c("response", "individual"),
   intercept = TRUE,
   ...,
@@ -24,7 +24,7 @@ cv.plmm(
 
 \item{y}{Continuous outcome vector for model fitting.}
 
-\item{V}{Known or estimated similarity matrix.}
+\item{K}{Known or estimated similarity matrix.}
 
 \item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.}
 

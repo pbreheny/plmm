@@ -4,14 +4,14 @@
 \alias{rotate_data}
 \title{Compute transformed X and y for subsequent plmm rescaling and fitting}
 \usage{
-rotate_data(X, y, V, intercept = TRUE, rotation = TRUE, eta_star)
+rotate_data(X, y, K = NULL, intercept = TRUE, rotation = TRUE, eta_star)
 }
 \arguments{
 \item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
 
 \item{y}{Continuous outcome vector.}
 
-\item{V}{Similarity matrix. This may be a known value supplied to plmm as V, or estimated based on X_for_K}
+\item{K}{Estimated or known similarity matrix. By default, K is the realized relationship matrix, \eqn{\frac{1}{p}XX^T}, where \eqn{p} is the number of columns in X}
 
 \item{intercept}{Logical flag for whether an intercept should be included.}
 
@@ -21,4 +21,9 @@ rotate_data(X, y, V, intercept = TRUE, rotation = TRUE, eta_star)
 }
 \description{
 This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
+}
+\examples{
+std_X <- scale(admix$X)
+K <- tcrossprod(admix$X, admix$X)/ncol(admix$X)
+rotated_dat <- rotate_data(std_X, admix$y, K)
 }

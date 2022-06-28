@@ -42,27 +42,37 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plmm_scad</span><span class="op">(</span><span class="va">X</span>, <span class="va">y</span>, <span class="va">p1</span>, standardize <span class="op">=</span> <span class="cn">FALSE</span>, X_for_K <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plmm_scad</span><span class="op">(</span><span class="va">X</span>, <span class="va">y</span>, <span class="va">p1</span>, standardize <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">K</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>X</dt>
 <dd><p>Design matrix.</p></dd>
+
+
 <dt>y</dt>
 <dd><p>Continuous outcome vector.</p></dd>
+
+
 <dt>p1</dt>
 <dd><p>Number of causal SNPs. Lambda will be selected such that &lt;= p1 variables enter the model.</p></dd>
+
+
 <dt>standardize</dt>
 <dd><p>Should standardization be performed within <code>glmnet()</code>? Defaults to FALSE.</p></dd>
-<dt>X_for_K</dt>
-<dd><p>X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.</p></dd>
+
+
+<dt>K</dt>
+<dd><p>Similarity matrix. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.</p></dd>
+
 </dl></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">RRM</span> <span class="op">&lt;-</span> <span class="fu"><a href="genRelatednessMat.html">genRelatednessMat</a></span><span class="op">(</span>X <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">plmm_scad</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, p1 <span class="op">=</span> <span class="fl">5</span>, K <span class="op">=</span> <span class="va">RRM</span><span class="op">)</span> <span class="co">#FIXME: throws Error in seq.default(log(lambda.max), log(lambda.min * lambda.max), len = nlambda) : 'from' must be a finite number</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in setup_lambda(X = std_SUX, y = SUy, alpha = alpha, nlambda = nlambda,     lambda.min = lambda.min, penalty.factor = penalty.factor,     intercept = intercept):</span> log(lambda.max) is not finite</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -74,7 +84,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

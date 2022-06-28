@@ -4,7 +4,7 @@
 \alias{plmm_scad}
 \title{Fit a penalizedLMM with SCAD regularization using penalizedLMM}
 \usage{
-plmm_scad(X, y, p1, standardize = FALSE, X_for_K = NULL)
+plmm_scad(X, y, p1, standardize = FALSE, K)
 }
 \arguments{
 \item{X}{Design matrix.}
@@ -15,11 +15,12 @@ plmm_scad(X, y, p1, standardize = FALSE, X_for_K = NULL)
 
 \item{standardize}{Should standardization be performed within \code{glmnet()}? Defaults to FALSE.}
 
-\item{X_for_K}{X matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
+\item{K}{Similarity matrix. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
 }
 \description{
 This function allows you to fit a linear mixed model via penalized maximum likelihood with null model variance component estimation.
 }
 \examples{
-
+RRM <- genRelatednessMat(X = scale(admix$X))
+fit <- plmm_scad(X = admix$X, y = admix$y, p1 = 5, K = RRM) #FIXME: throws Error in seq.default(log(lambda.max), log(lambda.min * lambda.max), len = nlambda) : 'from' must be a finite number
 }

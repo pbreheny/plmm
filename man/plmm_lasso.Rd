@@ -4,14 +4,14 @@
 \alias{plmm_lasso}
 \title{Fit a penalizedLMM with lasso regularization using penalizedLMM}
 \usage{
-plmm_lasso(X, y, V, p1, ...)
+plmm_lasso(X, y, K, p1, ...)
 }
 \arguments{
 \item{X}{Design matrix.}
 
 \item{y}{Continuous outcome vector.}
 
-\item{V}{RRM to use}
+\item{K}{Similarity matrix. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
 
 \item{p1}{Number of causal SNPs. Lambda will be selected such that <= p1 variables enter the model.}
 
@@ -22,5 +22,5 @@ This function allows you to fit a linear mixed model via penalized maximum likel
 }
 \examples{
 RRM <- genRelatednessMat(X = scale(admix$X))
-fit <- plmm_lasso(X = admix$X, y = admix$y, V = RRM, p1 = 10)
+fit <- plmm_lasso(X = admix$X, y = admix$y, K = RRM, p1 = 10)
 }

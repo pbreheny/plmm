@@ -42,25 +42,60 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">setup_lambda</span><span class="op">(</span><span class="va">X</span>, <span class="va">y</span>, <span class="va">alpha</span>, <span class="va">lambda.min</span>, <span class="va">nlambda</span>, <span class="va">penalty.factor</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">setup_lambda</span><span class="op">(</span>
+  <span class="va">X</span>,
+  <span class="va">y</span>,
+  <span class="va">alpha</span>,
+  <span class="va">lambda.min</span>,
+  <span class="va">nlambda</span>,
+  <span class="va">penalty.factor</span>,
+  intercept <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>X</dt>
 <dd><p>Design matrix which <em>includes</em> the intercept column if present. May include clinical covariates and other non-SNP data.</p></dd>
+
+
 <dt>y</dt>
 <dd><p>Continuous outcome vector.</p></dd>
+
+
 <dt>alpha</dt>
 <dd><p>Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.</p></dd>
+
+
 <dt>lambda.min</dt>
-<dd><p>The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.</p></dd>
+<dd><p>The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise. A value of lambda.min = 0 is not supported.</p></dd>
+
+
 <dt>nlambda</dt>
-<dd><p>The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.</p></dd>
+<dd><p>The desired number of lambda values in the sequence to be generated.</p></dd>
+
+
 <dt>penalty.factor</dt>
 <dd><p>A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.</p></dd>
+
+
+<dt>intercept</dt>
+<dd><p>Logical: does X contain an intercept column? Defaults to TRUE.</p></dd>
+
 </dl></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">RRM</span> <span class="op">&lt;-</span> <span class="fu"><a href="genRelatednessMat.html">genRelatednessMat</a></span><span class="op">(</span>X <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm_lasso.html">plmm_lasso</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, V <span class="op">=</span> <span class="va">RRM</span>, p1 <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plmm_lasso(X = admix$X, y = admix$y, V = RRM, p1 = 10):</span> argument "K" is missing, with no default</span>
+<span class="r-in"><span class="op">(</span><span class="fu">setup_lambda</span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span>, <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, alpha <span class="op">=</span> <span class="fl">0.1</span>, nlambda <span class="op">=</span> <span class="fl">10</span>, penalty.factor <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">penalty.factor</span><span class="op">)</span><span class="op">)</span> <span class="co"># use default lambda.min</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in x[, ii]:</span> subscript out of bounds</span>
+<span class="r-in"><span class="op">(</span><span class="fu">setup_lambda</span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span>, <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, alpha <span class="op">=</span> <span class="fl">0.1</span>, nlambda <span class="op">=</span> <span class="fl">10</span>, penalty.factor <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">penalty.factor</span><span class="op">)</span><span class="op">)</span> <span class="co"># user-specified lambda.min</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in x[, ii]:</span> subscript out of bounds</span>
+<span class="r-in"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -70,7 +105,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

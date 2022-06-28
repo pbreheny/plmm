@@ -4,13 +4,19 @@
 \alias{plmm_null}
 \title{Estimate eta using a null Gaussian penalizedLMM model}
 \usage{
-plmm_null(K, y)
+plmm_null(y, X = NULL, K = NULL)
 }
 \arguments{
-\item{K}{Estimated or known similarity matrix.}
-
 \item{y}{Continuous outcome vector. If not supplied, V is treated as known and eta is not estimated.}
+
+\item{X}{The matrix of SNP data. If K is not supplied, X is required.}
+
+\item{K}{Estimated or known similarity matrix. By default, K is the realized relationship matrix, \eqn{\frac{1}{p}XX^T}, where \eqn{p} is the number of columns in X}
 }
 \description{
 This function allows you to estimate eta (the signal to noise ratio, or narrow-sense variability) under the assumption of a null model.
+}
+\examples{
+res <- plmm_null(y = admix$y, X = admix$X)
+(res$eta) # estimate of eta 
 }

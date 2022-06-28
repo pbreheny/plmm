@@ -4,7 +4,7 @@
 \alias{plmm_mcp}
 \title{Fit a penalizedLMM with MCP regularization using penalizedLMM}
 \usage{
-plmm_mcp(X, y, p1, standardize = FALSE, X_for_K = NULL)
+plmm_mcp(X, y, p1, standardize = FALSE, K, ...)
 }
 \arguments{
 \item{X}{Design matrix.}
@@ -15,8 +15,13 @@ plmm_mcp(X, y, p1, standardize = FALSE, X_for_K = NULL)
 
 \item{standardize}{Should standardization be performed within \code{glmnet()}? Defaults to FALSE.}
 
-\item{X_for_K}{X matrix used to compute the similarity matrix, K. Defaults to XX^T. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
+\item{K}{Similarity matrix. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects.}
+
+\item{...}{Other arguments to plmm()}
 }
 \description{
 This function allows you to fit a linear mixed model via penalized maximum likelihood with null model variance component estimation.
+}
+\examples{
+fit <- plmm_mcp(admix$X, admix$y, p1 = 5)
 }

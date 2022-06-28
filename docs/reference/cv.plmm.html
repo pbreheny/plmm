@@ -45,7 +45,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cv.plmm</span><span class="op">(</span>
   <span class="va">X</span>,
   <span class="va">y</span>,
-  <span class="va">V</span>,
+  <span class="va">K</span>,
   type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"individual"</span><span class="op">)</span>,
   intercept <span class="op">=</span> <span class="cn">TRUE</span>,
   <span class="va">...</span>,
@@ -62,28 +62,51 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>X</dt>
 <dd><p>Design matrix for model fitting. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.</p></dd>
+
+
 <dt>y</dt>
 <dd><p>Continuous outcome vector for model fitting.</p></dd>
-<dt>V</dt>
+
+
+<dt>K</dt>
 <dd><p>Known or estimated similarity matrix.</p></dd>
+
+
 <dt>type</dt>
 <dd><p>A character argument indicating what should be returned from predict.plmm. If <code>type == 'response'</code> predictions are based on the linear predictor, <code>$X beta$</code>. If <code>type == 'individual'</code> predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.</p></dd>
+
+
 <dt>intercept</dt>
 <dd><p>Logical for whether intercept should be included.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments to plmm</p></dd>
+
+
 <dt>cluster</dt>
 <dd><p>cv.plmm can be run in parallel across a cluster using the parallel package. The cluster must be set up in advance using the makeCluster function from that package. The cluster must then be passed to cv.plmm.</p></dd>
+
+
 <dt>nfolds</dt>
 <dd><p>The number of cross-validation folds. Default is 10.</p></dd>
+
+
 <dt>seed</dt>
 <dd><p>You may set the seed of the random number generator in order to obtain reproducible results.</p></dd>
+
+
 <dt>fold</dt>
 <dd><p>Which fold each observation belongs to. By default the observations are randomly assigned.</p></dd>
+
+
 <dt>returnY</dt>
 <dd><p>Should cv.plmm return the linear predictors from the cross-validation folds? Default is FALSE; if TRUE, this will return a matrix in which the element for row i, column j is the fitted value for observation i from the fold in which observation i was excluded from the fit, at the jth value of lambda.</p></dd>
+
+
 <dt>trace</dt>
 <dd><p>If set to TRUE, inform the user of progress by announcing the beginning of each CV fold. Default is FALSE.</p></dd>
+
 </dl></div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -95,7 +118,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

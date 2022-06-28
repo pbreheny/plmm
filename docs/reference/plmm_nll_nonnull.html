@@ -49,16 +49,52 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>fit</dt>
 <dd><p>An object of class plmm_fit.</p></dd>
+
+
 <dt>SUX</dt>
 <dd><p>Rotated design matrix including rotated intercept and unpenalized columns, if present.</p></dd>
+
+
 <dt>SUy</dt>
 <dd><p>Rotated outcome vector.</p></dd>
+
+
 <dt>S</dt>
 <dd><p>Eigenvalues from similarity matrix used for model fitting.</p></dd>
+
+
 <dt>eta</dt>
 <dd><p>Estimated $eta$ value from object fit.</p></dd>
+
 </dl></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">admix</span><span class="op">$</span><span class="va">K</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">tcrossprod</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span>, <span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span> <span class="co"># create an estimated covariance matrix </span></span>
+<span class="r-in"><span class="co"># NB: this is an estimate of K </span></span>
+<span class="r-in"><span class="va">K_svd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/svd.html" class="external-link">svd</a></span><span class="op">(</span><span class="va">K</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in as.matrix(x):</span> object 'K' not found</span>
+<span class="r-in"><span class="va">U</span> <span class="op">&lt;-</span> <span class="va">K_svd</span><span class="op">$</span><span class="va">u</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'K_svd' not found</span>
+<span class="r-in"><span class="va">D</span> <span class="op">&lt;-</span> <span class="va">K_svd</span><span class="op">$</span><span class="va">d</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'K_svd' not found</span>
+<span class="r-in"><span class="co"># WORK IN PROGRESS #FIXME need to iron out this example</span></span>
+<span class="r-in"><span class="co"># See pp. 16-18 in A.R.'s thesis </span></span>
+<span class="r-in"><span class="va">ev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eigen.html" class="external-link">eigen</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">V</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in array(x, c(length(x), 1L), if (!is.null(names(x))) list(names(x),     NULL) else NULL):</span> 'data' must be of a vector type, was 'NULL'</span>
+<span class="r-in"><span class="va">U</span> <span class="op">&lt;-</span> <span class="va">ev</span><span class="op">$</span><span class="va">vectors</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'ev' not found</span>
+<span class="r-in"><span class="va">S</span> <span class="op">&lt;-</span> <span class="va">ev</span><span class="op">$</span><span class="va">values</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'ev' not found</span>
+<span class="r-in"><span class="va">UX</span> <span class="op">&lt;-</span> <span class="va">U</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="va">admix</span><span class="op">$</span><span class="va">X</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'U' not found</span>
+<span class="r-in"><span class="va">Uy</span> <span class="op">&lt;-</span> <span class="va">U</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="va">admix</span><span class="op">$</span><span class="va">y</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'U' not found</span>
+<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, V <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">V</span>, penalty <span class="op">=</span> <span class="st">"MCP"</span><span class="op">)</span></span>
+<span class="r-in"><span class="op">(</span><span class="fu">plmm_nll_nonnull</span><span class="op">(</span>fit <span class="op">=</span> <span class="va">my_fit</span>, SUX <span class="op">=</span> <span class="va">S</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="va">UX</span>, SUy <span class="op">=</span> <span class="va">S</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="va">admix</span><span class="op">$</span><span class="va">y</span>, S <span class="op">=</span> <span class="va">S</span>, eta <span class="op">=</span> <span class="va">my_fit</span><span class="op">$</span><span class="va">eta</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plmm_nll_nonnull(fit = my_fit, SUX = S %*% UX, SUy = S %*% admix$y,     S = S, eta = my_fit$eta):</span> object 'S' not found</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
@@ -68,7 +104,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>
