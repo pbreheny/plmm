@@ -12,6 +12,6 @@
 #' 
 #' X_scaled <- scale_varp(admix$X)
 #' admix$X[1:5, 1:7]; X_scaled[1:5, 1:7]
-scale_varp <- function(x){
+scale_varp <- function(X){
   scale(X, center = FALSE, scale = apply(X, 2, function(j) sqrt(mean(j^2, na.rm = TRUE))))
 }
