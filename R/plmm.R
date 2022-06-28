@@ -43,10 +43,10 @@ plmm <- function(X,
                  penalty = c("MCP", "SCAD", "lasso"),
                  gamma,
                  alpha = 1,
-                 lambda.min = ifelse(n>p, 0.001, 0.05),
-                 # lambda.min = NULL,
+                 # lambda.min = ifelse(n>p, 0.001, 0.05),
+                 lambda.min,
                  nlambda = 100,
-                 lambda = NULL,
+                 lambda,
                  eps = 1e-04,
                  max.iter = 10000,
                  convex = TRUE,
@@ -168,14 +168,15 @@ plmm <- function(X,
   xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) # population var without mean 0
   # TODO: rename this 'xtx' to something more descriptive 
 
-  # PCIK UP HERE June 22, 2022
-  # TODO: figure out what about this following call to setup_lambda() throws errors 
-  # in plmm_mcp() 
   ## Set up lambda
   if (missing(lambda)) {
-    lambda <- setup_lambda(X = std_SUX, y = SUy, alpha = alpha,
-                           lambda.min = lambda.min, nlambda = nlambda,
-                           penalty.factor = penalty.factor)
+    lambda <- setup_lambda(X = std_SUX,
+                           y = SUy,
+                           alpha = alpha,
+                           nlambda = nlambda,
+                           lambda.min = lambda.min,
+                           penalty.factor = penalty.factor,
+                           intercept = intercept)
     user.lambda <- FALSE
   } else {
     nlambda <- length(lambda)

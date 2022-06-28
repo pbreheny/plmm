@@ -3,6 +3,7 @@
 #' This function allows you compute a sequence of lambda values for plmm models.
 #' @param X Design matrix which *includes* the intercept column if present. May include clinical covariates and other non-SNP data.
 #' @param y Continuous outcome vector.
+#' @param intercept Logical: does X contain an intercept column? Defaults to TRUE.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
 #' @param lambda.min The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise. A value of lambda.min = 0 is not supported. 
 #' @param nlambda The desired number of lambda values in the sequence to be generated. 
@@ -17,7 +18,7 @@
 #' 
 
 
-setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor) {
+setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, intercept = TRUE) {
 
   # error checking: 
   # make sure alpha is neither missing nor zero
@@ -31,21 +32,30 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor) {
   
   # label dimensions of X 
   n <- nrow(X)
-  p <- ncol(X) # including int if intercept = TRUE
+  p <- ncol(X) # including intercept if intercept = TRUE
 
   # identify which variables (e.g. SNPs) to penalize 
-  ind <- which(penalty.factor != 0)
+  if(intercept){
+    penalty.factor <- penalty.factor[-1] # remove intercept from indicator 
+    ind <- which(penalty.factor != 0)
+  } else {
+    ind <- which(penalty.factor != 0)
+  }
+  
 
   # set up a fit from which to derive residuals 
   if (length(ind) != p) { # case 1: not all `p` columns are to be penalized
     fit <- stats::glm(y ~ -1 + X[, -ind, drop = FALSE], family='gaussian')
-  } else { # case 2: at least one column is to be penalized 
+  } else { # case 2: no columns are penalized 
     fit <- stats::glm(y ~ 1, family='gaussian')
   }
 
-  # determine the 
-  zmax <- max(abs((t(X[, ind]) %*% fit$residuals)) / penalty.factor[ind]) / n ### this first part can by xty again
+  # determine the maximum value for lambda 
+  # zmax <- max(abs((t(X[, ind]) %*% fit$residuals)) / penalty.factor[ind]) / n ### this first part can by xty again
+  zmax <- max(abs(crossprod(X[,ind], fit$residuals)) / penalty.factor[ind]) /n
   lambda.max <- zmax/alpha
+  # error check 
+  if(!is.finite(log(lambda.max))){stop("log(lambda.max) is not finite")}
   # TODO: debugging
   # print(lambda.max)
 
@@ -64,7 +74,6 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor) {
   # covariates and .05 otherwise. A value of lambda.min = 0 is not supported. 
   if(missing(lambda.min)){ # case 1: if the user does not specify a lambda.min value...
     if(n > p){
-      
       lambda <- exp(seq(log(lambda.max), log(0.001*lambda.max), len = nlambda))
     } else {
       lambda <- exp(seq(log(lambda.max), log(0.05*lambda.max), len = nlambda))
