@@ -1,5 +1,5 @@
 
-#' Generate data with population structure
+#' Simulate data with population structure
 #'
 #' This function allows you to simulate structured genetic data (SNP) with an unobserved environmental confounding effect.
 #' @param n Number of observations/samples to simulate. Defaults to 200. 
@@ -22,11 +22,11 @@
 #' @export
 #' 
 #' @examples 
-#' sim_dat <- genDataPS(structureX = "1d_linear")
-#' example_fit <- plmm(sim_dat$X, sim_dat$y, V = sim_dat$X%*%t(sim_dat$X))
+#' sim_dat <- sim_ps_dat(structureX = "1d_linear")
+#' example_fit <- plmm(sim_dat$X, sim_dat$y, K = sim_dat$X%*%t(sim_dat$X))
 
 
-genDataPS <- function(n = 200, p = 1000, p1 = floor(p/2), nJ = rep(50, 4),
+sim_ps_dat <- function(n = 200, p = 1000, p1 = floor(p/2), nJ = rep(50, 4),
                       # structureX = c("admixture", "indep_subpops", "1d_linear", "1d_circular", "independent", "other"),
                       structureX = "indep_subpops",
                       Fst = NULL,
@@ -65,7 +65,7 @@ genDataPS <- function(n = 200, p = 1000, p1 = floor(p/2), nJ = rep(50, 4),
   scaleEps <- sqrt((1 - eta) * (1 - xi))
 
   # Gen X
-  X <- genXps(n, nJ, p, structureX, Fst, inbr, standardizeX,
+  X <- sim_ps_x(n, nJ, p, structureX, Fst, inbr, standardizeX,
               structureX_other = structureX_other, sampleCols = sampleCols)
 
   # Gen (scaled) beta and standardized Xbeta (scale by eta)
@@ -85,7 +85,7 @@ genDataPS <- function(n = 200, p = 1000, p1 = floor(p/2), nJ = rep(50, 4),
   Z <- as.matrix(Matrix::bdiag(mlist))
 
   # Gen (scaled) gamma and standardized Zgamma (scale by eta and xi)
-  gamma_unscaled <- genGammaUnscaled(structureGamma, J)
+  gamma_unscaled <- sim_environ_eff(structureGamma, J)
   env0 <- Z %*% gamma_unscaled
   env <- env0 - mean(env0)
   env_sd <- sqrt(varp(env))

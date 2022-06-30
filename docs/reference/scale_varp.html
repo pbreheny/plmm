@@ -56,20 +56,20 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">M</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">25</span><span class="op">)</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">M</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]      [,2]        [,3]       [,4]       [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -1.2328720  2.322520  0.71470449 -0.5078997  0.4338061</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -0.8008145  1.576355 -0.09293448 -0.1901355  0.6640957</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  0.1259747 -1.978000  0.65264654  0.9427032 -0.5615373</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -0.8226093  1.003676 -0.88972838  2.2237351 -0.9590504</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] -1.0830044  0.343939  0.98092336 -0.3672516  1.1978580</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]        [,2]       [,3]        [,4]        [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -0.30272620  0.07984066 -0.9135088  0.50334029 -1.60263313</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  0.21075430 -0.11573082  1.3632135 -0.54213246 -0.93163926</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  0.91982409  0.17398913  0.5167402  0.16696547 -0.56604001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  0.23257580 -1.14783866 -0.9029506  0.09890113 -0.05032456</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  0.05115203  1.02264162  0.2697645 -1.11862672  0.68794961</span>
 <span class="r-in"><span class="va">M_scaled</span> <span class="op">&lt;-</span> <span class="fu">scale_varp</span><span class="op">(</span><span class="va">M</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">M_scaled</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]       [,3]       [,4]       [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -1.3738100  1.4449781  0.9727312 -0.4538194  0.5340450</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] -0.8923611  0.9807446 -0.1264862 -0.1698902  0.8175474</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  0.1403757 -1.2306321  0.8882687  0.8423258 -0.6912909</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -0.9166474  0.6244465 -1.2109432  1.9869555 -1.1806568</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] -1.2068099  0.2139850  1.3350619 -0.3281473  1.4746453</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]       [,3]       [,4]        [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] -0.6641400  0.1149204 -1.0413155  0.8305801 -1.74187046</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  0.4623662 -0.1665797  1.5539372 -0.8945925 -1.01258041</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  2.0179687  0.2504351  0.5890360  0.2755158 -0.61521776</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  0.5102396 -1.6521669 -1.0292801  0.1632004 -0.05469678</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  0.1122206  1.4719617  0.3075066 -1.8458867  0.74771892</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="va">X_scaled</span> <span class="op">&lt;-</span> <span class="fu">scale_varp</span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">7</span><span class="op">]</span>; <span class="va">X_scaled</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">7</span><span class="op">]</span></span>

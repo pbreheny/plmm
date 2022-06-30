@@ -10,7 +10,7 @@
 #' @export
 #' 
 #' @examples
-#' RRM <- genRelatednessMat(X = scale(admix$X))
+#' RRM <- relatedness_mat(X = scale(admix$X))
 #' fit <- plmm_lasso(X = admix$X, y = admix$y, K = RRM, p1 = 10)
 
 plmm_lasso <- function(X, y, K, p1, ...) {

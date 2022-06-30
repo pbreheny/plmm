@@ -10,18 +10,18 @@ template:
 reference:
   - title: Generating data
     contents:
-    - genDataPS
-    - genGammaUnscaled
-    - genRelatednessMat
-    - genXps
+    - sim_ps_dat
+    - sim_environ_eff
+    - relatedness_mat
+    - sim_ps_x
     
   - title: Fitting penalized linear mixed models (PLMMs) 
     contents:
     - plmm
     - plmm_lasso
     - plmm_mcp
-    - plmm_nll
-    - plmm_nll_nonnull
+    - logLik
+    - logLik_nonnull
     - plmm_null
     - plmm_scad
     

@@ -34,6 +34,8 @@
 #' admix$K <- tcrossprod(admix$X,admix$X)/ncol(admix$X) # create an estimated covariance matrix 
 #' fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
 #' summary(fit)
+#' 
+#' fit2 <- plmm(X = admix$X, y = admix$y)
 
 
 plmm <- function(X,
@@ -66,7 +68,7 @@ plmm <- function(X,
   penalty <- match.arg(penalty)
   
   # Set defaults 
-  if(missing(K)){K <- tcrossprod(X, X)/ncol(X)} 
+  if(missing(K)){K <- tcrossprod(X, X)/ncol(X)} #TODO: standardize X first 
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
   # Check types 
@@ -139,7 +141,8 @@ plmm <- function(X,
   }
 
   # make sure to *not* penalize the intercept term 
-  if (intercept) penalty.factor <- c(0, penalty.factor)
+  if (intercept) penalty.factor <- c(0, penalty.factor) #TODO: move this line after the lambda is calculated
+  # adding the zero too soon is causing issues in setup_lambda() 
 
   ## Re-standardize rotated SUX
   if (standardizeRtX){

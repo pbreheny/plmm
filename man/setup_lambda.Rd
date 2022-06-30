@@ -33,7 +33,7 @@ setup_lambda(
 This function allows you compute a sequence of lambda values for plmm models.
 }
 \examples{
-RRM <- genRelatednessMat(X = scale(admix$X))
+RRM <- relatedness_mat(X = scale(admix$X))
 fit <- plmm_lasso(X = admix$X, y = admix$y, V = RRM, p1 = 10)
 (setup_lambda(admix$X, admix$y, alpha = 0.1, nlambda = 10, penalty.factor = fit$fit$penalty.factor)) # use default lambda.min
 (setup_lambda(admix$X, admix$y, alpha = 0.1, nlambda = 10, penalty.factor = fit$fit$penalty.factor)) # user-specified lambda.min

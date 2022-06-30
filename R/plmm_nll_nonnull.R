@@ -21,9 +21,9 @@
 #' UX <- U%*%admix$X
 #' Uy <- U%*%admix$y
 #' fit <- plmm(X = admix$X, y = admix$y, V = admix$V, penalty = "MCP")
-#' (plmm_nll_nonnull(fit = my_fit, SUX = S%*%UX, SUy = S%*%admix$y, S = S, eta = my_fit$eta))
+#' (logLik_nonnull(fit = my_fit, SUX = S%*%UX, SUy = S%*%admix$y, S = S, eta = my_fit$eta))
 
-plmm_nll_nonnull <- function(fit, SUX, SUy, S, eta){
+logLik_nonnull <- function(fit, SUX, SUy, S, eta){
 
   n <- dim(SUX)[1]
   beta <- coef.plmm(fit)

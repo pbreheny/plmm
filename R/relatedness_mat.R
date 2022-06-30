@@ -1,4 +1,4 @@
-#' Generate a relatedness matrix
+#' Calculate a relatedness matrix
 #'
 #' This function allows you to generate an n by n genetic relatedness matrix. If a numeric matrix is supplied, the RRM (Hayes, 2009) is used
 #' and is computed XX'/p. If a character argument which describes the location and prefix of PLINK bed/bim/bam files is supplied,
@@ -9,15 +9,15 @@
 #' @export
 #' 
 #' @examples 
-#' RRM <- genRelatednessMat(X = scale(admix$X))
+#' RRM <- relatedness_mat(X = scale(admix$X))
 
-genRelatednessMat <- function(X, ...){
-  UseMethod("genRelatednessMat")
+relatedness_mat <- function(X, ...){
+  UseMethod("relatedness_mat")
 }
 
 
 #' @export
-genRelatednessMat.character <- function(X, ...){
+relatedness_mat.character <- function(X, ...){
   args <- list(...)
   gds.fn <- lapply(c(bed='bed', bim='bim', fam='fam', gds='gds'), function(y) paste0(X, '.', y))
   snpgdsBED2GDS(gds.fn$bed, gds.fn$fam, gds.fn$bim, gds.fn$gds)
@@ -32,7 +32,7 @@ genRelatednessMat.character <- function(X, ...){
 
 
 #' @export
-genRelatednessMat.matrix <- function(X, ...){
+relatedness_mat.matrix <- function(X, ...){
   rrm <- tcrossprod(ncvreg::std(X))/ncol(X)
   return(rrm)
 }

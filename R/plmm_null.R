@@ -27,7 +27,7 @@ plmm_null <- function(y, X = NULL, K = NULL){
   c(S, U) %<-% svd(K)[1:2]
   # NB: svd() returns components d, u, and v (in that order)
   Uy <- crossprod(U, y)
-  opt <- stats::optimize(f=plmm_nll, c(0.01, 0.99), Uy=Uy, S=S)
+  opt <- stats::optimize(f=logLik, c(0.01, 0.99), Uy=Uy, S=S)
   eta <- opt$minimum
   return(list(S=S, U=U, eta=eta))
 }

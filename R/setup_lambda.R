@@ -11,7 +11,7 @@
 #' @export
 #' 
 #' @examples 
-#' RRM <- genRelatednessMat(X = scale(admix$X))
+#' RRM <- relatedness_mat(X = scale(admix$X))
 #' fit <- plmm_lasso(X = admix$X, y = admix$y, V = RRM, p1 = 10)
 #' (setup_lambda(admix$X, admix$y, alpha = 0.1, nlambda = 10, penalty.factor = fit$fit$penalty.factor)) # use default lambda.min
 #' (setup_lambda(admix$X, admix$y, alpha = 0.1, nlambda = 10, penalty.factor = fit$fit$penalty.factor)) # user-specified lambda.min
@@ -50,6 +50,8 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
     fit <- stats::glm(y ~ 1, family='gaussian')
   }
 
+  # browser()
+  
   # determine the maximum value for lambda 
   # zmax <- max(abs((t(X[, ind]) %*% fit$residuals)) / penalty.factor[ind]) / n ### this first part can by xty again
   zmax <- max(abs(crossprod(X[,ind], fit$residuals)) / penalty.factor[ind]) /n

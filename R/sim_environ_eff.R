@@ -1,28 +1,28 @@
 
-#' Generate a vector of environmental confounding effects
+#' Simulate a vector of environmental confounding effects
 #'
-#' This function allows you to simulate an environmental confounding effect. This is used by \code{genDataPS()}, which scales the generated vector in order to comply with the user specified desired variance in the outcome attributable to the environmental effect.
+#' This function allows you to simulate an environmental confounding effect. This is used by \code{sim_ps_dat()}, which scales the generated vector in order to comply with the user specified desired variance in the outcome attributable to the environmental effect.
 #' @param structureGamma A character argument describing the desired structure.
 #' @param J Number of subpopulations.
 #' @export
 #' 
 #' @examples 
-#' genGammaUnscaled(structureGamma = "linear_concordant", J = 3)
+#' sim_environ_eff(structureGamma = "linear_concordant", J = 3)
 
 
-genGammaUnscaled <- function(structureGamma, J){
-  UseMethod("genGammaUnscaled")
+sim_environ_eff <- function(structureGamma, J){
+  UseMethod("sim_environ_eff")
 }
 
 #' @export
-genGammaUnscaled.default <- function(structureGamma, J){
+sim_environ_eff.default <- function(structureGamma, J){
   warning("No valid structure specified - defaulting to 'dichotomous_discordant'")
   gamma_unscaled <- 1:J
   return(gamma_unscaled)
 }
 
 #' @export
-genGammaUnscaled.character <- function(structureGamma = c('dichotomous_discordant',
+sim_environ_eff.character <- function(structureGamma = c('dichotomous_discordant',
                                                           'dichotomous_concordant',
                                                           'linear_discordant',
                                                           'linear_concordant',
@@ -66,7 +66,7 @@ genGammaUnscaled.character <- function(structureGamma = c('dichotomous_discordan
 
 
 #' @export
-genGammaUnscaled.numeric <- function(structureGamma, J){
+sim_environ_eff.numeric <- function(structureGamma, J){
   if (length(structureGamma) != J){
     stop("Length of numeric argument 'structureGamma' must equal argument 'J'")
   }

@@ -1,5 +1,5 @@
 
-#' Generate an X matrix with population structure
+#' Simulate an X matrix with population structure
 #'
 #' This function allows you to simulate structured genetic data (SNP).
 #' @param n Number of observations/samples to simulate.
@@ -15,9 +15,9 @@
 #' @export
 #' 
 #' @examples 
-#' sim_X <- genXps(n = 200, nJ = rep(100, 2), p = 1000, structureX = "indep_subpops", inbr = "heterogeneous")
+#' sim_X <- sim_ps_x(n = 200, nJ = rep(100, 2), p = 1000, structureX = "indep_subpops", inbr = "heterogeneous")
 
-genXps <- function(n, nJ, p,
+sim_ps_x <- function(n, nJ, p,
                    structureX = c("admixture", "indep_subpops", "1d_linear", "1d_circular", "independent", "other"),
                    Fst = NULL,
                    inbr = c("homogeneous", "heterogeneous"),

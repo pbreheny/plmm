@@ -49,18 +49,29 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>prefix</dt>
 <dd><p>Character argument that is the prefix of your bed/bim/fam files.</p></dd>
+
+
 <dt>dataDir</dt>
 <dd><p>Directory where plink files (and .sexcheck files are located if <code>sexcheck = TRUE</code>) are located</p></dd>
+
+
 <dt>sexcheck</dt>
 <dd><p>Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck"</p></dd>
+
+
 <dt>na.strings</dt>
 <dd><p>For <code>snpStats</code>. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"</p></dd>
+
+
 <dt>impute</dt>
 <dd><p>Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A three element list object:</p><ul><li><p><code>genotypes</code> The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns.</p></li>
+    
+
+<p>A three element list object:</p><ul><li><p><code>genotypes</code> The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns.</p></li>
 <li><p><code>map</code> A matrix of SNP data.</p></li>
 <li><p><code>fam</code> A matrix of subject data.</p></li>
 </ul></div>
@@ -74,7 +85,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>
