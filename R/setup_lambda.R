@@ -12,9 +12,8 @@
 #' 
 #' @examples 
 #' RRM <- relatedness_mat(X = scale(admix$X))
-#' fit <- plmm_lasso(X = admix$X, y = admix$y, V = RRM, p1 = 10)
+#' fit <- plmm_lasso(X = admix$X, y = admix$y, K = RRM, p1 = 10)
 #' (setup_lambda(admix$X, admix$y, alpha = 0.1, nlambda = 10, penalty.factor = fit$fit$penalty.factor)) # use default lambda.min
-#' (setup_lambda(admix$X, admix$y, alpha = 0.1, nlambda = 10, penalty.factor = fit$fit$penalty.factor)) # user-specified lambda.min
 #' 
 
 
@@ -24,10 +23,10 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   # make sure alpha is neither missing nor zero
   if(is.na(alpha) | is.null(alpha) | alpha == 0){stop("Must provide a non-zero value for alpha.")}
   # make sure user is not trying to use a lambda.min value of 0
-  # if(!missing(lambda.min)){
-  #   if(lambda.min == 0){stop("User-specified value for lambda.min cannot be zero")}
-  # }
-  # 
+  if(!missing(lambda.min)){
+    if(lambda.min == 0){stop("User-specified value for lambda.min cannot be zero")}
+  }
+
   
   
   # label dimensions of X 
@@ -54,22 +53,19 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   
   # determine the maximum value for lambda 
   # zmax <- max(abs((t(X[, ind]) %*% fit$residuals)) / penalty.factor[ind]) / n ### this first part can by xty again
-  zmax <- max(abs(crossprod(X[,ind], fit$residuals)) / penalty.factor[ind]) /n
+  decomp_backsolve <- abs(crossprod(X[,ind], fit$residuals)) / penalty.factor[ind]
+  zmax <- max(na.exclude(decomp_backsolve)) /n
+  
+  # browser()
+  
   lambda.max <- zmax/alpha
+  
+  # browser()
+  
   # error check 
   if(!is.finite(log(lambda.max))){stop("log(lambda.max) is not finite")}
   # TODO: debugging
   # print(lambda.max)
-
-  # FIXME: working to fix this as of June 23, 2022
-  # if (lambda.min == 0) {
-  #   lambda <- c(exp(seq(log(lambda.max), log(.001*lambda.max), len = nlambda-1)), 0)
-  # } else {
-  #   lambda <- exp(seq(log(lambda.max), log(lambda.min*lambda.max), len = nlambda))
-  # }
-  # 
-  # if (length(ind)!= p) lambda[1] <- lambda[1] * 1.001
-  # lambda
   
   
   # Default is .001 if the number of observations is larger than the number of 

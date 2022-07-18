@@ -31,8 +31,7 @@
 #' @export
 #' 
 #' @examples 
-#' admix$K <- tcrossprod(admix$X,admix$X)/ncol(admix$X) # create an estimated covariance matrix 
-#' fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
+#' plmm_fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
 #' summary(fit)
 #' 
 #' fit2 <- plmm(X = admix$X, y = admix$y)
@@ -68,7 +67,7 @@ plmm <- function(X,
   penalty <- match.arg(penalty)
   
   # Set defaults 
-  if(missing(K)){K <- tcrossprod(X, X)/ncol(X)} #TODO: standardize X first 
+  if(missing(K)){K <- relatedness_mat(X)}  
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
   # Check types 
@@ -140,10 +139,6 @@ plmm <- function(X,
     c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, intercept, rotation)
   }
 
-  # make sure to *not* penalize the intercept term 
-  if (intercept) penalty.factor <- c(0, penalty.factor) #TODO: move this line after the lambda is calculated
-  # adding the zero too soon is causing issues in setup_lambda() 
-
   ## Re-standardize rotated SUX
   if (standardizeRtX){
     if (intercept){
@@ -171,6 +166,8 @@ plmm <- function(X,
   xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) # population var without mean 0
   # TODO: rename this 'xtx' to something more descriptive 
 
+  browse()
+  
   ## Set up lambda
   if (missing(lambda)) {
     lambda <- setup_lambda(X = std_SUX,
@@ -185,6 +182,10 @@ plmm <- function(X,
     nlambda <- length(lambda)
     user.lambda <- TRUE
   }
+  
+  # make sure to *not* penalize the intercept term 
+  if (intercept) penalty.factor <- c(0, penalty.factor)
+  
 
   ## Placeholders for results
 

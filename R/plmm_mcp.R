@@ -11,7 +11,7 @@
 #' @export
 #' 
 #' @examples 
-#' fit <- plmm_mcp(admix$X, admix$y, p1 = 5)
+#' plmm_mcp_fit <- plmm_mcp(admix$X, admix$y, p1 = 5)
 
 
 

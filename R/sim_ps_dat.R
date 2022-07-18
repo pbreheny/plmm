@@ -6,7 +6,7 @@
 #' @param p Number of SNPs to simulate. Defaults to 1000. 
 #' @param p1 Number of SNPs that are causal. Defaults to floor(p/2).
 #' @param nJ Number of observations in each subpopulation. The length of nJ corresponds to the number of subpopulations. Defaults to rep(50, 4). 
-#' @param structureX Type of structure to simulate.
+#' @param structureX Type of structure to simulate. Defaults to `indep_subpops`. 
 #' @param Fst The desired final FST of the admixed individuals. Ranges from 0 to 1. A high FST implies greater differentiation among populations. Defaults to 0.1 if structureX = 1d_linear and 0.2 if structureX = indep_subpops. Otherwise defaults to NULL.
 #' @param inbr Indicates whether the desired inbreeding is homogeneous or heterogeneous. Defaults to heterogeneous.
 #' @param structureGamma The desired structure of the environmental confounding effect. Defaults to 'dichotomous_discordant'
