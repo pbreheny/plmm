@@ -12,7 +12,7 @@
 #' 
 #' @examples 
 #' std_X <- scale(admix$X)
-#' K <- tcrossprod(admix$X, admix$X)/ncol(admix$X)
+#' K <- relatedness_mat(std_X)
 #' rotated_dat <- rotate_data(std_X, admix$y, K)
 
 rotate_data <- function(X, y, K = NULL, intercept = TRUE, rotation = TRUE, eta_star){
@@ -22,7 +22,7 @@ rotate_data <- function(X, y, K = NULL, intercept = TRUE, rotation = TRUE, eta_s
   # Calculate RRM
   if(is.null(K)){
     p <- ncol(X)
-    K <- tcrossprod(X, X) * (1/p)
+    K <- relatedness_mat(X)
   }
   
   ## Calculate U, S, eta

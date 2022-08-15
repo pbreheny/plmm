@@ -11,7 +11,11 @@
 #' @export
 #' 
 #' @examples 
+#' \dontrun{
+#' #FIXME: this example is under construction
 #' plmm_mcp_fit <- plmm_mcp(admix$X, admix$y, p1 = 5)
+#' }
+#' 
 
 
 

@@ -16,7 +16,7 @@
 #' @param convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
 #' @param dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
 #' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
-#' @param init Initial values for coefficients. Default is TRUE. 
+#' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
 #' @param intercept Logical flag for whether an intercept should be included. Defaults to TRUE. 
@@ -31,7 +31,10 @@
 #' @export
 #' 
 #' @examples 
-#' plmm_fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+#' plmm_fit <- plmm(X = admix$X,
+#'  y = admix$y,
+#'   K = relatedness_mat(admix$X),
+#'   intercept = FALSE)
 #' summary(fit)
 #' 
 #' fit2 <- plmm(X = admix$X, y = admix$y)
@@ -124,11 +127,13 @@ plmm <- function(X,
   
   # identify nonsingular values in the standardized X matrix  
   ns <- attr(std_X, "nonsingular")
-  init <- init[ns] # remove any singular values
+  # remove initial values for coefficients representing columns with singular values
+  init <- init[ns] 
 
-  # only penalize non-singular values 
+  # keep only those penalty factors which penalize non-singular values 
   penalty.factor <- penalty.factor[ns]
 
+  # designate the dimensions of the design matrix 
   p <- ncol(std_X)
   n <- nrow(std_X)
 
@@ -166,7 +171,7 @@ plmm <- function(X,
   xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) # population var without mean 0
   # TODO: rename this 'xtx' to something more descriptive 
 
-  browse()
+  # browser()
   
   ## Set up lambda
   if (missing(lambda)) {
