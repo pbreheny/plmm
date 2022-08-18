@@ -8,9 +8,12 @@
 #' @export
 #' 
 #' @examples 
+#' \dontrun{
 #' admix$K <- (admix$X%*%t(admix$X))/ncol(admix$X) # create an estimated covariance matrix 
 #' fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
 #' # TODO: this throws an error: new_betas <- unstandardize(b = fit$beta, X = admix$X, std_X = scale(admix$X))
+#' }
+#' 
 
 unstandardize <- function(b, X, std_X, intercept = TRUE) {
   ns <- attr(std_X, 'nonsingular')

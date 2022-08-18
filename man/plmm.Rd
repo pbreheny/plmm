@@ -63,7 +63,7 @@ plmm(
 
 \item{penalty.factor}{A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.}
 
-\item{init}{Initial values for coefficients. Default is TRUE.}
+\item{init}{Initial values for coefficients. Default is 0 for all columns of X.}
 
 \item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
 
@@ -75,13 +75,14 @@ plmm(
 
 \item{rotation}{Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.}
 
-\item{...}{Not used.TODO: add return lines}
+\item{...}{Not used.}
 }
 \description{
 This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
 }
 \examples{
-admix$K <- tcrossprod(admix$X,admix$X)/ncol(admix$X) # create an estimated covariance matrix 
-fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
+plmm_fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
 summary(fit)
+
+fit2 <- plmm(X = admix$X, y = admix$y)
 }

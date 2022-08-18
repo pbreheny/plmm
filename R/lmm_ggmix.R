@@ -7,6 +7,10 @@
 #' @param standardize Should standardization be performed within \code{glmnet()}? Defaults to FALSE.
 #' @param K Matrix used to compute the similarity matrix, K. For multi-chromosome analysis this may be supplied in order to perform a leave-one-chromosome-out correction. The objective here is to adjust for population stratification and unobserved confounding without rotating out the causal SNP effects. Default is \eqn{\frac{1}{p} XX^T}
 #' @export
+#' 
+#' @examples 
+#' fit <- lmm_ggmix(X = admix$X, y = admix$y, p1 = 10, K = relatedness_mat(admix$X))
+#' summary(fit)
 
 
 lmm_ggmix <- function(X, y, p1, standardize = FALSE, K = NULL){

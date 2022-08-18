@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim_ps_dat.R
 \name{sim_ps_dat}
 \alias{sim_ps_dat}
-\title{Generate data with population structure}
+\title{Simulate data with population structure}
 \usage{
 sim_ps_dat(
   n = 200,
@@ -30,7 +30,7 @@ sim_ps_dat(
 
 \item{nJ}{Number of observations in each subpopulation. The length of nJ corresponds to the number of subpopulations. Defaults to rep(50, 4).}
 
-\item{structureX}{Type of structure to simulate.}
+\item{structureX}{Type of structure to simulate. Defaults to \code{indep_subpops}.}
 
 \item{Fst}{The desired final FST of the admixed individuals. Ranges from 0 to 1. A high FST implies greater differentiation among populations. Defaults to 0.1 if structureX = 1d_linear and 0.2 if structureX = indep_subpops. Otherwise defaults to NULL.}
 
@@ -58,5 +58,5 @@ This function allows you to simulate structured genetic data (SNP) with an unobs
 }
 \examples{
 sim_dat <- sim_ps_dat(structureX = "1d_linear")
-example_fit <- plmm(sim_dat$X, sim_dat$y, V = sim_dat$X\%*\%t(sim_dat$X))
+example_fit <- plmm(sim_dat$X, sim_dat$y, K = sim_dat$X\%*\%t(sim_dat$X))
 }

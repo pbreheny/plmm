@@ -18,3 +18,9 @@
 \description{
 Coef method for "cv.plmm" class
 }
+\examples{
+\dontrun{
+cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
+coef(cv.plmm(cv_fit))
+}
+}

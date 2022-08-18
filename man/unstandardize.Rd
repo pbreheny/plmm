@@ -19,7 +19,10 @@ unstandardize(b, X, std_X, intercept = TRUE)
 This function allows you to unstandardize coefficient values based on attributes of X.
 }
 \examples{
+\dontrun{
 admix$K <- (admix$X\%*\%t(admix$X))/ncol(admix$X) # create an estimated covariance matrix 
 fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
 # TODO: this throws an error: new_betas <- unstandardize(b = fit$beta, X = admix$X, std_X = scale(admix$X))
+}
+
 }

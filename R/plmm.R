@@ -25,16 +25,12 @@
 #' @param rotation Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.
 #' @param ... Not used.
 #' 
-#' # TODO: add return lines 
 #' 
 #' @importFrom zeallot %<-%
 #' @export
 #' 
 #' @examples 
-#' plmm_fit <- plmm(X = admix$X,
-#'  y = admix$y,
-#'   K = relatedness_mat(admix$X),
-#'   intercept = FALSE)
+#' plmm_fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
 #' summary(fit)
 #' 
 #' fit2 <- plmm(X = admix$X, y = admix$y)
@@ -242,7 +238,8 @@ plmm <- function(X,
                         penalty.factor = penalty.factor,
                         n = n,
                         iter = iter,
-                        converged = converged),
+                        converged = converged,
+                        intercept = intercept),
                         class = "plmm")
   if (missing(returnX)) {
     if (utils::object.size(SUX) > 1e8) {

@@ -24,6 +24,6 @@ This function allows you to fit a linear mixed model via non-convex penalized ma
 }
 \examples{
 std_X <- scale(admix$X)
-K <- tcrossprod(admix$X, admix$X)/ncol(admix$X)
+K <- relatedness_mat(std_X)
 rotated_dat <- rotate_data(std_X, admix$y, K)
 }

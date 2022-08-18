@@ -14,6 +14,11 @@
 #' @param returnY Should cv.plmm return the linear predictors from the cross-validation folds? Default is FALSE; if TRUE, this will return a matrix in which the element for row i, column j is the fitted value for observation i from the fold in which observation i was excluded from the fit, at the jth value of lambda.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each CV fold. Default is FALSE.
 #' @export
+#' 
+#' @examples 
+#' \dontrun{
+#' cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
+#' }
 
 
 cv.plmm <- function(X, y, K, type = c('response', 'individual'), intercept = TRUE, ..., cluster, nfolds=10, seed, fold,

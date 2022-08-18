@@ -54,7 +54,7 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   # determine the maximum value for lambda 
   # zmax <- max(abs((t(X[, ind]) %*% fit$residuals)) / penalty.factor[ind]) / n ### this first part can by xty again
   decomp_backsolve <- abs(crossprod(X[,ind], fit$residuals)) / penalty.factor[ind]
-  zmax <- max(na.exclude(decomp_backsolve)) /n
+  zmax <- max(stats::na.exclude(decomp_backsolve)) /n
   
   # browser()
   

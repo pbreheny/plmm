@@ -23,5 +23,9 @@ plmm_mcp(X, y, p1, standardize = FALSE, K, ...)
 This function allows you to fit a linear mixed model via penalized maximum likelihood with null model variance component estimation.
 }
 \examples{
-fit <- plmm_mcp(admix$X, admix$y, p1 = 5)
+\dontrun{
+#FIXME: this example is under construction
+plmm_mcp_fit <- plmm_mcp(admix$X, admix$y, p1 = 5)
+}
+
 }

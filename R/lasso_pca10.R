@@ -8,6 +8,10 @@
 #' @importFrom zeallot %<-%
 #' @importFrom glmnet glmnet
 #' @export
+#' 
+#' @examples 
+#' fit <- lasso_pca10(admix$X, admix$y, p1 = 5)
+#' summary(fit)
 
 
 lasso_pca10 <- function(X, y, p1, ...){

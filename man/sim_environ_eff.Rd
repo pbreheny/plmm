@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim_environ_eff.R
 \name{sim_environ_eff}
 \alias{sim_environ_eff}
-\title{Generate a vector of environmental confounding effects}
+\title{Simulate a vector of environmental confounding effects}
 \usage{
 sim_environ_eff(structureGamma, J)
 }

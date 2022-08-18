@@ -11,6 +11,9 @@
 #' @param ... Optional arguments
 #' @importFrom zeallot %<-%
 #' @export
+#' 
+
+
 
 cvf <- function(i, X, y, K, fold, type, cv.args, ...) {
   cv.args$X <- X[fold!=i, , drop=FALSE]

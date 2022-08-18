@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim_ps_x.R
 \name{sim_ps_x}
 \alias{sim_ps_x}
-\title{Generate an X matrix with population structure}
+\title{Simulate an X matrix with population structure}
 \usage{
 sim_ps_x(
   n,

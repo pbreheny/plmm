@@ -18,3 +18,7 @@ lasso_pca10(X, y, p1, ...)
 \description{
 This function allows you to fit a linear model via lasso-penalized maximum likelihood, adjusted for the first 10 principal components (unpenalized), with the same output values as those of lmm_lasso_eta. Primarily used for simulation and comparison with lmm_lasso_eta.
 }
+\examples{
+fit <- lasso_pca10(admix$X, admix$y, p1 = 5)
+summary(fit)
+}
