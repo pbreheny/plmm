@@ -30,8 +30,8 @@
 #' @export
 #' 
 #' @examples 
-#' plmm_fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
-#' summary(fit)
+#' fit1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
+#' summary(fit1)
 #' 
 #' fit2 <- plmm(X = admix$X, y = admix$y)
 
@@ -112,6 +112,8 @@ plmm <- function(X,
 
   ## Standardize X
   if (standardizeX){
+    # NB: the following line will eliminate singular columns (eg monomorphic SNPs)
+    #  from the design matrix. 
     std_X <- ncvreg::std(X)
   } else {
     std_X <- X
@@ -130,7 +132,7 @@ plmm <- function(X,
   penalty.factor <- penalty.factor[ns]
 
   # designate the dimensions of the design matrix 
-  p <- ncol(std_X)
+  p <- ncol(std_X) #FIXME: should these be defined with X, instead of std_X?
   n <- nrow(std_X)
 
   ## Rotate data
@@ -153,6 +155,9 @@ plmm <- function(X,
     }
     attributes(std_SUX)$scale <- attr(std_SUX_noInt, 'scale')
     attributes(std_SUX)$nonsingular <- attr(std_SUX_noInt, 'nonsingular')
+    # Aug. 24, 2022 - I am wondering if the line below should be added 
+    # xtx <- rep(1, ncol(std_X))
+    
   } else {
     std_SUX <- SUX
     if (intercept){
@@ -164,8 +169,10 @@ plmm <- function(X,
       attributes(std_SUX)$nonsingular <- 1:ncol(SUX)
     }
   }
-  xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) # population var without mean 0
-  # TODO: rename this 'xtx' to something more descriptive 
+  # calculate population var without mean 0; will need this for call to ncvfit()
+  # Aug. 24, 2022 - I am wondering if the line below is only appropriate in the 
+  #   case where standardizeRtX = F
+  xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
 
   # browser()
   
@@ -192,13 +199,14 @@ plmm <- function(X,
 
   if (intercept) init <- c(0, init) # add initial value for intercept
   resid <- drop(SUy - std_SUX %*% init)
-  b <- matrix(NA, ncol(std_SUX), nlambda)
+  b <- matrix(NA, nrow=ncol(std_SUX), ncol=nlambda) 
   iter <- integer(nlambda)
   converged <- logical(nlambda)
   loss <- numeric(nlambda)
   # think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
+    # browser()
     res <- ncvreg::ncvfit(std_SUX, SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
     b[, ll] <- init <- res$beta
     iter[ll] <- res$iter
@@ -220,14 +228,15 @@ plmm <- function(X,
   bb <- unscale(b[, ind, drop = FALSE], SUX, std_SUX, intercept)
 
   # unstandardize original data
-  beta <- unstandardize(bb, X, std_X, intercept)
+  beta_vals <- unstandardize(bb, X, std_X, intercept)
 
   varnames <- if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)
   if (intercept) varnames <- c("(Intercept)", varnames)
-  dimnames(beta) <- list(varnames, lamNames(lambda))
+  # name beta values: SNPs (or covariates) on the rows, lambda values on the columns
+  dimnames(beta_vals) <- list(varnames, lamNames(lambda))
 
   ## Output
-  val <- structure(list(beta = beta,
+  val <- structure(list(beta_vals = beta_vals,
                         eta = eta,
                         lambda = lambda,
                         penalty = penalty,

@@ -22,7 +22,7 @@ unstandardize <- function(std_betas, X, std_X, intercept = TRUE) {
   
   if (intercept){
   # partition the beta values into intercept and non-intercept parts
-    a <- std_betas[1, , drop = FALSE] 
+    a <- std_betas[1, , drop = FALSE] # this is the intercept 
     b <- std_betas[-1, , drop=FALSE]
     
     # initialize beta with zeros; the + 1 is for the intercept
@@ -31,13 +31,14 @@ unstandardize <- function(std_betas, X, std_X, intercept = TRUE) {
     # unscale the beta values for nonsingular columns
     unscaled_b <- b/attr(std_X, 'scale')[ns]
     
+    # browser()
     # fill in the un-transformed values
-    un_std_beta[ns+1,] <- unscaled_b # again, the + 1 is for the intercept
     un_std_beta[1,] <- a - crossprod(attr(std_X, 'center')[ns], unscaled_b)
+    un_std_beta[ns+1,] <- unscaled_b # again, the + 1 is for the intercept
     
   } else {
-    un_std_beta <- matrix(0, nrow = ncol(X), ncol = ncol(b))
-    unscaled_b <- b / scale
+    un_std_beta <- matrix(0, nrow = ncol(X), ncol = ncol(std_betas))
+    unscaled_b <- std_betas / attr(std_X, 'scale')[ns]
     un_std_beta[ns, ] <- unscaled_b
   }
   return(un_std_beta)

@@ -8,13 +8,11 @@
 #' @export
 #'
 #' @examples 
-#' admix$K <- (admix$X%*%t(admix$X))/ncol(admix$X) # create an estimated covariance matrix 
+#' admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix 
 #' fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
 #' unscaled_betas <- unscale(b = fit$beta, X = admix$X, scaled_X = fit$SUX, intercept = TRUE)
 
 unscale <- function(b, X, scaled_X, intercept = TRUE) {
-  # create a matrix for beta values to be "filled in"
-  beta <- matrix(0, nrow = ncol(X), ncol = ncol(b))
   # identify which columns of the scaled, rotated design matrix are nonsingular 
   ns <- attr(scaled_X, 'nonsingular')
   # extract the scaling values from the non-singular columns
@@ -22,13 +20,18 @@ unscale <- function(b, X, scaled_X, intercept = TRUE) {
   
   # calculate unscaled beta values 
   if (intercept){ # case 1: intercept 
-    beta[1,] <- b[1, , drop = FALSE] # don't change the intercept values 
-    b <- b[-1, , drop=FALSE] # b has all non-intercept values 
+    # create a matrix for beta values to be "filled in"
+    unscaled_beta <- matrix(0, nrow = ncol(X) + 1, ncol = ncol(b))
+    
+    unscaled_beta[1,] <- b[1, , drop = FALSE] # don't change the intercept values 
+    b <- b[-1, , drop=FALSE] # now, b has only non-intercept values 
     bb <- b / scale # unscale the non-intercept values 
-    beta[1 + ns,] <- bb # fill in the rest of the beta values 
+    unscaled_beta[1 + ns,] <- bb # fill in the rest of the beta values 
   } else { # case 2: no intercept 
+    # create a matrix for beta values to be "filled in"
+    unscaled_beta <- matrix(0, nrow = ncol(X), ncol = ncol(b))
     bb <- b / scale # unscale the coefficient values 
-    beta[ns, ] <- bb # fill in beta values for nonsingular coefficients 
+    unscaled_beta[ns, ] <- bb # fill in beta values for nonsingular coefficients 
   }
-  return(beta)
+  return(unscaled_beta)
 }
