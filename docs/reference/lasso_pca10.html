@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +64,18 @@
 
 </dl></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">lasso_pca10</span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span>, <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, p1 <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Length Class  Mode   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fit      12    elnet  list   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> nonzero   1    -none- numeric</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> coef    100    -none- numeric</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> delta     1    -none- logical</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> eta       1    -none- logical</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

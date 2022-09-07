@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,13 +86,11 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">RRM</span> <span class="op">&lt;-</span> <span class="fu"><a href="genRelatednessMat.html">relatedness_mat</a></span><span class="op">(</span>X <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm_lasso.html">plmm_lasso</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, V <span class="op">=</span> <span class="va">RRM</span>, p1 <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plmm_lasso(X = admix$X, y = admix$y, V = RRM, p1 = 10):</span> argument "K" is missing, with no default</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">RRM</span> <span class="op">&lt;-</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span>X <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm_lasso.html">plmm_lasso</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="va">RRM</span>, p1 <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">(</span><span class="fu">setup_lambda</span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span>, <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, alpha <span class="op">=</span> <span class="fl">0.1</span>, nlambda <span class="op">=</span> <span class="fl">10</span>, penalty.factor <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">penalty.factor</span><span class="op">)</span><span class="op">)</span> <span class="co"># use default lambda.min</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in setup_lambda(admix$X, admix$y, alpha = 0.1, nlambda = 10, penalty.factor = fit$fit$penalty.factor):</span> object 'fit' not found</span>
-<span class="r-in"><span class="op">(</span><span class="fu">setup_lambda</span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span>, <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, alpha <span class="op">=</span> <span class="fl">0.1</span>, nlambda <span class="op">=</span> <span class="fl">10</span>, penalty.factor <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">penalty.factor</span><span class="op">)</span><span class="op">)</span> <span class="co"># user-specified lambda.min</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in setup_lambda(admix$X, admix$y, alpha = 0.1, nlambda = 10, penalty.factor = fit$fit$penalty.factor):</span> object 'fit' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 7.499211317 3.480825551 1.615656101 0.749921132 0.348082555 0.161565610</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.074992113 0.034808256 0.016156561 0.007499211</span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>

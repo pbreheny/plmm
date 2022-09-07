@@ -61,6 +61,12 @@
     <loc>/reference/lmm_lasso.html</loc>
   </url>
   <url>
+    <loc>/reference/logLik.html</loc>
+  </url>
+  <url>
+    <loc>/reference/logLik_nonnull.html</loc>
+  </url>
+  <url>
     <loc>/reference/loss.plmm.html</loc>
   </url>
   <url>
@@ -97,6 +103,9 @@
     <loc>/reference/preprocess.html</loc>
   </url>
   <url>
+    <loc>/reference/relatedness_mat.html</loc>
+  </url>
+  <url>
     <loc>/reference/rotate_data.html</loc>
   </url>
   <url>
@@ -106,10 +115,22 @@
     <loc>/reference/setup_lambda.html</loc>
   </url>
   <url>
+    <loc>/reference/sim_environ_eff.html</loc>
+  </url>
+  <url>
+    <loc>/reference/sim_ps_dat.html</loc>
+  </url>
+  <url>
+    <loc>/reference/sim_ps_x.html</loc>
+  </url>
+  <url>
     <loc>/reference/unscale.html</loc>
   </url>
   <url>
     <loc>/reference/unstandardize.html</loc>
+  </url>
+  <url>
+    <loc>/reference/untransform.html</loc>
   </url>
   <url>
     <loc>/reference/varp.html</loc>

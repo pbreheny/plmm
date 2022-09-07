@@ -4,7 +4,7 @@
 \alias{rotate_data}
 \title{Compute transformed X and y for subsequent plmm rescaling and fitting}
 \usage{
-rotate_data(X, y, K = NULL, intercept = TRUE, rotation = TRUE, eta_star)
+rotate_data(X, y, K = NULL, eta_star)
 }
 \arguments{
 \item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
@@ -12,10 +12,6 @@ rotate_data(X, y, K = NULL, intercept = TRUE, rotation = TRUE, eta_star)
 \item{y}{Continuous outcome vector.}
 
 \item{K}{Estimated or known similarity matrix. By default, K is the realized relationship matrix, \eqn{\frac{1}{p}XX^T}, where \eqn{p} is the number of columns in X}
-
-\item{intercept}{Logical flag for whether an intercept should be included.}
-
-\item{rotation}{Logical flag to indicate whether the rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.}
 
 \item{eta_star}{Optional arg to input a specific eta term rather than estimate it from the data. If v is a known matrix, this should be 1.}
 }

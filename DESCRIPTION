@@ -1,6 +1,6 @@
 Package: penalizedLMM
 Title: Fit nonconvex-penalized linear mixed models to account for the presence of unobserved confounding effects
-Version: 0.1.2
+Version: 0.2.0
 Date: 2022-06-06
 Authors@R: c(
     person("Anna C.","Reisetter", role = c("aut", "cre"),
@@ -16,7 +16,7 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0
-Suggests: snpStats, popkin, ggmix, graphics, grDevices, parallel, MASS
+Suggests: snpStats, ggmix, graphics, grDevices, parallel, MASS
 Imports: 
     stats,
     ncvreg,
@@ -28,4 +28,5 @@ Imports:
     zeallot,
     data.table,
     SNPRelate,
-    tinytest
+    tinytest,
+    popkin

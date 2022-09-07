@@ -10,11 +10,8 @@
 #' @export
 #' 
 #' @examples 
-#' \dontrun{
-#' #FIXME: this example is under construction
 #' RRM <- relatedness_mat(X = scale(admix$X))
-#' fit <- plmm_scad(X = admix$X, y = admix$y, p1 = 5, K = RRM) #FIXME: throws Error 
-#' }
+#' fit_scad <- plmm_scad(X = admix$X, y = admix$y, p1 = 5, K = RRM)
 #' 
 
 

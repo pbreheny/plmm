@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,24 +47,19 @@
 
       <dl><dt>
           
-          <code><a href="genDataPS.html">sim_ps_dat()</a></code> 
+          <code><a href="sim_ps_dat.html">sim_ps_dat()</a></code> 
         </dt>
-        <dd>Generate data with population structure</dd>
+        <dd>Simulate data with population structure</dd>
       </dl><dl><dt>
           
-          <code><a href="genGammaUnscaled.html">sim_environ_eff()</a></code> 
+          <code><a href="sim_environ_eff.html">sim_environ_eff()</a></code> 
         </dt>
-        <dd>Generate a vector of environmental confounding effects</dd>
+        <dd>Simulate a vector of environmental confounding effects</dd>
       </dl><dl><dt>
           
-          <code><a href="genRelatednessMat.html">relatedness_mat()</a></code> 
+          <code><a href="sim_ps_x.html">sim_ps_x()</a></code> 
         </dt>
-        <dd>Generate a relatedness matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="genXps.html">sim_ps_x()</a></code> 
-        </dt>
-        <dd>Generate an X matrix with population structure</dd>
+        <dd>Simulate an X matrix with population structure</dd>
       </dl></div><div class="section level2">
       <h2 id="fitting-penalized-linear-mixed-models-plmms-">Fitting penalized linear mixed models (PLMMs)<a class="anchor" aria-label="anchor" href="#fitting-penalized-linear-mixed-models-plmms-"></a></h2>
       
@@ -91,16 +86,6 @@
           <code><a href="plmm_mcp.html">plmm_mcp()</a></code> 
         </dt>
         <dd>Fit a penalizedLMM with MCP regularization using penalizedLMM</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm_nll.html">logLik()</a></code> 
-        </dt>
-        <dd>Evaluate the negative log-likelihood of a null Gaussian penalizedLMM model</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm_nll_nonnull.html">logLik_nonnull()</a></code> 
-        </dt>
-        <dd>Evaluate the negative log-likelihood of a non-null Gaussian plmm model</dd>
       </dl><dl><dt>
           
           <code><a href="plmm_null.html">plmm_null()</a></code> 
@@ -142,6 +127,16 @@
           <code><a href="loss.plmm.html">loss.plmm()</a></code> 
         </dt>
         <dd>Loss method for "plmm" class</dd>
+      </dl><dl><dt>
+          
+          <code><a href="logLik.html">logLik()</a></code> 
+        </dt>
+        <dd>Evaluate the negative log-likelihood of a null Gaussian penalizedLMM model</dd>
+      </dl><dl><dt>
+          
+          <code><a href="logLik_nonnull.html">logLik_nonnull()</a></code> <code><a href="logLik_nonnull.html">logLik_nonnull()</a></code> 
+        </dt>
+        <dd>Evaluate the negative log-likelihood of a non-null Gaussian plmm model</dd>
       </dl></div><div class="section level2">
       <h2 id="coefficient-methods-for-plmms">Coefficient methods for PLMMs<a class="anchor" aria-label="anchor" href="#coefficient-methods-for-plmms"></a></h2>
       
@@ -222,6 +217,11 @@
         <dd>Preprocess PLINK files</dd>
       </dl><dl><dt>
           
+          <code><a href="relatedness_mat.html">relatedness_mat()</a></code> 
+        </dt>
+        <dd>Calculate a relatedness matrix</dd>
+      </dl><dl><dt>
+          
           <code><a href="rotate_data.html">rotate_data()</a></code> 
         </dt>
         <dd>Compute transformed X and y for subsequent plmm rescaling and fitting</dd>
@@ -232,14 +232,9 @@
         <dd>Calculate scale by the population standard deviation, without centering</dd>
       </dl><dl><dt>
           
-          <code><a href="unscale.html">unscale()</a></code> 
+          <code><a href="untransform.html">untransform()</a></code> 
         </dt>
-        <dd>Unscale coefficient values</dd>
-      </dl><dl><dt>
-          
-          <code><a href="unstandardize.html">unstandardize()</a></code> 
-        </dt>
-        <dd>Unstandardize coefficient values</dd>
+        <dd>Untransform coefficient values back to the original scale</dd>
       </dl><dl><dt>
           
           <code><a href="varp.html">varp()</a></code> 

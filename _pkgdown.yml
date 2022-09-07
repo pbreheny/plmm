@@ -12,7 +12,6 @@ reference:
     contents:
     - sim_ps_dat
     - sim_environ_eff
-    - relatedness_mat
     - sim_ps_x
     
   - title: Fitting penalized linear mixed models (PLMMs) 
@@ -20,8 +19,6 @@ reference:
     - plmm
     - plmm_lasso
     - plmm_mcp
-    - logLik
-    - logLik_nonnull
     - plmm_null
     - plmm_scad
     
@@ -31,6 +28,8 @@ reference:
     - cv.plmm
     - gic
     - loss.plmm
+    - logLik
+    - logLik_nonnull
     
   - title: Coefficient methods for PLMMs
     contents:
@@ -49,10 +48,10 @@ reference:
   - title: Data (pre)processing and wrangling
     contents:
     - preprocess
+    - relatedness_mat
     - rotate_data
     - scale_varp
-    - unscale
-    - unstandardize
+    - untransform
     - varp
     
   - title: Plotting and formatting

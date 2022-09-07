@@ -21,10 +21,7 @@ plmm_scad(X, y, p1, standardize = FALSE, K)
 This function allows you to fit a linear mixed model via penalized maximum likelihood with null model variance component estimation.
 }
 \examples{
-\dontrun{
-#FIXME: this example is under construction
 RRM <- relatedness_mat(X = scale(admix$X))
-fit <- plmm_scad(X = admix$X, y = admix$y, p1 = 5, K = RRM) #FIXME: throws Error 
-}
+fit_scad <- plmm_scad(X = admix$X, y = admix$y, p1 = 5, K = RRM)
 
 }

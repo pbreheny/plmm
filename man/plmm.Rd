@@ -23,10 +23,6 @@ plmm(
   penalty.factor = rep(1, ncol(X)),
   init = rep(0, ncol(X)),
   returnX = TRUE,
-  intercept = TRUE,
-  standardizeX = TRUE,
-  standardizeRtX = TRUE,
-  rotation = TRUE,
   ...
 )
 }
@@ -66,23 +62,13 @@ plmm(
 \item{init}{Initial values for coefficients. Default is 0 for all columns of X.}
 
 \item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
-
-\item{intercept}{Logical flag for whether an intercept should be included. Defaults to TRUE.}
-
-\item{standardizeX}{Logical flag for X matrix standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.}
-
-\item{standardizeRtX}{Logical flag for transformed X matrix scaling (or rescaling). The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.}
-
-\item{rotation}{Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.}
-
-\item{...}{Not used.}
 }
 \description{
 This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
 }
 \examples{
-plmm_fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
-summary(fit)
+fit1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+summary(fit1)
 
 fit2 <- plmm(X = admix$X, y = admix$y)
 }
