@@ -18,10 +18,14 @@ unscale <- function(b, X, scaled_X, intercept = TRUE) {
   # extract the scaling values from the non-singular columns
   scale <- attr(scaled_X, 'scale')[ns]
   
+  # Aug. 26: could use the line below instead of initializing with zeros
+  # unscaled_beta <- b
+  
   # calculate unscaled beta values 
   if (intercept){ # case 1: intercept 
     # create a matrix for beta values to be "filled in"
-    unscaled_beta <- matrix(0, nrow = ncol(X) + 1, ncol = ncol(b))
+    # unscaled_beta should have the same dimensions as b
+    unscaled_beta <- matrix(0, nrow = ncol(X), ncol = ncol(b))
     
     unscaled_beta[1,] <- b[1, , drop = FALSE] # don't change the intercept values 
     b <- b[-1, , drop=FALSE] # now, b has only non-intercept values 

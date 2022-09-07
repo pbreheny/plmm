@@ -11,13 +11,8 @@
 #' @export
 #' 
 #' @examples 
-#' \dontrun{
-#' #FIXME: this example is under construction
 #' plmm_mcp_fit <- plmm_mcp(admix$X, admix$y, p1 = 5)
-#' }
-#' 
-
-
+#'
 
 plmm_mcp <- function(X, y, p1, standardize = FALSE, K, ...) {
   if (missing(K)){ # case 1: no K supplied, so use the plmm() default: 

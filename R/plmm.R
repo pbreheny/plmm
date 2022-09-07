@@ -19,18 +19,12 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
-#' @param intercept Logical flag for whether an intercept should be included. Defaults to TRUE. 
-#' @param standardizeX Logical flag for X matrix standardization, prior to data transformation. The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize.
-#' @param standardizeRtX Logical flag for transformed X matrix scaling (or rescaling). The coefficients are always returned on the original scale. Default is TRUE. If variables are in the same units already, or manually standardized, you might not wish to standardize, but this is generally recommended.
-#' @param rotation Logical flag to indicate whether the weighted rotation of the data should be performed (TRUE), or not (FALSE). This is primarily for testing purposes and defaults to TRUE.
-#' @param ... Not used.
-#' 
 #' 
 #' @importFrom zeallot %<-%
 #' @export
 #' 
 #' @examples 
-#' fit1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
+#' fit1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
 #' summary(fit1)
 #' 
 #' fit2 <- plmm(X = admix$X, y = admix$y)
@@ -55,10 +49,6 @@ plmm <- function(X,
                  penalty.factor = rep(1, ncol(X)),
                  init = rep(0, ncol(X)),
                  returnX = TRUE,
-                 intercept = TRUE,
-                 standardizeX = TRUE,
-                 standardizeRtX = TRUE,
-                 rotation = TRUE,
                  ...) {
 
   # Coersion
@@ -111,17 +101,10 @@ plmm <- function(X,
   if ("n.lambda" %in% names(dots)) nlambda <- dots$n.lambda
 
   ## Standardize X
-  if (standardizeX){
-    # NB: the following line will eliminate singular columns (eg monomorphic SNPs)
-    #  from the design matrix. 
-    std_X <- ncvreg::std(X)
-  } else {
-    std_X <- X
-    attributes(std_X)$center <- rep(0, ncol(std_X))
-    attributes(std_X)$scale <- rep(1, ncol(std_X))
-    attributes(std_X)$nonsingular <- 1:ncol(std_X)
-    # X_ns <- attr(std_X, "nonsingular") # shouldn't need this value in this scenario
-  }
+  # NB: the following line will eliminate singular columns (eg monomorphic SNPs)
+  #  from the design matrix. 
+  std_X <- ncvreg::std(X)
+  
   
   # identify nonsingular values in the standardized X matrix  
   ns <- attr(std_X, "nonsingular")
@@ -137,76 +120,49 @@ plmm <- function(X,
 
   ## Rotate data
   if (!missing(eta_star)){
-    c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, intercept, rotation, eta_star)
+    c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star)
   } else {
-    c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, intercept, rotation)
+    c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K)
   }
 
-  ## Re-standardize rotated SUX
-  if (standardizeRtX){
-    if (intercept){
-      std_SUX_noInt <- scale_varp(SUX[,-1, drop = FALSE])
-      attributes(std_SUX_noInt)$nonsingular <- attributes(ncvreg::std(SUX[,-1, drop = FALSE]))$nonsingular
-      std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt)
-    } else {
-      std_SUX_noInt <- scale_varp(SUX)
-      attributes(std_SUX_noInt)$nonsingular <- attributes(ncvreg::std(SUX))$nonsingular
-      std_SUX <- std_SUX_noInt
-    }
-    attributes(std_SUX)$scale <- attr(std_SUX_noInt, 'scale')
-    attributes(std_SUX)$nonsingular <- attr(std_SUX_noInt, 'nonsingular')
-    # Aug. 24, 2022 - I am wondering if the line below should be added 
-    # xtx <- rep(1, ncol(std_X))
-    
-  } else {
-    std_SUX <- SUX
-    if (intercept){
-      attributes(std_SUX)$scale <- rep(1, ncol(SUX) - 1)
-      attributes(std_SUX)$nonsingular <- 1:(ncol(SUX) - 1)
-      # xtx <- c(1, apply(SUXX[,-1], 2, varp))
-    } else {
-      attributes(std_SUX)$scale <- rep(1, ncol(SUX))
-      attributes(std_SUX)$nonsingular <- 1:ncol(SUX)
-    }
-  }
-  # calculate population var without mean 0; will need this for call to ncvfit()
-  # Aug. 24, 2022 - I am wondering if the line below is only appropriate in the 
-  #   case where standardizeRtX = F
-  xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
+## Re-standardize rotated SUX
+std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
+std_SUX_noInt <- std_SUX_temp$scaled_X
 
-  # browser()
-  
-  ## Set up lambda
-  if (missing(lambda)) {
+std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
+attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
+
+# calculate population var without mean 0; will need this for call to ncvfit()
+xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
+
+## Set up lambda
+if (missing(lambda)) {
     lambda <- setup_lambda(X = std_SUX,
                            y = SUy,
                            alpha = alpha,
                            nlambda = nlambda,
                            lambda.min = lambda.min,
-                           penalty.factor = penalty.factor,
-                           intercept = intercept)
+                           penalty.factor = penalty.factor)
     user.lambda <- FALSE
   } else {
     nlambda <- length(lambda)
     user.lambda <- TRUE
   }
   
-  # make sure to *not* penalize the intercept term 
-  if (intercept) penalty.factor <- c(0, penalty.factor)
+# make sure to *not* penalize the intercept term 
+penalty.factor <- c(0, penalty.factor)
   
 
-  ## Placeholders for results
-
-  if (intercept) init <- c(0, init) # add initial value for intercept
-  resid <- drop(SUy - std_SUX %*% init)
-  b <- matrix(NA, nrow=ncol(std_SUX), ncol=nlambda) 
-  iter <- integer(nlambda)
-  converged <- logical(nlambda)
-  loss <- numeric(nlambda)
+## Placeholders for results
+init <- c(0, init) # add initial value for intercept
+resid <- drop(SUy - std_SUX %*% init)
+b <- matrix(NA, nrow=ncol(std_SUX), ncol=nlambda) 
+iter <- integer(nlambda)
+converged <- logical(nlambda)
+loss <- numeric(nlambda)
   # think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
-    # browser()
     res <- ncvreg::ncvfit(std_SUX, SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
     b[, ll] <- init <- res$beta
     iter[ll] <- res$iter
@@ -224,19 +180,17 @@ plmm <- function(X,
   if (warn & sum(iter) == max.iter) warning("Maximum number of iterations reached")
   convex.min <- if (convex) convexMin(b, std_SUX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', penalty.factor) else NULL
 
-  # unscale transformed data
-  bb <- unscale(b[, ind, drop = FALSE], SUX, std_SUX, intercept)
+# reverse the transfromations of the beta values 
+beta_vals <- untransform(b, ns, X, std_X, SUX, std_SUX)
 
-  # unstandardize original data
-  beta_vals <- unstandardize(bb, X, std_X, intercept)
+# give the matrix of beta_values readable names 
+# SNPs (or covariates) on the rows, lambda values on the columns
+varnames <- if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)
+varnames <- c("(Intercept)", varnames)
+dimnames(beta_vals) <- list(varnames, lamNames(lambda))
 
-  varnames <- if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)
-  if (intercept) varnames <- c("(Intercept)", varnames)
-  # name beta values: SNPs (or covariates) on the rows, lambda values on the columns
-  dimnames(beta_vals) <- list(varnames, lamNames(lambda))
-
-  ## Output
-  val <- structure(list(beta_vals = beta_vals,
+## Output
+val <- structure(list(beta_vals = beta_vals,
                         eta = eta,
                         lambda = lambda,
                         penalty = penalty,
@@ -247,8 +201,7 @@ plmm <- function(X,
                         penalty.factor = penalty.factor,
                         n = n,
                         iter = iter,
-                        converged = converged,
-                        intercept = intercept),
+                        converged = converged),
                         class = "plmm")
   if (missing(returnX)) {
     if (utils::object.size(SUX) > 1e8) {
