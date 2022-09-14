@@ -18,13 +18,13 @@ coef.plmm <- function(object, lambda, which = 1:length(object$lambda), drop = TR
     l <- floor(ind)
     r <- ceiling(ind)
     w <- ind%%1
-    beta <- (1 - w) * object$beta[, l, drop = FALSE] + w * object$beta[, r, drop = FALSE]
-    colnames(beta) <- lamNames(lambda)
+    beta_vals <- (1 - w) * object$beta_vals[, l, drop = FALSE] + w * object$beta_vals[, r, drop = FALSE]
+    colnames(beta_vals) <- lamNames(lambda)
   }
-  else beta <- object$beta[, which, drop = FALSE]
+  else beta_vals <- object$beta_vals[, which, drop = FALSE]
   if (drop){
-    return(drop(beta))
+    return(drop(beta_vals))
   } else{
-    return(beta)
+    return(beta_vals)
   }
 }

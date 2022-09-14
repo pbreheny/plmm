@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples 
-#' fit <- lasso(admix$X, admix$y, p1 = 5)
+#' lasso_fit <- lasso(admix$X, admix$y, p1 = 5)
 
 lasso <- function(X, y, p1, ...) {
   args.list <- list(...)

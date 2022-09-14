@@ -7,11 +7,10 @@
 #' @export
 #' 
 #' @examples 
-#' admix$K <- admix$X%*%t(admix$X) # create an estimated covariance matrix 
-#' # NB: this is an estimate of K 
-#' ev <- eigen(admix$V)
+#' admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix 
+#' ev <- eigen(admix$K)
 #' U <- ev$vectors
-#' fit <- plmm(X = admix$X, y = admix$y, V = admix$V, penalty = "MCP")
+#' fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
 #' (logLik(eta = fit$eta, Uy = U%*%admix$y, S = ev$values ))
 
 logLik <- function(eta, Uy, S){

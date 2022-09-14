@@ -6,28 +6,26 @@
 #' @param SUy Rotated outcome vector. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
 #' @param S Eigenvalues from similarity matrix used for model fitting. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
 #' @param eta Estimated $eta$ value from object fit.
-#' @param intercept Logical indicating whether an intercept was used in the model
 #' @importFrom zeallot %<-%
 #' @export
 #' 
 #' @examples
-#' \dontrun{
-#' fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
-#' gic(fit = fit, ic = "bic", SUX = fit$SUX, SUy = fit$SUy, S = fit$S, eta = fit$eta)
-#' gic(fit = fit) #FIXME (Aug. 18, 2022)
-#' }
+#' my_fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+#' gic_res <- gic(fit = my_fit, ic = "bic", SUX = my_fit$SUX, SUy = my_fit$SUy, S = my_fit$S, eta = my_fit$eta)
+#' names(gic_res)
+#' range(gic_res$gic, na.rm = T) # NAs will result from monomorphic SNPs
 
 
-gic <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S, eta, intercept){
+gic <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S, eta){
   UseMethod("gic")
 }
 
-gic.default <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S, eta, intercept){
+gic.default <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S, eta){
   stop("This function should be used with an object of class plmm_fit")
 }
 
 #' @export
-gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), SUX, SUy, S, eta, intercept){
+gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), SUX, SUy, S, eta){
 
   #need to deal with situations where dim SUX != dim X because of singularity
 
@@ -48,23 +46,16 @@ gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), SUX, SUy, S, eta, interc
     S <- fit$S
   }
 
-  if(fit$intercept){
-    c(n, p) %<-% dim(SUX[,-1]) # this assumes there is an intercept column
-    eta <- fit$eta
-    ll <- logLik_nonnull(fit, SUX, SUy, S, eta)
-    j <- predict.plmm(fit, type='nvars')
-    jj <- pmin(j, p/2) # dont' give smaller penalties for larger models
-    df <- j + 2 # +1 for intercept, +1 for sigma2
-    # ts <-  choose(p, j) # no penalty if selecting all bc this value is small
-    # limit this to select at most half the vars?
-  } else {
-    c(n,p) %<-% dim(SUX) 
-    eta <- fit$eta
-    ll <- logLik_nonnull(fit, SUX, SUy, S, eta)
-    j <- predict.plmm(fit, type='nvars')
-    jj <- pmin(j, p/2) # dont' give smaller penalties for larger models
-    df <- j + 2 # +1 for sigma2
-  }
+
+c(n, p) %<-% dim(SUX[,-1]) # this assumes there is an intercept column
+eta <- fit$eta
+ll <- logLik_nonnull(fit, SUX, SUy, S, eta)
+j <- predict.plmm(fit, type='nvars')
+jj <- pmin(j, p/2) # dont' give smaller penalties for larger models
+df <- j + 2 # +1 for intercept, +1 for sigma2
+# ts <-  choose(p, j) # no penalty if selecting all bc this value is small
+# limit this to select at most half the vars?
+
 
   if (ic == "bic"){
     an <- log(n)

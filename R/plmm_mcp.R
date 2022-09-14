@@ -19,14 +19,12 @@ plmm_mcp <- function(X, y, p1, standardize = FALSE, K, ...) {
     fit <- plmm(X = X,
                 y = y, 
                 penalty = 'MCP',
-                standardizeX = standardize,
                 ...)
   } else { # case 2: user-specified K
     fit <- plmm(X = X,
                 y = y,
                 K = K,
                 penalty = 'MCP',
-                standardizeX = standardize,
                 ...)
   }
   sel <- predict.plmm(fit, type = "nvar")

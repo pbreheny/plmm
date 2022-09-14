@@ -12,6 +12,7 @@
 #' @examples
 #' RRM <- relatedness_mat(X = scale(admix$X))
 #' fit <- plmm_lasso(X = admix$X, y = admix$y, K = RRM, p1 = 10)
+#' names(fit$fit)
 
 plmm_lasso <- function(X, y, K, p1, ...) {
   args.list <- list(...)

@@ -17,9 +17,9 @@
 
 plmm_scad <- function(X, y, p1, standardize = FALSE, K) {
   if (missing(K)){ # case 1: use default K 
-    fit <- plmm(X, y, penalty = 'SCAD', standardizeX = standardize)
+    fit <- plmm(X, y, penalty = 'SCAD')
   } else { # case 2: use user-supplied K 
-    fit <- plmm(X, y, K, penalty = 'SCAD', standardizeX = standardize)
+    fit <- plmm(X, y, K, penalty = 'SCAD')
   }
   sel <- predict.plmm(fit, type = "nvar")
   coef <- coef(fit, min(fit$lambda[sel <= p1]))[-1]

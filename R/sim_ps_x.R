@@ -15,7 +15,11 @@
 #' @export
 #' 
 #' @examples 
-#' sim_X <- sim_ps_x(n = 200, nJ = rep(100, 2), p = 1000, structureX = "indep_subpops", inbr = "heterogeneous")
+#' sim_X <- sim_ps_x(n = 200,
+#'  nJ = rep(100, 2),
+#'  p = 1000,
+#'   structureX = "indep_subpops",
+#'   inbr = "heterogeneous")
 
 sim_ps_x <- function(n, nJ, p,
                    structureX = c("admixture", "indep_subpops", "1d_linear", "1d_circular", "independent", "other"),

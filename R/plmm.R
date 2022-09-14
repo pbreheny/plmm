@@ -20,6 +20,8 @@
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
 #' 
+#' @return A list including the estimated coeficients on the original scale, as well as other model fitting details 
+#' 
 #' @importFrom zeallot %<-%
 #' @export
 #' 
@@ -48,18 +50,17 @@ plmm <- function(X,
                  warn = TRUE,
                  penalty.factor = rep(1, ncol(X)),
                  init = rep(0, ncol(X)),
-                 returnX = TRUE,
-                 ...) {
+                 returnX = TRUE) {
 
-  # Coersion
+  ## coersion
   U <- S <- SUX <- SUy <- eta <- NULL
   penalty <- match.arg(penalty)
   
-  # Set defaults 
+  ## set defaults 
   if(missing(K)){K <- relatedness_mat(X)}  
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
-  # Check types 
+  ## check types 
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
@@ -77,7 +78,7 @@ plmm <- function(X,
   }
   if (!is.double(penalty.factor)) penalty.factor <- as.double(penalty.factor)
 
-  # Error checking
+  ## error checking
   if (gamma <= 1 & penalty=="MCP") stop("gamma must be greater than 1 for the MC penalty", call.=FALSE)
   if (gamma <= 2 & penalty=="SCAD") stop("gamma must be greater than 2 for the SCAD penalty", call.=FALSE)
   if (nlambda < 2) stop("nlambda must be at least 2", call.=FALSE)
@@ -96,11 +97,7 @@ plmm <- function(X,
     if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
   }
 
-  ## Deprecation support
-  dots <- list(...)
-  if ("n.lambda" %in% names(dots)) nlambda <- dots$n.lambda
-
-  ## Standardize X
+## standardize X
   # NB: the following line will eliminate singular columns (eg monomorphic SNPs)
   #  from the design matrix. 
   std_X <- ncvreg::std(X)
@@ -108,34 +105,35 @@ plmm <- function(X,
   
   # identify nonsingular values in the standardized X matrix  
   ns <- attr(std_X, "nonsingular")
+  
   # remove initial values for coefficients representing columns with singular values
   init <- init[ns] 
 
-  # keep only those penalty factors which penalize non-singular values 
+## keep only those penalty factors which penalize non-singular values 
   penalty.factor <- penalty.factor[ns]
 
-  # designate the dimensions of the design matrix 
+## designate the dimensions of the design matrix 
   p <- ncol(std_X) #FIXME: should these be defined with X, instead of std_X?
   n <- nrow(std_X)
 
-  ## Rotate data
+## rotate data
   if (!missing(eta_star)){
     c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star)
   } else {
     c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K)
   }
 
-## Re-standardize rotated SUX
+## re-standardize rotated SUX
 std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
 std_SUX_noInt <- std_SUX_temp$scaled_X
 
 std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
 attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
 
-# calculate population var without mean 0; will need this for call to ncvfit()
+## calculate population var without mean 0; will need this for call to ncvfit()
 xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
 
-## Set up lambda
+## set up lambda
 if (missing(lambda)) {
     lambda <- setup_lambda(X = std_SUX,
                            y = SUy,
@@ -153,13 +151,15 @@ if (missing(lambda)) {
 penalty.factor <- c(0, penalty.factor)
   
 
-## Placeholders for results
+## placeholders for results
 init <- c(0, init) # add initial value for intercept
 resid <- drop(SUy - std_SUX %*% init)
 b <- matrix(NA, nrow=ncol(std_SUX), ncol=nlambda) 
 iter <- integer(nlambda)
 converged <- logical(nlambda)
 loss <- numeric(nlambda)
+
+## main attraction 
   # think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
@@ -171,7 +171,7 @@ loss <- numeric(nlambda)
     resid <- res$resid
   }
 
-  ## Eliminate saturated lambda values, if any
+## eliminate saturated lambda values, if any
   ind <- !is.na(iter)
   iter <- iter[ind]
   converged <- converged[ind]
@@ -180,7 +180,7 @@ loss <- numeric(nlambda)
   if (warn & sum(iter) == max.iter) warning("Maximum number of iterations reached")
   convex.min <- if (convex) convexMin(b, std_SUX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', penalty.factor) else NULL
 
-# reverse the transfromations of the beta values 
+# reverse the transformations of the beta values 
 beta_vals <- untransform(b, ns, X, std_X, SUX, std_SUX)
 
 # give the matrix of beta_values readable names 
@@ -189,7 +189,7 @@ varnames <- if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colname
 varnames <- c("(Intercept)", varnames)
 dimnames(beta_vals) <- list(varnames, lamNames(lambda))
 
-## Output
+## output
 val <- structure(list(beta_vals = beta_vals,
                         eta = eta,
                         lambda = lambda,
@@ -200,6 +200,7 @@ val <- structure(list(beta_vals = beta_vals,
                         loss = loss,
                         penalty.factor = penalty.factor,
                         n = n,
+                        ns_idx = c(1, 1 + ns), # PAY ATTENTION HERE! 
                         iter = iter,
                         converged = converged),
                         class = "plmm")

@@ -9,8 +9,8 @@
 #' @export
 #' 
 #' @examples 
-#' fit <- lmm_ggmix(X = admix$X, y = admix$y, p1 = 10, K = relatedness_mat(admix$X))
-#' summary(fit)
+#' lmm_ggmix_fit <- lmm_ggmix(X = admix$X, y = admix$y, p1 = 10, K = relatedness_mat(admix$X))
+
 
 
 lmm_ggmix <- function(X, y, p1, standardize = FALSE, K = NULL){

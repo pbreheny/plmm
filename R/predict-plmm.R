@@ -5,7 +5,7 @@
 #' @param type A character argument indicating what should be returned.
 #' @param lambda A numeric vector of lambda values.
 #' @param which Vector of lambda indices for which coefficients to return.
-#' @param XX Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'individual'}.
+#' @param no_int_X Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'individual'}.
 #' @param y Optional argument. Original continuous outcome vector from object. Required if \code{type == 'individual'}.
 #' @param U Optional argument. Eigenvectors from the similarity matrix from object. Required if \code{type == 'individual'}.
 #' @param S Optional argument. Eigenvalues from the similarity matrix from object. Required if \code{type == 'individual'}.
@@ -79,7 +79,7 @@
 #' newX = X2,
 #' type = 'individual',
 #' lambda = object$lambda.min,
-#' XX = X1,
+#' no_int_X = X1,
 #' y = y1,
 #' U = object$fit$U,
 #' S = object$fit$S,
@@ -93,7 +93,7 @@
 #' newX = X2,
 #' type = 'individual',
 #' lambda = object$lambda.min,
-#' XX = X1,
+#' no_int_X = X1,
 #' y = y1,
 #' U = object$fit$U,
 #' S = object$fit$S,
@@ -120,7 +120,7 @@
 #' newX = X2,
 #' type = 'individual',
 #' lambda = object$lambda.min,
-#' XX = X1,
+#' no_int_X = X1,
 #' y = y1,
 #' U = object$fit$U,
 #' S = object$fit$S,
@@ -134,7 +134,7 @@
 #' newX = X2,
 #' type = 'individual',
 #' lambda = object$lambda.min,
-#' XX = X1,
+#' no_int_X = X1,
 #' y = y1,
 #' U = object$fit$U,
 #' S = object$fit$S,
@@ -205,7 +205,7 @@
 #' newX = X2,
 #' type = 'individual',
 #' lambda = object$lambda.min,
-#' XX = X1,
+#' no_int_X = X1,
 #' y = y1,
 #' U = object$fit$U,
 #' S = object$fit$S,
@@ -220,7 +220,7 @@
 #' newX = X2,
 #' type = 'individual',
 #' lambda = object$lambda.min,
-#' XX = X1,
+#' no_int_X = X1,
 #' y = y1,
 #' U = object$fit$U,
 #' S = object$fit$S,
@@ -247,7 +247,7 @@
 #' newX = X2,
 #' type = 'individual',
 #' lambda = object$lambda.min,
-#' XX = X1,
+#' no_int_X = X1,
 #' y = y1,
 #' U = object$fit$U,
 #' S = object$fit$S,
@@ -263,7 +263,7 @@
 #' newX = X2,
 #' type = 'individual',
 #' lambda = object$lambda.min,
-#' XX = X1,
+#' no_int_X = X1,
 #' y = y1,
 #' U = object$fit$U,
 #' S = object$fit$S,
@@ -275,7 +275,7 @@
 
 
 predict.plmm <- function(object, newX, type=c("response", "individual", "coefficients", "vars", "nvars"),
-                           lambda, which=1:length(object$lambda), XX, y, U, S, eta, covariance, intercept = TRUE, ...) {
+                           lambda, which=1:length(object$lambda), no_int_X, y, U, S, eta, covariance, intercept = TRUE, ...) {
   type <- match.arg(type)
   beta <- coef.plmm(object, lambda=lambda, which=which, drop=FALSE) # includes intercept if present
   if (type=="coefficients") return(beta)
@@ -285,11 +285,11 @@ predict.plmm <- function(object, newX, type=c("response", "individual", "coeffic
     Xbeta <- cbind(1, newX) %*% beta
     if (type=="response") return(drop(Xbeta))
     if (type == "individual"){
-      if (missing(XX) || missing(y) || missing(U) || missing(S) || missing(eta) || missing(covariance)){
-        stop('Original XX, y, U, S, eta, and covariance must be supplied if type is individual')
+      if (missing(no_int_X) || missing(y) || missing(U) || missing(S) || missing(eta) || missing(covariance)){
+        stop('Original no_int_X, y, U, S, eta, and covariance must be supplied if type is individual')
       }
       # can't just use the rotated y and x here - need to scale by inverse of V, not sqrt(V)
-      ranef <- covariance %*% U %*% diag((1 + eta * (S - 1))^(-1)) %*% t(U) %*% (y - cbind(1, XX) %*% beta)
+      ranef <- covariance %*% U %*% diag((1 + eta * (S - 1))^(-1)) %*% t(U) %*% (y - cbind(1, no_int_X) %*% beta)
       # print(eta)
       blup <- Xbeta + ranef
       return(blup)
@@ -300,11 +300,11 @@ predict.plmm <- function(object, newX, type=c("response", "individual", "coeffic
     Xbeta <- cbind(newX) %*% beta
     if (type=="response") return(drop(Xbeta))
     if (type == "individual"){
-      if (missing(XX) || missing(y) || missing(U) || missing(S) || missing(eta) || missing(covariance)){
-        stop('Original XX, y, U, S, eta, and covariance must be supplied if type is individual')
+      if (missing(no_int_X) || missing(y) || missing(U) || missing(S) || missing(eta) || missing(covariance)){
+        stop('Original no_int_X, y, U, S, eta, and covariance must be supplied if type is individual')
       }
       # can't just use the rotated y and x here - need to scale by inverse of V, not sqrt(V)
-      ranef <- covariance %*% U %*% diag((1 + eta * (S - 1))^(-1)) %*% t(U) %*% (y - XX %*% beta)
+      ranef <- covariance %*% U %*% diag((1 + eta * (S - 1))^(-1)) %*% t(U) %*% (y - no_int_X %*% beta)
       # print(eta)
       blup <- Xbeta + ranef
       return(blup)
