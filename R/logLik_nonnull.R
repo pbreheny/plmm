@@ -38,7 +38,7 @@ logLik_nonnull <- function(fit, SUX, SUy, S, eta){
   
   # pad NAs where there are monomorphic values 
   ll_padded <- rep(NA_integer_, n_betas)
-  names(ll_padded) <- names(coefs)
+  names(ll_padded) <- names(beta_vals)
   ll_padded[fit$ns_idx] <- ll
 
   return(ll_padded)

@@ -5,7 +5,6 @@
 #' @param y Continuous outcome vector for model fitting.
 #' @param K Known or estimated similarity matrix.
 #' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
-#' @param intercept Logical for whether intercept should be included.
 #' @param ... Additional arguments to plmm
 #' @param cluster cv.plmm can be run in parallel across a cluster using the parallel package. The cluster must be set up in advance using the makeCluster function from that package. The cluster must then be passed to cv.plmm.
 #' @param nfolds The number of cross-validation folds. Default is 10.
@@ -16,12 +15,12 @@
 #' @export
 #' 
 #' @examples 
-#' \dontrun{
-#' cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
-#' }
+#' cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+#' 
 
 
-cv.plmm <- function(X, y, K, type = c('response', 'individual'), intercept = TRUE, ..., cluster, nfolds=10, seed, fold,
+cv.plmm <- function(X, y, K, type = c('response', 'individual'), ...,
+                    cluster, nfolds=10, seed, fold,
                     returnY=FALSE, trace=FALSE) {
 
   # Coersion
@@ -36,8 +35,9 @@ cv.plmm <- function(X, y, K, type = c('response', 'individual'), intercept = TRU
   if (is.matrix(y)) {
     y <- drop(y)
   }
+  if(missing(type)) {type == 'response'} 
 
-  fit.args <- c(list(X = X, y = y, K = K, intercept = intercept), list(...))
+  fit.args <- c(list(X = X, y = y, K = K), list(...))
   fit <- do.call('plmm', fit.args)
 
   cv.args <- list(...)
@@ -45,7 +45,7 @@ cv.plmm <- function(X, y, K, type = c('response', 'individual'), intercept = TRU
   cv.args$convex <- FALSE
   cv.args$lambda <- fit$lambda
   cv.args$eta_star <- fit$eta
-  cv.args$intercept <- intercept
+  
   if (type == 'individual') cv.args$returnX <- TRUE
 
   n <- length(y)

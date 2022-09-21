@@ -27,9 +27,10 @@
 #' 
 #' @examples 
 #' fit1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' summary(fit1)
+#' summary.plmm(fit1)
 #' 
 #' fit2 <- plmm(X = admix$X, y = admix$y)
+#' summary.plmm(fit2)
 
 
 plmm <- function(X,
@@ -77,7 +78,7 @@ plmm <- function(X,
     options(op)
   }
   if (!is.double(penalty.factor)) penalty.factor <- as.double(penalty.factor)
-
+  
   ## error checking
   if (gamma <= 1 & penalty=="MCP") stop("gamma must be greater than 1 for the MC penalty", call.=FALSE)
   if (gamma <= 2 & penalty=="SCAD") stop("gamma must be greater than 2 for the SCAD penalty", call.=FALSE)
@@ -113,7 +114,7 @@ plmm <- function(X,
   penalty.factor <- penalty.factor[ns]
 
 ## designate the dimensions of the design matrix 
-  p <- ncol(std_X) #FIXME: should these be defined with X, instead of std_X?
+  p <- ncol(std_X) 
   n <- nrow(std_X)
 
 ## rotate data
@@ -146,6 +147,10 @@ if (missing(lambda)) {
     nlambda <- length(lambda)
     user.lambda <- TRUE
   }
+
+# make sure lambda sequence (if user-supplied) is in DESCENDING order
+if (max(diff(lambda)) > 0) stop("User-supplied lambda sequence must be in descending (largest -> smallest) order")
+
   
 # make sure to *not* penalize the intercept term 
 penalty.factor <- c(0, penalty.factor)

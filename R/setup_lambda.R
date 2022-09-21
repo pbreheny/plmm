@@ -50,23 +50,16 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
     fit <- stats::glm(y ~ 1, family='gaussian')
   }
 
-  # browser()
   
   # determine the maximum value for lambda 
-  # zmax <- max(abs((t(X[, ind]) %*% fit$residuals)) / penalty.factor[ind]) / n ### this first part can by xty again
   decomp_backsolve <- abs(crossprod(X[,ind], fit$residuals)) / penalty.factor[ind]
   zmax <- max(stats::na.exclude(decomp_backsolve)) /n
-  
-  # browser()
-  
   lambda.max <- zmax/alpha
   
-  # browser()
   
   # error check 
   if(!is.finite(log(lambda.max))){stop("log(lambda.max) is not finite")}
-  # TODO: debugging
-  # print(lambda.max)
+
   
   
   # Default is .001 if the number of observations is larger than the number of 

@@ -6,6 +6,10 @@
 #' @param drop Logical.
 #' @param ... Additional arguments.
 #' @export
+#' 
+#' @examples 
+#' fit <- plmm(admix$X, admix$y)
+#' (coef.plmm(fit)[1:10, 1:5])
 
 coef.plmm <- function(object, lambda, which = 1:length(object$lambda), drop = TRUE, ...){
   if (!missing(lambda)) {

@@ -10,8 +10,8 @@
 #' @export
 #' 
 #' @examples
-#' my_fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' gic_res <- gic(fit = my_fit, ic = "bic", SUX = my_fit$SUX, SUy = my_fit$SUy, S = my_fit$S, eta = my_fit$eta)
+#' fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+#' gic_res <- gic(fit = fit, ic = "bic", SUX = fit$SUX, SUy = fit$SUy, S = fit$S, eta = fit$eta)
 #' names(gic_res)
 #' range(gic_res$gic, na.rm = T) # NAs will result from monomorphic SNPs
 
