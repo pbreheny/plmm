@@ -7,7 +7,7 @@
 \method{plot}{plmm}(x, alpha = 1, log.l = FALSE, shade = TRUE, col, ...)
 }
 \arguments{
-\item{x}{An object of class plmm}
+\item{x}{An object of class \code{plmm}}
 
 \item{alpha}{Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. \code{alpha=1} is equivalent to MCP/SCAD penalty, while \code{alpha=0} would be equivalent to ridge regression. However, \code{alpha=0} is not supported; alpha may be arbitrarily small, but not exactly 0.}
 
@@ -15,10 +15,16 @@
 
 \item{shade}{Logical to indicate whether a local nonconvex region should be shaded. Defaults to TRUE.}
 
-\item{col}{Color vector.}
+\item{col}{Vector of colors for coefficient lines.}
 
 \item{...}{Additional arguments.}
 }
 \description{
 Plot method for plmm class
+}
+\examples{
+fit <- plmm(admix$X[,1:10], admix$y, nlambda = 10)
+# for the sake of illustration, I consider only 10 SNPs in the plot 
+plot(fit)
+plot(fit, log.l = TRUE)
 }

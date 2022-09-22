@@ -6,8 +6,9 @@
 #' 
 #' @examples 
 #' fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' head(loss.plmm(yhat = (fit$SUy), y = admix$y))
-#' #TODO (Aug. 18, 2022): ensure that the above choice of 'yhat' is sensible 
+#' yhat <- predict.plmm(object = fit, newX = admix$X, type = 'response', lambda = 0.05)
+#' head(loss.plmm(yhat = yhat, y = admix$y))
+
  
  
 loss.plmm <- function(y, yhat) {

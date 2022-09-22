@@ -15,7 +15,7 @@ loss.plmm(y, yhat)
 Loss method for "plmm" class
 }
 \examples{
-fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
-head(loss.plmm(yhat = (fit$SUy), y = admix$y))
-#TODO (Aug. 18, 2022): ensure that the above choice of 'yhat' is sensible 
+fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+yhat <- predict.plmm(object = fit, newX = admix$X, type = 'response', lambda = 0.05)
+head(loss.plmm(yhat = yhat, y = admix$y))
 }

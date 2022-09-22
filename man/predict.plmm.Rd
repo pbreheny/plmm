@@ -7,31 +7,30 @@
 \method{predict}{plmm}(
   object,
   newX,
-  type = c("response", "individual", "coefficients", "vars", "nvars"),
+  type = c("response", "coefficients", "vars", "nvars", "individual"),
   lambda,
   which = 1:length(object$lambda),
-  XX,
+  no_int_X,
   y,
   U,
   S,
   eta,
   covariance,
-  intercept = TRUE,
   ...
 )
 }
 \arguments{
-\item{object}{An object of class plmm.}
+\item{object}{An object of class \code{plmm}.}
 
 \item{newX}{Design matrix used for computing predicted values if requested.}
 
-\item{type}{A character argument indicating what should be returned.}
+\item{type}{A character argument indicating what type of prediction should be returned.}
 
-\item{lambda}{A numeric vector of lambda values.}
+\item{lambda}{A numeric vector of regularization parameter \code{lambda} values at which predictions are requested.}
 
-\item{which}{Vector of lambda indices for which coefficients to return.}
+\item{which}{Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.}
 
-\item{XX}{Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'individual'}.}
+\item{no_int_X}{Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'individual'}.}
 
 \item{y}{Optional argument. Original continuous outcome vector from object. Required if \code{type == 'individual'}.}
 
@@ -43,14 +42,21 @@
 
 \item{covariance}{Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'individual'}.}
 
-\item{intercept}{optional logical argument}
-
 \item{...}{Additional optional arguments}
 }
 \description{
 Predict method for plmm class
 }
 \examples{
+
+fit <- plmm(X = admix$X, y = admix$y, lambda = c(0.05, 0.01))
+head(predict.plmm(object = fit, newX = admix$X, type = 'response', lambda = 0.05))
+head(predict.plmm(object = fit, newX = admix$X, type = 'vars'))
+predict.plmm(object = fit, newX = admix$X, type = 'nvars')
+\dontrun{
+predict.plmm(object = fit, newX = admix$X, type = 'individual', no_int_X = admix$X,
+y = admix$y, U = fit$U, S = fit$S, eta = fit$eta, covariance = crossprod(admix$X))
+}
 \dontrun{
 # Out of sample predictions are NOT improved by BLUP when X cannot be used to
 # estimate V
@@ -114,7 +120,7 @@ blup <- predict.plmm(object$fit,
 newX = X2,
 type = 'individual',
 lambda = object$lambda.min,
-XX = X1,
+no_int_X = X1,
 y = y1,
 U = object$fit$U,
 S = object$fit$S,
@@ -128,7 +134,7 @@ blup_V <- predict.plmm(object$fit,
 newX = X2,
 type = 'individual',
 lambda = object$lambda.min,
-XX = X1,
+no_int_X = X1,
 y = y1,
 U = object$fit$U,
 S = object$fit$S,
@@ -155,7 +161,7 @@ blup_null <- predict.plmm(object$fit,
 newX = X2,
 type = 'individual',
 lambda = object$lambda.min,
-XX = X1,
+no_int_X = X1,
 y = y1,
 U = object$fit$U,
 S = object$fit$S,
@@ -169,7 +175,7 @@ blup_null_V <- predict.plmm(object$fit,
 newX = X2,
 type = 'individual',
 lambda = object$lambda.min,
-XX = X1,
+no_int_X = X1,
 y = y1,
 U = object$fit$U,
 S = object$fit$S,
@@ -240,7 +246,7 @@ blup <- predict.plmm(object$fit,
 newX = X2,
 type = 'individual',
 lambda = object$lambda.min,
-XX = X1,
+no_int_X = X1,
 y = y1,
 U = object$fit$U,
 S = object$fit$S,
@@ -255,7 +261,7 @@ blup_V <- predict.plmm(object$fit,
 newX = X2,
 type = 'individual',
 lambda = object$lambda.min,
-XX = X1,
+no_int_X = X1,
 y = y1,
 U = object$fit$U,
 S = object$fit$S,
@@ -282,7 +288,7 @@ blup_null <- predict.plmm(object$fit,
 newX = X2,
 type = 'individual',
 lambda = object$lambda.min,
-XX = X1,
+no_int_X = X1,
 y = y1,
 U = object$fit$U,
 S = object$fit$S,
@@ -298,7 +304,7 @@ blup_null_V <- predict.plmm(object$fit,
 newX = X2,
 type = 'individual',
 lambda = object$lambda.min,
-XX = X1,
+no_int_X = X1,
 y = y1,
 U = object$fit$U,
 S = object$fit$S,

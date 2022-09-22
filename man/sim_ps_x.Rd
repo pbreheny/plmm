@@ -43,5 +43,9 @@ sim_ps_x(
 This function allows you to simulate structured genetic data (SNP).
 }
 \examples{
-sim_X <- sim_ps_x(n = 200, nJ = rep(100, 2), p = 1000, structureX = "indep_subpops", inbr = "heterogeneous")
+sim_X <- sim_ps_x(n = 200,
+ nJ = rep(100, 2),
+ p = 1000,
+  structureX = "indep_subpops",
+  inbr = "heterogeneous")
 }

@@ -22,8 +22,7 @@ plmm(
   warn = TRUE,
   penalty.factor = rep(1, ncol(X)),
   init = rep(0, ncol(X)),
-  returnX = TRUE,
-  ...
+  returnX = TRUE
 )
 }
 \arguments{
@@ -63,12 +62,14 @@ plmm(
 
 \item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
 }
+\value{
+A list including the estimated coeficients on the original scale, as well as other model fitting details
+}
 \description{
 This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
 }
 \examples{
-fit1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-summary(fit1)
-
-fit2 <- plmm(X = admix$X, y = admix$y)
+fit <- plmm(X = admix$X[,1:10], y = admix$y, K = relatedness_mat(admix$X))
+summary.plmm(fit)
+short_summary <- summary.plmm(fit)
 }

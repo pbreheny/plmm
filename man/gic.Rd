@@ -4,7 +4,7 @@
 \alias{gic}
 \title{General information criterion method of selecting lambda for "plmm" class}
 \usage{
-gic(fit, ic = c("bic", "hdbic"), SUX, SUy, S, eta, intercept)
+gic(fit, ic = c("bic", "hdbic"), SUX, SUy, S, eta)
 }
 \arguments{
 \item{fit}{An object of class "plmm."}
@@ -18,16 +18,13 @@ gic(fit, ic = c("bic", "hdbic"), SUX, SUy, S, eta, intercept)
 \item{S}{Eigenvalues from similarity matrix used for model fitting. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
 
 \item{eta}{Estimated $eta$ value from object fit.}
-
-\item{intercept}{Logical indicating whether an intercept was used in the model}
 }
 \description{
 General information criterion method of selecting lambda for "plmm" class
 }
 \examples{
-\dontrun{
-fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
-gic(fit = fit, ic = "bic", SUX = fit$SUX, SUy = fit$SUy, S = fit$S, eta = fit$eta)
-gic(fit = fit) #FIXME (Aug. 18, 2022)
-}
+fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+gic_res <- gic(fit = fit, ic = "bic", SUX = fit$SUX, SUy = fit$SUy, S = fit$S, eta = fit$eta)
+names(gic_res)
+range(gic_res$gic, na.rm = T) # NAs will result from monomorphic SNPs
 }

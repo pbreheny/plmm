@@ -7,7 +7,7 @@
 plmm_null(y, X = NULL, K = NULL)
 }
 \arguments{
-\item{y}{Continuous outcome vector. If not supplied, V is treated as known and eta is not estimated.}
+\item{y}{Continuous outcome vector. If not supplied, K is treated as known and eta is not estimated.}
 
 \item{X}{The matrix of SNP data. If K is not supplied, X is required.}
 

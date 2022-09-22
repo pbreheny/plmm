@@ -26,11 +26,9 @@
 #' @export
 #' 
 #' @examples 
-#' fit1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' summary.plmm(fit1)
-#' 
-#' fit2 <- plmm(X = admix$X, y = admix$y)
-#' summary.plmm(fit2)
+#' fit <- plmm(X = admix$X[,1:10], y = admix$y, K = relatedness_mat(admix$X))
+#' summary.plmm(fit)
+#' short_summary <- summary.plmm(fit)
 
 
 plmm <- function(X,

@@ -9,7 +9,6 @@ cv.plmm(
   y,
   K,
   type = c("response", "individual"),
-  intercept = TRUE,
   ...,
   cluster,
   nfolds = 10,
@@ -27,8 +26,6 @@ cv.plmm(
 \item{K}{Known or estimated similarity matrix.}
 
 \item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.}
-
-\item{intercept}{Logical for whether intercept should be included.}
 
 \item{...}{Additional arguments to plmm}
 
@@ -48,7 +45,6 @@ cv.plmm(
 Performs k-fold cross validation for lasso-, MCP-, or SCAD-penalized penalized linear mixed models over a grid of values for the regularization parameter lambda.
 }
 \examples{
-\dontrun{
-cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), intercept = FALSE)
-}
+cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+
 }

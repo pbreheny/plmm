@@ -32,15 +32,11 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   
   # label dimensions of X 
   n <- nrow(X)
-  p <- ncol(X) # including intercept if intercept = TRUE
+  p <- ncol(X) # including intercept 
 
   # identify which variables (e.g. SNPs) to penalize 
-  if(intercept){
-    penalty.factor <- penalty.factor[-1] # remove intercept from indicator 
-    ind <- which(penalty.factor != 0)
-  } else {
-    ind <- which(penalty.factor != 0)
-  }
+  penalty.factor <- penalty.factor[-1] # remove intercept from indicator 
+  ind <- which(penalty.factor != 0)
   
 
   # set up a fit from which to derive residuals 

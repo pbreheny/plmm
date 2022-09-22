@@ -1,21 +1,29 @@
 #' Predict method for plmm class
 #'
-#' @param object An object of class plmm.
+#' @param object An object of class \code{plmm}.
 #' @param newX Design matrix used for computing predicted values if requested.
-#' @param type A character argument indicating what should be returned.
-#' @param lambda A numeric vector of lambda values.
-#' @param which Vector of lambda indices for which coefficients to return.
+#' @param type A character argument indicating what type of prediction should be returned.
+#' @param lambda A numeric vector of regularization parameter \code{lambda} values at which predictions are requested.
+#' @param which Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
 #' @param no_int_X Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'individual'}.
 #' @param y Optional argument. Original continuous outcome vector from object. Required if \code{type == 'individual'}.
 #' @param U Optional argument. Eigenvectors from the similarity matrix from object. Required if \code{type == 'individual'}.
 #' @param S Optional argument. Eigenvalues from the similarity matrix from object. Required if \code{type == 'individual'}.
 #' @param eta Optional argument. Estimated $eta$ value from object. Required if \code{type == 'individual'}.
 #' @param covariance Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'individual'}.
-#' @param intercept optional logical argument
 #' @param ... Additional optional arguments
 #' @export
 #'
 #' @examples
+#' 
+#' fit <- plmm(X = admix$X, y = admix$y, lambda = c(0.05, 0.01))
+#' head(predict.plmm(object = fit, newX = admix$X, type = 'response', lambda = 0.05))
+#' head(predict.plmm(object = fit, newX = admix$X, type = 'vars'))
+#' predict.plmm(object = fit, newX = admix$X, type = 'nvars')
+#' \dontrun{
+#' predict.plmm(object = fit, newX = admix$X, type = 'individual', no_int_X = admix$X,
+#' y = admix$y, U = fit$U, S = fit$S, eta = fit$eta, covariance = crossprod(admix$X))
+#' }
 #' \dontrun{
 #' # Out of sample predictions are NOT improved by BLUP when X cannot be used to
 #' # estimate V
@@ -274,41 +282,31 @@
 #' }
 
 
-predict.plmm <- function(object, newX, type=c("response", "individual", "coefficients", "vars", "nvars"),
-                           lambda, which=1:length(object$lambda), no_int_X, y, U, S, eta, covariance, intercept = TRUE, ...) {
+predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars", "nvars", "individual"),
+                           lambda, which=1:length(object$lambda), no_int_X, y, U, S, eta, covariance, ...) {
   type <- match.arg(type)
-  beta <- coef.plmm(object, lambda=lambda, which=which, drop=FALSE) # includes intercept if present
-  if (type=="coefficients") return(beta)
-  if (intercept){
-    if (type=="nvars") return(apply(beta[-1, , drop=FALSE] !=0, 2, sum)) # don't count intercept
-    if (type=="vars") return(drop(apply(beta[-1, , drop=FALSE]!=0, 2, FUN=which))) # don't count intercept
-    Xbeta <- cbind(1, newX) %*% beta
-    if (type=="response") return(drop(Xbeta))
-    if (type == "individual"){
-      if (missing(no_int_X) || missing(y) || missing(U) || missing(S) || missing(eta) || missing(covariance)){
-        stop('Original no_int_X, y, U, S, eta, and covariance must be supplied if type is individual')
-      }
-      # can't just use the rotated y and x here - need to scale by inverse of V, not sqrt(V)
-      ranef <- covariance %*% U %*% diag((1 + eta * (S - 1))^(-1)) %*% t(U) %*% (y - cbind(1, no_int_X) %*% beta)
-      # print(eta)
-      blup <- Xbeta + ranef
-      return(blup)
+  beta_vals <- coef.plmm(object, lambda=lambda, which=which, drop=FALSE) # includes intercept 
+  
+  # addressing each type: 
+  
+  if (type=="coefficients") return(beta_vals)
+
+  if (type=="nvars") return(apply(beta_vals[-1, , drop=FALSE]!=0, 2, sum)) # don't count intercept
+  
+  if (type=="vars") return(drop(apply(beta_vals[-1, , drop=FALSE]!=0, 2, FUN=which))) # don't count intercept
+  
+  Xbeta <- cbind(1, newX) %*% beta_vals
+  if (type=="response") return(drop(Xbeta))
+  
+  if (type == "individual"){
+    if (missing(no_int_X) || missing(y) || missing(U) || missing(S) || missing(eta) || missing(covariance)){
+      stop('Original no_int_X, y, U, S, eta, and covariance must be supplied if type is individual')
     }
-  } else {
-    if (type=="nvars") return(apply(beta[, , drop=FALSE] !=0, 2, sum))
-    if (type=="vars") return(drop(apply(beta[, , drop=FALSE]!=0, 2, FUN=which)))
-    Xbeta <- cbind(newX) %*% beta
-    if (type=="response") return(drop(Xbeta))
-    if (type == "individual"){
-      if (missing(no_int_X) || missing(y) || missing(U) || missing(S) || missing(eta) || missing(covariance)){
-        stop('Original no_int_X, y, U, S, eta, and covariance must be supplied if type is individual')
-      }
-      # can't just use the rotated y and x here - need to scale by inverse of V, not sqrt(V)
-      ranef <- covariance %*% U %*% diag((1 + eta * (S - 1))^(-1)) %*% t(U) %*% (y - no_int_X %*% beta)
-      # print(eta)
-      blup <- Xbeta + ranef
-      return(blup)
-    }
+    # can't just use the rotated y and x here - need to scale by inverse of K, not sqrt(K)
+    ranef <- covariance %*% U %*% diag((1 + eta * (S - 1))^(-1)) %*% t(U) %*% (y - cbind(1, no_int_X) %*% beta_vals)
+    # print(eta)
+    blup <- Xbeta + ranef
+    return(blup)
   }
 
 }

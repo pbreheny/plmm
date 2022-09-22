@@ -17,10 +17,9 @@ logLik(eta, Uy, S)
 This function allows you to evaluate the negtive log-likelihood of a linear mixed model under the assumption of a null model in order to estimate the variance parameter, eta.
 }
 \examples{
-admix$K <- admix$X\%*\%t(admix$X) # create an estimated covariance matrix 
-# NB: this is an estimate of K 
-ev <- eigen(admix$V)
+admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix 
+ev <- eigen(admix$K)
 U <- ev$vectors
-fit <- plmm(X = admix$X, y = admix$y, V = admix$V, penalty = "MCP")
+fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
 (logLik(eta = fit$eta, Uy = U\%*\%admix$y, S = ev$values ))
 }

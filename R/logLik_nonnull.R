@@ -10,7 +10,8 @@
 #' @examples 
 #' admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix 
 #' my_fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
-#' LL <- logLik_nonnull(fit = my_fit, SUX = my_fit$SUX, SUy = my_fit$SUy, S = my_fit$S, eta = my_fit$eta)
+#' LL <- logLik_nonnull(fit = my_fit, SUX = my_fit$SUX, SUy = my_fit$SUy, 
+#' S = my_fit$S, eta = my_fit$eta)
 #' head(LL)
 #' # See pp. 16-18 in A.R.'s thesis for details 
 
