@@ -10,6 +10,7 @@
 #'
 #' @examples 
 #' lasso_fit <- lasso(admix$X, admix$y, p1 = 5)
+#' s <- summary(lasso_fit)
 
 lasso <- function(X, y, p1, ...) {
   args.list <- list(...)

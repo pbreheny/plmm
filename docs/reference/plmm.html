@@ -60,8 +60,7 @@
   warn <span class="op">=</span> <span class="cn">TRUE</span>,
   penalty.factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span>,
   init <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span>,
-  returnX <span class="op">=</span> <span class="cn">TRUE</span>,
-  <span class="va">...</span>
+  returnX <span class="op">=</span> <span class="cn">TRUE</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -139,31 +138,48 @@
 <dd><p>Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>A list including the estimated coeficients on the original scale, as well as other model fitting details</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                Length Class  Mode     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> beta           10100  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> eta                1  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> lambda           100  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> penalty            1  -none- character</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> gamma              1  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> alpha              1  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> convex.min         1  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> loss             100  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> penalty.factor    99  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n                  1  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> iter             100  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> converged        100  -none- logical  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> SUX            19503  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> SUy              197  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> U              38809  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> S                197  -none- numeric  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> std_X          19306  -none- numeric  </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The lambda value that minimizes loss:  0.0005181608 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # of coefficients estimated:  11 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  6 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The predictors included in the model are:  Snp1 Snp2 Snp4 Snp5 Snp9 Snp10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The monomorphic SNPs were:  Snp8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $best_lam_idx</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $best_lam</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0005181608</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $select_beta_vals</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  (Intercept)         Snp1         Snp2         Snp3         Snp4         Snp5 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -0.472631419  0.418618832  0.052461015 -1.809189991  0.294588295  0.134216366 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Snp6         Snp7         Snp8         Snp9        Snp10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -0.274122107 -0.128452861  0.000000000  0.001992861  0.320635048 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $chosen_predictors</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Snp1"  "Snp2"  "Snp4"  "Snp5"  "Snp9"  "Snp10"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $monomorphic_snps</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Snp8"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span class="va">short_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The lambda value that minimizes loss:  0.0005181608 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # of coefficients estimated:  11 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  6 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The predictors included in the model are:  Snp1 Snp2 Snp4 Snp5 Snp9 Snp10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> The monomorphic SNPs were:  Snp8 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -46,16 +46,15 @@
 <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>
   <span class="va">object</span>,
   <span class="va">newX</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"individual"</span>, <span class="st">"coefficients"</span>, <span class="st">"vars"</span>, <span class="st">"nvars"</span><span class="op">)</span>,
+  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"coefficients"</span>, <span class="st">"vars"</span>, <span class="st">"nvars"</span>, <span class="st">"individual"</span><span class="op">)</span>,
   <span class="va">lambda</span>,
   which <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">lambda</span><span class="op">)</span>,
-  <span class="va">XX</span>,
+  <span class="va">no_int_X</span>,
   <span class="va">y</span>,
   <span class="va">U</span>,
   <span class="va">S</span>,
   <span class="va">eta</span>,
   <span class="va">covariance</span>,
-  intercept <span class="op">=</span> <span class="cn">TRUE</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -63,7 +62,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>object</dt>
-<dd><p>An object of class plmm.</p></dd>
+<dd><p>An object of class <code>plmm</code>.</p></dd>
 
 
 <dt>newX</dt>
@@ -71,18 +70,18 @@
 
 
 <dt>type</dt>
-<dd><p>A character argument indicating what should be returned.</p></dd>
+<dd><p>A character argument indicating what type of prediction should be returned.</p></dd>
 
 
 <dt>lambda</dt>
-<dd><p>A numeric vector of lambda values.</p></dd>
+<dd><p>A numeric vector of regularization parameter <code>lambda</code> values at which predictions are requested.</p></dd>
 
 
 <dt>which</dt>
-<dd><p>Vector of lambda indices for which coefficients to return.</p></dd>
+<dd><p>Vector of indices of the penalty parameter <code>lambda</code> at which predictions are required. By default, all indices are returned.</p></dd>
 
 
-<dt>XX</dt>
+<dt>no_int_X</dt>
 <dd><p>Optional argument. Original design matrix (not including intercept column) from object. Required if <code>type == 'individual'</code>.</p></dd>
 
 
@@ -106,10 +105,6 @@
 <dd><p>Optional argument. $q times n$ covariance matrix between new and old observations. Required if <code>type == 'individual'</code>.</p></dd>
 
 
-<dt>intercept</dt>
-<dd><p>optional logical argument</p></dd>
-
-
 <dt>...</dt>
 <dd><p>Additional optional arguments</p></dd>
 
@@ -117,7 +112,49 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
+<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, lambda <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.01</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, type <span class="op">=</span> <span class="st">'response'</span>, lambda <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.482265 1.491049 1.137473 1.357829 2.004830 1.043942</span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, type <span class="op">=</span> <span class="st">'vars'</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`0.0500`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp1  Snp3  Snp4  Snp6  Snp9 Snp10 Snp11 Snp12 Snp13 Snp15 Snp16 Snp18 Snp19 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     1     3     4     6     9    10    11    12    13    15    16    18    19 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Snp20 Snp22 Snp24 Snp25 Snp28 Snp33 Snp34 Snp37 Snp38 Snp41 Snp42 Snp44 Snp47 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    20    22    24    25    28    33    34    37    38    41    42    44    47 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Snp50 Snp51 Snp53 Snp58 Snp59 Snp63 Snp64 Snp65 Snp66 Snp68 Snp69 Snp71 Snp72 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    50    51    53    58    59    63    64    65    66    68    69    71    72 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Snp74 Snp79 Snp80 Snp81 Snp83 Snp85 Snp86 Snp87 Snp88 Snp90 Snp95 Snp96 Snp97 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    74    79    80    81    83    85    86    87    88    90    95    96    97 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Snp99 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    99 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`0.0100`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Snp1   Snp2   Snp3   Snp4   Snp5   Snp6   Snp7   Snp9  Snp10  Snp11  Snp12 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      1      2      3      4      5      6      7      9     10     11     12 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp13  Snp15  Snp16  Snp18  Snp19  Snp20  Snp22  Snp23  Snp24  Snp25  Snp26 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     13     15     16     18     19     20     22     23     24     25     26 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp27  Snp28  Snp29  Snp31  Snp32  Snp33  Snp34  Snp37  Snp38  Snp39  Snp40 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     27     28     29     31     32     33     34     37     38     39     40 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp41  Snp42  Snp43  Snp44  Snp45  Snp46  Snp47  Snp48  Snp49  Snp50  Snp51 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     41     42     43     44     45     46     47     48     49     50     51 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp53  Snp55  Snp58  Snp59  Snp60  Snp61  Snp63  Snp64  Snp65  Snp66  Snp67 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     53     55     58     59     60     61     63     64     65     66     67 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp68  Snp69  Snp70  Snp71  Snp72  Snp73  Snp74  Snp76  Snp77  Snp79  Snp80 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     68     69     70     71     72     73     74     76     77     79     80 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp81  Snp82  Snp83  Snp84  Snp85  Snp86  Snp87  Snp88  Snp89  Snp90  Snp91 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     81     82     83     84     85     86     87     88     89     90     91 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp92  Snp93  Snp94  Snp95  Snp96  Snp97  Snp98  Snp99 Snp100 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     92     93     94     95     96     97     98     99    100 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, type <span class="op">=</span> <span class="st">'nvars'</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.0500 0.0100 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     53     86 </span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span class="r-in"><span class="fu">predict.plmm</span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, type <span class="op">=</span> <span class="st">'individual'</span>, no_int_X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>,</span>
+<span class="r-in">y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, U <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">U</span>, S <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">S</span>, eta <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">eta</span>, covariance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span class="op">}</span></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="co"># Out of sample predictions are NOT improved by BLUP when X cannot be used to</span></span>
 <span class="r-in"><span class="co"># estimate V</span></span>
 <span class="r-in"><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">210</span></span>
@@ -180,7 +217,7 @@
 <span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
 <span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
 <span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">XX <span class="op">=</span> <span class="va">X1</span>,</span>
+<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
 <span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
 <span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
 <span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
@@ -194,7 +231,7 @@
 <span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
 <span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
 <span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">XX <span class="op">=</span> <span class="va">X1</span>,</span>
+<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
 <span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
 <span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
 <span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
@@ -221,7 +258,7 @@
 <span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
 <span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
 <span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">XX <span class="op">=</span> <span class="va">X1</span>,</span>
+<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
 <span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
 <span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
 <span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
@@ -235,7 +272,7 @@
 <span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
 <span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
 <span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">XX <span class="op">=</span> <span class="va">X1</span>,</span>
+<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
 <span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
 <span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
 <span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
@@ -306,7 +343,7 @@
 <span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
 <span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
 <span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">XX <span class="op">=</span> <span class="va">X1</span>,</span>
+<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
 <span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
 <span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
 <span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
@@ -321,7 +358,7 @@
 <span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
 <span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
 <span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">XX <span class="op">=</span> <span class="va">X1</span>,</span>
+<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
 <span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
 <span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
 <span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
@@ -348,7 +385,7 @@
 <span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
 <span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
 <span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">XX <span class="op">=</span> <span class="va">X1</span>,</span>
+<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
 <span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
 <span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
 <span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
@@ -364,7 +401,7 @@
 <span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
 <span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
 <span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">XX <span class="op">=</span> <span class="va">X1</span>,</span>
+<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
 <span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
 <span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
 <span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>

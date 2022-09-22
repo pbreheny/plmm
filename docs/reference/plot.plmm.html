@@ -49,7 +49,7 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>x</dt>
-<dd><p>An object of class plmm</p></dd>
+<dd><p>An object of class <code>plmm</code></p></dd>
 
 
 <dt>alpha</dt>
@@ -65,7 +65,7 @@
 
 
 <dt>col</dt>
-<dd><p>Color vector.</p></dd>
+<dd><p>Vector of colors for coefficient lines.</p></dd>
 
 
 <dt>...</dt>
@@ -73,6 +73,16 @@
 
 </dl></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>, <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, nlambda <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span class="r-in"><span class="co"># for the sake of illustration, I consider only 10 SNPs in the plot </span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span class="r-plt img"><img src="plot.plmm-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, log.l <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-plt img"><img src="plot.plmm-2.png" alt="" width="700" height="433"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

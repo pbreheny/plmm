@@ -24,5 +24,5 @@ This function allows you to fit a linear mixed model via penalized maximum likel
 }
 \examples{
 plmm_mcp_fit <- plmm_mcp(admix$X, admix$y, p1 = 5)
-
+s <- summary(plmm_mcp_fit)
 }

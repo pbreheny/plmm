@@ -50,9 +50,9 @@ Predict method for plmm class
 \examples{
 
 fit <- plmm(X = admix$X, y = admix$y, lambda = c(0.05, 0.01))
-head(predict.plmm(object = fit, newX = admix$X, type = 'response', lambda = 0.05))
-head(predict.plmm(object = fit, newX = admix$X, type = 'vars'))
-predict.plmm(object = fit, newX = admix$X, type = 'nvars')
+head(predict(object = fit, newX = admix$X, type = 'response', lambda = 0.05))
+head(predict(object = fit, newX = admix$X, type = 'vars'))
+predict(object = fit, newX = admix$X, type = 'nvars')
 \dontrun{
 predict.plmm(object = fit, newX = admix$X, type = 'individual', no_int_X = admix$X,
 y = admix$y, U = fit$U, S = fit$S, eta = fit$eta, covariance = crossprod(admix$X))

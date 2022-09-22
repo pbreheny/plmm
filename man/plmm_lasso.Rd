@@ -23,5 +23,5 @@ This function allows you to fit a linear mixed model via penalized maximum likel
 \examples{
 RRM <- relatedness_mat(X = scale(admix$X))
 fit <- plmm_lasso(X = admix$X, y = admix$y, K = RRM, p1 = 10)
-names(fit$fit)
+s <- summary(fit)
 }

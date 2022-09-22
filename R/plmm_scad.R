@@ -12,7 +12,7 @@
 #' @examples 
 #' RRM <- relatedness_mat(X = scale(admix$X))
 #' fit_scad <- plmm_scad(X = admix$X, y = admix$y, p1 = 5, K = RRM)
-#' 
+#' s <- summary(fit_scad)
 
 
 plmm_scad <- function(X, y, p1, standardize = FALSE, K) {

@@ -20,4 +20,5 @@ This function allows you to fit a linear model via lasso-penalized maximum likel
 }
 \examples{
 lasso_fit <- lasso(admix$X, admix$y, p1 = 5)
+s <- summary(lasso_fit)
 }

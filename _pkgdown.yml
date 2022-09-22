@@ -54,9 +54,10 @@ reference:
     - untransform
     - varp
     
-  - title: Plotting and formatting
+  - title: Plotting, summarizing, and formatting
     contents:
     - lamNames
+    - summary.plmm
     - plot.cv.plmm
     - plot.plmm
     

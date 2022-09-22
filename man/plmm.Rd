@@ -70,6 +70,6 @@ This function allows you to fit a linear mixed model via non-convex penalized ma
 }
 \examples{
 fit <- plmm(X = admix$X[,1:10], y = admix$y, K = relatedness_mat(admix$X))
-summary.plmm(fit)
-short_summary <- summary.plmm(fit)
+summary(fit)
+short_summary <- summary(fit)
 }
