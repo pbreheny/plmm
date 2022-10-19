@@ -28,9 +28,14 @@ dimnames(B1) <- NULL
 # test 1 - implementation 
 tinytest::expect_equal(A1, B1, tolerance = 0.01)
 
+
+# Test 1.5 Case where K is diagonal and lambda is 0 ---------------------------
+
+# use 'lm' here instead of glmnet
+
 # Test 2: Case where K is diagonal -------------------------------------------
 
-K_diagonal <- diag(x = rnorm(n = nrow(admix$X)),
+K_diagonal <- diag(x = (rnorm(n = nrow(admix$X))^2),
                    nrow = nrow(admix$X))
 
 lambda2 <- c(1, 0.1, 0.01, 0.001)
@@ -45,7 +50,8 @@ lasso2 <- glmnet(x = admix$X,
                  y = admix$y,
                  family = "gaussian",
                  lambda = lambda2,
-                 weights = diag(K_diagonal))
+                 # weights are by INVERSE variance 
+                 weights = 1/diag(K_diagonal))
 
 
 A2 <- as.matrix(plmm2$beta_vals[2:10, ]) 

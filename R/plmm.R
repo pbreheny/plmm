@@ -5,6 +5,7 @@
 #' @param y Continuous outcome vector.
 #' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
+#' @param k An integer between 1 and \code{nrow(K)} indicating the number of singular values requested *if* package \code{RSpectra} is installed. Defaults to NULL. 
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for SCAD.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
@@ -34,6 +35,7 @@
 plmm <- function(X,
                  y,
                  K,
+                 k = NULL,
                  eta_star,
                  penalty = c("MCP", "SCAD", "lasso"),
                  gamma,
@@ -117,9 +119,19 @@ plmm <- function(X,
 
 ## rotate data
   if (!missing(eta_star)){
-    c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star)
+    if(is.null(k)){
+      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star)
+    } else {
+      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star, k)
+    }
+    
   } else {
-    c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K)
+    if(is.null(k)){
+      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K)
+    } else {
+      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, k)
+    }
+    
   }
 
 ## re-standardize rotated SUX
@@ -221,6 +233,10 @@ val <- structure(list(beta_vals = beta_vals,
     val$U <- U
     val$S <- S
     val$std_X <- std_X
-  }
+  } 
+if (utils::object.size(X) < 1e8){ # if it fits, it ships 
+  val$X <- X # this is the original design matrix WITHOUT the intercept!
+  val$y <- y
+}
   return(val)
 }

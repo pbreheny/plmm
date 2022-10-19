@@ -5,6 +5,7 @@
 #' @param y Continuous outcome vector.
 #' @param K Estimated or known similarity matrix. By default, K is the realized relationship matrix, \eqn{\frac{1}{p}XX^T}, where \eqn{p} is the number of columns in X
 #' @param eta_star Optional arg to input a specific eta term rather than estimate it from the data. If v is a known matrix, this should be 1.
+#' @param k An integer between 1 and \code{nrow(K)} indicating the number of singular values requested *if* package \code{RSpectra} is installed. Defaults to NULL. 
 #' @importFrom zeallot %<-%
 #' @export
 #' 
@@ -13,7 +14,7 @@
 #' K <- relatedness_mat(std_X)
 #' rotated_dat <- rotate_data(std_X, admix$y, K)
 
-rotate_data <- function(X, y, K = NULL, eta_star){
+rotate_data <- function(X, y, K = NULL, eta_star, k = NULL){
   # Coersion
   S <- U <- UU <- eta <- NULL
 
@@ -27,7 +28,13 @@ rotate_data <- function(X, y, K = NULL, eta_star){
   if (missing(eta_star)){
       c(S, U, eta) %<-% plmm_null(K = K, y = y) # estimate eta if needed 
     } else {
-      c(S, U) %<-% svd(K)[1:2]
+      if("RSpectra" %in% rownames(installed.packages()) & !is.null(k)){
+        c(S, U) %<-% Rspectra::svds(K, nv = 0, k = k)[1:2]
+      } else {
+        c(S, U) %<-% svd(K)[1:2]
+      }
+      
+      # NB: nv=0 avoids the calculation of right singular vectors, which we will not use
       eta <- eta_star
     }
   # Construct W 
