@@ -5,4 +5,6 @@ xxx*\.R$
 .Rhistory
 .DS_Store
 admixture_data.R # this is my scratch work for generating the example data set 
-inst/extdata # don't save external files yet (Oct. 2022)
+cad_raw.R
+inst/extdata/og_cad* # big PLINK files, of which my example files are a subset
+inst/extdata/cad.log # the log from my PLINK filtering step 
