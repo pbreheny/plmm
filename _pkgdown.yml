@@ -47,6 +47,7 @@ reference:
     
   - title: Data (pre)processing and wrangling
     contents:
+    - plink_example 
     - process_plink
     - relatedness_mat
     - rotate_data

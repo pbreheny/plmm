@@ -5,3 +5,4 @@ xxx*\.R$
 .Rhistory
 .DS_Store
 admixture_data.R # this is my scratch work for generating the example data set 
+inst/extdata # don't save external files yet (Oct. 2022)

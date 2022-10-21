@@ -11,6 +11,10 @@
 #' * `map` A matrix of SNP data.
 #' * `fam` A matrix of subject data.
 #' @export
+#' 
+#' @examples 
+#' test <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+#' 
 
 process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", impute = TRUE){
 
