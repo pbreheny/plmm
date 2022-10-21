@@ -46,6 +46,7 @@
   <span class="va">X</span>,
   <span class="va">y</span>,
   <span class="va">K</span>,
+  k <span class="op">=</span> <span class="cn">NULL</span>,
   <span class="va">eta_star</span>,
   penalty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCP"</span>, <span class="st">"SCAD"</span>, <span class="st">"lasso"</span><span class="op">)</span>,
   <span class="va">gamma</span>,
@@ -76,6 +77,10 @@
 
 <dt>K</dt>
 <dd><p>Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \(\frac{1}{p}(XX^T)\)).</p></dd>
+
+
+<dt>k</dt>
+<dd><p>An integer between 1 and <code>nrow(K)</code> indicating the number of singular values requested <em>if</em> package <code>RSpectra</code> is installed. Defaults to NULL.</p></dd>
 
 
 <dt>eta_star</dt>
@@ -149,37 +154,9 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> The lambda value that minimizes loss:  0.0005181608 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # of coefficients estimated:  11 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  6 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> The predictors included in the model are:  Snp1 Snp2 Snp4 Snp5 Snp9 Snp10 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> The monomorphic SNPs were:  Snp8 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $best_lam_idx</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $best_lam</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0005181608</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $select_beta_vals</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  (Intercept)         Snp1         Snp2         Snp3         Snp4         Snp5 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -0.472631419  0.418618832  0.052461015 -1.809189991  0.294588295  0.134216366 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Snp6         Snp7         Snp8         Snp9        Snp10 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -0.274122107 -0.128452861  0.000000000  0.001992861  0.320635048 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $chosen_predictors</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Snp1"  "Snp2"  "Snp4"  "Snp5"  "Snp9"  "Snp10"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $monomorphic_snps</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Snp8"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary.plmm(fit):</span> One of the arguments 'lambda' or 'idx' must be provided.</span>
 <span class="r-in"><span class="va">short_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> The lambda value that minimizes loss:  0.0005181608 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # of coefficients estimated:  11 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  6 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> The predictors included in the model are:  Snp1 Snp2 Snp4 Snp5 Snp9 Snp10 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> The monomorphic SNPs were:  Snp8 </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary.plmm(fit):</span> One of the arguments 'lambda' or 'idx' must be provided.</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

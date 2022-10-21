@@ -4,7 +4,7 @@
 \alias{rotate_data}
 \title{Compute transformed X and y for subsequent plmm rescaling and fitting}
 \usage{
-rotate_data(X, y, K = NULL, eta_star)
+rotate_data(X, y, K = NULL, eta_star, k = NULL)
 }
 \arguments{
 \item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
@@ -14,6 +14,8 @@ rotate_data(X, y, K = NULL, eta_star)
 \item{K}{Estimated or known similarity matrix. By default, K is the realized relationship matrix, \eqn{\frac{1}{p}XX^T}, where \eqn{p} is the number of columns in X}
 
 \item{eta_star}{Optional arg to input a specific eta term rather than estimate it from the data. If v is a known matrix, this should be 1.}
+
+\item{k}{An integer between 1 and \code{nrow(K)} indicating the number of singular values requested \emph{if} package \code{RSpectra} is installed. Defaults to NULL.}
 }
 \description{
 This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.

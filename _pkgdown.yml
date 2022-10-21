@@ -47,7 +47,7 @@ reference:
     
   - title: Data (pre)processing and wrangling
     contents:
-    - preprocess
+    - process_plink
     - relatedness_mat
     - rotate_data
     - scale_varp
@@ -58,6 +58,7 @@ reference:
     contents:
     - lamNames
     - summary.plmm
+    - print.summary.plmm
     - plot.cv.plmm
     - plot.plmm
     

@@ -224,19 +224,22 @@ val <- structure(list(beta_vals = beta_vals,
       warning("Due to the large size of SUX (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).")
       returnX <- FALSE
     } else {
+      # if it fits, it ships 
       returnX <- TRUE
     }
   }
   if (returnX) {
-    val$SUX <- SUX
-    val$SUy <- SUy
+    val$X <- X # this is the original design matrix WITHOUT the intercept!
+    val$y <- y
+    
+    val$std_X <- std_X
+    
     val$U <- U
     val$S <- S
-    val$std_X <- std_X
+    
+    val$SUX <- SUX
+    val$SUy <- SUy
+    
   } 
-if (utils::object.size(X) < 1e8){ # if it fits, it ships 
-  val$X <- X # this is the original design matrix WITHOUT the intercept!
-  val$y <- y
-}
   return(val)
 }

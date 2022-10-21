@@ -26,7 +26,21 @@
 #'  pred1 <- predict(object = fit, newX = newX, type = "response")
 #'  
 #'  # make predictions for a select number of lambda values 
-#'  pred2 <- predict(object = fit, newX = newX, type = "response", which=98)
+#'  pred2 <- predict(object = fit, newX = newX, type = "response", idx=98)
+#'  
+#'  # make prediction using blup 
+#'  pred3 <- predict(object = fit, newX = newX, type = "blup", idx=98)
+#'
+#'  # compare y predictions 
+#'   compare_y <- data.frame(y = admix$y, yhat_response = pred2, yhat_blup = pred3)
+#'  
+#'  \dontrun{
+#'  fit_noX <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X),
+#'   returnX = FALSE)
+#'  
+#'  pred4 <- predict(object = fit_noX, newX = newX, type = "blup", idx=98)
+#'  
+#'  }
 #'  
 #'  # make predictions when X is big 
 #'  # TODO: add an example here 
@@ -64,7 +78,7 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
     
     # case 2: some calculations must be done before the blup prediction
    if (!("X" %in% names(object) & ("SUX" %in% names(object)))) {
-      if(missing(X) | missing(y)) stop("The design matrix is required for BLUP calculation, but is not available in the plmm object.\n This is ususally because X is large.\n Please supply the no-intercept design matrix to the X argument, and the vector of outcomes to the y argument.")
+      if(missing(no_int_X) | missing(y)) stop("The design matrix is required for BLUP calculation, but is not available in the plmm object.\n This is ususally because X is large.\n Please supply the no-intercept design matrix to the no_int_X argument, and the vector of outcomes to the y argument.")
       # calculate K 
       K <- relatedness_mat(X)
       # calculate S and U 

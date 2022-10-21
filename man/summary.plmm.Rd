@@ -2,23 +2,40 @@
 % Please edit documentation in R/summary-plmm.R
 \name{summary.plmm}
 \alias{summary.plmm}
-\title{A summary method for the plmm class}
+\title{A summary method for the plmm objects}
 \usage{
-\method{summary}{plmm}(object, quiet = FALSE)
+\method{summary}{plmm}(object, lambda, idx, eps = 1e-05)
 }
 \arguments{
 \item{object}{An object of class \code{plmm}}
 
-\item{quiet}{A logical indicating whether the console output is desired. Defaults to FALSE.}
+\item{lambda}{The regularization parameter value at which inference should be reported.}
+
+\item{idx}{Alternatively, \code{lambda} may be specified by an index; \code{idx=10} means:
+report inference for the 10th value of \code{lambda} along the regularization path. If both \code{lambda} and \code{idx} are specified, \code{lambda} takes precedence.}
+
+\item{eps}{If lambda is given, eps is the tolerance for difference between the given lambda value and a lambda value from the object. Defaults to 0.0001 (1e-5)}
 }
 \value{
-A list containing:
+The return value is an object with S3 class \code{summary.plmm}. The class has its own print method and contains the following list elements:
+\itemize{
+\item \code{penalty}: The penalty used by \code{plmm} (e.g. SCAD, MCP, lasso)
+\item \code{n}: Number of instances/observations
+\item \code{p}: Number of regression coefficients (not including the intercept)
+\item \code{converged}: Logical indicator for whether the model converged
+\item \code{lambda}: The \code{lambda} value at which inference is being reported
+\item \code{lambda_char}: A formatted character string indicating the lambda value
+\item \code{nvars}: The number of nonzero coefficients (again, not including the intercept) at that value of \code{lambda}
+\item \code{nonzero}: The column names indicating the nonzero coefficients in the model at the specified value of \code{lambda}
+\item \code{constant_features}: A character vector with the names of any columns in the design matrix
+whose values are constant in the whole sample (e.g., monomorphic SNPs in a genetics context)
+}
 }
 \description{
-A summary method for the plmm class
+A summary method for the plmm objects
 }
 \examples{
 fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-example <- summary.plmm(fit)
-#TODO: Sept. 14, 2022 - need a more sophisticated way to select the 'best' lambda value 
+s1 <- summary(fit, idx = 97)
+s2 <- summary(fit, lambda = 0.0005957590)
 }

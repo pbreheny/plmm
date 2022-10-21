@@ -46,9 +46,9 @@
 <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>
   <span class="va">object</span>,
   <span class="va">newX</span>,
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"coefficients"</span>, <span class="st">"vars"</span>, <span class="st">"nvars"</span>, <span class="st">"individual"</span><span class="op">)</span>,
+  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"coefficients"</span>, <span class="st">"vars"</span>, <span class="st">"nvars"</span>, <span class="st">"blup"</span><span class="op">)</span>,
   <span class="va">lambda</span>,
-  which <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">lambda</span><span class="op">)</span>,
+  idx <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">lambda</span><span class="op">)</span>,
   <span class="va">no_int_X</span>,
   <span class="va">y</span>,
   <span class="va">U</span>,
@@ -70,346 +70,77 @@
 
 
 <dt>type</dt>
-<dd><p>A character argument indicating what type of prediction should be returned.</p></dd>
+<dd><p>A character argument indicating what type of prediction should be returned. Options are "response," "coefficients," "vars," "nvars," and "blup." See details.</p></dd>
 
 
 <dt>lambda</dt>
 <dd><p>A numeric vector of regularization parameter <code>lambda</code> values at which predictions are requested.</p></dd>
 
 
-<dt>which</dt>
+<dt>idx</dt>
 <dd><p>Vector of indices of the penalty parameter <code>lambda</code> at which predictions are required. By default, all indices are returned.</p></dd>
 
 
-<dt>no_int_X</dt>
-<dd><p>Optional argument. Original design matrix (not including intercept column) from object. Required if <code>type == 'individual'</code>.</p></dd>
-
-
 <dt>y</dt>
-<dd><p>Optional argument. Original continuous outcome vector from object. Required if <code>type == 'individual'</code>.</p></dd>
+<dd><p>Optional argument. Original continuous outcome vector from object. Required if <code>type == 'blup'</code>.</p></dd>
 
 
 <dt>U</dt>
-<dd><p>Optional argument. Eigenvectors from the similarity matrix from object. Required if <code>type == 'individual'</code>.</p></dd>
+<dd><p>Optional argument. Eigenvectors from the similarity matrix from object. Required if <code>type == 'blup'</code>.</p></dd>
 
 
 <dt>S</dt>
-<dd><p>Optional argument. Eigenvalues from the similarity matrix from object. Required if <code>type == 'individual'</code>.</p></dd>
+<dd><p>Optional argument. Eigenvalues from the similarity matrix from object. Required if <code>type == 'blup'</code>.</p></dd>
 
 
 <dt>eta</dt>
-<dd><p>Optional argument. Estimated $eta$ value from object. Required if <code>type == 'individual'</code>.</p></dd>
+<dd><p>Optional argument. Estimated $eta$ value from object. Required if <code>type == 'blup'</code>.</p></dd>
 
 
 <dt>covariance</dt>
-<dd><p>Optional argument. $q times n$ covariance matrix between new and old observations. Required if <code>type == 'individual'</code>.</p></dd>
+<dd><p>Optional argument. $q times n$ covariance matrix between new and old observations. Required if <code>type == 'blup'</code>.</p></dd>
 
 
 <dt>...</dt>
 <dd><p>Additional optional arguments</p></dd>
 
+
+<dt>X</dt>
+<dd><p>Optional argument. Original design matrix (not including intercept column) from object. Required if <code>type == 'blup'</code> and object is too large to be returned in <code>plmm</code> object.</p></dd>
+
 </dl></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, lambda <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.01</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, type <span class="op">=</span> <span class="st">'response'</span>, lambda <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.482265 1.491049 1.137473 1.357829 2.004830 1.043942</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, type <span class="op">=</span> <span class="st">'vars'</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`0.0500`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp1  Snp3  Snp4  Snp6  Snp9 Snp10 Snp11 Snp12 Snp13 Snp15 Snp16 Snp18 Snp19 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     1     3     4     6     9    10    11    12    13    15    16    18    19 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Snp20 Snp22 Snp24 Snp25 Snp28 Snp33 Snp34 Snp37 Snp38 Snp41 Snp42 Snp44 Snp47 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    20    22    24    25    28    33    34    37    38    41    42    44    47 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Snp50 Snp51 Snp53 Snp58 Snp59 Snp63 Snp64 Snp65 Snp66 Snp68 Snp69 Snp71 Snp72 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    50    51    53    58    59    63    64    65    66    68    69    71    72 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Snp74 Snp79 Snp80 Snp81 Snp83 Snp85 Snp86 Snp87 Snp88 Snp90 Snp95 Snp96 Snp97 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    74    79    80    81    83    85    86    87    88    90    95    96    97 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Snp99 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    99 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`0.0100`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Snp1   Snp2   Snp3   Snp4   Snp5   Snp6   Snp7   Snp9  Snp10  Snp11  Snp12 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      1      2      3      4      5      6      7      9     10     11     12 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp13  Snp15  Snp16  Snp18  Snp19  Snp20  Snp22  Snp23  Snp24  Snp25  Snp26 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     13     15     16     18     19     20     22     23     24     25     26 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp27  Snp28  Snp29  Snp31  Snp32  Snp33  Snp34  Snp37  Snp38  Snp39  Snp40 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     27     28     29     31     32     33     34     37     38     39     40 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp41  Snp42  Snp43  Snp44  Snp45  Snp46  Snp47  Snp48  Snp49  Snp50  Snp51 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     41     42     43     44     45     46     47     48     49     50     51 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp53  Snp55  Snp58  Snp59  Snp60  Snp61  Snp63  Snp64  Snp65  Snp66  Snp67 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     53     55     58     59     60     61     63     64     65     66     67 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp68  Snp69  Snp70  Snp71  Snp72  Snp73  Snp74  Snp76  Snp77  Snp79  Snp80 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     68     69     70     71     72     73     74     76     77     79     80 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp81  Snp82  Snp83  Snp84  Snp85  Snp86  Snp87  Snp88  Snp89  Snp90  Snp91 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     81     82     83     84     85     86     87     88     89     90     91 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Snp92  Snp93  Snp94  Snp95  Snp96  Snp97  Snp98  Snp99 Snp100 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     92     93     94     95     96     97     98     99    100 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, type <span class="op">=</span> <span class="st">'nvars'</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.0500 0.0100 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     53     86 </span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="fu">predict.plmm</span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, type <span class="op">=</span> <span class="st">'individual'</span>, no_int_X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>,</span>
-<span class="r-in">y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, U <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">U</span>, S <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">S</span>, eta <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">eta</span>, covariance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co"># Out of sample predictions are NOT improved by BLUP when X cannot be used to</span></span>
-<span class="r-in"><span class="co"># estimate V</span></span>
-<span class="r-in"><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">210</span></span>
-<span class="r-in"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
-<span class="r-in"><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
-<span class="r-in"><span class="va">SNR</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># fit a model </span></span>
+<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># Generate data (X unrelated to V)</span></span>
-<span class="r-in"><span class="va">V</span> <span class="op">&lt;-</span> <span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/bdiag.html" class="external-link">bdiag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span>,</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span>,</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">V</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">V</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">V</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">X1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n</span> <span class="op">*</span> <span class="va">p</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, <span class="va">n</span>, <span class="va">p</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">j</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="va">p</span></span>
-<span class="r-in"><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, times <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="va">j</span> <span class="op">&lt;=</span> <span class="va">p1</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="va">b</span> <span class="op">*</span> <span class="va">s</span></span>
-<span class="r-in"><span class="va">covX</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">X1</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">n</span></span>
-<span class="r-in"><span class="va">beta</span> <span class="op">&lt;-</span> <span class="va">b</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">SNR</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">b</span>, <span class="va">covX</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">b</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">Xbeta</span> <span class="op">&lt;-</span> <span class="va">X1</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span></span>
-<span class="r-in"><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span><span class="op">)</span>, <span class="va">V</span><span class="op">)</span> <span class="co"># errors are structured</span></span>
-<span class="r-in"><span class="va">y1</span> <span class="op">&lt;-</span> <span class="va">Xbeta</span> <span class="op">+</span> <span class="va">e</span></span>
+<span class="r-in"><span class="co"># simulate new data </span></span>
+<span class="r-in"><span class="va">newX</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim_ps_x.html">sim_ps_x</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>, nJ <span class="op">=</span> <span class="fl">4</span>, p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>,</span>
+<span class="r-in"> structureX <span class="op">=</span> <span class="st">"independent"</span>, inbr <span class="op">=</span> <span class="st">"heterogeneous"</span>, standardizeX <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="co"># make predictions for all lambda values </span></span>
+<span class="r-in"> <span class="va">pred1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="co"># make predictions for a select number of lambda values </span></span>
+<span class="r-in"> <span class="va">pred2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"response"</span>, idx<span class="op">=</span><span class="fl">98</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="co"># make prediction using blup </span></span>
+<span class="r-in"> <span class="va">pred3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"blup"</span>, idx<span class="op">=</span><span class="fl">98</span><span class="op">)</span></span>
 <span class="r-in"></span>
-<span class="r-in"><span class="co"># fit the model</span></span>
-<span class="r-in"><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.plmm.html">cv.plmm</a></span><span class="op">(</span><span class="va">X1</span>,</span>
-<span class="r-in">                  <span class="va">y1</span>,</span>
-<span class="r-in">                  <span class="va">V</span>,</span>
-<span class="r-in">                  eta_star <span class="op">=</span> <span class="fl">1</span>,</span>
-<span class="r-in">                  type <span class="op">=</span> <span class="st">'individual'</span>,</span>
-<span class="r-in">                  penalty <span class="op">=</span> <span class="st">"lasso"</span>,</span>
-<span class="r-in">                  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
-<span class="r-in">                  standardizeX <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                  standardizeRtX <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                  rotation <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                  returnX <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                  nfolds <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span class="r-in"><span class="co"># NOTE: in-sample predictions as above in CV are fine, because V supplies the</span></span>
-<span class="r-in"><span class="co"># known covariance between the outcomes used in different folds.</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># generate an X2 that is similar to X1</span></span>
-<span class="r-in"><span class="va">X2</span> <span class="op">&lt;-</span> <span class="va">X1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">X1</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fl">0.0001</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">covX</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">n</span></span>
-<span class="r-in"><span class="va">beta</span> <span class="op">&lt;-</span> <span class="va">b</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">SNR</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">b</span>, <span class="va">covX</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">b</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">Xbeta</span> <span class="op">&lt;-</span> <span class="va">X2</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span></span>
-<span class="r-in"><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span><span class="op">)</span>, <span class="va">V</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">y2</span> <span class="op">&lt;-</span> <span class="va">Xbeta</span> <span class="op">+</span> <span class="va">e</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># linear predictor works well</span></span>
-<span class="r-in"><span class="va">linear_predictor</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'response'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">linear_predictor</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># but the blup doesn't, because `cov(t(X2), t(X1))` doesn't provide</span></span>
-<span class="r-in"><span class="co"># information about `cov(y2, y1)`</span></span>
-<span class="r-in"><span class="va">blup</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
-<span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
-<span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
-<span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
-<span class="r-in">covariance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cov</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">X1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">eta <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">eta</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">blup</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># in this case, cov(y2, y1) ~= V -this information improves the blup</span></span>
-<span class="r-in"><span class="va">blup_V</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
-<span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
-<span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
-<span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
-<span class="r-in">covariance <span class="op">=</span> <span class="va">V</span>,</span>
-<span class="r-in">eta <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">eta</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">blup_V</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># with the null model...</span></span>
-<span class="r-in"><span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span>,</span>
-<span class="r-in">ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># ...the linear predictor is worse...</span></span>
-<span class="r-in"><span class="va">linear_predictor_null</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'response'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">linear_predictor_null</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># ...but the blup is even worse, because we are left only with a noisy</span></span>
-<span class="r-in"><span class="co"># rotation of y as an estimate</span></span>
-<span class="r-in"><span class="va">blup_null</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
-<span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
-<span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
-<span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
-<span class="r-in">covariance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cov</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">X1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">eta <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">eta</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">blup_null</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># again, in this case, cov(y2, y1) ~= V, which notably improves the blup</span></span>
-<span class="r-in"><span class="va">blup_null_V</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
-<span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
-<span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
-<span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
-<span class="r-in">covariance <span class="op">=</span> <span class="va">V</span>,</span>
-<span class="r-in">eta <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">eta</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">blup_null_V</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Based on this, we expect to see out of sample predictions ARE improved when</span></span>
-<span class="r-in"><span class="co"># V can be estimated from X</span></span>
-<span class="r-in"><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">210</span></span>
-<span class="r-in"><span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
-<span class="r-in"><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
-<span class="r-in"><span class="va">SNR</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Generate data (X related to V)</span></span>
-<span class="r-in"><span class="va">V</span> <span class="op">&lt;-</span> <span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/bdiag.html" class="external-link">bdiag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span>,</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span>,</span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span>, <span class="va">n</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">V</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">V</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">V</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">1</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">X1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">p</span>, mu <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span><span class="op">)</span>, Sigma <span class="op">=</span> <span class="va">V</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">j</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="va">p</span></span>
-<span class="r-in"><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, times <span class="op">=</span> <span class="va">p</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="va">j</span> <span class="op">&lt;=</span> <span class="va">p1</span></span>
-<span class="r-in"><span class="va">b</span> <span class="op">&lt;-</span> <span class="va">b</span> <span class="op">*</span> <span class="va">s</span></span>
-<span class="r-in"><span class="va">covX</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">X1</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">n</span></span>
-<span class="r-in"><span class="va">beta</span> <span class="op">&lt;-</span> <span class="va">b</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">SNR</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">b</span>, <span class="va">covX</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">b</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">Xbeta</span> <span class="op">&lt;-</span> <span class="va">X1</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span></span>
-<span class="r-in"><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span><span class="op">)</span>, <span class="va">V</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">y1</span> <span class="op">&lt;-</span> <span class="va">Xbeta</span> <span class="op">+</span> <span class="va">e</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># fit the model</span></span>
-<span class="r-in"><span class="va">object</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.plmm.html">cv.plmm</a></span><span class="op">(</span><span class="va">X1</span>,</span>
-<span class="r-in">                  <span class="va">y1</span>,</span>
-<span class="r-in">                  <span class="va">V</span>,</span>
-<span class="r-in">                  eta_star <span class="op">=</span> <span class="fl">1</span>,</span>
-<span class="r-in">                  type <span class="op">=</span> <span class="st">'individual'</span>,</span>
-<span class="r-in">                  penalty <span class="op">=</span> <span class="st">"lasso"</span>,</span>
-<span class="r-in">                  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
-<span class="r-in">                  standardizeX <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                  standardizeRtX <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                  rotation <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                  returnX <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                  nfolds <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># generate an X2 that is similar to X1</span></span>
-<span class="r-in"><span class="va">X2</span> <span class="op">&lt;-</span> <span class="va">X1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">X1</span><span class="op">)</span>, <span class="fl">0</span>, <span class="fl">0.0001</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">covX</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">var</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span><span class="op">/</span><span class="va">n</span></span>
-<span class="r-in"><span class="va">beta</span> <span class="op">&lt;-</span> <span class="va">b</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">SNR</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">b</span>, <span class="va">covX</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">b</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">Xbeta</span> <span class="op">&lt;-</span> <span class="va">X2</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">beta</span></span>
-<span class="r-in"><span class="va">e</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html" class="external-link">mvrnorm</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">n</span><span class="op">)</span>, <span class="va">V</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">y2</span> <span class="op">&lt;-</span> <span class="va">Xbeta</span> <span class="op">+</span> <span class="va">e</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># linear predictor works well</span></span>
-<span class="r-in"><span class="va">linear_predictor</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'response'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">linear_predictor</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># and the blup improves upon the linear predictor because</span></span>
-<span class="r-in"><span class="co"># `cov(t(X2), t(X1))` ~=`cov(y2, y1)`</span></span>
-<span class="r-in"><span class="va">blup</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
-<span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
-<span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
-<span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
-<span class="r-in">covariance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cov</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">X1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">eta <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">eta</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">blup</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># in this case, knowing the true(ish) cov(y2, y1) is even more beneficial than</span></span>
-<span class="r-in"><span class="co"># using the version estimated from `cov(t(X2), t(X1))`</span></span>
-<span class="r-in"><span class="va">blup_V</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
-<span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
-<span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
-<span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
-<span class="r-in">covariance <span class="op">=</span> <span class="va">V</span>,</span>
-<span class="r-in">eta <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">eta</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">blup_V</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># with the null model...</span></span>
-<span class="r-in"><span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">beta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span>,</span>
-<span class="r-in">ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># ...the linear predictor is worse...</span></span>
-<span class="r-in"><span class="va">linear_predictor_null</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'response'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">linear_predictor_null</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># ...but the blup is better because we still have information about</span></span>
-<span class="r-in"><span class="co"># `cov(y2, y1)` ~= `cov(t(X2), t(X1))`</span></span>
-<span class="r-in"><span class="va">blup_null</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
-<span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
-<span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
-<span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
-<span class="r-in">covariance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cov</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">X2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">X1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">eta <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">eta</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">blup_null</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># in this case, knowing the true(ish) cov(y2, y1) gives a more drastic</span></span>
-<span class="r-in"><span class="co"># improvement than using the version estimated from `cov(t(X2), t(X1))`</span></span>
-<span class="r-in"><span class="co"># because we don't have any information from the linear predictor</span></span>
-<span class="r-in"><span class="va">blup_null_V</span> <span class="op">&lt;-</span> <span class="fu">predict.plmm</span><span class="op">(</span><span class="va">object</span><span class="op">$</span><span class="va">fit</span>,</span>
-<span class="r-in">newX <span class="op">=</span> <span class="va">X2</span>,</span>
-<span class="r-in">type <span class="op">=</span> <span class="st">'individual'</span>,</span>
-<span class="r-in">lambda <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">lambda.min</span>,</span>
-<span class="r-in">no_int_X <span class="op">=</span> <span class="va">X1</span>,</span>
-<span class="r-in">y <span class="op">=</span> <span class="va">y1</span>,</span>
-<span class="r-in">U <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">U</span>,</span>
-<span class="r-in">S <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">S</span>,</span>
-<span class="r-in">covariance <span class="op">=</span> <span class="va">V</span>,</span>
-<span class="r-in">eta <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">eta</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">blup_null_V</span> <span class="op">-</span> <span class="va">y2</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y2</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+<span class="r-in"> <span class="co"># compare y predictions </span></span>
+<span class="r-in">  <span class="va">compare_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, yhat_response <span class="op">=</span> <span class="va">pred2</span>, yhat_blup <span class="op">=</span> <span class="va">pred3</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span class="r-in"> <span class="va">fit_noX</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>,</span>
+<span class="r-in">  returnX <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="va">pred4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit_noX</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"blup"</span>, idx<span class="op">=</span><span class="fl">98</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="op">}</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="co"># make predictions when X is big </span></span>
+<span class="r-in"> <span class="co"># TODO: add an example here </span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

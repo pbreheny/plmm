@@ -8,6 +8,7 @@ plmm(
   X,
   y,
   K,
+  k = NULL,
   eta_star,
   penalty = c("MCP", "SCAD", "lasso"),
   gamma,
@@ -31,6 +32,8 @@ plmm(
 \item{y}{Continuous outcome vector.}
 
 \item{K}{Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).}
+
+\item{k}{An integer between 1 and \code{nrow(K)} indicating the number of singular values requested \emph{if} package \code{RSpectra} is installed. Defaults to NULL.}
 
 \item{eta_star}{Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.}
 

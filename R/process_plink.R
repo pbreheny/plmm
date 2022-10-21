@@ -1,4 +1,3 @@
-
 #' Preprocess PLINK files
 #'
 #' This function allows you to preprocess PLINK bed/bim/fam files for use with \code{penalizedLMM} functions. Unreliable SNPs are removed and missing values are imptued using either \code{snpStats}, or if not tagged, the HWE mean value.
@@ -13,7 +12,7 @@
 #' * `fam` A matrix of subject data.
 #' @export
 
-preprocess <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", impute = TRUE){
+process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", impute = TRUE){
 
   cat("\nPreprocessing", prefix, "data:\n")
 
