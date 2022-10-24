@@ -13,10 +13,8 @@
 #' @export
 #' 
 #' @examples 
-#' \dontrun{
-#' # TODO: add the external files (in inst/extdata), and then use them here 
 #' test <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
-#' }
+#' 
 #' 
 #' 
 

@@ -30,6 +30,13 @@
 #' fit <- plmm(X = admix$X[,1:10], y = admix$y, K = relatedness_mat(admix$X))
 #' summary(fit)
 #' short_summary <- summary(fit)
+#' 
+#' # now use PLINK data files
+#' cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+#' cad_clinical <- read.csv((plink_example(path="cad_clinical.csv"))
+#' # for the sake of illustration, I use a simple mean imputation for the outcome 
+#' cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clincal$hdl)
+#' fit_plink <- plmm(X = coerce_snpmatrix(cad$genotypes), y = cad_clinical$hdl_impute)
 
 
 plmm <- function(X,

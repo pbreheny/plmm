@@ -42,11 +42,24 @@
 #'  
 #'  }
 #'  
-#'  # make predictions when X is big 
-#'  # TODO: add an example here 
+#'  
+#' # make predictions when X is big
+#' cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+#' cad_clinical <- read.csv((plink_example(path="cad_clinical.csv"))
+#' # for the sake of illustration, I use a simple mean imputation for the outcome 
+#' cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clincal$hdl)
+#' fit_cad <- plmm(X = coerce_snpmatrix(cad$genotypes), y = cad_clinical$hdl_impute)
+#' cad_X <- coerce_snpmatrix(cad$genotypes)
+#' cad_y <- cad_clinical$hdl_impute
+#' newX_cad <- sim_ps_x(n = nrow(cad_X), nJ = 4, p = ncol(cad_X),
+#'  structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
+#' pred_cad <- predict(object = fit_cad, newX = newX_cad, type='blup', idx = 95, X = cad_X, y = cad_y)
+#'  head(data.frame(cad_y, pred_cad))
+#'  
+#'  # TODO: debug the 'blup' calculation 
 
 predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),
-                           lambda, idx=1:length(object$lambda), no_int_X, y, U, S, eta, covariance, ...) {
+                           lambda, idx=1:length(object$lambda), X, y, U, S, eta, covariance, ...) {
   type <- match.arg(type)
   beta_vals <- coef.plmm(object, lambda=lambda, which=idx, drop=FALSE) # includes intercept 
   
@@ -78,7 +91,7 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
     
     # case 2: some calculations must be done before the blup prediction
    if (!("X" %in% names(object) & ("SUX" %in% names(object)))) {
-      if(missing(no_int_X) | missing(y)) stop("The design matrix is required for BLUP calculation, but is not available in the plmm object.\n This is ususally because X is large.\n Please supply the no-intercept design matrix to the no_int_X argument, and the vector of outcomes to the y argument.")
+      if(missing(X) | missing(y)) stop("The design matrix is required for BLUP calculation, but is not available in the plmm object.\n This is ususally because X is large.\n Please supply the no-intercept design matrix to the X argument, and the vector of outcomes to the y argument.")
       # calculate K 
       K <- relatedness_mat(X)
       # calculate S and U 
