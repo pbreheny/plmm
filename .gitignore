@@ -4,9 +4,9 @@ xxx*\.R$
 *\.rds$
 .Rhistory
 .DS_Store
-admixture_data.R # this is my scratch work for generating the example data set 
+admixture_data.R 
 cad_raw.R
-inst/extdata/og_cad.bed # big PLINK files, of which my example files are a subset
+inst/extdata/og_cad.bed 
 inst/extdata/og_cad.bim
 inst/extdata/og_cad.fam
-inst/extdata/cad.log # the log from my PLINK filtering step 
+inst/extdata/cad.log 
