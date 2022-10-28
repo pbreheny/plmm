@@ -80,7 +80,7 @@
 
 
 <dt>k</dt>
-<dd><p>An integer between 1 and <code>nrow(K)</code> indicating the number of singular values requested <em>if</em> package <code>RSpectra</code> is installed. Defaults to NULL.</p></dd>
+<dd><p><em>Not available yet; argument in development</em>: An integer between 1 and <code>nrow(K)</code> indicating the number of singular values requested <em>if</em> package <code>RSpectra</code> is installed. Defaults to NULL.</p></dd>
 
 
 <dt>eta_star</dt>
@@ -152,12 +152,7 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary.plmm(fit):</span> One of the arguments 'lambda' or 'idx' must be provided.</span>
-<span class="r-in"><span class="va">short_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summary.plmm(fit):</span> One of the arguments 'lambda' or 'idx' must be provided.</span>
-</code></pre></div>
+    
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

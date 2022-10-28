@@ -82,6 +82,7 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
       
       # calculate covariance between new and old observations 
       covariance <- newX %*% t(object$X)
+      # TODO: use tcrossprd
       # idea: standardize (as is done in relatedness_mat)
       # covariance <- (ncvreg::std(newX) %*% t(ncvreg::std(object$X)))/ncol(object$X)
       
@@ -89,6 +90,7 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
       # NB: can't just use the rotated y and x here - need to scale by inverse of K, not sqrt(K)
       
       # print(eta) 
+      # TODO: need to ceate the Xbeta object 
       blup <- Xbeta + ranef
     } 
     

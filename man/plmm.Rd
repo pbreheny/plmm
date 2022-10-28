@@ -33,7 +33,7 @@ plmm(
 
 \item{K}{Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).}
 
-\item{k}{An integer between 1 and \code{nrow(K)} indicating the number of singular values requested \emph{if} package \code{RSpectra} is installed. Defaults to NULL.}
+\item{k}{\emph{Not available yet; argument in development}: An integer between 1 and \code{nrow(K)} indicating the number of singular values requested \emph{if} package \code{RSpectra} is installed. Defaults to NULL.}
 
 \item{eta_star}{Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.}
 
@@ -73,6 +73,13 @@ This function allows you to fit a linear mixed model via non-convex penalized ma
 }
 \examples{
 fit <- plmm(X = admix$X[,1:10], y = admix$y, K = relatedness_mat(admix$X))
-summary(fit)
-short_summary <- summary(fit)
+summary(fit, idx = 99)
+
+
+# now use PLINK data files
+cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+cad_clinical <- read.csv((plink_example(path="cad_clinical.csv"))
+# for the sake of illustration, I use a simple mean imputation for the outcome 
+cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clincal$hdl)
+fit_plink <- plmm(X = coerce_snpmatrix(cad$genotypes), y = cad_clinical$hdl_impute)
 }

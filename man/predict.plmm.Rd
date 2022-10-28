@@ -10,12 +10,8 @@
   type = c("response", "coefficients", "vars", "nvars", "blup"),
   lambda,
   idx = 1:length(object$lambda),
-  no_int_X,
+  X,
   y,
-  U,
-  S,
-  eta,
-  covariance,
   ...
 )
 }
@@ -30,7 +26,11 @@
 
 \item{idx}{Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.}
 
+\item{X}{Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'blup'} and object is too large to be returned in \code{plmm} object.}
+
 \item{y}{Optional argument. Original continuous outcome vector from object. Required if \code{type == 'blup'}.}
+
+\item{...}{Additional optional arguments}
 
 \item{U}{Optional argument. Eigenvectors from the similarity matrix from object. Required if \code{type == 'blup'}.}
 
@@ -39,10 +39,6 @@
 \item{eta}{Optional argument. Estimated $eta$ value from object. Required if \code{type == 'blup'}.}
 
 \item{covariance}{Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'blup'}.}
-
-\item{...}{Additional optional arguments}
-
-\item{X}{Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'blup'} and object is too large to be returned in \code{plmm} object.}
 }
 \description{
 Predict method for plmm class
@@ -75,6 +71,19 @@ newX <- sim_ps_x(n = nrow(admix$X), nJ = 4, p = ncol(admix$X),
  
  }
  
- # make predictions when X is big 
- # TODO: add an example here 
+ 
+# make predictions when X is big
+cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+cad_clinical <- read.csv((plink_example(path="cad_clinical.csv"))
+# for the sake of illustration, I use a simple mean imputation for the outcome 
+cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clincal$hdl)
+fit_cad <- plmm(X = coerce_snpmatrix(cad$genotypes), y = cad_clinical$hdl_impute)
+cad_X <- coerce_snpmatrix(cad$genotypes)
+cad_y <- cad_clinical$hdl_impute
+newX_cad <- sim_ps_x(n = nrow(cad_X), nJ = 4, p = ncol(cad_X),
+ structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
+pred_cad <- predict(object = fit_cad, newX = newX_cad, type='blup', idx = 95, X = cad_X, y = cad_y)
+ head(data.frame(cad_y, pred_cad))
+ 
+ # TODO: debug the 'blup' calculation 
 }

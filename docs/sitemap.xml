@@ -19,6 +19,9 @@
     <loc>/reference/coef.plmm.html</loc>
   </url>
   <url>
+    <loc>/reference/coerce_snpmatrix.html</loc>
+  </url>
+  <url>
     <loc>/reference/convexMin.html</loc>
   </url>
   <url>
@@ -68,6 +71,9 @@
   </url>
   <url>
     <loc>/reference/loss.plmm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plink_example.html</loc>
   </url>
   <url>
     <loc>/reference/plmm.html</loc>
