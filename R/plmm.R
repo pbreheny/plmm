@@ -5,7 +5,7 @@
 #' @param y Continuous outcome vector.
 #' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
-#' @param k An integer between 1 and \code{nrow(K)} indicating the number of singular values requested *if* package \code{RSpectra} is installed. Defaults to NULL. 
+#' @param k *Not available yet; argument in development*: An integer between 1 and \code{nrow(K)} indicating the number of singular values requested *if* package \code{RSpectra} is installed. Defaults to NULL. 
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for SCAD.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
@@ -28,8 +28,8 @@
 #' 
 #' @examples 
 #' fit <- plmm(X = admix$X[,1:10], y = admix$y, K = relatedness_mat(admix$X))
-#' summary(fit)
-#' short_summary <- summary(fit)
+#' summary(fit, idx = 99)
+#' 
 #' 
 #' # now use PLINK data files
 #' cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))

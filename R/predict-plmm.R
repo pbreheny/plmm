@@ -59,7 +59,7 @@
 #'  # TODO: debug the 'blup' calculation 
 
 predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),
-                           lambda, idx=1:length(object$lambda), X, y, U, S, eta, covariance, ...) {
+                           lambda, idx=1:length(object$lambda), X, y, ...) {
   type <- match.arg(type)
   beta_vals <- coef.plmm(object, lambda=lambda, which=idx, drop=FALSE) # includes intercept 
   
@@ -79,8 +79,11 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
     
     # case 1: the object contains all items needed for blup prediction 
     if ("X" %in% names(object) & ("SUX" %in% names(object))){
+      
       # calculate covariance between new and old observations 
       covariance <- newX %*% t(object$X)
+      # idea: standardize (as is done in relatedness_mat)
+      # covariance <- (ncvreg::std(newX) %*% t(ncvreg::std(object$X)))/ncol(object$X)
       
       ranef <- covariance %*% object$U %*% diag((1 + object$eta * (object$S - 1))^(-1)) %*% t(object$U) %*% (object$y - cbind(1, object$X) %*% beta_vals)
       # NB: can't just use the rotated y and x here - need to scale by inverse of K, not sqrt(K)

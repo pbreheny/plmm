@@ -3,40 +3,66 @@
 # NOTE: These tests are in the process of being rewritten in order to be 
 #   consistent with the updates I have made to the package. 
 
-# Test 1: Case where K = identity -------------------------------------------
+# Test 0: Case where K = identity -------------------------------------------
 
 # set up 
 K_identity <- diag(nrow = nrow(admix$X))
-lambda1 <- c(1, 0.1, 0.01, 0.001)
+lambda0 <- c(1, 0.1, 0.01, 0.001)
 
-plmm1 <- plmm(X = admix$X,
+plmm0 <- plmm(X = admix$X,
               y = admix$y,
               K = K_identity,
-              lambda = lambda1,
+              lambda = lambda0,
               penalty = "lasso")
 
-lasso1 <- glmnet(x = admix$X,
+lasso0 <- glmnet(x = admix$X,
                  y = admix$y,
                  family = "gaussian",
-                 lambda = lambda1)
+                 lambda = lambda0)
 
-A1 <- as.matrix(plmm1$beta_vals[2:10, ]) 
-dimnames(A1) <- NULL
-B1 <- as.matrix(lasso1$beta[1:9, ]) # NB: glmnet() does not return intercept values
-dimnames(B1) <- NULL
+A0 <- as.matrix(plmm0$beta_vals[2:10, ]) 
+dimnames(A0) <- NULL
+B0 <- as.matrix(lasso0$beta[1:9, ]) # NB: glmnet() does not return intercept values
+dimnames(B0) <- NULL
 
 # test 1 - implementation 
-tinytest::expect_equal(A1, B1, tolerance = 0.01)
+tinytest::expect_equal(A0, B0, tolerance = 0.01)
 
 
-# Test 1.5 Case where K is diagonal and lambda is 0 ---------------------------
+# Test 1 Case where K is diagonal and lambda is 0 ---------------------------
 
 # use 'lm' here instead of glmnet
 
-# Test 2: Case where K is diagonal -------------------------------------------
-
 K_diagonal <- diag(x = (rnorm(n = nrow(admix$X))^2),
                    nrow = nrow(admix$X))
+
+plmm1 <- plmm(X = admix$X,
+              y = admix$y,
+              K = K_diagonal,
+              # even though I am interested in lambda == 0, the arg here must be
+              # a sequence 
+              lambda = c(0.001, 0),
+              penalty = "lasso")
+
+print(summary(plmm1, lambda = 0))
+
+A1 <- plmm1$beta_vals[,"0.0000"]
+names(A1) <- NULL
+
+lm1 <- lm(admix$y ~ admix$X, 
+          weights = 1/diag(K_diagonal))
+
+B1 <- lm1$coefficients
+names(B1) <- NULL
+B1 <- ifelse(is.na(B1), 0, B1)
+
+# test 1: implementation 
+tinytest::expect_equal(A1, B1, tolerance = 0.01)
+
+# investigate 
+head(data.frame(A1, B1)) # the signs look right, but the magnitudes are off 
+
+# Test 2: Case where K is diagonal -------------------------------------------
 
 lambda2 <- c(1, 0.1, 0.01, 0.001)
 
@@ -100,6 +126,17 @@ fit4 <- plmm(X = small_X, y = small_y, lambda = lambda4)
 fit4$beta_vals
 
 # QUESTION: should I be comparing fit4$beta_vals with og_betas? 
+
+# Test 5: case where K is simulated to have no population structure ----------
+
+K_independent <- sim_ps_x(n = nrow(admix$X),
+                          p = ncol(admix$X),
+                          # supposing all individuals are independent 
+                          nJ = nrow(admix$X),
+                          structureX = "independent"
+) |> 
+  relatedness_mat()
+
 
 ## Appendix: Code from previous version of the package -----------------------
 # library(tinytest)
