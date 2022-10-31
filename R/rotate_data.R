@@ -13,6 +13,7 @@
 #' std_X <- scale(admix$X)
 #' K <- relatedness_mat(std_X)
 #' rotated_dat <- rotate_data(std_X, admix$y, K)
+#' rotated_dat2 <- rotate_data(std_X, admix$y, K = K, k = 5)
 
 rotate_data <- function(X, y, K = NULL, eta_star, k = NULL){
   # Coersion
@@ -25,8 +26,15 @@ rotate_data <- function(X, y, K = NULL, eta_star, k = NULL){
   }
   
   ## Calculate U, S, eta
+  # case 1: estimate eta if needed
   if (missing(eta_star)){
-      c(S, U, eta) %<-% plmm_null(K = K, y = y) # estimate eta if needed 
+    if("RSpectra" %in% rownames(installed.packages()) & !is.null(k)){
+      c(S, U, eta) %<-% plmm_null(K = K, y = y, k = k) 
+    } else {
+      c(S, U, eta) %<-% plmm_null(K = K, y = y)
+      }
+       
+    # case 2: eta is supplied as an argument 
     } else {
       if("RSpectra" %in% rownames(installed.packages()) & !is.null(k)){
         c(S, U) %<-% Rspectra::svds(K, nv = 0, k = k)[1:2]

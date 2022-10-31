@@ -11,6 +11,10 @@
 #' @examples
 #' res <- plmm_null(y = admix$y, X = admix$X)
 #' (res$eta) # estimate of eta 
+#' 
+#' res2 <- plmm_null(y = admix$y, X = sim_ps_x(n = nrow(admix$X), nJ = 3, p = ncol(admix$X)), k = 3)
+#' (res2$eta)
+
 
 plmm_null <- function(y, X = NULL, K = NULL, k = NULL){
   

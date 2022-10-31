@@ -6,9 +6,10 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
 #' X <- coerce_snpmatrix(cad$genotypes)
-#' 
+#' }
 coerce_snpmatrix <- function(snpmatrix){
   mat <- as.matrix(snpmatrix)
   numeric_mat <- apply(mat, 2, as.numeric)

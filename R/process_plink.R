@@ -6,8 +6,9 @@
 #' @param sexcheck Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck"
 #' @param na.strings For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"
 #' @param impute Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.
+#' @param coerce Logical flag: should the design matrix be coerced into a numeric matrix? Defaults to TRUE. 
 #' @return A three element list object:
-#' * `genotypes` The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns.
+#' * `genotypes` The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns. If coerce=T, this is a numeric matrix. 
 #' * `map` A matrix of SNP data.
 #' * `fam` A matrix of subject data.
 #' @export
@@ -104,12 +105,18 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
   fam <- obj$fam[rownames(genotypes),]
   fam$prefix <- prefix
 
+  # coerce to numeric matrix? 
+  if(coerce){
+    genotypes <- coerce_snpmatrix(genotypes)
+  } 
+  
+  
   # done...
   cat("\nPreprocessing", prefix, "data DONE!\n",
       "\nSubjects:", nrow(genotypes),
       "\nSNPs:", ncol(genotypes),
       "\nMissing values:", missing, "\n")
-
+  
   return(list(genotypes = genotypes,
               map = map,
               fam = fam))
