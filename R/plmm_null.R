@@ -26,7 +26,7 @@ plmm_null <- function(y, X = NULL, K = NULL, k = NULL){
     K <- relatedness_mat(X)
   } 
   
-  # estimate eta 
+  # calculate S and U 
   S <- U <- NULL
   
   if("RSpectra" %in% rownames(installed.packages()) & !is.null(k)){
@@ -39,7 +39,7 @@ plmm_null <- function(y, X = NULL, K = NULL, k = NULL){
   S <- svd_K$d
   U <- svd_K$u
  
-  
+  # estimate eta
   Uy <- crossprod(U, y)
   opt <- stats::optimize(f=logLik, c(0.01, 0.99), Uy=Uy, S=S)
   eta <- opt$minimum

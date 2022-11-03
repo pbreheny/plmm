@@ -25,7 +25,7 @@ dimnames(A0) <- NULL
 B0 <- as.matrix(lasso0$beta[1:9, ]) # NB: glmnet() does not return intercept values
 dimnames(B0) <- NULL
 
-# test 1 - implementation 
+# test 0 - implementation 
 tinytest::expect_equal(A0, B0, tolerance = 0.01)
 
 
@@ -60,7 +60,7 @@ B1 <- ifelse(is.na(B1), 0, B1)
 tinytest::expect_equal(A1, B1, tolerance = 0.01)
 
 # investigate 
-head(data.frame(A1, B1)) # the signs look right, but the magnitudes are off 
+head(data.frame(A1, B1))
 
 # Test 2: Case where K is diagonal -------------------------------------------
 

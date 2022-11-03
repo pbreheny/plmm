@@ -32,9 +32,15 @@ print.summary.plmm <- function(x){
 
   # constant features 
   if(length(x$constant_features) > 0){
-    cat("Constant features (features without variation): ",
-        x$constant_features, "\n")
-  }
+    if(length(x$constant_features) < 10){
+      cat("Constant features (features without variation): ",
+          x$constant_features, "\n")
+    } else {
+      cat("Number of constant features (features without variation): ",
+          length(x$constant_features), "\n")
+    }
+    
+  } 
   
   
   cat("-------------------------------------------------\n")

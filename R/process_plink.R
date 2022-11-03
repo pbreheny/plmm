@@ -19,7 +19,7 @@
 #' 
 #' 
 
-process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", impute = TRUE){
+process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", impute = TRUE, coerce=TRUE){
 
   cat("\nPreprocessing", prefix, "data:\n")
 

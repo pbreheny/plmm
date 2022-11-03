@@ -27,17 +27,31 @@
 #' @export
 #' 
 #' @examples 
-#' fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' s <- summary(fit, idx = 99)
-#' print(s)
+#' # using admix data 
+#' fit_admix1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+#' s1 <- summary(fit_admix1, idx = 99)
+#' print(s1)
+#' 
+#' \dontrun{
+#' fit_admix2 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), k = 3)
+#' s2 <- summary(fit_admix2, idx = 99)
+#' print(s2)
+#' }
+#' 
 #' 
 #' # now use PLINK data files
 #' \dontrun{
 #' cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
-#' cad_clinical <- read.csv((plink_example(path="cad_clinical.csv"))
+#' cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
 #' # for the sake of illustration, I use a simple mean imputation for the outcome 
-#' cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clincal$hdl)
-#' fit_plink <- plmm(X = coerce_snpmatrix(cad$genotypes), y = cad_clinical$hdl_impute, k = 10)
+#' cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
+#' 
+#' # fit with no 'k' specified
+#' fit_plink1 <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute)
+#' summary(fit_plink1, idx = 5)
+#' 
+#' # fit with 'k = 5' specified
+#' fit_plink2 <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
 #' }
 
 

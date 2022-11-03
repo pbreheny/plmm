@@ -35,7 +35,9 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   p <- ncol(X) # including intercept 
 
   # identify which variables (e.g. SNPs) to penalize 
-  penalty.factor <- penalty.factor[-1] # remove intercept from indicator 
+  # penalty.factor <- penalty.factor[-1] # remove intercept from indicator 
+  penalty.factor <- c(0, penalty.factor) # NB: I changed this on Nov. 2
+  # TODO: verify this change in penalty factor adjustment 
   ind <- which(penalty.factor != 0)
   
 
