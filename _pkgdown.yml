@@ -61,6 +61,8 @@ reference:
     - lamNames
     - summary.plmm
     - print.summary.plmm
+    - summary.cv.plmm
+    - print.summary.cv.plmm
     - plot.cv.plmm
     - plot.plmm
     

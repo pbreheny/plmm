@@ -4,7 +4,7 @@
 #' @param X Design matrix for model fitting. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
 #' @param y Continuous outcome vector for model fitting.
 #' @param K Known or estimated similarity matrix.
-#' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
+#' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
 #' @param ... Additional arguments to plmm
 #' @param cluster cv.plmm can be run in parallel across a cluster using the parallel package. The cluster must be set up in advance using the makeCluster function from that package. The cluster must then be passed to cv.plmm.
 #' @param nfolds The number of cross-validation folds. Default is 10.
@@ -19,7 +19,7 @@
 #' 
 
 
-cv.plmm <- function(X, y, K, type = c('response', 'individual'), ...,
+cv.plmm <- function(X, y, K, type = c('response', 'blup'), ...,
                     cluster, nfolds=10, seed, fold,
                     returnY=FALSE, trace=FALSE) {
 
@@ -35,6 +35,7 @@ cv.plmm <- function(X, y, K, type = c('response', 'individual'), ...,
   if (is.matrix(y)) {
     y <- drop(y)
   }
+  # Default type is 'response'
   if(missing(type)) {type == 'response'} 
 
   fit.args <- c(list(X = X, y = y, K = K), list(...))
@@ -46,8 +47,11 @@ cv.plmm <- function(X, y, K, type = c('response', 'individual'), ...,
   cv.args$lambda <- fit$lambda
   cv.args$eta_star <- fit$eta
   
-  if (type == 'individual') cv.args$returnX <- TRUE
-
+  # TODO: Figure out why the following line throws a warning: 
+  if (type == 'blup') {cv.args$returnX <- TRUE}
+  # In if (type == "blup") { ... :
+   #    the condition has length > 1 and only the first element will be used
+  
   n <- length(y)
   E <- Y <- matrix(NA, nrow=n, ncol=length(fit$lambda))
 

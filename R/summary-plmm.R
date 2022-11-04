@@ -31,8 +31,8 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5){
   # TODO: make sure the following line is robust
   if(missing(idx)) idx <- which(abs(object$lambda - lambda) < eps)
   
-  # nvars 
-  nvars <- predict(object, type="nvars", lambda=lambda, which=idx)
+  # nvars (tells number of non-zero coefficients)
+  nvars <- predict(object, type="nvars", lambda=lambda, idx=idx)
   
   # error checking 
   if(length(nvars) > 1) stop("You must specify a single model (i.e., a single value of lambda)", call. = FALSE)
@@ -40,7 +40,7 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5){
   lambda_char <- colnames(object$beta_vals)[idx]
   
   
-  # which variables have non-zero coefficients? 
+  # tells WHICH variables have non-zero coefficients 
   nz <- which(object$beta_vals[,lambda_char] > .Machine$double.eps)
   nonzero <- rownames(object$beta_vals[nz,lambda_char,drop=F])
   # don't drop, because we need the dimnames here ^ 
