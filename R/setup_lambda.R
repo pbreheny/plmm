@@ -48,7 +48,6 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
     fit <- stats::glm(y ~ 1, family='gaussian')
   }
 
-  
   # determine the maximum value for lambda 
   decomp_backsolve <- abs(crossprod(X[,ind], fit$residuals)) / penalty.factor[ind]
   zmax <- max(stats::na.exclude(decomp_backsolve)) /n

@@ -32,16 +32,16 @@ rotate_data <- function(X, y, K = NULL, eta_star, k = NULL){
       c(S, U, eta) %<-% plmm_null(K = K, y = y, k = k) 
     } else {
       c(S, U, eta) %<-% plmm_null(K = K, y = y)
-      }
-       
+    }
+    
     # case 2: eta is supplied as an argument 
+  } else {
+    if("RSpectra" %in% rownames(installed.packages()) & !is.null(k)){
+      c(S, U) %<-% Rspectra::svds(K, nv = 0, k = k)[1:2]
     } else {
-      if("RSpectra" %in% rownames(installed.packages()) & !is.null(k)){
-        c(S, U) %<-% Rspectra::svds(K, nv = 0, k = k)[1:2]
-      } else {
-        c(S, U) %<-% svd(K)[1:2]
-      }
-      
+      c(S, U) %<-% svd(K)[1:2]
+    }
+    
       # NB: nv=0 avoids the calculation of right singular vectors, which we will not use
       eta <- eta_star
     }

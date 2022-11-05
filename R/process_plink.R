@@ -7,6 +7,7 @@
 #' @param na.strings For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"
 #' @param impute Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.
 #' @param coerce Logical flag: should the design matrix be coerced into a numeric matrix? Defaults to TRUE. 
+#' @param quiet Logical flag: should progress messages be printed? Defaults to FALSE. 
 #' @return A three element list object:
 #' * `genotypes` The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns. If coerce=T, this is a numeric matrix. 
 #' * `map` A matrix of SNP data.
@@ -19,9 +20,11 @@
 #' 
 #' 
 
-process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", impute = TRUE, coerce=TRUE){
+process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", impute = TRUE, coerce=TRUE, quiet=FALSE){
 
-  cat("\nPreprocessing", prefix, "data:\n")
+  if(!quiet){
+    cat("\nPreprocessing", prefix, "data:\n")
+  }
 
   obj <- snpStats::read.plink(file.path(dataDir, prefix), na.strings = na.strings)
 
@@ -31,8 +34,11 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
                                !(snpStats::col.summary(obj$genotypes)$P.BB %in% c(NA, 1)) &
                                obj$map$chromosome %in% 1:22]
 
-  cat("\nRemoving ", dim(obj$geno)[2] - dim(genotypes)[2], "SNPs that are monomorphic or outside of chromosomes 1-22.\n")
-
+  if(!quiet){
+    cat("\nRemoving ", dim(obj$geno)[2] - dim(genotypes)[2], "SNPs that are monomorphic or outside of chromosomes 1-22.\n")
+    
+  }
+  
   # if sexcheck = TRUE, remove subjects with sex discrepancies
   if (sexcheck == TRUE) {
     sexdat <- data.table::fread(file.path(dataDir, paste0(prefix, ".sexcheck")))
@@ -40,35 +46,49 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
     if (length(iid_sex_discrep) > 0){
       genotypes <- genotypes[-match(iid_sex_discrep, rownames(genotypes)), ]
     }
-    cat("\nRemoving", ifelse(length(iid_sex_discrep) > 0, length(iid_sex_discrep), 0), "subjects with sex discrepancies.\n")
-
+    if(!quiet){
+      cat("\nRemoving", ifelse(length(iid_sex_discrep) > 0, length(iid_sex_discrep), 0), "subjects with sex discrepancies.\n")
+    }
+    
   }
 
   if (impute) {
 
     # Now how many SNPs have missing data?
     missing <- table(snpStats::col.summary(genotypes)$Call.rate == 1)
-    cat("\nThere are", ifelse(length(missing) == 2, missing[1], 0), "SNPs with missing data that we will attempt to impute.\n")
-
+    if(!quiet){
+      cat("\nThere are", ifelse(length(missing) == 2, missing[1], 0), "SNPs with missing data that we will attempt to impute.\n")
+      
+      }
+    
     # Impute missing values
     rules <- snpStats::snp.imputation(genotypes, minA=0)
     out <- snpStats::impute.snps(rules, genotypes, as.numeric=FALSE)
 
     # How many SNPs have missing data after imputation?
     missing <- table(snpStats::col.summary(out)$Call.rate == 1)
-    cat("\nThere are", ifelse(length(missing) == 2, missing[1], 0), "SNPs with missing data after imputation.\n")
-
+    if(!quiet){
+      cat("\nThere are", ifelse(length(missing) == 2, missing[1], 0), "SNPs with missing data after imputation.\n")
+      
+    }
+    
     # How many SNPs cannot be imputed and still have >= 50% missing values?
     missing <- table(snpStats::col.summary(out)$Call.rate <= 0.5)
-    cat("\nOf these SNPs,", ifelse(length(missing) == 2, missing[2], 0), "have call rates <= 50% and will be removed.\n")
-
+    if(!quiet){
+      cat("\nOf these SNPs,", ifelse(length(missing) == 2, missing[2], 0), "have call rates <= 50% and will be removed.\n")
+      
+    }
+    
     # Throw out SNPs that have >= 50% missingness, even after imputation
     out2 <- out[, snpStats::col.summary(out)$Call.rate > 0.5]
 
     # How many SNPs will be imputed with mean values?
     missing <- table(snpStats::col.summary(out2)$Call.rate == 1)
-    cat("\nThere are", ifelse(length(missing) == 2, missing[1], 0), "SNPs that still have missing data which will be imputed with the HWE expected value.\n")
-
+    if(!quiet){
+      cat("\nThere are", ifelse(length(missing) == 2, missing[1], 0), "SNPs that still have missing data which will be imputed with the HWE expected value.\n")
+      
+    }
+    
     # keep snp order for later
     order_snps <- colnames(out2)
 
@@ -112,10 +132,13 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
   
   
   # done...
-  cat("\nPreprocessing", prefix, "data DONE!\n",
-      "\nSubjects:", nrow(genotypes),
-      "\nSNPs:", ncol(genotypes),
-      "\nMissing values:", missing, "\n")
+  if(!quiet){
+    cat("\nPreprocessing", prefix, "data DONE!\n",
+        "\nSubjects:", nrow(genotypes),
+        "\nSNPs:", ncol(genotypes),
+        "\nMissing values:", missing, "\n")
+  }
+  
   
   return(list(genotypes = genotypes,
               map = map,

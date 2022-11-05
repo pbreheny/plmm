@@ -21,7 +21,7 @@
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
 #' 
-#' @return A list including the estimated coeficients on the original scale, as well as other model fitting details 
+#' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
 #' 
 #' @importFrom zeallot %<-%
 #' @export
@@ -49,9 +49,11 @@
 #' # fit with no 'k' specified
 #' fit_plink1 <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute)
 #' summary(fit_plink1, idx = 5)
+#' # Runs in 219 seconds (3.65 mins)
 #' 
-#' # fit with 'k = 5' specified
+#' # fit with 'k = 5' specified (so using RSpectra::svds())
 #' fit_plink2 <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
+#' # Runs in 44 seconds 
 #' }
 
 
@@ -143,16 +145,16 @@ plmm <- function(X,
 ## rotate data
   if (!missing(eta_star)){
     if(is.null(k)){
-      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star)
+      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star = eta_star, k = k)
     } else {
-      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star, k)
+      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star = eta_star, k = k)
     }
     
   } else {
     if(is.null(k)){
       c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K)
     } else {
-      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, k)
+      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, k = k)
     }
     
   }
@@ -166,6 +168,7 @@ attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
 
 ## calculate population var without mean 0; will need this for call to ncvfit()
 xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
+
 
 ## set up lambda
 if (missing(lambda)) {
