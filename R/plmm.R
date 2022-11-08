@@ -49,11 +49,11 @@
 #' # fit with no 'k' specified
 #' fit_plink1 <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute)
 #' summary(fit_plink1, idx = 5)
-#' # Runs in 219 seconds (3.65 mins)
+#' # Runs in 219 seconds (3.65 mins) on my 2015 MacBook Pro
 #' 
 #' # fit with 'k = 5' specified (so using RSpectra::svds())
 #' fit_plink2 <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
-#' # Runs in 44 seconds 
+#' # Runs in 44 seconds on my 2015 MacBook Pro
 #' }
 
 
@@ -122,7 +122,8 @@ plmm <- function(X,
     if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
     if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
   }
-
+  
+  
 ## standardize X
   # NB: the following line will eliminate singular columns (eg monomorphic SNPs)
   #  from the design matrix. 

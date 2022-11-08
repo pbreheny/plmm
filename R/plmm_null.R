@@ -29,7 +29,14 @@ plmm_null <- function(y, X = NULL, K = NULL, k = NULL){
   # calculate S and U 
   S <- U <- NULL
   
-  if("RSpectra" %in% rownames(installed.packages()) & !is.null(k)){
+  # check to see if RSpectra is installed 
+  RSpectra <- ifelse(system.file(package = "RSpectra") == "",
+                     FALSE, 
+                     TRUE)
+  
+  
+  
+  if(RSpectra & !is.null(k)){
     svd_K <- RSpectra::svds(K, nv = 0, k = k)
     # NB: nv=0 avoids the calculation of right singular vectors, which we will not use
   } else {

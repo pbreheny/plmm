@@ -1,0 +1,136 @@
+---
+title: "Getting started with penalizedLMM"
+author: "Tabitha Peter"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with penalizedLMM}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+library(penalizedLMM)
+set.seed(25)
+knitr::opts_knit$set(aliases=c(h = 'fig.height', w = 'fig.width'))
+knitr::opts_chunk$set(comment="#", collapse=TRUE, cache=FALSE, tidy=FALSE)
+knitr::knit_hooks$set(small.mar = function(before, options, envir) {
+  if (before) par(mar = c(4, 4, .1, .1))
+})
+
+
+# FIXME: take out the following line after the next update
+devtools::load_all()
+```
+
+
+**NOTE**: This vignette is under development -- not all of the examples here are fully worked through. In fact, as of this writing, most of them are not working yet. My work here is an example of [working with the garage door open](https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu).
+
+
+## Introduction 
+
+`penalizedLMM` is an `R` package created for the purpose of fitting penalized regression models to high dimensional data, particularly that in which the observations are not independent. This kind of data arises often in the context of genetics (*e.g.* GWAS dealing with population structure), and this will be the motivation for the examples presented here.
+
+At this time, the package is designed for linear regression only -- that is, we are considering only continuous (numeric) outcomes. In the future, I would like to extend this package to handle logistic regression (to handle dichotomous outcomes). 
+
+Since we are focused on penalized regression in this package, `penalizedLMM` offers 3 choices of penalty: the minimax concave (MCP), the smoothly clipped absolute deviation (SCAD), and the least absolute shrinkage and selection operator (LASSO).  Much of the work in this package is built on the concepts/techniques provided in the `ncvreg` package, whose author is [my thesis advisor](https://myweb.uiowa.edu/pbreheny/). 
+
+`penalizedLMM` currently includes two example data sets: 
+
+  * `admix` is a small data set (197 observations, 100 SNPs) that describes individuals of different racial backgrounds. The outcome of `admix` is simulated to include population structure effects (*i.e.* race/ethnicity have an impact on the SNP associations). 
+  
+  * `cad` (acronym for **c**oronary **a**rtery **d**isease) is a medium sized data set (1401 observations, 42117 SNPs) with several health outcomes as well as age and sex information. This data set is a subset of a much larger data set (the original data has over 800K SNPs). For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
+
+In this overview, I will provide a demo of the main functions in `penalizedLMM` using both of these data sets. 
+
+
+## Basic model fitting 
+
+The `admix` data is already formatted to have an $X$ and $y$, so I can jump right in with a call to `plmm`:
+
+```{r admix_fit}
+admix_fit <- plmm(X = admix$X, y = admix$y)
+summary(admix_fit, lambda = admix_fit$lambda[95])
+```
+
+The `cad` data is in the bed/bim/fam format, so I need to do some preprocessing first: 
+
+```{r cad_process}
+cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+
+cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
+
+# for the sake of illustration, I use a simple mean imputation for the outcome 
+
+cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
+```
+
+Now that we have the data processed, we can fit a model. In order to make this model run in a reasonable amount of time on my laptop (which is a 2015 MacBook Pro), I am going to include an additional argument $k$. If $k$ is specified and the package `RSpectra` is installed, the singular value decomposition algorithm is `RSpectra::svds(k, ...)` -- this will be more efficient.   
+
+```{r cad_fit}
+cad_fit <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
+
+summary(cad_fit, lambda = cad_fit$lambda[25])
+```
+
+
+## Cross validation 
+
+
+```{r admix_cv}
+admix_cv <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+
+# FIXME: something is wrong with the summary function 
+# admix_cv_s <- summary.cv.plmm(admix_cv, lambda = '1se')
+```
+
+
+```{r cad_cv}
+
+```
+
+
+
+## Plots 
+
+```{r admix_plots}
+plot(admix_fit)
+```
+
+
+## Predicted values 
+
+```{r admix_pred}
+# simulate new data 
+admix_newX <- sim_ps_x(n = nrow(admix$X), nJ = 4, p = ncol(admix$X),
+  structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
+
+# make predictions for a select number of lambda values
+admix_pred1 <- predict(object = admix_fit, newX = admix_newX, type = "response", idx=98)
+
+# make prediction using blup 
+admix_pred2 <- predict(object = admix_fit, newX = admix_newX, type = "blup", idx=98)
+
+# compare y predictions 
+admix_compare_y <- data.frame(y = admix$y, yhat_response = admix_pred1, yhat_blup = admix_pred2)
+
+```
+
+
+```{r cad_pred, eval=FALSE}
+# make predictions when X is big
+cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
+# for the sake of illustration, I use a simple mean imputation for the outcome 
+cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
+fit_cad <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
+cad_X <- cad$genotypes
+cad_y <- cad_clinical$hdl_impute
+cad_newX <- sim_ps_x(n = nrow(cad_X), nJ = 4, p = ncol(cad_X),
+  structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
+cad_pred <- predict(object = fit_cad, newX = cad_newX, type='blup', idx = 95,
+                    X = cad_X, y = cad_y, k = 5)
+head(data.frame(cad_y, cad_pred))
+
+```
+

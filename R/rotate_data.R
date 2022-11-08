@@ -18,6 +18,12 @@
 rotate_data <- function(X, y, K = NULL, eta_star, k = NULL){
   # Coersion
   S <- U <- UU <- eta <- NULL
+  
+  # check to see if RSpectra is installed 
+  RSpectra <- ifelse(system.file(package = "RSpectra") == "",
+                     FALSE, 
+                     TRUE)
+  
 
   # Calculate RRM
   if(is.null(K)){
@@ -28,7 +34,7 @@ rotate_data <- function(X, y, K = NULL, eta_star, k = NULL){
   ## Calculate U, S, eta
   # case 1: estimate eta if needed
   if (missing(eta_star)){
-    if("RSpectra" %in% rownames(installed.packages()) & !is.null(k)){
+    if(RSpectra & !is.null(k)){
       c(S, U, eta) %<-% plmm_null(K = K, y = y, k = k) 
     } else {
       c(S, U, eta) %<-% plmm_null(K = K, y = y)
@@ -36,7 +42,7 @@ rotate_data <- function(X, y, K = NULL, eta_star, k = NULL){
     
     # case 2: eta is supplied as an argument 
   } else {
-    if("RSpectra" %in% rownames(installed.packages()) & !is.null(k)){
+    if(RSpectra & !is.null(k)){
       c(S, U) %<-% Rspectra::svds(K, nv = 0, k = k)[1:2]
     } else {
       c(S, U) %<-% svd(K)[1:2]
