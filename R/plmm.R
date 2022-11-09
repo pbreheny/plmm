@@ -20,7 +20,7 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
-#' 
+#' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
 #' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
 #' 
 #' @importFrom zeallot %<-%
@@ -76,7 +76,8 @@ plmm <- function(X,
                  warn = TRUE,
                  penalty.factor = rep(1, ncol(X)),
                  init = rep(0, ncol(X)),
-                 returnX = TRUE) {
+                 returnX = TRUE,
+                 trace = FALSE) {
 
   ## coersion
   U <- S <- SUX <- SUy <- eta <- NULL
@@ -123,6 +124,7 @@ plmm <- function(X,
     if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
   }
   
+  if(trace){cat("Passed all checks. Beginning standardization + rotation.\n")}
   
 ## standardize X
   # NB: the following line will eliminate singular columns (eg monomorphic SNPs)
@@ -170,6 +172,7 @@ attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
 ## calculate population var without mean 0; will need this for call to ncvfit()
 xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
 
+if(trace){cat("Standardization + rotation complete. Beginning model fitting.\n")}
 
 ## set up lambda
 if (missing(lambda)) {
@@ -211,6 +214,7 @@ loss <- numeric(nlambda)
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
     loss[ll] <- res$loss
     resid <- res$resid
+    if(trace){cat("Fitting model with lambda #", ll, sep="","\n")}
   }
 
 ## eliminate saturated lambda values, if any
@@ -224,6 +228,8 @@ loss <- numeric(nlambda)
 
 # reverse the transformations of the beta values 
 beta_vals <- untransform(b, ns, X, std_X, SUX, std_SUX)
+
+if(trace){cat("Beta values are estimated -- almost done!\n")}
 
 # give the matrix of beta_values readable names 
 # SNPs (or covariates) on the rows, lambda values on the columns

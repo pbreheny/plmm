@@ -23,7 +23,8 @@ plmm(
   warn = TRUE,
   penalty.factor = rep(1, ncol(X)),
   init = rep(0, ncol(X)),
-  returnX = TRUE
+  returnX = TRUE,
+  trace = FALSE
 )
 }
 \arguments{
@@ -33,7 +34,7 @@ plmm(
 
 \item{K}{Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).}
 
-\item{k}{\emph{Not available yet; argument in development}: An integer between 1 and \code{nrow(K)} indicating the number of singular values requested \emph{if} package \code{RSpectra} is installed. Defaults to NULL.}
+\item{k}{An integer between 1 and \code{nrow(K)} indicating the number of singular values requested \emph{if} package \code{RSpectra} is installed. Defaults to NULL.}
 
 \item{eta_star}{Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.}
 
@@ -64,22 +65,42 @@ plmm(
 \item{init}{Initial values for coefficients. Default is 0 for all columns of X.}
 
 \item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
+
+\item{trace}{If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.}
 }
 \value{
-A list including the estimated coeficients on the original scale, as well as other model fitting details
+A list including the estimated coefficients on the original scale, as well as other model fitting details
 }
 \description{
 This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
 }
 \examples{
-fit <- plmm(X = admix$X[,1:10], y = admix$y, K = relatedness_mat(admix$X))
-summary(fit, idx = 99)
+# using admix data 
+fit_admix1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+s1 <- summary(fit_admix1, idx = 99)
+print(s1)
+
+\dontrun{
+fit_admix2 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), k = 3)
+s2 <- summary(fit_admix2, idx = 99)
+print(s2)
+}
 
 
 # now use PLINK data files
+\dontrun{
 cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
-cad_clinical <- read.csv((plink_example(path="cad_clinical.csv"))
+cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
 # for the sake of illustration, I use a simple mean imputation for the outcome 
-cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clincal$hdl)
-fit_plink <- plmm(X = coerce_snpmatrix(cad$genotypes), y = cad_clinical$hdl_impute)
+cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
+
+# fit with no 'k' specified
+fit_plink1 <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute)
+summary(fit_plink1, idx = 5)
+# Runs in 219 seconds (3.65 mins) on my 2015 MacBook Pro
+
+# fit with 'k = 5' specified (so using RSpectra::svds())
+fit_plink2 <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
+# Runs in 44 seconds on my 2015 MacBook Pro
+}
 }

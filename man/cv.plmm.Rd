@@ -8,7 +8,7 @@ cv.plmm(
   X,
   y,
   K,
-  type = c("response", "individual"),
+  type = c("response", "blup"),
   ...,
   cluster,
   nfolds = 10,
@@ -25,7 +25,7 @@ cv.plmm(
 
 \item{K}{Known or estimated similarity matrix.}
 
-\item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.}
+\item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.}
 
 \item{...}{Additional arguments to plmm}
 

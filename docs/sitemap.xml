@@ -4,6 +4,12 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/articles/getting_started.html</loc>
+  </url>
+  <url>
+    <loc>/articles/index.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
@@ -109,6 +115,9 @@
     <loc>/reference/preprocess.html</loc>
   </url>
   <url>
+    <loc>/reference/print.summary.cv.plmm.html</loc>
+  </url>
+  <url>
     <loc>/reference/print.summary.plmm.html</loc>
   </url>
   <url>
@@ -134,6 +143,9 @@
   </url>
   <url>
     <loc>/reference/sim_ps_x.html</loc>
+  </url>
+  <url>
+    <loc>/reference/summary.cv.plmm.html</loc>
   </url>
   <url>
     <loc>/reference/summary.plmm.html</loc>

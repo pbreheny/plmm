@@ -39,7 +39,9 @@ Since we are focused on penalized regression in this package, `penalizedLMM` off
 
   * `admix` is a small data set (197 observations, 100 SNPs) that describes individuals of different racial backgrounds. The outcome of `admix` is simulated to include population structure effects (*i.e.* race/ethnicity have an impact on the SNP associations). 
   
-  * `cad` (acronym for **c**oronary **a**rtery **d**isease) is a medium sized data set (1401 observations, 42117 SNPs) with several health outcomes as well as age and sex information. This data set is a subset of a much larger data set (the original data has over 800K SNPs). For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
+  * `cad_lite` (acronym for **c**oronary **a**rtery **d**isease) is a lower mid-sized data set (1401 observations, 4217 SNPs) with several health outcomes as well as age and sex information. This data set is a subset of a much larger data set (the original data has over 800K SNPs). For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
+  
+  * `cad` (acronym for **c**oronary **a**rtery **d**isease) is an upper mid-sized data set (1401 observations, 42117 SNPs) with several health outcomes as well as age and sex information. This data set is a larger subset the same data used as the reference for `cad_lite`.
 
 In this overview, I will provide a demo of the main functions in `penalizedLMM` using both of these data sets. 
 
@@ -53,40 +55,85 @@ admix_fit <- plmm(X = admix$X, y = admix$y)
 summary(admix_fit, lambda = admix_fit$lambda[95])
 ```
 
-The `cad` data is in the bed/bim/fam format, so I need to do some preprocessing first: 
+The `cad_lite` data is in the bed/bim/fam format, so I need to do some preprocessing first: 
 
-```{r cad_process}
-cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+```{r cad_lite_process}
+cad_lite <- process_plink(prefix = "cad",
+                          dataDir = plink_example(path="cad.fam", parent=T))
+# NB: there is a 'quiet' option in process_plink() that will silence the printed messages
 
 cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
 
 # for the sake of illustration, I use a simple mean imputation for the outcome 
-
-cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
+cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl),
+                                       mean(cad_clinical$hdl, na.rm = T),
+                                       cad_clinical$hdl)
 ```
 
-Now that we have the data processed, we can fit a model. In order to make this model run in a reasonable amount of time on my laptop (which is a 2015 MacBook Pro), I am going to include an additional argument $k$. If $k$ is specified and the package `RSpectra` is installed, the singular value decomposition algorithm is `RSpectra::svds(k, ...)` -- this will be more efficient.   
+Now that we have the data processed, we can fit a model. 
 
-```{r cad_fit}
-cad_fit <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
-
-summary(cad_fit, lambda = cad_fit$lambda[25])
+```{r cad_lite_fit}
+cad_lite_fit <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute,
+                     trace = TRUE)
+names(cad_lite_fit)
 ```
 
+Notice that the returned `plmm` object does not include an $X$ matrix; as noted by the warning, this matrix is not returned due to its large size. 
+
+The returned `beta_vals` item is a matrix whose rows are $\beta$ coefficients and whose columns represent values of the penalization parameter $\lambda$. By default, `plmm` fits 100 values of $\lambda$ (see the `setup_lambda` function for details). 
+
+We can summarize this fit at the 25th $\lambda$ value:  
+
+```{r summary1}
+summary(cad_lite_fit, lambda = cad_lite_fit$lambda[25])
+```
+
+Notice that a large number of these SNPs are constant features -- that is, SNPs whose values do not vary among the members of this population. For such features, a value of $\beta=0$ is returned for all values of $\lambda$. 
+
+In order to make this model run in a more reasonable amount of time on my laptop (which is a 2015 MacBook Pro), I am going to re-run this model with an additional argument $k$. If $k$ is specified and the package `RSpectra` is installed, the singular value decomposition algorithm is `RSpectra::svds(k, ...)` -- this will be more efficient.  
+
+```{r cad_lite_fit2}
+cad_lite_fit2 <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute, k = 5)
+names(cad_lite_fit2)
+```
+
+Notice that `cad_lite_fit2` object *does* include a $X$ matrix -- the use of $k$ has reduced the returned matrix to a size < 100 Mb. Let's summarize this new fit: 
+
+
+```{r summary2}
+summary(cad_lite_fit2, lambda = cad_lite_fit2$lambda[25])
+```
+
+TODO: examine why there is only one nonzero $\beta$ value returned in the second summary call. 
 
 ## Cross validation 
 
+To select a $\lambda$ value, we often use cross validation. Below is an example of using `cv.plmm` to select a $\lambda$ that minimizes cross-validation error: 
 
-```{r admix_cv}
+```{r admix_cv, warning=FALSE}
+# FIXME: fix the warning issue 
 admix_cv <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
 
-# FIXME: something is wrong with the summary function 
-# admix_cv_s <- summary.cv.plmm(admix_cv, lambda = '1se')
+
+admix_cv_s <- summary.cv.plmm(admix_cv, lambda = '1se')
+print.summary.cv.plmm(admix_cv_s)
 ```
 
 
-```{r cad_cv}
 
+TODO: figure out this error: 'Warning in if (type == "blup") { :
+  the condition has length > 1 and only the first element will be used'
+
+To see how this would work for our `cad_lite` data, we can use the lines below: 
+
+```{r cad_cv, eval=FALSE}
+# FIXME: this is taking several minutes -- need to come back here 
+cad_lite_cv <- cv.plmm(X = cad_lite$genotypes, 
+                       y = cad_clinical$hdl_impute,
+                       K = relatedness_mat(cad_lite$genotypes),
+                       trace = TRUE)
+
+print.summary.cv.plmm(summary.cv.plmm(cad_lite_cv, lambda = "1se"))
 ```
 
 
@@ -114,23 +161,30 @@ admix_pred2 <- predict(object = admix_fit, newX = admix_newX, type = "blup", idx
 # compare y predictions 
 admix_compare_y <- data.frame(y = admix$y, yhat_response = admix_pred1, yhat_blup = admix_pred2)
 
+(admix_compare_y)
+
+# FIXME: why are my predictions so off? Something is wrong in predict.plmm()....
 ```
 
 
 ```{r cad_pred, eval=FALSE}
-# make predictions when X is big
-cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
-cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
-# for the sake of illustration, I use a simple mean imputation for the outcome 
-cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
-fit_cad <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
-cad_X <- cad$genotypes
+# make predictions when X is bigger
+cad_X <- cad_lite$genotypes
 cad_y <- cad_clinical$hdl_impute
-cad_newX <- sim_ps_x(n = nrow(cad_X), nJ = 4, p = ncol(cad_X),
+
+cad_lite_newX <- sim_ps_x(n = nrow(cad_X), nJ = 4, p = ncol(cad_X),
   structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
-cad_pred <- predict(object = fit_cad, newX = cad_newX, type='blup', idx = 95,
-                    X = cad_X, y = cad_y, k = 5)
-head(data.frame(cad_y, cad_pred))
+
+cad_lite_pred <- predict(object = cad_lite_fit,
+                         newX = cad_lite_newX,
+                         type='blup',
+                         idx = 95,
+                         # for BLUP prediction method, must supply X and y
+                         X = cad_X,
+                         y = cad_y)
+
+# compare the observed and predicted values 
+head(data.frame(cad_y, cad_lite_pred))
 
 ```
 

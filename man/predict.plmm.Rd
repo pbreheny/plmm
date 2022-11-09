@@ -74,16 +74,17 @@ newX <- sim_ps_x(n = nrow(admix$X), nJ = 4, p = ncol(admix$X),
  
 # make predictions when X is big
 cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
-cad_clinical <- read.csv((plink_example(path="cad_clinical.csv"))
+cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
 # for the sake of illustration, I use a simple mean imputation for the outcome 
-cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clincal$hdl)
-fit_cad <- plmm(X = coerce_snpmatrix(cad$genotypes), y = cad_clinical$hdl_impute)
-cad_X <- coerce_snpmatrix(cad$genotypes)
+cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
+fit_cad <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
+cad_X <- cad$genotypes
 cad_y <- cad_clinical$hdl_impute
 newX_cad <- sim_ps_x(n = nrow(cad_X), nJ = 4, p = ncol(cad_X),
  structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
 pred_cad <- predict(object = fit_cad, newX = newX_cad, type='blup', idx = 95, X = cad_X, y = cad_y)
- head(data.frame(cad_y, pred_cad))
+head(data.frame(cad_y, pred_cad))
+
  
- # TODO: debug the 'blup' calculation 
+
 }

@@ -4,7 +4,6 @@
 #' @param digits The number of digits to use in formatting output 
 #' @param ... 
 #'
-#' @return
 #' @export
 #'
 #' @examples

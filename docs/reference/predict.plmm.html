@@ -21,6 +21,12 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/getting_started.html">Getting started with penalizedLMM</a>
+  </div>
+</li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
@@ -108,7 +114,62 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># fit a model </span></span>
+<span class="r-in"><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># simulate new data </span></span>
+<span class="r-in"><span class="va">newX</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim_ps_x.html">sim_ps_x</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>, nJ <span class="op">=</span> <span class="fl">4</span>, p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>,</span>
+<span class="r-in"> structureX <span class="op">=</span> <span class="st">"independent"</span>, inbr <span class="op">=</span> <span class="st">"heterogeneous"</span>, standardizeX <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="co"># make predictions for all lambda values </span></span>
+<span class="r-in"> <span class="va">pred1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="co"># make predictions for a select number of lambda values </span></span>
+<span class="r-in"> <span class="va">pred2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"response"</span>, idx<span class="op">=</span><span class="fl">98</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="co"># make prediction using blup </span></span>
+<span class="r-in"> <span class="va">pred3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"blup"</span>, idx<span class="op">=</span><span class="fl">98</span><span class="op">)</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The BLUP option is under development. Rely on these estimates at your own risk.</span>
+<span class="r-in"></span>
+<span class="r-in"> <span class="co"># compare y predictions </span></span>
+<span class="r-in">  <span class="va">compare_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, yhat_response <span class="op">=</span> <span class="va">pred2</span>, yhat_blup <span class="op">=</span> <span class="va">pred3</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span class="r-in"> <span class="va">fit_noX</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>,</span>
+<span class="r-in">  returnX <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="va">pred4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit_noX</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"blup"</span>, idx<span class="op">=</span><span class="fl">98</span><span class="op">)</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> <span class="op">}</span></span>
+<span class="r-in"> </span>
+<span class="r-in"> </span>
+<span class="r-in"><span class="co"># make predictions when X is big</span></span>
+<span class="r-in"><span class="va">cad</span> <span class="op">&lt;-</span> <span class="fu"><a href="process_plink.html">process_plink</a></span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"cad"</span>, dataDir <span class="op">=</span> <span class="fu"><a href="plink_example.html">plink_example</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">"cad.fam"</span>, parent<span class="op">=</span><span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Preprocessing cad data:</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in base::system.file("inst/extdata", package = "penalizedLMM", mustWork = T):</span> no file found</span>
+<span class="r-in"><span class="va">cad_clinical</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="plink_example.html">plink_example</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">"cad_clinical.csv"</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in base::system.file("inst/extdata", path, package = "penalizedLMM",     mustWork = TRUE):</span> no file found</span>
+<span class="r-in"><span class="co"># for the sake of illustration, I use a simple mean imputation for the outcome </span></span>
+<span class="r-in"><span class="va">cad_clinical</span><span class="op">$</span><span class="va">hdl_impute</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">cad_clinical</span><span class="op">$</span><span class="va">hdl</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">cad_clinical</span><span class="op">$</span><span class="va">hdl</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>, <span class="va">cad_clinical</span><span class="op">$</span><span class="va">hdl</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T),     cad_clinical$hdl):</span> object 'cad_clinical' not found</span>
+<span class="r-in"><span class="va">fit_cad</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">cad</span><span class="op">$</span><span class="va">genotypes</span>, y <span class="op">=</span> <span class="va">cad_clinical</span><span class="op">$</span><span class="va">hdl_impute</span>, k <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in relatedness_mat(X):</span> object 'cad' not found</span>
+<span class="r-in"><span class="va">cad_X</span> <span class="op">&lt;-</span> <span class="va">cad</span><span class="op">$</span><span class="va">genotypes</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'cad' not found</span>
+<span class="r-in"><span class="va">cad_y</span> <span class="op">&lt;-</span> <span class="va">cad_clinical</span><span class="op">$</span><span class="va">hdl_impute</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'cad_clinical' not found</span>
+<span class="r-in"><span class="va">newX_cad</span> <span class="op">&lt;-</span> <span class="fu"><a href="sim_ps_x.html">sim_ps_x</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">cad_X</span><span class="op">)</span>, nJ <span class="op">=</span> <span class="fl">4</span>, p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">cad_X</span><span class="op">)</span>,</span>
+<span class="r-in"> structureX <span class="op">=</span> <span class="st">"independent"</span>, inbr <span class="op">=</span> <span class="st">"heterogeneous"</span>, standardizeX <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in nrow(cad_X):</span> object 'cad_X' not found</span>
+<span class="r-in"><span class="va">pred_cad</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit_cad</span>, newX <span class="op">=</span> <span class="va">newX_cad</span>, type<span class="op">=</span><span class="st">'blup'</span>, idx <span class="op">=</span> <span class="fl">95</span>, X <span class="op">=</span> <span class="va">cad_X</span>, y <span class="op">=</span> <span class="va">cad_y</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in predict(object = fit_cad, newX = newX_cad, type = "blup", idx = 95,     X = cad_X, y = cad_y):</span> object 'fit_cad' not found</span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">cad_y</span>, <span class="va">pred_cad</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in data.frame(cad_y, pred_cad):</span> object 'cad_y' not found</span>
+<span class="r-in"></span>
+<span class="r-in"> </span>
+<span class="r-in"></span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

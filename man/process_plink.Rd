@@ -9,7 +9,9 @@ process_plink(
   dataDir,
   sexcheck = FALSE,
   na.strings = "-9",
-  impute = TRUE
+  impute = TRUE,
+  coerce = TRUE,
+  quiet = FALSE
 )
 }
 \arguments{
@@ -22,11 +24,15 @@ process_plink(
 \item{na.strings}{For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"}
 
 \item{impute}{Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.}
+
+\item{coerce}{Logical flag: should the design matrix be coerced into a numeric matrix? Defaults to TRUE.}
+
+\item{quiet}{Logical flag: should progress messages be printed? Defaults to FALSE.}
 }
 \value{
 A three element list object:
 \itemize{
-\item \code{genotypes} The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns.
+\item \code{genotypes} The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns. If coerce=T, this is a numeric matrix.
 \item \code{map} A matrix of SNP data.
 \item \code{fam} A matrix of subject data.
 }
