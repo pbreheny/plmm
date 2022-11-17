@@ -27,9 +27,10 @@ cvf <- function(i, X, y, K, fold, type, cv.args, ...) {
   beta <- coef.plmm(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
   Xbeta <- predict.plmm(fit.i, newX = X2, type = 'response', lambda = fit.i$lambda)
   yhat <- matrix(drop(Xbeta), length(y2))
-
-  if (type == 'individual'){
-    yhat <- predict.plmm(fit.i, newX = X2, type = 'individual', lambda = fit.i$lambda,
+  
+  # browser()
+  if (type == 'blup'){
+    yhat <- predict.plmm(fit.i, newX = X2, type = 'blup', lambda = fit.i$lambda,
                          X = cv.args$X, y = cv.args$y, U = fit.i$U, S = fit.i$S,
                          eta = fit.i$eta, 
                          covariance = K[fold == i, fold != i, drop = FALSE])

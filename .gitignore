@@ -9,6 +9,7 @@ cad_raw.R
 inst/extdata/og_cad.bed 
 inst/extdata/og_cad.bim
 inst/extdata/og_cad.fam
-inst/extdata/cad.log 
+inst/extdata/cad_mid.log 
 inst/extdata/cad_lite.log 
 Rprof.*
+R/scratch.R

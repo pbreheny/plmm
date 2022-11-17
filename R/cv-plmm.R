@@ -16,10 +16,11 @@
 #' 
 #' @examples 
 #' cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' 
+#' cv_s <- summary.cv.plmm(cv_fit, lambda = "1se")
+#' print(cv_s)
 
 
-cv.plmm <- function(X, y, K, type = c('response', 'blup'), ...,
+cv.plmm <- function(X, y, K, type = 'response', ...,
                     cluster, nfolds=10, seed, fold,
                     returnY=FALSE, trace=FALSE) {
 
@@ -47,10 +48,7 @@ cv.plmm <- function(X, y, K, type = c('response', 'blup'), ...,
   cv.args$lambda <- fit$lambda
   cv.args$eta_star <- fit$eta
   
-  # TODO: Figure out why the following line throws a warning: 
   if (type == 'blup') {cv.args$returnX <- TRUE}
-  # In if (type == "blup") { ... :
-   #    the condition has length > 1 and only the first element will be used
   
   n <- length(y)
   E <- Y <- matrix(NA, nrow=n, ncol=length(fit$lambda))
@@ -71,12 +69,16 @@ cv.plmm <- function(X, y, K, type = c('response', 'blup'), ...,
     fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=X, y=y, K=K, fold=fold, type=type, cv.args=cv.args)
   }
 
+  if (trace) cat("\nStarting cross validation\n")  
+  # set up progress bar -- this can take a while
+  if(trace){pb <- txtProgressBar(min = 0, max = nfolds, style = 3)}
   for (i in 1:nfolds) {
     if (!missing(cluster)) {
       res <- fold.results[[i]]
+      if (trace) {setTxtProgressBar(pb, i)}
     } else {
-      if (trace) cat("Starting CV fold #", i, sep="","\n")
-      res <- cvf(i, X, y, K, fold, type, cv.args)
+      res <- cvf(i = i, X = X, y = y, K = K, fold = fold, type = type, cv.args = cv.args)
+      if (trace) {setTxtProgressBar(pb, i)}
     }
     # browser()
     E[fold==i, 1:res$nl] <- res$loss

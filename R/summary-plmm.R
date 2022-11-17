@@ -46,8 +46,10 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5){
   # don't drop, because we need the dimnames here ^ 
   
   # if there were any monomorphic SNPs, say so: 
-  constant_features <- rownames(object$beta_vals)[rowSums(object$beta_vals) == 0]
-  
+  if("X" %in% names(object)){
+    snp_vars <- apply(object$X, 2, FUN = var)
+    constant_features <- names(which(snp_vars == 0 ))
+  } 
   
   out <- structure(list(
     penalty=object$penalty,

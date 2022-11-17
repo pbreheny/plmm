@@ -19,7 +19,7 @@
 #' cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
 #' s <- summary.cv.plmm(cv_fit)
 #' print.summary.cv.plmm(s)
-summary.cv.plmm <- function(obj, lambda = 'min'){
+summary.cv.plmm <- function(obj, lambda = "min"){
   
   # determine the number of nonzero coefficients at specified lambda value
   

@@ -44,12 +44,12 @@
 #'  
 #'  
 #' # make predictions when X is big
-#' cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+#' cad_mid <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam", parent=T))
 #' cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
 #' # for the sake of illustration, I use a simple mean imputation for the outcome 
 #' cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
-#' fit_cad <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
-#' cad_X <- cad$genotypes
+#' fit_cad <- plmm(X = cad_mid$genotypes, y = cad_clinical$hdl_impute, k = 5)
+#' cad_X <- cad_mid$genotypes
 #' cad_y <- cad_clinical$hdl_impute
 #' newX_cad <- sim_ps_x(n = nrow(cad_X), nJ = 4, p = ncol(cad_X),
 #'  structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
@@ -88,7 +88,7 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
       # NB: can't just use the rotated y and x here - need to scale by inverse of K, not sqrt(K)
       
       # print(eta) 
-      # TODO: need to ceate the Xbeta object 
+      # TODO: need to create the Xbeta object 
       blup <- Xbeta + ranef
     } 
     

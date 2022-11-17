@@ -12,6 +12,7 @@
 #' (coef.plmm(fit)[1:10, 1:5])
 
 coef.plmm <- function(object, lambda, which = 1:length(object$lambda), drop = TRUE, ...){
+  # error check for supplied lambda value 
   if (!missing(lambda)) {
     if (max(lambda) > max(object$lambda) | min(lambda) <
         min(object$lambda)) {
@@ -26,6 +27,7 @@ coef.plmm <- function(object, lambda, which = 1:length(object$lambda), drop = TR
     colnames(beta_vals) <- lamNames(lambda)
   }
   else beta_vals <- object$beta_vals[, which, drop = FALSE]
+  
   if (drop){
     return(drop(beta_vals))
   } else{

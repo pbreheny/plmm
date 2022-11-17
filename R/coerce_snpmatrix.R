@@ -6,13 +6,11 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
-#' X <- coerce_snpmatrix(cad$genotypes)
-#' }
+#' cad <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam", parent=T), coerce=F)
+#' X <- coerce_snpmatrix(cad_lite$genotypes)
+
 coerce_snpmatrix <- function(snpmatrix){
-  mat <- as.matrix(snpmatrix)
-  numeric_mat <- apply(mat, 2, as.numeric)
+  mat <- as(snpmatrix, 'numeric')
   
   # if NAs, throw warning 
   if(sum(is.na(numeric_mat)) > 0) warning("Watch out: there are missing values in the returned matrix.")

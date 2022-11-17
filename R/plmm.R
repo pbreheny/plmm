@@ -41,19 +41,20 @@
 #' 
 #' # now use PLINK data files
 #' \dontrun{
-#' cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+#' 
+#' cad_mid <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam", parent=T))
 #' cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
 #' # for the sake of illustration, I use a simple mean imputation for the outcome 
 #' cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
 #' 
 #' # fit with no 'k' specified
-#' fit_plink1 <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute)
+#' fit_plink1 <- plmm(X = cad_mid$genotypes, y = cad_clinical$hdl_impute, trace = TRUE)
 #' summary(fit_plink1, idx = 5)
-#' # Runs in 219 seconds (3.65 mins) on my 2015 MacBook Pro
+#' # Runs in ~219 seconds (3.65 mins) on my 2015 MacBook Pro
 #' 
 #' # fit with 'k = 5' specified (so using RSpectra::svds())
-#' fit_plink2 <- plmm(X = cad$genotypes, y = cad_clinical$hdl_impute, k = 5)
-#' # Runs in 44 seconds on my 2015 MacBook Pro
+#' fit_plink2 <- plmm(X = cad_mid$genotypes, y = cad_clinical$hdl_impute, k = 5, trace = TRUE)
+#' # Runs in ~44 seconds on my 2015 MacBook Pro
 #' }
 
 
@@ -83,8 +84,7 @@ plmm <- function(X,
   U <- S <- SUX <- SUy <- eta <- NULL
   penalty <- match.arg(penalty)
   
-  ## set defaults 
-  if(missing(K)){K <- relatedness_mat(X)}  
+  ## set default gamma
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
   ## check types 
@@ -114,6 +114,13 @@ plmm <- function(X,
   if (length(init)!=ncol(X)) stop("Dimensions of init and X do not match", call.=FALSE)
   if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
   if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
+  
+  # set up K if not user-specified
+  if(missing(K) & trace==TRUE){message("Matrix K was not supplied. Calculating K as the realized relatedness matrix.")}
+  if(missing(K)){K <- relatedness_mat(X)}  
+  if(missing(K) & trace==TRUE){message("Calculation of K is complete.")}
+  
+  # working with user-specified K
   if (!missing(K)){
     if (!inherits(K, "matrix")) {
       tmp <- try(K <- stats::model.matrix(~0+., data=K), silent=TRUE)
@@ -205,7 +212,9 @@ converged <- logical(nlambda)
 loss <- numeric(nlambda)
 
 ## main attraction 
-  # think about putting this loop in C
+# set up progress bar -- this can take a while
+if(trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
+  # TODO: think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
     res <- ncvreg::ncvfit(std_SUX, SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
@@ -214,7 +223,7 @@ loss <- numeric(nlambda)
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
     loss[ll] <- res$loss
     resid <- res$resid
-    if(trace){cat("Fitting model with lambda #", ll, sep="","\n")}
+    if(trace){setTxtProgressBar(pb, ll)}
   }
 
 ## eliminate saturated lambda values, if any
@@ -229,7 +238,7 @@ loss <- numeric(nlambda)
 # reverse the transformations of the beta values 
 beta_vals <- untransform(b, ns, X, std_X, SUX, std_SUX)
 
-if(trace){cat("Beta values are estimated -- almost done!\n")}
+if(trace){cat("\nBeta values are estimated -- almost done!\n")}
 
 # give the matrix of beta_values readable names 
 # SNPs (or covariates) on the rows, lambda values on the columns
