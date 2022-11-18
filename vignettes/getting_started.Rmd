@@ -61,8 +61,9 @@ The `cad_lite` data is in the bed/bim/fam format, so I need to do some preproces
 
 ```{r cad_lite_process}
 cad_lite <- process_plink(prefix = "cad_lite",
-                          dataDir = plink_example(path="cad_lite.fam", parent=T))
-# NB: there is a 'quiet' option in process_plink() that will silence the printed messages
+                          dataDir = plink_example(path="cad_lite.fam",
+                                                  parent=T))
+# NB: the 'quiet' option in process_plink()  will silence the printed messages
 
 cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
 
@@ -87,7 +88,7 @@ We can summarize this fit at the 25th $\lambda$ value:
 summary(cad_lite_fit, lambda = cad_lite_fit$lambda[25])
 ```
 
-Notice that a large number of these SNPs are constant features -- that is, SNPs whose values do not vary among the members of this population. For such features, a value of $\beta=0$ is returned for all values of $\lambda$. 
+Notice that a notable number of these SNPs are constant features -- that is, SNPs whose values do not vary among the members of this population. For such features, a value of $\beta=0$ is returned for all values of $\lambda$. 
 
 In order to make this model run faster on my laptop (which is a 2015 MacBook Pro), I am going to re-run this model with an additional argument $k$. If $k$ is specified and the package `RSpectra` is installed, the singular value decomposition algorithm is `RSpectra::svds(k, ...)` -- this will be more efficient.  
 
@@ -103,7 +104,7 @@ summary(cad_lite_fit2, lambda = cad_lite_fit2$lambda[25])
 #TODO: examine why there is only one nonzero beta value returned here  
 ```
 
-Notice that the two $\lambda$ values at which we examined `cad_lite_fit` and `cad_lite_fit2` were not the same; those values were ```r cad_lite_fit$lambda[25]``` and ```r cad_lite_fit2$lambda[25]``` respectively. 
+Notice that the two $\lambda$ values at which we examined `cad_lite_fit` and `cad_lite_fit2` were not the same; those values were `r cad_lite_fit$lambda[25]` and `r cad_lite_fit2$lambda[25]` respectively. 
 
 
 
@@ -149,7 +150,7 @@ admix_pred2 <- predict(object = admix_fit, newX = admix$X, type = "blup", idx=98
 # compare y predictions 
 admix_compare_y <- data.frame(y = admix$y, yhat_response = admix_pred1, yhat_blup = admix_pred2)
 colnames(admix_compare_y) <- c("Y", "Y hat response", "Y hat BLUP")
-(head(admix_compare_y))
+print(head(admix_compare_y))
 ```
 
 
@@ -166,6 +167,6 @@ cad_lite_pred <- predict(object = cad_lite_fit,
 # compare the observed and predicted values 
 compare_cad_lite_y <- data.frame(cad_clinical$hdl_impute, cad_lite_pred)
 colnames(compare_cad_lite_y) <- c("Y", "Y hat BLUP")
-(head(compare_cad_lite_y))
+print(head(compare_cad_lite_y))
 ```
 

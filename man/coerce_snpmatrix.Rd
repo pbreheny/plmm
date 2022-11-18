@@ -16,8 +16,6 @@ A matrix of numeric values
 Coerce SnpMatrix: a function to convert a SnpMatrix object into a matrix of numeric values
 }
 \examples{
-\dontrun{
-cad <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
-X <- coerce_snpmatrix(cad$genotypes)
-}
+cad <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam", parent=T), coerce=F)
+X <- coerce_snpmatrix(cad_lite$genotypes)
 }

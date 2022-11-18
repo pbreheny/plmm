@@ -12,4 +12,6 @@ inst/extdata/og_cad.fam
 inst/extdata/cad_mid.log 
 inst/extdata/cad_lite.log 
 Rprof.*
-R/scratch.R
+scratch.R
+*.rds
+*.bk

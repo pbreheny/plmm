@@ -54,7 +54,6 @@
   sexcheck <span class="op">=</span> <span class="cn">FALSE</span>,
   na.strings <span class="op">=</span> <span class="st">"-9"</span>,
   impute <span class="op">=</span> <span class="cn">TRUE</span>,
-  coerce <span class="op">=</span> <span class="cn">TRUE</span>,
   quiet <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -81,10 +80,6 @@
 <dd><p>Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.</p></dd>
 
 
-<dt>coerce</dt>
-<dd><p>Logical flag: should the design matrix be coerced into a numeric matrix? Defaults to TRUE.</p></dd>
-
-
 <dt>quiet</dt>
 <dd><p>Logical flag: should progress messages be printed? Defaults to FALSE.</p></dd>
 
@@ -100,11 +95,13 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu">process_plink</span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"cad"</span>, dataDir <span class="op">=</span> <span class="fu"><a href="plink_example.html">plink_example</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">"cad.fam"</span>, parent<span class="op">=</span><span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu">process_plink</span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"cad_lite"</span>, dataDir <span class="op">=</span> <span class="fu"><a href="plink_example.html">plink_example</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">"cad_lite.fam"</span>, parent<span class="op">=</span><span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Preprocessing cad data:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Preprocessing cad_lite data:</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in base::system.file("inst/extdata", package = "penalizedLMM", mustWork = T):</span> no file found</span>
-<span class="r-in"></span>
+<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span class="r-in"><span class="va">test2</span> <span class="op">&lt;-</span> <span class="fu">process_plink</span><span class="op">(</span>prefix <span class="op">=</span> <span class="st">"cad"</span>, dataDir <span class="op">=</span> <span class="fu"><a href="plink_example.html">plink_example</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">"cad.fam"</span>, parent<span class="op">=</span><span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 <span class="r-in"></span>
 </code></pre></div>

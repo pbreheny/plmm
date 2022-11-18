@@ -6,3 +6,6 @@
 ^\.version\.json$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^.*\.bk
+^.*\.rds
+^scratch.R$

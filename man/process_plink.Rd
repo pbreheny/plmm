@@ -10,7 +10,6 @@ process_plink(
   sexcheck = FALSE,
   na.strings = "-9",
   impute = TRUE,
-  coerce = TRUE,
   quiet = FALSE
 )
 }
@@ -24,8 +23,6 @@ process_plink(
 \item{na.strings}{For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"}
 
 \item{impute}{Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.}
-
-\item{coerce}{Logical flag: should the design matrix be coerced into a numeric matrix? Defaults to TRUE.}
 
 \item{quiet}{Logical flag: should progress messages be printed? Defaults to FALSE.}
 }
@@ -41,8 +38,10 @@ A three element list object:
 This function allows you to preprocess PLINK bed/bim/fam files for use with \code{penalizedLMM} functions. Unreliable SNPs are removed and missing values are imptued using either \code{snpStats}, or if not tagged, the HWE mean value.
 }
 \examples{
-test <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
-
+test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam", parent=T))
+\dontrun{
+test2 <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+}
 
 
 }

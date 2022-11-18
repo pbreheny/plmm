@@ -8,7 +8,7 @@ cv.plmm(
   X,
   y,
   K,
-  type = c("response", "blup"),
+  type = "response",
   ...,
   cluster,
   nfolds = 10,
@@ -46,5 +46,6 @@ Performs k-fold cross validation for lasso-, MCP-, or SCAD-penalized penalized l
 }
 \examples{
 cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-
+cv_s <- summary.cv.plmm(cv_fit, lambda = "1se")
+print(cv_s)
 }
