@@ -39,32 +39,33 @@ K_diagonal <- diag(x = (rnorm(n = nrow(admix$X))^2),
 plmm1 <- plmm(X = admix$X,
               y = admix$y,
               K = K_diagonal,
-              # even though I am interested in lambda == 0, the arg here must be
-              # a sequence 
+              # FIXME: Need to fix plmm so that lambda can be a single value
               lambda = c(0.001, 0),
               penalty = "lasso")
 
+v1 <- diag(K_diagonal)*plmm1$eta + 1 
 print(summary(plmm1, lambda = 0))
 
 A1 <- plmm1$beta_vals[,"0.0000"]
 names(A1) <- NULL
 
 lm1 <- lm(admix$y ~ admix$X, 
-          weights = 1/diag(K_diagonal))
+          weights = 1/v1)
 
 B1 <- lm1$coefficients
+
 names(B1) <- NULL
 B1 <- ifelse(is.na(B1), 0, B1)
 
 # test 1: implementation 
 tinytest::expect_equal(A1, B1, tolerance = 0.01)
 
-# investigate 
-head(data.frame(A1, B1))
+# check  
+# head(data.frame(A1, B1))
 
-# Test 2: Case where K is diagonal -------------------------------------------
+# Test 2: Case where K is diagonal and lambda != 0 -----------------------------
 
-lambda2 <- c(1, 0.1, 0.01, 0.001)
+lambda2 <- c(1, 0.1, 0.01)
 
 plmm2 <- plmm(X = admix$X,
               y = admix$y,
@@ -72,12 +73,14 @@ plmm2 <- plmm(X = admix$X,
               lambda = lambda2,
               penalty = "lasso")
 
+v2 <- diag(K_diagonal)*plmm2$eta + 1 
+
 lasso2 <- glmnet(x = admix$X,
                  y = admix$y,
                  family = "gaussian",
                  lambda = lambda2,
                  # weights are by INVERSE variance 
-                 weights = 1/diag(K_diagonal))
+                 weights = 1/v2)
 
 
 A2 <- as.matrix(plmm2$beta_vals[2:10, ]) 
@@ -86,16 +89,16 @@ B2 <- as.matrix(lasso2$beta[1:9, ]) # NB: glmnet() does not return intercept val
 dimnames(B2) <- NULL
 
 # test 2 - implementation 
-tinytest::expect_equal(A2, B2, tolerance = 0.01)
+tinytest::expect_equal(A2, B2, tolerance = 0.1)
 
 # Test 3: show that monomorphic SNPs are given beta values of 0s -------------
 monomorphic <- apply(admix$X[,1:15], 2, var) == 0
 monomorphic_snps <- colnames(admix$X[,1:15])[monomorphic]
 # SNPs 8 and 14 are monomorphic 
-fit3 <- plmm(admix$X[,1:15], admix$y)
+fit3 <- plmm(X = admix$X[,1:15], y = admix$y)
 
 # test 3: implementation 
-tinytest::expect_equivalent(summary.plmm(fit3, quiet = T)$monomorphic_snps,
+tinytest::expect_equivalent(summary.plmm(fit3, idx = 1)$constant_features,
                             monomorphic_snps)
 
 

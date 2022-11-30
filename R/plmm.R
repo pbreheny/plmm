@@ -191,13 +191,13 @@ if (missing(lambda)) {
                            penalty.factor = penalty.factor)
     user.lambda <- FALSE
   } else {
+    # make sure (if user-supplied sequence) is in DESCENDING order
+    if(length(lambda) > 1){
+      if (max(diff(lambda)) > 0) stop("User-supplied lambda sequence must be in descending (largest -> smallest) order")
+    }
     nlambda <- length(lambda)
     user.lambda <- TRUE
   }
-
-# make sure lambda sequence (if user-supplied) is in DESCENDING order
-if (max(diff(lambda)) > 0) stop("User-supplied lambda sequence must be in descending (largest -> smallest) order")
-
   
 # make sure to *not* penalize the intercept term 
 penalty.factor <- c(0, penalty.factor)
