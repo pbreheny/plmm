@@ -50,6 +50,7 @@ reference:
     - coerce_snpmatrix
     - plink_example 
     - process_plink
+    - process_plink_2
     - relatedness_mat
     - rotate_data
     - scale_varp

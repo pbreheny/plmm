@@ -40,7 +40,7 @@ This function allows you to preprocess PLINK bed/bim/fam files for use with \cod
 \examples{
 test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam", parent=T))
 \dontrun{
-test2 <- process_plink(prefix = "cad", dataDir = plink_example(path="cad.fam", parent=T))
+test2 <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam", parent=T))
 }
 
 
