@@ -12,6 +12,7 @@
 #' 
 #' \dontrun{
 #' cad_mid <- process_plink_2(data_dir = plink_example(path = "cad_mid.bed", parent = T), prefix = "cad_mid", rds = T, impute = "simple", method = "mean0")
+#' cad_lite <- process_plink_2(data_dir = plink_example(path = "cad_lite.bed", parent = T), prefix = "cad_lite", rds = F, impute = "xgboost")
 #' }
 process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", quiet = FALSE, ...){
   
@@ -84,34 +85,39 @@ process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", qu
   
   # impute missing values
   if(impute == "simple"){
-    obj$imputed_X <- bigsnpr::snp_fastImputeSimple(Gna = X,
+    # NB: this will overwite obj$genotypes
+    obj$genotypes <- bigsnpr::snp_fastImputeSimple(Gna = X,
                                                    ncores = bigstatsr::nb_cores(),
                                                    ...) # dots can pass method
     
-  } else if (impute == "xgboost"){
-    # FIXME: this is still not working; when I kill it, I get this warning: 
-    # "NA or NaN values in the resulting correlation matrix."
-    obj$imputed_X <- bigsnpr::snp_fastImpute(Gna = X,
-                                             ncores = bigstatsr::nb_cores(),
-                                             infos.chr = chr,
-                                             seed = as.numeric(Sys.Date()),
-                                             ...) # dots can pass method
+    # now, to make the save the imputed values
+    obj <- bigsnpr::snp_save(obj)
+
     
+  } else if (impute == "xgboost"){
+    browser()
+    imp <- bigsnpr::snp_fastImpute(Gna = X,
+                                   ncores = bigstatsr::nb_cores(),
+                                   infos.chr = chr,
+                                   seed = as.numeric(Sys.Date()),
+                                   ...) # dots can pass method
+    
+    # save imputed values (NB: will overwrite obj$genotypes)
+    obj$genotypes$code256 <- bigsnpr::CODE_IMPUTE_PRED
+    obj <- bigsnpr::snp_save(obj)
+  
     
   } else stop("Argument impute must be either simple or xgboost.")
   
-  # now, to make the save the imputed values
-  obj$imputed_X$code256 <- bigsnpr::CODE_IMPUTE_PRED
-  obj <- bigsnpr::snp_save(obj)
+  
+  
+  
+  if(!quiet){cat("\nDone!\n")}
   
   # return data in a tractable format 
   # NB: this assumes that X will fit into memory!! 
   # TODO: add nuance here 
-  imputed_X <- obj$imputed_X[,]
-  
-  if(!quiet){cat("\nDone!\n")}
-  
-  return(list(X = imputed_X,
+  return(list(X = obj$genotypes[,],
               constants_idx = which(constants_idx == "TRUE")))
   
   
