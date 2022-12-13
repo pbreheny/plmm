@@ -2,7 +2,7 @@
 #'
 #' Internal function for cv.plmm which calls plmm on a fold subset of the original data.
 #' @param i Fold number to be excluded from fit.
-#' @param X Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
+#' @param XX Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
 #' @param K Known or estimated similarity matrix.
 #' @param y Original continuous outcome vector.
 #' @param fold n-length vector of fold-assignments.
@@ -15,13 +15,13 @@
 
 
 
-cvf <- function(i, X, y, K, fold, type, cv.args, ...) {
-  cv.args$X <- X[fold!=i, , drop=FALSE]
+cvf <- function(i, XX, y, K, fold, type, cv.args, ...) {
+  cv.args$X <- XX[fold!=i, , drop=FALSE]
   cv.args$y <- y[fold!=i]
   cv.args$K <- K[fold!=i, fold!=i, drop=FALSE]
   fit.i <- do.call("plmm", cv.args)
 
-  X2 <- X[fold==i, , drop=FALSE]
+  X2 <- XX[fold==i, , drop=FALSE]
   y2 <- y[fold==i]
 
   beta <- coef.plmm(fit.i, fit.i$lambda, drop=FALSE) # includes intercept

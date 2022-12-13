@@ -77,7 +77,7 @@ cv.plmm <- function(X, y, K, type = 'response', ...,
       res <- fold.results[[i]]
       if (trace) {setTxtProgressBar(pb, i)}
     } else {
-      res <- cvf(i = i, X = X, y = y, K = K, fold = fold, type = type, cv.args = cv.args)
+      res <- cvf(i = i, XX = X, y = y, K = K, fold = fold, type = type, cv.args = cv.args)
       if (trace) {setTxtProgressBar(pb, i)}
     }
     # browser()
