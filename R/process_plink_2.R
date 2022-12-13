@@ -90,12 +90,11 @@ process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", qu
                                                    ncores = bigstatsr::nb_cores(),
                                                    ...) # dots can pass method
     
-    # now, to make the save the imputed values
+    # now, save the imputed values
     obj <- bigsnpr::snp_save(obj)
 
     
   } else if (impute == "xgboost"){
-    browser()
     imp <- bigsnpr::snp_fastImpute(Gna = X,
                                    ncores = bigstatsr::nb_cores(),
                                    infos.chr = chr,
