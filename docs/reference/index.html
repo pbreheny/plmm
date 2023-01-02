@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,11 +92,6 @@
           <code><a href="plmm_mcp.html">plmm_mcp()</a></code> 
         </dt>
         <dd>Fit a penalizedLMM with MCP regularization using penalizedLMM</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm_null.html">plmm_null()</a></code> 
-        </dt>
-        <dd>Estimate eta using a null Gaussian penalizedLMM model</dd>
       </dl><dl><dt>
           
           <code><a href="plmm_scad.html">plmm_scad()</a></code> 
@@ -182,6 +177,12 @@
         <dd>Calculate index for which objective function ceases to be locally convex</dd>
       </dl><dl><dt>
           
+          <code><a href="estimate_eta.html">estimate_eta()</a></code> 
+        </dt>
+        <dd>Estimate eta (to be used in rotating the data)
+This function is called internally by <code><a href="../reference/plmm.html">plmm()</a></code></dd>
+      </dl><dl><dt>
+          
           <code><a href="lasso.html">lasso()</a></code> 
         </dt>
         <dd>Fit a linear model with lasso regularization</dd>
@@ -241,11 +242,6 @@
           <code><a href="relatedness_mat.html">relatedness_mat()</a></code> 
         </dt>
         <dd>Calculate a relatedness matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="rotate_data.html">rotate_data()</a></code> 
-        </dt>
-        <dd>Compute transformed X and y for subsequent plmm rescaling and fitting</dd>
       </dl><dl><dt>
           
           <code><a href="scale_varp.html">scale_varp()</a></code> 

@@ -19,7 +19,6 @@ reference:
     - plmm
     - plmm_lasso
     - plmm_mcp
-    - plmm_null
     - plmm_scad
     
   - title: Loss, information, and cross-validation for PLMMs
@@ -39,6 +38,7 @@ reference:
   - title: Other model fitting methods (and some helper functions)
     contents: 
     - convexMin
+    - estimate_eta
     - lasso
     - lasso_pca10
     - lmm_ggmix
@@ -52,7 +52,6 @@ reference:
     - process_plink
     - process_plink_2
     - relatedness_mat
-    - rotate_data
     - scale_varp
     - untransform
     - varp

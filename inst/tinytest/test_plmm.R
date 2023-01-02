@@ -1,7 +1,5 @@
 # Tabitha Peter 
-# Fall 2022
-# NOTE: These tests are in the process of being rewritten in order to be 
-#   consistent with the updates I have made to the package. 
+# January 2023
 
 # Test 0: Case where K = identity -------------------------------------------
 
@@ -103,7 +101,7 @@ tinytest::expect_equivalent(summary.plmm(fit3, idx = 1)$constant_features,
 
 
 # Test 4: examine the 'untransform' function ---------------------------------
-
+# NB: this test is still in the 'scratch-work' phase! 
 # setup lambda
 lambda4 <- 0.1
 nlambda <- 1
