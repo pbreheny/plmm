@@ -50,7 +50,7 @@ rotate_data <- function(X, y, K = NULL, eta_star, k = NULL){
     
       # NB: nv=0 avoids the calculation of right singular vectors, which we will not use
       eta <- eta_star
-    }
+  }
   # Construct W 
   W <- diag((eta * S + (1 - eta))^(-1/2))
   

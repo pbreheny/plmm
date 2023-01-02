@@ -169,6 +169,7 @@ plmm <- function(X,
     
   }
 
+
 ## re-standardize rotated SUX
 std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
 std_SUX_noInt <- std_SUX_temp$scaled_X
