@@ -79,7 +79,7 @@ plmm <- function(X,
                  init = rep(0, ncol(X)),
                  returnX = TRUE,
                  trace = FALSE) {
-
+  
   ## coersion
   U <- S <- SUX <- SUy <- eta <- NULL
   penalty <- match.arg(penalty)
@@ -115,11 +115,6 @@ plmm <- function(X,
   if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
   if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
   
-  # set up K if not user-specified
-  if(missing(K) & trace==TRUE){message("Matrix K was not supplied. Calculating K as the realized relatedness matrix.")}
-  if(missing(K)){K <- relatedness_mat(X)}  
-  if(missing(K) & trace==TRUE){message("Calculation of K is complete.")}
-  
   # working with user-specified K
   if (!missing(K)){
     if (!inherits(K, "matrix")) {
@@ -133,57 +128,59 @@ plmm <- function(X,
   
   if(trace){cat("Passed all checks. Beginning standardization + rotation.\n")}
   
-## standardize X
+  # standardize X
   # NB: the following line will eliminate singular columns (eg monomorphic SNPs)
   #  from the design matrix. 
-  std_X <- ncvreg::std(X)
-  
+  std_X <- ncvreg::std(X) 
   
   # identify nonsingular values in the standardized X matrix  
   ns <- attr(std_X, "nonsingular")
   
   # remove initial values for coefficients representing columns with singular values
   init <- init[ns] 
-
-## keep only those penalty factors which penalize non-singular values 
+  
+  # keep only those penalty factors which penalize non-singular values 
   penalty.factor <- penalty.factor[ns]
-
-## designate the dimensions of the design matrix 
-  p <- ncol(std_X) 
-  n <- nrow(std_X)
-
-## rotate data
-  if (!missing(eta_star)){
-    if(is.null(k)){
-      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star = eta_star, k = k)
-    } else {
-      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, eta_star = eta_star, k = k)
-    }
+  
+  # designate the dimensions of the design matrix 
+  p <- ncol(X) 
+  n <- nrow(X)
+  
+  # calculate SVD
+  ## case 1: K is not specified
+  if (missing(K)){
+    c(D, U) %<-% svd(std_X, nv = 0) # don't need V
+    # TODO: add RSpectra option here (or, use bigsnpr SVD method)
+    S <- (D^2)/p # singular values of K, the realized relationship matrix
     
   } else {
-    if(is.null(k)){
-      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K)
-    } else {
-      c(SUX, SUy, eta, U, S) %<-% rotate_data(std_X, y, K, k = k)
-    }
-    
+    ## case 2: K is user-specified 
+    S <- U <- NULL
+    c(S, U) %<-% svd(K, nv = 0) # again, don't need V 
   }
-
-
-## re-standardize rotated SUX
-std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
-std_SUX_noInt <- std_SUX_temp$scaled_X
-
-std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
-attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
-
-## calculate population var without mean 0; will need this for call to ncvfit()
-xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
-
-if(trace){cat("Standardization + rotation complete. Beginning model fitting.\n")}
-
-## set up lambda
-if (missing(lambda)) {
+  
+  # estimate eta
+  eta <- estimate_eta(S = S, U = U, y = y)
+  
+  # rotate data
+  W <- diag((eta * S + (1 - eta))^(-1/2))
+  SUX <- W %*% crossprod(U, cbind(1, std_X)) # add column of 1s for intercept
+  SUy <- drop(W %*% crossprod(U, y))
+  
+  # re-standardize rotated SUX
+  std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
+  std_SUX_noInt <- std_SUX_temp$scaled_X
+  
+  std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
+  attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
+  
+  # calculate population var without mean 0; will need this for call to ncvfit()
+  xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
+  
+  if(trace){cat("Standardization + rotation complete. Beginning model fitting.\n")}
+  
+  # set up lambda
+  if (missing(lambda)) {
     lambda <- setup_lambda(X = std_SUX,
                            y = SUy,
                            alpha = alpha,
@@ -200,22 +197,22 @@ if (missing(lambda)) {
     user.lambda <- TRUE
   }
   
-# make sure to *not* penalize the intercept term 
-penalty.factor <- c(0, penalty.factor)
+  # make sure to *not* penalize the intercept term 
+  penalty.factor <- c(0, penalty.factor)
   
-
-## placeholders for results
-init <- c(0, init) # add initial value for intercept
-resid <- drop(SUy - std_SUX %*% init)
-b <- matrix(NA, nrow=ncol(std_SUX), ncol=nlambda) 
-iter <- integer(nlambda)
-converged <- logical(nlambda)
-loss <- numeric(nlambda)
-
-## main attraction 
-# set up progress bar -- this can take a while
-if(trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
-  # TODO: think about putting this loop in C
+  
+  # placeholders for results
+  init <- c(0, init) # add initial value for intercept
+  resid <- drop(SUy - std_SUX %*% init)
+  b <- matrix(NA, nrow=ncol(std_SUX), ncol=nlambda) 
+  iter <- integer(nlambda)
+  converged <- logical(nlambda)
+  loss <- numeric(nlambda)
+  
+  # main attraction 
+  ## set up progress bar -- this can take a while
+  if(trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
+  ## TODO: think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
     res <- ncvreg::ncvfit(std_SUX, SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
@@ -226,8 +223,8 @@ if(trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
     resid <- res$resid
     if(trace){setTxtProgressBar(pb, ll)}
   }
-
-## eliminate saturated lambda values, if any
+  
+  # eliminate saturated lambda values, if any
   ind <- !is.na(iter)
   iter <- iter[ind]
   converged <- converged[ind]
@@ -235,20 +232,20 @@ if(trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
   loss <- loss[ind]
   if (warn & sum(iter) == max.iter) warning("Maximum number of iterations reached")
   convex.min <- if (convex) convexMin(b, std_SUX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', penalty.factor) else NULL
-
-# reverse the transformations of the beta values 
-beta_vals <- untransform(b, ns, X, std_X, SUX, std_SUX)
-
-if(trace){cat("\nBeta values are estimated -- almost done!\n")}
-
-# give the matrix of beta_values readable names 
-# SNPs (or covariates) on the rows, lambda values on the columns
-varnames <- if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)
-varnames <- c("(Intercept)", varnames)
-dimnames(beta_vals) <- list(varnames, lamNames(lambda))
-
-## output
-val <- structure(list(beta_vals = beta_vals,
+  
+  # reverse the transformations of the beta values 
+  beta_vals <- untransform(b, ns, X, std_X, SUX, std_SUX)
+  
+  if(trace){cat("\nBeta values are estimated -- almost done!\n")}
+  
+  # give the matrix of beta_values readable names 
+  # SNPs (or covariates) on the rows, lambda values on the columns
+  varnames <- if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)
+  varnames <- c("(Intercept)", varnames)
+  dimnames(beta_vals) <- list(varnames, lamNames(lambda))
+  
+  ## output
+  val <- structure(list(beta_vals = beta_vals,
                         eta = eta,
                         lambda = lambda,
                         penalty = penalty,
@@ -261,7 +258,7 @@ val <- structure(list(beta_vals = beta_vals,
                         ns_idx = c(1, 1 + ns), # PAY ATTENTION HERE! 
                         iter = iter,
                         converged = converged),
-                        class = "plmm")
+                   class = "plmm")
   if (missing(returnX)) {
     if (utils::object.size(SUX) > 1e8) {
       warning("Due to the large size of SUX (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).")
