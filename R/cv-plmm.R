@@ -4,8 +4,10 @@
 #' @param X Design matrix for model fitting. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
 #' @param y Continuous outcome vector for model fitting.
 #' @param K Known or estimated similarity matrix.
+#' @param eta_star Optional arg. to \code{plmm_prep}. Defaults to NULL.
+#' @param penalty.factor Optional arg. to \code{plmm_prep}. Defaults to 1 for all predictors (except the intercept). 
 #' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
-#' @param ... Additional arguments to plmm
+#' @param ... Additional arguments to \code{plmm_fit}
 #' @param cluster cv.plmm can be run in parallel across a cluster using the parallel package. The cluster must be set up in advance using the makeCluster function from that package. The cluster must then be passed to cv.plmm.
 #' @param nfolds The number of cross-validation folds. Default is 10.
 #' @param fold Which fold each observation belongs to. By default the observations are randomly assigned.
@@ -20,29 +22,39 @@
 #' print(cv_s)
 
 
-cv.plmm <- function(X, y, K, type = 'response', ...,
-                    cluster, nfolds=10, seed, fold,
-                    returnY=FALSE, trace=FALSE) {
+cv.plmm <- function(X,
+                    y,
+                    K,
+                    eta_star = NULL,
+                    penalty.factor = rep(1, ncol(X)),
+                    type = 'response',
+                    ...,
+                    cluster,
+                    nfolds=10,
+                    seed,
+                    fold,
+                    returnY=FALSE,
+                    trace=FALSE) {
 
-  # Coersion
-  if (missing(K)) stop('Similarity matrix must be provided.')
-  if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
-  if (!inherits(X, "matrix")) {
-    tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
-    if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
-  }
-  if (typeof(X)=="integer") storage.mode(X) <- "double"
-  if (typeof(X)=="character") stop("X must be a numeric matrix", call.=FALSE)
-  if (is.matrix(y)) {
-    y <- drop(y)
-  }
   # Default type is 'response'
   if(missing(type)) {type == 'response'} 
 
-  fit.args <- c(list(X = X, y = y, K = K), list(...))
-  fit <- do.call('plmm', fit.args)
-
-  cv.args <- list(...)
+  prep.args <- c(list(X = X,
+                     y = y,
+                     K = K,
+                     eta_star = eta_star,
+                     penalty.factor = penalty.factor))
+  
+  # implement preparation steps for model fitting 
+  prep <- do.call('plmm_prep', prep.args)
+  
+  
+  # implement full model fit 
+  fit.args <- c(list(X = X, y = y, prep = prep), list(...))
+  fit <- do.call('plmm_fit', fit.args)
+  
+  # set up arguments for cv 
+  cv.args <- fit.args
   cv.args$warn <- FALSE
   cv.args$convex <- FALSE
   cv.args$lambda <- fit$lambda
@@ -50,8 +62,8 @@ cv.plmm <- function(X, y, K, type = 'response', ...,
   
   if (type == 'blup') {cv.args$returnX <- TRUE}
   
-  n <- length(y)
-  E <- Y <- matrix(NA, nrow=n, ncol=length(fit$lambda))
+  n <- length(fit$y)
+  E <- Y <- matrix(NA, nrow=nrow(X), ncol=length(fit$lambda))
 
   if (!missing(seed)) set.seed(seed)
   sde <- sqrt(.Machine$double.eps)
@@ -66,7 +78,7 @@ cv.plmm <- function(X, y, K, type = 'response', ...,
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
     parallel::clusterExport(cluster, c("X", "y", "K", "fold", "type", "cv.args"), envir=environment())
     parallel::clusterCall(cluster, function() library(penalizedLMM))
-    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=X, y=y, K=K, fold=fold, type=type, cv.args=cv.args)
+    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=X, y=y, fold=fold, type=type, cv.args=cv.args)
   }
 
   if (trace) cat("\nStarting cross validation\n")  
@@ -77,7 +89,7 @@ cv.plmm <- function(X, y, K, type = 'response', ...,
       res <- fold.results[[i]]
       if (trace) {setTxtProgressBar(pb, i)}
     } else {
-      res <- cvf(i = i, XX = X, y = y, K = K, fold = fold, type = type, cv.args = cv.args)
+      res <- cvf(i = i, XX = X, y = y, fold = fold, type = type, cv.args = cv.args)
       if (trace) {setTxtProgressBar(pb, i)}
     }
     # browser()

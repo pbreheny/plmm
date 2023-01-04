@@ -1,4 +1,5 @@
 #' PLMM prep: a function to run checks, SVD, and rotation prior to fitting a PLMM model
+#' This is an internal function for \code{cv.plmm}
 #'
 #' @param X Design matrix. May include clinical covariates and other non-SNP data.
 #' @param y Continuous outcome vector.
@@ -9,8 +10,6 @@
 #' @param ... Not used yet
 #'
 #' @return List with these components: 
-#' * X
-#' * y 
 #' * std_X: standardized design matrix 
 #' * std_SUX: re-standardized rotated design matrix. This is 'fed' into \code{plmm_fit()}. 
 #' * eta: numeric value representing the ratio of variances. 
@@ -119,17 +118,13 @@ plmm_prep <- function(X,
   
   
   # return values to be passed into plmm_fit(): 
-  ret <- structure(list(X = X, # TODO: address the case where X is too large to return
-                        y = y,
-                        std_X = std_X,
+  ret <- structure(list(std_X = std_X,
                         std_SUX = std_SUX,
                         S = S,
                         U = U,
                         eta = eta,
                         SUX = SUX,
                         SUy = SUy,
-                        n = n,
-                        p = p,
                         ns = ns,
                         penalty.factor = penalty.factor))
   

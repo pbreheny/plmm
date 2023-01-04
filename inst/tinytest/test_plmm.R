@@ -110,7 +110,7 @@ tinytest::expect_equivalent(A4, B4)
 
 
 # if plmm_fit is working, it should give the same result as plmm: 
-fit4 <- plmm_fit(prep = prep4)
+fit4 <- plmm_fit(prep = prep4, X = admix$X, y = admix$y)
 tinytest::expect_equivalent(fit4$beta_vals, fit_admix4$beta_vals)
 
 # Test : examine the 'untransform' function ---------------------------------

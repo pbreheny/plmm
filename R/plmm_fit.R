@@ -1,5 +1,7 @@
 #' PLMM fit: a function that fits a PLMM using the values returned by plmm_prep()
-#'
+#' This is an internal function for \code{cv.plmm}
+#' @param X The same design matrix used in \code{plmm_prep}
+#' @param y The continuous outcome vector used in \code{plmm_prep}
 #' @param prep A list as returned from \code{plmm_prep}
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for SCAD.
@@ -21,8 +23,10 @@
 #'
 #' @examples
 #' prep1 <- plmm_prep(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' fit1 <- plmm_fit(prep = prep1)
-plmm_fit <- function(prep, 
+#' fit1 <- plmm_fit(X = admix$X, y = admix$y, prep = prep1)
+plmm_fit <- function(X,
+                     y,
+                     prep, 
                      penalty = c("MCP", "SCAD", "lasso"),
                      gamma,
                      alpha = 1,
@@ -45,10 +49,6 @@ plmm_fit <- function(prep,
   # set default gamma
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
-  # retrieve X and y 
-  X <- prep$X
-  y <- prep$y
-  
   # error checking
   if (gamma <= 1 & penalty=="MCP") stop("gamma must be greater than 1 for the MC penalty", call.=FALSE)
   if (gamma <= 2 & penalty=="SCAD") stop("gamma must be greater than 2 for the SCAD penalty", call.=FALSE)
@@ -56,6 +56,9 @@ plmm_fit <- function(prep,
   if (alpha <= 0) stop("alpha must be greater than 0; choose a small positive number instead", call.=FALSE)
   if (length(init)!=ncol(X)) stop("Dimensions of init and X do not match", call.=FALSE)
   
+  # designate the dimensions of the design matrix 
+  p <- ncol(X) 
+  n <- nrow(X)
   
   # calculate population var without mean 0; will need this for call to ncvfit()
   xtx <- apply(prep$std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
@@ -85,7 +88,7 @@ plmm_fit <- function(prep,
   }
   
   # make sure to *not* penalize the intercept term 
-  penalty.factor <- c(0, prep$penalty.factor)
+  new.penalty.factor <- c(0, prep$penalty.factor)
   
   
   # placeholders for results
@@ -102,7 +105,7 @@ plmm_fit <- function(prep,
   ## TODO: think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
-    res <- ncvreg::ncvfit(prep$std_SUX, prep$SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, penalty.factor, warn)
+    res <- ncvreg::ncvfit(prep$std_SUX, prep$SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
     b[, ll] <- init <- res$beta
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
@@ -118,7 +121,7 @@ plmm_fit <- function(prep,
   lambda <- lambda[ind]
   loss <- loss[ind]
   if (warn & sum(iter) == max.iter) warning("Maximum number of iterations reached")
-  convex.min <- if (convex) convexMin(b, prep$std_SUX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', penalty.factor) else NULL
+  convex.min <- if (convex) convexMin(b, prep$std_SUX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', new.penalty.factor) else NULL
   
   # reverse the transformations of the beta values 
   beta_vals <- untransform(b, prep$ns, X, prep$std_X, prep$SUX, prep$std_SUX)
@@ -133,15 +136,13 @@ plmm_fit <- function(prep,
   
   ## output
   val <- structure(list(beta_vals = beta_vals,
-                        eta = prep$eta,
                         lambda = lambda,
                         penalty = penalty,
                         gamma = gamma,
                         alpha = alpha,
                         convex.min = convex.min,
                         loss = loss,
-                        penalty.factor = penalty.factor,
-                        n = prep$n,
+                        new.penalty.factor = new.penalty.factor,
                         ns_idx = c(1, 1 + prep$ns), # PAY ATTENTION HERE! 
                         iter = iter,
                         converged = converged),
@@ -158,15 +159,6 @@ plmm_fit <- function(prep,
   if (returnX) {
     val$X <- X # this is the original design matrix WITHOUT the intercept!
     val$y <- y
-    
-    val$std_X <- prep$std_X
-    
-    val$U <- prep$U
-    val$S <- prep$S
-    
-    val$SUX <- prep$SUX
-    val$SUy <- prep$SUy
-    
   } 
   return(val)
   
