@@ -15,7 +15,7 @@
 
 
 cvf <- function(i, XX, y, fold, type, cv.args, ...) {
-  # overwrite X and y arguments
+  # overwrite X and y arguments to leave out the ith fold
   cv.args$X <- XX[fold!=i, , drop=FALSE]
   cv.args$y <- y[fold!=i]
   # NB: inside each fold, we are not re-doing the prep steps like SVD, rotation, etc.
