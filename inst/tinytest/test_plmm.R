@@ -100,7 +100,20 @@ tinytest::expect_equivalent(summary.plmm(fit3, idx = 1)$constant_features,
                             monomorphic_snps)
 
 
-# Test 4: examine the 'untransform' function ---------------------------------
+# Test 4: check the plmm_prep/fit functions -----------------------------------
+# if plmm_prep is working, it should be giving the same (partial) results as plmm: 
+prep4 <- plmm_prep(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+fit_admix4 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+A4 <- prep4$SUX
+B4 <- fit_admix4$SUX
+tinytest::expect_equivalent(A4, B4)
+
+
+# if plmm_fit is working, it should give the same result as plmm: 
+fit4 <- plmm_fit(prep = prep4)
+tinytest::expect_equivalent(fit4$beta_vals, fit_admix4$beta_vals)
+
+# Test : examine the 'untransform' function ---------------------------------
 # NB: this test is still in the 'scratch-work' phase! 
 # setup lambda
 lambda4 <- 0.1

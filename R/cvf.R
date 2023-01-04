@@ -2,7 +2,7 @@
 #'
 #' Internal function for cv.plmm which calls plmm on a fold subset of the original data.
 #' @param i Fold number to be excluded from fit.
-#' @param XX Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
+#' @param XX Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied with a matrix containing only SNP data for computation of GRM.
 #' @param K Known or estimated similarity matrix.
 #' @param y Original continuous outcome vector.
 #' @param fold n-length vector of fold-assignments.
