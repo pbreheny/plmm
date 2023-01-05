@@ -8,10 +8,19 @@
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
 #' @param ... Other arguments to bigsnpr::snp_fastImpute or bigsnpr::snp_fastImputeSimple (depending on choice of \code{impute})
 #' 
+#' @return A list of two components: 
+#' * X: the fully-imputed design matrix 
+#' * constants_idx: A numeric vector with the indices of the constant features. An index of 5 indicates that the 5th feature is constant (i.e. has zero variance)
+#' 
+#' 
 #' @examples 
+#' 
+#' 
 #' 
 #' \dontrun{
 #' cad_mid <- process_plink_2(data_dir = plink_example(path = "cad_mid.bed", parent = T), prefix = "cad_mid", rds = T, impute = "simple", method = "mean0")
+#' str(cad_mid) 
+#' 
 #' cad_lite <- process_plink_2(data_dir = plink_example(path = "cad_lite.bed", parent = T), prefix = "cad_lite", rds = F, impute = "xgboost")
 #' }
 process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", quiet = FALSE, ...){
@@ -95,6 +104,7 @@ process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", qu
 
     
   } else if (impute == "xgboost"){
+    browser()
     imp <- bigsnpr::snp_fastImpute(Gna = X,
                                    ncores = bigstatsr::nb_cores(),
                                    infos.chr = chr,
