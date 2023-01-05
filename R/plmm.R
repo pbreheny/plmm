@@ -55,6 +55,7 @@
 #' # fit with 'k = 5' specified (so using RSpectra::svds())
 #' fit_plink2 <- plmm(X = cad_mid$genotypes, y = cad_clinical$hdl_impute, k = 5, trace = TRUE)
 #' # Runs in ~44 seconds on my 2015 MacBook Pro
+#' summary(fit_plink2, idx = 5);summary(fit_plink2, idx = 95)
 #' }
 
 
@@ -126,6 +127,9 @@ plmm <- function(X,
     if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
   }
   
+  # determine whether to use RSpectra methods: 
+  rspectra <- ifelse("RSpectra" %in% rownames(installed.packages()), 1, 0)
+  
   if(trace){cat("Passed all checks. Beginning standardization + rotation.\n")}
   
   # standardize X
@@ -149,8 +153,14 @@ plmm <- function(X,
   # calculate SVD
   ## case 1: K is not specified
   if (missing(K)){
-    c(D, U) %<-% svd(std_X, nv = 0) # don't need V
-    # TODO: add RSpectra option here (or, use bigsnpr SVD method)
+    # if k is specified and RSpectra is installed, use svds(): 
+    if(rspectra & !is.null(k)){
+      c(D, U) %<-% RSpectra::svds(A = std_X, nv = 0, k = k)[1:2]
+    } else {
+      # otherwise, use "normal" std():
+      c(D, U) %<-% svd(std_X, nv = 0) # don't need V
+    }
+    
     S <- (D^2)/p # singular values of K, the realized relationship matrix
     
   } else {

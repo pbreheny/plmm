@@ -21,6 +21,8 @@
 #' cad_mid <- process_plink_2(data_dir = plink_example(path = "cad_mid.bed", parent = T), prefix = "cad_mid", rds = T, impute = "simple", method = "mean0")
 #' str(cad_mid) 
 #' 
+#' cad_full <- process_plink_2(data_dir = plink_example(path = "og_cad.bed", parent = T), prefix = "og_cad", rds = F, impute = "simple", method = "mean0")
+#' 
 #' cad_lite <- process_plink_2(data_dir = plink_example(path = "cad_lite.bed", parent = T), prefix = "cad_lite", rds = F, impute = "xgboost")
 #' }
 process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", quiet = FALSE, ...){
