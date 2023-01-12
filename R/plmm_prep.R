@@ -109,17 +109,8 @@ plmm_prep <- function(X,
   SUX <- W %*% crossprod(U, cbind(1, std_X)) # add column of 1s for intercept
   SUy <- drop(W %*% crossprod(U, y))
   
-  # re-standardize rotated SUX
-  std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
-  std_SUX_noInt <- std_SUX_temp$scaled_X
-  
-  std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
-  attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
-  
-  
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(std_X = std_X,
-                        std_SUX = std_SUX,
                         S = S,
                         U = U,
                         eta = eta,

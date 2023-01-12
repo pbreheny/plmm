@@ -29,7 +29,15 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5){
   if(missing(lambda) & missing(idx)) stop("One of the arguments 'lambda' or 'idx' must be provided.")
   if(missing(lambda)) lambda <- object$lambda[idx]
   # TODO: make sure the following line is robust
-  if(missing(idx)) idx <- which(abs(object$lambda - lambda) < eps)
+  if(missing(idx)) {
+    idx <- which(abs(object$lambda - lambda) < eps)
+    if(sum(idx) == 0) {
+      warning("The user-specified lambda value is not within epsilon of any lambda values used to fit the model. Will proceed with the fitted model lambda value closest to the user-specified lambda.")
+      idx <- which.min(abs(object$lambda - lambda))
+    }
+    
+  }
+    
   
   # nvars (tells number of non-zero coefficients)
   nvars <- predict(object, type="nvars", lambda=lambda, idx=idx)

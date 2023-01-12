@@ -5,6 +5,7 @@
 #' @param y Continuous outcome vector for model fitting.
 #' @param K Known or estimated similarity matrix.
 #' @param eta_star Optional arg. to \code{plmm_prep}. Defaults to NULL.
+#' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param penalty.factor Optional arg. to \code{plmm_prep}. Defaults to 1 for all predictors (except the intercept). 
 #' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
 #' @param ... Additional arguments to \code{plmm_fit}
@@ -17,7 +18,7 @@
 #' @export
 #' 
 #' @examples 
-#' cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+#' cv_fit <- cv.plmm(X = admix$X, y = admix$y)
 #' cv_s <- summary.cv.plmm(cv_fit, lambda = "1se")
 #' print(cv_s)
 
@@ -26,6 +27,7 @@ cv.plmm <- function(X,
                     y,
                     K,
                     eta_star = NULL,
+                    penalty = c("MCP", "SCAD", "lasso"),
                     penalty.factor = rep(1, ncol(X)),
                     type = 'response',
                     ...,
@@ -39,6 +41,12 @@ cv.plmm <- function(X,
   # default type is 'response'
   if(missing(type)) {type == 'response'} 
   
+  # default K is realized relatedness matrix 
+  if(missing(K)){K <- relatedness_mat(X)}
+  
+  # determine penalty 
+  penalty <- match.arg(penalty)
+  
   # implement preparation steps for model fitting 
   prep.args <- c(list(X = X,
                       y = y,
@@ -50,7 +58,7 @@ cv.plmm <- function(X,
   
   
   # implement full model fit 
-  fit.args <- c(list(X = X, y = y, prep = prep), list(...))
+  fit.args <- c(list(X = X, y = y, prep = prep, penalty = penalty), list(...))
   fit <- do.call('plmm_fit', fit.args)
   
   # set up arguments for cv 
@@ -62,12 +70,17 @@ cv.plmm <- function(X,
   
   if (type == 'blup') {cv.args$returnX <- TRUE}
   
+  # initialize objects to hold CV results 
   n <- length(fit$y)
   E <- Y <- matrix(NA, nrow=nrow(X), ncol=length(fit$lambda))
 
-  if (!missing(seed)) set.seed(seed)
+  
+  # set up folds for cross validation 
+  if (!missing(seed)){set.seed(seed)}
+  
   sde <- sqrt(.Machine$double.eps)
-  if (missing(fold)) {
+  
+  if(missing(fold)) {
     fold <- sample(1:n %% nfolds)
     fold[fold==0] <- nfolds
   } else {
@@ -80,7 +93,7 @@ cv.plmm <- function(X,
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
     parallel::clusterExport(cluster, c("X", "y", "K", "fold", "type", "cv.args"), envir=environment())
     parallel::clusterCall(cluster, function() library(penalizedLMM))
-    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, XX=X, y=y, fold=fold, type=type, cv.args=cv.args)
+    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, X=X, y=y, fold=fold, type=type, cv.args=cv.args)
   }
 
   if (trace) cat("\nStarting cross validation\n")  
@@ -93,7 +106,7 @@ cv.plmm <- function(X,
       if (trace) {setTxtProgressBar(pb, i)}
     } else {
       # case 2: cluster NOT user specified 
-      res <- cvf(i = i, XX = X, y = y, fold = fold, type = type, cv.args = cv.args)
+      res <- cvf(i = i, fold = fold, type = type, cv.args = cv.args)
       if (trace) {setTxtProgressBar(pb, i)}
     }
     # browser()
@@ -103,7 +116,7 @@ cv.plmm <- function(X,
   }
 
   # eliminate saturated lambda values, if any
-  ind <- which(apply(is.finite(E), 2, all))
+  ind <- which(apply(is.finite(E), 2, all)) # index for lambda values to keep
   E <- E[, ind, drop=FALSE]
   Y <- Y[, ind]
   lambda <- fit$lambda[ind]
@@ -119,6 +132,8 @@ cv.plmm <- function(X,
   within1se <- which(cve >= l.se & cve <= u.se)
   min1se <- which.max(lambda %in% lambda[within1se])
 
+  # browser()
+  
   # bias correction
   e <- sapply(1:nfolds, function(i) apply(E[fold==i, , drop=FALSE], 2, mean))
   Bias <- mean(e[min,] - apply(e, 2, min))

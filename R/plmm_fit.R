@@ -60,18 +60,23 @@ plmm_fit <- function(X,
   p <- ncol(X) 
   n <- nrow(X)
   
+  # re-standardize rotated SUX
+  std_SUX_temp <- scale_varp(prep$SUX[,-1, drop = FALSE])
+  std_SUX_noInt <- std_SUX_temp$scaled_X
+  std_SUX <- cbind(prep$SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
+  attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
+  
   # calculate population var without mean 0; will need this for call to ncvfit()
-  xtx <- apply(prep$std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
+  xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
   
   if(trace){cat("Setup complete. Beginning model fitting.\n")}
-  
   
   # remove initial values for coefficients representing columns with singular values
   init <- init[prep$ns] 
   
   # set up lambda
   if (missing(lambda)) {
-    lambda <- setup_lambda(X = prep$std_SUX,
+    lambda <- setup_lambda(X = std_SUX,
                            y = prep$SUy,
                            alpha = alpha,
                            nlambda = nlambda,
@@ -90,11 +95,10 @@ plmm_fit <- function(X,
   # make sure to *not* penalize the intercept term 
   new.penalty.factor <- c(0, prep$penalty.factor)
   
-  
   # placeholders for results
   init <- c(0, init) # add initial value for intercept
-  resid <- drop(prep$SUy - prep$std_SUX %*% init)
-  b <- matrix(NA, nrow=ncol(prep$std_SUX), ncol=nlambda) 
+  resid <- drop(prep$SUy - std_SUX %*% init)
+  b <- matrix(NA, nrow=ncol(std_SUX), ncol=nlambda) 
   iter <- integer(nlambda)
   converged <- logical(nlambda)
   loss <- numeric(nlambda)
@@ -105,7 +109,7 @@ plmm_fit <- function(X,
   ## TODO: think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
-    res <- ncvreg::ncvfit(prep$std_SUX, prep$SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
+    res <- ncvreg::ncvfit(std_SUX, prep$SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
     b[, ll] <- init <- res$beta
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
@@ -121,10 +125,10 @@ plmm_fit <- function(X,
   lambda <- lambda[ind]
   loss <- loss[ind]
   if (warn & sum(iter) == max.iter) warning("Maximum number of iterations reached")
-  convex.min <- if (convex) convexMin(b, prep$std_SUX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', new.penalty.factor) else NULL
+  convex.min <- if (convex) convexMin(b, std_SUX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', new.penalty.factor) else NULL
   
   # reverse the transformations of the beta values 
-  beta_vals <- untransform(b, prep$ns, X, prep$std_X, prep$SUX, prep$std_SUX)
+  beta_vals <- untransform(b, prep$ns, X, prep$std_X, prep$SUX, std_SUX)
   
   if(trace){cat("\nBeta values are estimated -- almost done!\n")}
   
