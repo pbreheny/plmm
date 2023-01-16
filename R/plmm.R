@@ -234,7 +234,8 @@ plmm <- function(X,
   convex.min <- if (convex) convexMin(b, std_SUX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', penalty.factor) else NULL
   
   # reverse the transformations of the beta values 
-  beta_vals <- untransform(b, ns, X, std_X, SUX, std_SUX)
+  beta_vals <- untransform(res_b = b, ns = ns, ncol_X = ncol(X),
+                           std_X = std_X, SUX = SUX, std_SUX = std_SUX)
   
   if(trace){cat("\nBeta values are estimated -- almost done!\n")}
   

@@ -25,7 +25,7 @@
 
 cv.plmm <- function(X,
                     y,
-                    K,
+                    K = NULL,
                     eta_star = NULL,
                     penalty = c("MCP", "SCAD", "lasso"),
                     penalty.factor = rep(1, ncol(X)),
@@ -41,9 +41,6 @@ cv.plmm <- function(X,
   # default type is 'response'
   if(missing(type)) {type == 'response'} 
   
-  # default K is realized relatedness matrix 
-  if(missing(K)){K <- relatedness_mat(X)}
-  
   # determine penalty 
   penalty <- match.arg(penalty)
   
@@ -52,7 +49,9 @@ cv.plmm <- function(X,
                       y = y,
                       K = K,
                       eta_star = eta_star,
-                      penalty.factor = penalty.factor))
+                      penalty.factor = penalty.factor,
+                      returnX,
+                      trace))
   
   prep <- do.call('plmm_prep', prep.args)
   

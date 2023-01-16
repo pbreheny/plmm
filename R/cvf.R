@@ -18,9 +18,18 @@ cvf <- function(i, fold, type, cv.args, ...) {
   X2 <- cv.args$X[fold==i, , drop=FALSE]
   y2 <- cv.args$y[fold==i]
   
+  # TODO: subset SUX (and maybe other args.) to match fold indices 
   # overwrite X and y cv arguments to leave out the ith fold
   cv.args$X <- cv.args$X[fold!=i, , drop=FALSE]
   cv.args$y <- cv.args$y[fold!=i]
+  
+  browser()
+  cv.args$prep$std_X <- cv.args$prep$std_X[fold!=i, ,drop=FALSE]
+  cv.args$prep$S <- cv.args$prep$S[fold!=i]
+  cv.args$prep$U <- cv.args$prep$U[fold!=i, ,drop=FALSE]
+  cv.args$prep$SUX <- cv.args$prep$SUX[fold!=i, ,drop=FALSE]
+  cv.args$prep$SUy <- cv.args$prep$SUy[fold!=i, ,drop=FALSE]
+  
   # TODO: explore why the line below is causing the function to throw an error
   # cv.args$prep$std_X <- ncvreg::std(cv.args$X)
   # NB: inside each fold, we are not re-doing the prep steps like SVD, rotation, etc.

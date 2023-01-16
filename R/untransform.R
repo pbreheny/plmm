@@ -5,7 +5,7 @@
 #' 
 #' @param res_b The values returned in the 'beta' argument of the ncvfit() object
 #' @param ns The indices of the non-singular columns of the ORIGINAL design matrix
-#' @param X The original design matrix (has no intercept)
+#' @param ncol_X The number of columns in the original design matrix (without the intercept)
 #' @param std_X The standardized design matrix BEFORE rotation; this should have attributes 'scale', 'center', and 'nonsingular'
 #' @param SUX The rotated design matrix (has the intercept)
 #' @param std_SUX The standardized design matrix AFTER rotation; this should have attribute 'scale'
@@ -13,7 +13,7 @@
 #' @export
 
 
-untransform <- function(res_b, ns, X, std_X, SUX, std_SUX){
+untransform <- function(res_b, ns, ncol_X, std_X, SUX, std_SUX){
   
 ## Step 1: reverse the POST-ROTATION standardization ##  
   
@@ -32,7 +32,7 @@ untransform <- function(res_b, ns, X, std_X, SUX, std_SUX){
   # initialize beta with zeros; nrow = # of predictors, ncol = # of lambda values
   # this will create columns of zeros for betas corresponding to singular columns
   untransformed_beta <- matrix(0,
-                               nrow = (ncol(X) + 1), # + 1 is for the intercept
+                               nrow = (ncol_X + 1), # + 1 is for the intercept
                                ncol = ncol(untransformed_b1))
   
   # unscale the beta values for non-singular, non-intercept columns

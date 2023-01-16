@@ -1,7 +1,5 @@
 #' PLMM fit: a function that fits a PLMM using the values returned by plmm_prep()
 #' This is an internal function for \code{cv.plmm}
-#' @param X The same design matrix used in \code{plmm_prep}
-#' @param y The continuous outcome vector used in \code{plmm_prep}
 #' @param prep A list as returned from \code{plmm_prep}
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for SCAD.
@@ -11,22 +9,31 @@
 #' @param lambda A user-specified sequence of lambda values. By default, a sequence of values of length nlambda is computed, equally spaced on the log scale.
 #' @param eps Convergence threshold. The algorithm iterates until the RMSD for the change in linear predictors for each coefficient is less than eps. Default is \code{1e-4}.
 #' @param max.iter Maximum number of iterations (total across entire path). Default is 10000.
-#' @param convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
-#' @param dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
 #' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
-#' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
-#' @return
+#' @return A list with these components: 
+#' * std_X: The standardized design matrix 
+#' * SUX: first partial result of data rotation 
+#' * SUy: second partial result of data rotation 
+#' * eta: numeric value representing the ratio of variances. 
+#' * std_SUX: re-standardized rotated design matrix. This is 'fed' into \code{plmm_fit()}. 
+#' * b: The values returned in the 'beta' argument of the ncvfit() object
+#' * lambda: The sequence of lambda values used in model fitting 
+#' * iter: The number of iterations at each given lambda value 
+#' * converged: The convergence status at each given lambda value 
+#' * penalty: The type of penalty used in model fitting
+#' * penalty.factor: A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
+#' * ns: The indices of the non-singular columns of the ORIGINAL design matrix
+#' * ncol_X: The number of columns in the ORIGINAL design matrix 
+#' 
 #' @export
 #'
 #' @examples
-#' prep1 <- plmm_prep(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' fit1 <- plmm_fit(X = admix$X, y = admix$y, prep = prep1)
-plmm_fit <- function(X,
-                     y,
-                     prep, 
+#' prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
+#' fit1 <- plmm_fit(prep = prep1)
+plmm_fit <- function(prep, 
                      penalty = c("MCP", "SCAD", "lasso"),
                      gamma,
                      alpha = 1,
@@ -36,12 +43,9 @@ plmm_fit <- function(X,
                      lambda,
                      eps = 1e-04,
                      max.iter = 10000,
-                     convex = TRUE,
-                     dfmax = p + 1,
                      warn = TRUE,
-                     init = rep(0, ncol(X)),
-                     returnX = TRUE, 
-                     trace = FALSE){
+                     init = NULL,
+                     returnX = TRUE){
   
   # coercion
   penalty <- match.arg(penalty)
@@ -49,27 +53,36 @@ plmm_fit <- function(X,
   # set default gamma
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
+  # set default init
+  if(is.null(init)) init <- rep(0, prep$ncol_X)
+  
   # error checking
   if (gamma <= 1 & penalty=="MCP") stop("gamma must be greater than 1 for the MC penalty", call.=FALSE)
   if (gamma <= 2 & penalty=="SCAD") stop("gamma must be greater than 2 for the SCAD penalty", call.=FALSE)
   if (nlambda < 2) stop("nlambda must be at least 2", call.=FALSE)
   if (alpha <= 0) stop("alpha must be greater than 0; choose a small positive number instead", call.=FALSE)
-  if (length(init)!=ncol(X)) stop("Dimensions of init and X do not match", call.=FALSE)
+  if (length(init)!=prep$ncol_X) stop("Dimensions of init and X do not match", call.=FALSE)
   
-  # designate the dimensions of the design matrix 
-  p <- ncol(X) 
-  n <- nrow(X)
+  if(prep$trace){cat("Beginning standardization + rotation.")}
+  
+  # estimate eta
+  eta <- estimate_eta(S = prep$S, U = prep$U, y = prep$y)
+  
+  # rotate data
+  W <- diag((eta * prep$S + (1 - eta))^(-1/2))
+  SUX <- W %*% crossprod(prep$U, cbind(1, prep$std_X)) # add column of 1s for intercept
+  SUy <- drop(W %*% crossprod(prep$U, prep$y))
   
   # re-standardize rotated SUX
-  std_SUX_temp <- scale_varp(prep$SUX[,-1, drop = FALSE])
+  std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
   std_SUX_noInt <- std_SUX_temp$scaled_X
-  std_SUX <- cbind(prep$SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
+  std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
   attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
   
   # calculate population var without mean 0; will need this for call to ncvfit()
   xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
   
-  if(trace){cat("Setup complete. Beginning model fitting.\n")}
+  if(prep$trace){cat("Setup complete. Beginning model fitting.\n")}
   
   # remove initial values for coefficients representing columns with singular values
   init <- init[prep$ns] 
@@ -77,7 +90,7 @@ plmm_fit <- function(X,
   # set up lambda
   if (missing(lambda)) {
     lambda <- setup_lambda(X = std_SUX,
-                           y = prep$SUy,
+                           y = SUy,
                            alpha = alpha,
                            nlambda = nlambda,
                            lambda.min = lambda.min,
@@ -97,7 +110,7 @@ plmm_fit <- function(X,
   
   # placeholders for results
   init <- c(0, init) # add initial value for intercept
-  resid <- drop(prep$SUy - std_SUX %*% init)
+  resid <- drop(SUy - std_SUX %*% init)
   b <- matrix(NA, nrow=ncol(std_SUX), ncol=nlambda) 
   iter <- integer(nlambda)
   converged <- logical(nlambda)
@@ -105,66 +118,47 @@ plmm_fit <- function(X,
   
   # main attraction 
   ## set up progress bar -- this can take a while
-  if(trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
+  if(prep$trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
   ## TODO: think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
-    res <- ncvreg::ncvfit(std_SUX, prep$SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
+    res <- ncvreg::ncvfit(std_SUX, SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
     b[, ll] <- init <- res$beta
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
     loss[ll] <- res$loss
     resid <- res$resid
-    if(trace){setTxtProgressBar(pb, ll)}
+    if(prep$trace){setTxtProgressBar(pb, ll)}
   }
   
-  # eliminate saturated lambda values, if any
-  ind <- !is.na(iter)
-  iter <- iter[ind]
-  converged <- converged[ind]
-  lambda <- lambda[ind]
-  loss <- loss[ind]
-  if (warn & sum(iter) == max.iter) warning("Maximum number of iterations reached")
-  convex.min <- if (convex) convexMin(b, std_SUX, penalty, gamma, lambda*(1-alpha), family = 'gaussian', new.penalty.factor) else NULL
+  ret <- structure(list(
+    std_X = prep$std_X,
+    y = prep$y,
+    std_SUX = std_SUX,
+    SUX = SUX,
+    ncol_X = prep$ncol_X,
+    lambda = lambda,
+    b = b,
+    iter = iter,
+    converged = converged,
+    penalty = penalty, 
+    penalty.factor = new.penalty.factor,
+    gamma = gamma,
+    alpha = alpha,
+    ns = prep$ns,
+    snp_names = prep$snp_names,
+    penalty = penalty,
+    nlambda = nlambda,
+    eps = eps,
+    max.iter = max.iter,
+    warn = warn,
+    init = init,
+    returnX = prep$returnX,
+    trace = prep$trace
+  ))
   
-  # reverse the transformations of the beta values 
-  beta_vals <- untransform(b, prep$ns, X, prep$std_X, prep$SUX, std_SUX)
+  return(ret)
   
-  if(trace){cat("\nBeta values are estimated -- almost done!\n")}
-  
-  # give the matrix of beta_values readable names 
-  # SNPs (or covariates) on the rows, lambda values on the columns
-  varnames <- if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)
-  varnames <- c("(Intercept)", varnames)
-  dimnames(beta_vals) <- list(varnames, lamNames(lambda))
-  
-  ## output
-  val <- structure(list(beta_vals = beta_vals,
-                        lambda = lambda,
-                        penalty = penalty,
-                        gamma = gamma,
-                        alpha = alpha,
-                        convex.min = convex.min,
-                        loss = loss,
-                        new.penalty.factor = new.penalty.factor,
-                        ns_idx = c(1, 1 + prep$ns), # PAY ATTENTION HERE! 
-                        iter = iter,
-                        converged = converged),
-                   class = "plmm")
-  if (missing(returnX)) {
-    if (utils::object.size(prep$SUX) > 1e8) {
-      warning("Due to the large size of SUX (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).")
-      returnX <- FALSE
-    } else {
-      # if it fits, it ships 
-      returnX <- TRUE
-    }
-  }
-  if (returnX) {
-    val$X <- X # this is the original design matrix WITHOUT the intercept!
-    val$y <- y
-  } 
-  return(val)
   
   
 }
