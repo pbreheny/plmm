@@ -54,9 +54,10 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5){
   # don't drop, because we need the dimnames here ^ 
   
   # if there were any monomorphic SNPs, say so: 
-  if("X" %in% names(object)){
-    snp_vars <- apply(object$X, 2, FUN = var)
-    constant_features <- names(which(snp_vars == 0 ))
+  if("std_X" %in% names(object)){
+    constant_features <- paste0("Feature ",
+                                setdiff(1:ncol(object$std_X),
+                                        attr(object$std_X, "nonsingular")))
   } 
   
   out <- structure(list(

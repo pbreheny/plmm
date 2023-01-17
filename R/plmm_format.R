@@ -60,6 +60,7 @@ plmm_format <- function(fit,
   ## output
   val <- structure(list(beta_vals = beta_vals,
                         lambda = lambda,
+                        eta = fit$eta,
                         penalty = fit$penalty,
                         gamma = fit$gamma,
                         alpha = fit$alpha,

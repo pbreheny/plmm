@@ -5,7 +5,7 @@
 #' @param fold n-length vector of fold-assignments.
 #' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP).
 #' @param cv.args List of additional arguments to be passed to plmm.
-#' @param ... Optional arguments
+#' @param ... Optional arguments to `predict.list`
 #' @importFrom zeallot %<-%
 #' @export
 #' 
@@ -15,36 +15,26 @@
 cvf <- function(i, fold, type, cv.args, ...) {
   
   # extract test set
-  X2 <- cv.args$X[fold==i, , drop=FALSE]
-  y2 <- cv.args$y[fold==i]
+  X2 <- cv.args$prep$std_X[fold==i, , drop=FALSE]
+  y2 <- cv.args$prep$y[fold==i]
   
-  # TODO: subset SUX (and maybe other args.) to match fold indices 
-  # overwrite X and y cv arguments to leave out the ith fold
-  cv.args$X <- cv.args$X[fold!=i, , drop=FALSE]
-  cv.args$y <- cv.args$y[fold!=i]
-  
-  browser()
+  # subset std_X, U, and y to match fold indices 
+  #   (and in so doing, leave out the ith fold)
   cv.args$prep$std_X <- cv.args$prep$std_X[fold!=i, ,drop=FALSE]
-  cv.args$prep$S <- cv.args$prep$S[fold!=i]
   cv.args$prep$U <- cv.args$prep$U[fold!=i, ,drop=FALSE]
-  cv.args$prep$SUX <- cv.args$prep$SUX[fold!=i, ,drop=FALSE]
-  cv.args$prep$SUy <- cv.args$prep$SUy[fold!=i, ,drop=FALSE]
+  cv.args$prep$y <- cv.args$prep$y[fold!=i]
   
-  # TODO: explore why the line below is causing the function to throw an error
-  # cv.args$prep$std_X <- ncvreg::std(cv.args$X)
   # NB: inside each fold, we are not re-doing the prep steps like SVD, rotation, etc.
   fit.i <- do.call("plmm_fit", cv.args)
-
-  # browser()
-  beta <- coef.plmm(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
-  Xbeta <- predict.plmm(fit.i, newX = X2, type = 'response', lambda = fit.i$lambda)
+  
+  beta <- coef.list(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
+  Xbeta <- predict.list(fit = fit.i, newX = X2, type = 'response', lambda = fit.i$lambda)
   yhat <- matrix(data = drop(Xbeta), nrow = length(y2))
   
   if (type == 'blup'){
-    yhat <- predict.plmm(fit.i, newX = X2, type = 'blup', lambda = fit.i$lambda,
-                         X = cv.args$X, y = cv.args$y, U = fit.i$U, S = fit.i$S,
-                         eta = fit.i$eta, 
-                         covariance = K[fold == i, fold != i, drop = FALSE])
+    yhat <- predict.list(fit = fit.i, newX = X2, type = 'blup',
+                         lambda = fit.i$lambda, prep = cv.args$prep, ...)
+                        
   }
   loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(y2, yhat[,ll]))
   list(loss=loss, nl=length(fit.i$lambda), yhat=yhat)

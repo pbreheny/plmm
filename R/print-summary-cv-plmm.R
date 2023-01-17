@@ -12,7 +12,7 @@
 #' print.summary.cv.plmm(s)
 print.summary.cv.plmm <- function(obj, digits, ...){
   digits <- if (missing(digits)) digits <- c(2, 4, 2, 2, 3) else rep(digits, length.out=5)
-  cat(obj$fit$penalty, "-penalized model with n=", nrow(obj$fit$X),"\n", sep="")
+  cat(obj$fit$penalty, "-penalized model with n=", nrow(obj$fit$std_X),"\n", sep="")
   cat("At minimum cross-validation error (lambda=", formatC(obj$lambda.min, digits[2], format="f"), "):\n", sep="")
   cat("-------------------------------------------------\n")
   cat("  Nonzero coefficients: ", obj$nvars, "\n", sep="")

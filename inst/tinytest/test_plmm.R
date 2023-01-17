@@ -91,13 +91,14 @@ tinytest::expect_equal(A2, B2, tolerance = 0.1)
 
 # Test 3: show that monomorphic SNPs are given beta values of 0s -------------
 monomorphic <- apply(admix$X[,1:15], 2, var) == 0
-monomorphic_snps <- colnames(admix$X[,1:15])[monomorphic]
+monomorphic_snps <- paste0("Feature ", which(monomorphic))
 # SNPs 8 and 14 are monomorphic 
 fit3 <- plmm(X = admix$X[,1:15], y = admix$y)
 
 # test 3: implementation 
 tinytest::expect_equivalent(summary.plmm(fit3, idx = 1)$constant_features,
                             monomorphic_snps)
+# PICK UP HERE: 
 
 
 # Test 4: check the plmm_prep/fit functions -----------------------------------

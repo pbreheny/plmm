@@ -13,6 +13,7 @@
 #' @param nfolds The number of cross-validation folds. Default is 10.
 #' @param fold Which fold each observation belongs to. By default the observations are randomly assigned.
 #' @param seed You may set the seed of the random number generator in order to obtain reproducible results.
+#' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
 #' @param returnY Should cv.plmm return the linear predictors from the cross-validation folds? Default is FALSE; if TRUE, this will return a matrix in which the element for row i, column j is the fitted value for observation i from the fold in which observation i was excluded from the fit, at the jth value of lambda.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each CV fold. Default is FALSE.
 #' @export
@@ -35,6 +36,7 @@ cv.plmm <- function(X,
                     nfolds=10,
                     seed,
                     fold,
+                    returnX = TRUE,
                     returnY=FALSE,
                     trace=FALSE) {
 
@@ -50,20 +52,19 @@ cv.plmm <- function(X,
                       K = K,
                       eta_star = eta_star,
                       penalty.factor = penalty.factor,
-                      returnX,
+                      returnX = returnX,
                       trace))
   
   prep <- do.call('plmm_prep', prep.args)
   
   
   # implement full model fit 
-  fit.args <- c(list(X = X, y = y, prep = prep, penalty = penalty), list(...))
+  fit.args <- c(list(prep = prep, penalty = penalty), list(...))
   fit <- do.call('plmm_fit', fit.args)
   
   # set up arguments for cv 
   cv.args <- fit.args
   cv.args$warn <- FALSE
-  cv.args$convex <- FALSE
   cv.args$lambda <- fit$lambda
   cv.args$eta_star <- fit$eta
   

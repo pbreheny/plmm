@@ -69,7 +69,11 @@ plot.cv.plmm <- function(x, log.l=TRUE, type=c("cve", "rsq", "scale", "snr", "al
   suppressWarnings(graphics::arrows(x0=l[aind], x1=l[aind], y0=L[aind], y1=U[aind], code=3, angle=90, col="gray80", length=.05))
   graphics::points(l[ind], y[ind], col=col, pch=19, cex=.5)
   if (selected) {
-    n.s <- predict.plmm(x$fit, lambda=x$lambda, type="nvars")
+    if(x$fit |> class() == "list"){
+      n.s <- predict.list(x$fit, lambda=x$lambda, type="nvars")
+    } else {
+      n.s <- predict.plmm(x$fit, lambda=x$lambda, type="nvars")
+    }
     graphics::axis(3, at=l, labels=n.s, tick=FALSE, line=-0.5)
     graphics::mtext("Variables selected", cex=0.8, line=1.5)
   }
