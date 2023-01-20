@@ -96,10 +96,8 @@ monomorphic_snps <- paste0("Feature ", which(monomorphic))
 fit3 <- plmm(X = admix$X[,1:15], y = admix$y)
 
 # test 3: implementation 
-tinytest::expect_equivalent(summary.plmm(fit3, idx = 1)$constant_features,
+tinytest::expect_equivalent(summary.plmm(fit3, idx = 99)$constant_features,
                             monomorphic_snps)
-# PICK UP HERE: 
-
 
 # Test 4: check the plmm_prep/fit functions -----------------------------------
 # if plmm_prep is working, it should be giving the same (partial) results as plmm: 

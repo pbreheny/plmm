@@ -56,13 +56,13 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5){
   # if there were any monomorphic SNPs, say so: 
   if("std_X" %in% names(object)){
     constant_features <- paste0("Feature ",
-                                setdiff(1:ncol(object$std_X),
+                                setdiff(1:object$ncol_X,
                                         attr(object$std_X, "nonsingular")))
   } 
   
   out <- structure(list(
     penalty=object$penalty,
-    n=object$n,
+    n=object$n, # TODO: fix this (need to return n somewhere before this...)
     p=nrow(object$beta_vals),
     converged=object$converged[idx],
     lambda=lambda, 

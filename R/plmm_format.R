@@ -68,6 +68,7 @@ plmm_format <- function(fit,
                         loss = loss,
                         penalty.factor = fit$penalty.factor,
                         ns_idx = c(1, 1 + fit$ns), # PAY ATTENTION HERE! 
+                        ncol_X = fit$ncol_X,
                         iter = iter,
                         converged = converged),
                    class = "plmm")
