@@ -91,27 +91,41 @@ tinytest::expect_equal(A2, B2, tolerance = 0.1)
 
 # Test 3: show that monomorphic SNPs are given beta values of 0s -------------
 monomorphic <- apply(admix$X[,1:15], 2, var) == 0
-monomorphic_snps <- colnames(admix$X[,1:15])[monomorphic]
+monomorphic_snps <- paste0("Feature ", which(monomorphic))
 # SNPs 8 and 14 are monomorphic 
 fit3 <- plmm(X = admix$X[,1:15], y = admix$y)
 
 # test 3: implementation 
-tinytest::expect_equivalent(summary.plmm(fit3, idx = 1)$constant_features,
+tinytest::expect_equivalent(summary.plmm(fit3, idx = 99)$constant_features,
                             monomorphic_snps)
-
 
 # Test 4: check the plmm_prep/fit functions -----------------------------------
 # if plmm_prep is working, it should be giving the same (partial) results as plmm: 
-prep4 <- plmm_prep(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-fit_admix4 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-A4 <- prep4$SUX
-B4 <- fit_admix4$SUX
+
+prep <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
+fit <- plmm_fit(prep = prep)
+res <- plmm_format(fit)
+plmm_admix <- plmm(X = admix$X, y = admix$y)
+
+# test A: see if SUX lines up 
+A4 <- fit$SUX
+B4 <- plmm_admix$SUX
 tinytest::expect_equivalent(A4, B4)
 
+# test B: if plmm_fit is working, it should give the same result as plmm: 
+tinytest::expect_equivalent(res$beta_vals, plmm_admix$beta_vals)
 
-# if plmm_fit is working, it should give the same result as plmm: 
-fit4 <- plmm_fit(prep = prep4)
-tinytest::expect_equivalent(fit4$beta_vals, fit_admix4$beta_vals)
+# Test 5: case where K is simulated to have no population structure ----------
+
+K_independent <- sim_ps_x(n = nrow(admix$X),
+                          p = ncol(admix$X),
+                          # supposing all individuals are independent 
+                          nJ = nrow(admix$X),
+                          structureX = "independent"
+) |> 
+  relatedness_mat()
+
+
 
 # Test : examine the 'untransform' function ---------------------------------
 # NB: this test is still in the 'scratch-work' phase! 
@@ -141,15 +155,6 @@ fit4$beta_vals
 
 # QUESTION: should I be comparing fit4$beta_vals with og_betas? 
 
-# Test 5: case where K is simulated to have no population structure ----------
-
-K_independent <- sim_ps_x(n = nrow(admix$X),
-                          p = ncol(admix$X),
-                          # supposing all individuals are independent 
-                          nJ = nrow(admix$X),
-                          structureX = "independent"
-) |> 
-  relatedness_mat()
 
 
 ## Appendix: Code from previous version of the package -----------------------

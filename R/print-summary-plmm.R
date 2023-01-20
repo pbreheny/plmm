@@ -15,7 +15,7 @@
 #' print.summary.plmm(s3)
 print.summary.plmm <- function(x){
   
-  cat(x$penalty, "-penalized regression model with n=", x$n, ", p=", x$p, sep="")
+  cat(x$penalty, "-penalized regression model with n=", x$std |> nrow(), ", p=", x$p, sep="")
   cat(" at lambda=", x$lambda_char, "\n", sep="")
   cat("-------------------------------------------------\n")
 

@@ -29,7 +29,15 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5){
   if(missing(lambda) & missing(idx)) stop("One of the arguments 'lambda' or 'idx' must be provided.")
   if(missing(lambda)) lambda <- object$lambda[idx]
   # TODO: make sure the following line is robust
-  if(missing(idx)) idx <- which(abs(object$lambda - lambda) < eps)
+  if(missing(idx)) {
+    idx <- which(abs(object$lambda - lambda) < eps)
+    if(sum(idx) == 0) {
+      warning("The user-specified lambda value is not within epsilon of any lambda values used to fit the model. Will proceed with the fitted model lambda value closest to the user-specified lambda.")
+      idx <- which.min(abs(object$lambda - lambda))
+    }
+    
+  }
+    
   
   # nvars (tells number of non-zero coefficients)
   nvars <- predict(object, type="nvars", lambda=lambda, idx=idx)
@@ -46,14 +54,15 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5){
   # don't drop, because we need the dimnames here ^ 
   
   # if there were any monomorphic SNPs, say so: 
-  if("X" %in% names(object)){
-    snp_vars <- apply(object$X, 2, FUN = var)
-    constant_features <- names(which(snp_vars == 0 ))
+  if("std_X" %in% names(object)){
+    constant_features <- paste0("Feature ",
+                                setdiff(1:object$ncol_X,
+                                        attr(object$std_X, "nonsingular")))
   } 
   
   out <- structure(list(
     penalty=object$penalty,
-    n=object$n,
+    n=object$n, # TODO: fix this (need to return n somewhere before this...)
     p=nrow(object$beta_vals),
     converged=object$converged[idx],
     lambda=lambda, 

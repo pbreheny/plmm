@@ -1,7 +1,7 @@
 #' Compute sequence of lambda values
 #'
 #' This function allows you compute a sequence of lambda values for plmm models.
-#' @param X Design matrix which *includes* the intercept column if present. May include clinical covariates and other non-SNP data.
+#' @param X Rotated and standardized design matrix which *includes* the intercept column if present. May include clinical covariates and other non-SNP data.
 #' @param y Continuous outcome vector.
 #' @param intercept Logical: does X contain an intercept column? Defaults to TRUE.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.

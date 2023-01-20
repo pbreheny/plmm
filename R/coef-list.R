@@ -1,41 +1,38 @@
-#' Coef method for "plmm" class
+#' Coef method for a list used in cross-validation (e.g. the \code{fit.i} within \code{cvf})
 #'
-#' @param object An object of class "plmm."
+#' @param fit A list with the components returned by `plmm_fit`
 #' @param lambda A numeric vector of lambda values.
 #' @param which Vector of lambda indices for which coefficients to return.
 #' @param drop Logical.
 #' @param ... Additional arguments.
 #' @export
 #' 
-#' @examples 
-#' fit <- plmm(admix$X, admix$y)
-#' (coef.plmm(fit)[1:10, 1:5])
 
-coef.plmm <- function(object, lambda, which = 1:length(object$lambda), drop = TRUE, ...){
+coef.list <- function(fit, lambda, which, drop, ...){
   # error check for supplied lambda value 
   if (!missing(lambda)) {
-    if (max(lambda) > max(object$lambda) | min(lambda) <
-        min(object$lambda)) {
+    if (max(lambda) > max(fit$lambda) | min(lambda) <
+        min(fit$lambda)) {
       stop("Supplied lambda value(s) are outside the range of the model fit.",
            call. = FALSE)
     }
-    ind <- stats::approx(object$lambda, seq(object$lambda), lambda)$y
+    ind <- stats::approx(fit$lambda, seq(fit$lambda), lambda)$y
     l <- floor(ind)
     r <- ceiling(ind)
     w <- ind%%1
-    beta_vals <- (1 - w) * object$beta_vals[, l, drop = FALSE] + w * object$beta_vals[, r, drop = FALSE]
+    beta_vals <- (1 - w) * fit$b[, l, drop = FALSE] + w * fit$b[, r, drop = FALSE]
     
     # format dim. names
     if(is.null(dim(beta_vals))) {
       # case 1: beta_vals is a vector 
       names(beta_vals) <- lamNames(lambda)
-      } else {
-        # case 2: beta_vals is a matrix
+    } else {
+      # case 2: beta_vals is a matrix
       colnames(beta_vals) <- lamNames(lambda)
     }
     
   }
-  else beta_vals <- object$beta_vals[, which, drop = FALSE]
+  else beta_vals <- fit$b[, which, drop = FALSE]
   
   if (drop){
     return(drop(beta_vals))

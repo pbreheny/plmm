@@ -11,6 +11,7 @@
 #' * `fit`: The \code{plmm} fit used in the cross validation
 #' * `bias`: The mean bias of the cross validation
 #' * `loss`: The loss (at each fold?) TODO: double-check this  
+#' * `penalty`: The penalty applied to the fitted model
 #' 
 #' 
 #' @export
@@ -42,6 +43,7 @@ summary.cv.plmm <- function(obj, lambda = "min"){
   # TODO: determine what else should go here 
   out <- structure(list(lambda.min = obj$lambda.min,
                         lambda.1se = obj$lambda.1se,
+                        penalty = obj$penalty,
                         nvars = nvars,
                         cve = obj$cve,
                         min = obj$min,
