@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,9 +80,9 @@
 <span class="r-in"><span class="va">my_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">K</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">LL</span> <span class="op">&lt;-</span> <span class="fu">logLik_nonnull</span><span class="op">(</span>fit <span class="op">=</span> <span class="va">my_fit</span>, SUX <span class="op">=</span> <span class="va">my_fit</span><span class="op">$</span><span class="va">SUX</span>, SUy <span class="op">=</span> <span class="va">my_fit</span><span class="op">$</span><span class="va">SUy</span>, </span>
 <span class="r-in">S <span class="op">=</span> <span class="va">my_fit</span><span class="op">$</span><span class="va">S</span>, eta <span class="op">=</span> <span class="va">my_fit</span><span class="op">$</span><span class="va">eta</span><span class="op">)</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>number of items to replace is not a multiple of replacement length</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in SUX %*% bb:</span> requires numeric/complex matrix/vector arguments</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">LL</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -350.8784 -349.8027 -347.7783 -345.7445 -343.9401 -343.6242</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in head(LL):</span> object 'LL' not found</span>
 <span class="r-in"><span class="co"># See pp. 16-18 in A.R.'s thesis for details </span></span>
 </code></pre></div>
     </div>

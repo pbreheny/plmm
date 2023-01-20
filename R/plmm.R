@@ -29,7 +29,7 @@
 #' 
 #' @examples 
 #' # using admix data 
-#' fit_admix1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+#' fit_admix1 <- plmm(X = admix$X, y = admix$y)
 #' s1 <- summary(fit_admix1, idx = 99)
 #' print(s1)
 #' 

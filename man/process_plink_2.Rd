@@ -27,13 +27,26 @@ Note: 'impute' argument is still under construction. Only "simple" method is ava
 
 \item{...}{Other arguments to bigsnpr::snp_fastImpute or bigsnpr::snp_fastImputeSimple (depending on choice of \code{impute})}
 }
+\value{
+A list of two components:
+\itemize{
+\item X: the fully-imputed design matrix
+\item constants_idx: A numeric vector with the indices of the constant features. An index of 5 indicates that the 5th feature is constant (i.e. has zero variance)
+}
+}
 \description{
 An updated function for processing PLINK files
 }
 \examples{
 
+
+
 \dontrun{
 cad_mid <- process_plink_2(data_dir = plink_example(path = "cad_mid.bed", parent = T), prefix = "cad_mid", rds = T, impute = "simple", method = "mean0")
+str(cad_mid) 
+
+cad_full <- process_plink_2(data_dir = plink_example(path = "og_cad.bed", parent = T), prefix = "og_cad", rds = F, impute = "simple", method = "mean0")
+
 cad_lite <- process_plink_2(data_dir = plink_example(path = "cad_lite.bed", parent = T), prefix = "cad_lite", rds = F, impute = "xgboost")
 }
 }

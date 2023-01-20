@@ -7,7 +7,7 @@
 plmm(
   X,
   y,
-  K,
+  K = NULL,
   k = NULL,
   eta_star,
   penalty = c("MCP", "SCAD", "lasso"),
@@ -73,10 +73,11 @@ A list including the estimated coefficients on the original scale, as well as ot
 }
 \description{
 This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
+NB: this function is simply a wrapper for plmm_prep -> plmm_fit -> plmm_format
 }
 \examples{
 # using admix data 
-fit_admix1 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+fit_admix1 <- plmm(X = admix$X, y = admix$y)
 s1 <- summary(fit_admix1, idx = 99)
 print(s1)
 
@@ -103,5 +104,6 @@ summary(fit_plink1, idx = 5)
 # fit with 'k = 5' specified (so using RSpectra::svds())
 fit_plink2 <- plmm(X = cad_mid$genotypes, y = cad_clinical$hdl_impute, k = 5, trace = TRUE)
 # Runs in ~44 seconds on my 2015 MacBook Pro
+summary(fit_plink2, idx = 5);summary(fit_plink2, idx = 95)
 }
 }

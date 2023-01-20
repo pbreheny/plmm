@@ -12,7 +12,7 @@ coefficient values on their original scale. It is called by plmm()."><!-- mathja
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@ coefficient values on their original scale. It is called by plmm().</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">untransform</span><span class="op">(</span><span class="va">res_b</span>, <span class="va">ns</span>, <span class="va">X</span>, <span class="va">std_X</span>, <span class="va">SUX</span>, <span class="va">std_SUX</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">untransform</span><span class="op">(</span><span class="va">res_b</span>, <span class="va">ns</span>, <span class="va">ncol_X</span>, <span class="va">std_X</span>, <span class="va">SUX</span>, <span class="va">std_SUX</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -64,8 +64,8 @@ coefficient values on their original scale. It is called by plmm().</p>
 <dd><p>The indices of the non-singular columns of the ORIGINAL design matrix</p></dd>
 
 
-<dt>X</dt>
-<dd><p>The original design matrix (has no intercept)</p></dd>
+<dt>ncol_X</dt>
+<dd><p>The number of columns in the original design matrix (without the intercept)</p></dd>
 
 
 <dt>std_X</dt>

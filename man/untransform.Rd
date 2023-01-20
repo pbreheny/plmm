@@ -4,14 +4,14 @@
 \alias{untransform}
 \title{Untransform coefficient values back to the original scale}
 \usage{
-untransform(res_b, ns, X, std_X, SUX, std_SUX)
+untransform(res_b, ns, ncol_X, std_X, SUX, std_SUX)
 }
 \arguments{
 \item{res_b}{The values returned in the 'beta' argument of the ncvfit() object}
 
 \item{ns}{The indices of the non-singular columns of the ORIGINAL design matrix}
 
-\item{X}{The original design matrix (has no intercept)}
+\item{ncol_X}{The number of columns in the original design matrix (without the intercept)}
 
 \item{std_X}{The standardized design matrix BEFORE rotation; this should have attributes 'scale', 'center', and 'nonsingular'}
 

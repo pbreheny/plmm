@@ -5,13 +5,13 @@
 #' @param dfmax dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
 #' 
 #' @return A list with the components: 
-#' * beta_vals: The estimated $\beta$ values at each value of $\lambda$
-#' * eta: The estimated $\eta$ value 
-#' * lambda: The sequence of $\lambda$ values used in model fitting
+#' * beta_vals: The estimated beta values at each value of lambda
+#' * eta: The estimated eta value 
+#' * lambda: The sequence of lambda values used in model fitting
 #' * penalty: A string indicating the type of penalty used to fit the model
 #' * ns_idx: COME BACK HERE
-#' * iter: The number of iterations at each value of $\lambda$ (MAYBE take this out)
-#' * converged: The convergence status at each value of $\lambda$ 
+#' * iter: The number of iterations at each value of lambda (MAYBE take this out)
+#' * converged: The convergence status at each value of lambda
 #' * X: if returnX = TRUE and size SUX < 100 Mb, the original X will be returned
 #' 
 #' 

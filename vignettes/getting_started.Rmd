@@ -76,8 +76,8 @@ cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl),
 Now that we have the data processed, we can fit a model. 
 
 ```{r cad_lite_fit}
-cad_lite_fit <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute)
-names(cad_lite_fit)
+# cad_lite_fit <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute)
+# names(cad_lite_fit)
 ```
 
 The returned `beta_vals` item is a matrix whose rows are $\beta$ coefficients and whose columns represent values of the penalization parameter $\lambda$. By default, `plmm` fits 100 values of $\lambda$ (see the `setup_lambda` function for details). 
@@ -85,7 +85,7 @@ The returned `beta_vals` item is a matrix whose rows are $\beta$ coefficients an
 We can summarize this fit at the 25th $\lambda$ value:  
 
 ```{r summary1}
-summary(cad_lite_fit, lambda = cad_lite_fit$lambda[25])
+# summary(cad_lite_fit, lambda = cad_lite_fit$lambda[25])
 ```
 
 Notice that a notable number of these SNPs are constant features -- that is, SNPs whose values do not vary among the members of this population. For such features, a value of $\beta=0$ is returned for all values of $\lambda$. 
@@ -93,18 +93,20 @@ Notice that a notable number of these SNPs are constant features -- that is, SNP
 In order to make this model run faster on my laptop (which is a 2015 MacBook Pro), I am going to re-run this model with an additional argument $k$. If $k$ is specified and the package `RSpectra` is installed, the singular value decomposition algorithm is `RSpectra::svds(k, ...)` -- this will be more efficient.  
 
 ```{r cad_lite_fit2}
-cad_lite_fit2 <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute, k = 5)
-names(cad_lite_fit2)
+# cad_lite_fit2 <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute, k = 5)
+# names(cad_lite_fit2)
 ```
 
 Let's summarize this new fit -- 
 
 ```{r summary2}
-summary(cad_lite_fit2, lambda = cad_lite_fit2$lambda[25])
+# summary(cad_lite_fit2, lambda = cad_lite_fit2$lambda[25])
 #TODO: examine why there is only one nonzero beta value returned here  
-```
 
-Notice that the two $\lambda$ values at which we examined `cad_lite_fit` and `cad_lite_fit2` were not the same; those values were `r cad_lite_fit$lambda[25]` and `r cad_lite_fit2$lambda[25]` respectively. 
+# Notice that the two $\lambda$ values at which we examined `cad_lite_fit` and `cad_lite_fit2` were not the same; those values were `r cad_lite_fit$lambda[25]` and `r cad_lite_fit2$lambda[25]` respectively. 
+# 
+
+```
 
 
 
@@ -116,6 +118,7 @@ To select a $\lambda$ value, we often use cross validation. Below is an example 
 admix_cv <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
 admix_cv_s <- summary.cv.plmm(admix_cv, lambda = "1se")
 print.summary.cv.plmm(admix_cv_s)
+plot(admix_cv)
 ```
 
 
@@ -123,12 +126,12 @@ To see how this would work for our `cad_lite` data, we can use the lines below:
 
 ```{r cad_cv, eval=FALSE}
 # FIXME: this is taking several minutes -- need to come back here 
-cad_lite_cv <- cv.plmm(X = cad_lite$genotypes, 
-                       y = cad_clinical$hdl_impute,
-                       K = relatedness_mat(cad_lite$genotypes))
+# cad_lite_cv <- cv.plmm(X = cad_lite$genotypes, 
+#                        y = cad_clinical$hdl_impute,
+#                        K = relatedness_mat(cad_lite$genotypes))
 # to see progress bar, run the above with the trace = TRUE argument
 
-print.summary.cv.plmm(summary.cv.plmm(cad_lite_cv, lambda = "min"))
+# print.summary.cv.plmm(summary.cv.plmm(cad_lite_cv, lambda = "min"))
 ```
 
 ## Plots 
@@ -142,15 +145,22 @@ plot(admix_fit)
 
 ```{r admix_pred}
 # make predictions for select lambda value(s)
-admix_pred1 <- predict(object = admix_fit, newX = admix$X, type = "response", idx=98)
+admix_pred1 <- predict(object = admix_fit,
+                       newX = admix$X,
+                       type = "response",
+                       idx=98)
 
 # make prediction using blup 
-admix_pred2 <- predict(object = admix_fit, newX = admix$X, type = "blup", idx=98)
+# admix_pred2 <- predict.list(fit = admix_fit,
+#                             prep = plmm_prep(admix$X, admix$y),
+#                             newX = admix$X,
+#                             type = "blup",
+#                             idx=98)
 
 # compare y predictions 
-admix_compare_y <- data.frame(y = admix$y, yhat_response = admix_pred1, yhat_blup = admix_pred2)
-colnames(admix_compare_y) <- c("Y", "Y hat response", "Y hat BLUP")
-print(head(admix_compare_y))
+# admix_compare_y <- data.frame(y = admix$y, yhat_response = admix_pred1, yhat_blup = admix_pred2)
+# colnames(admix_compare_y) <- c("Y", "Y hat response", "Y hat BLUP")
+# print(head(admix_compare_y))
 ```
 
 
@@ -167,6 +177,9 @@ cad_lite_pred <- predict(object = cad_lite_fit,
 # compare the observed and predicted values 
 compare_cad_lite_y <- data.frame(cad_clinical$hdl_impute, cad_lite_pred)
 colnames(compare_cad_lite_y) <- c("Y", "Y hat BLUP")
+
 print(head(compare_cad_lite_y))
 ```
+
+< More to come... >
 

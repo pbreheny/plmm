@@ -10,7 +10,6 @@
 #' @param ... Additional optional arguments
 #' @export
 #'
-#' @examples
 
 predict.list <- function(fit, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),
                          lambda, idx=1:length(fit$lambda), prep = NULL, ...) {

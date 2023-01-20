@@ -22,6 +22,9 @@
     <loc>/reference/coef.cv.plmm.html</loc>
   </url>
   <url>
+    <loc>/reference/coef.list.html</loc>
+  </url>
+  <url>
     <loc>/reference/coef.plmm.html</loc>
   </url>
   <url>
@@ -88,6 +91,12 @@
     <loc>/reference/plmm.html</loc>
   </url>
   <url>
+    <loc>/reference/plmm_fit.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plmm_format.html</loc>
+  </url>
+  <url>
     <loc>/reference/plmm_lasso.html</loc>
   </url>
   <url>
@@ -103,6 +112,9 @@
     <loc>/reference/plmm_null.html</loc>
   </url>
   <url>
+    <loc>/reference/plmm_prep.html</loc>
+  </url>
+  <url>
     <loc>/reference/plmm_scad.html</loc>
   </url>
   <url>
@@ -110,6 +122,9 @@
   </url>
   <url>
     <loc>/reference/plot.plmm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/predict.list.html</loc>
   </url>
   <url>
     <loc>/reference/predict.plmm.html</loc>

@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,9 +130,13 @@
 <span class="r-in"> <span class="co"># make prediction using blup </span></span>
 <span class="r-in"> <span class="va">pred3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"blup"</span>, idx<span class="op">=</span><span class="fl">98</span><span class="op">)</span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The BLUP option is under development. Rely on these estimates at your own risk.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in predict.plmm(object = fit, newX = newX, type = "blup", idx = 98):</span> The design matrix is required for BLUP calculation, but is not available in the plmm object.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>  This is ususally because X is large.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span>  Please supply the no-intercept design matrix to the X argument, and the vector of outcomes to the y argument.</span>
 <span class="r-in"></span>
 <span class="r-in"> <span class="co"># compare y predictions </span></span>
 <span class="r-in">  <span class="va">compare_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, yhat_response <span class="op">=</span> <span class="va">pred2</span>, yhat_blup <span class="op">=</span> <span class="va">pred3</span><span class="op">)</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in data.frame(y = admix$y, yhat_response = pred2, yhat_blup = pred3):</span> object 'pred3' not found</span>
 <span class="r-in"> </span>
 <span class="r-in"> <span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"> <span class="va">fit_noX</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>,</span>

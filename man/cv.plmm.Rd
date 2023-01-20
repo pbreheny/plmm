@@ -7,13 +7,17 @@
 cv.plmm(
   X,
   y,
-  K,
+  K = NULL,
+  eta_star = NULL,
+  penalty = c("MCP", "SCAD", "lasso"),
+  penalty.factor = rep(1, ncol(X)),
   type = "response",
   ...,
   cluster,
   nfolds = 10,
   seed,
   fold,
+  returnX = TRUE,
   returnY = FALSE,
   trace = FALSE
 )
@@ -25,9 +29,15 @@ cv.plmm(
 
 \item{K}{Known or estimated similarity matrix.}
 
+\item{eta_star}{Optional arg. to \code{plmm_prep}. Defaults to NULL.}
+
+\item{penalty}{The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".}
+
+\item{penalty.factor}{Optional arg. to \code{plmm_prep}. Defaults to 1 for all predictors (except the intercept).}
+
 \item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.}
 
-\item{...}{Additional arguments to plmm}
+\item{...}{Additional arguments to \code{plmm_fit}}
 
 \item{cluster}{cv.plmm can be run in parallel across a cluster using the parallel package. The cluster must be set up in advance using the makeCluster function from that package. The cluster must then be passed to cv.plmm.}
 
@@ -37,6 +47,8 @@ cv.plmm(
 
 \item{fold}{Which fold each observation belongs to. By default the observations are randomly assigned.}
 
+\item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
+
 \item{returnY}{Should cv.plmm return the linear predictors from the cross-validation folds? Default is FALSE; if TRUE, this will return a matrix in which the element for row i, column j is the fitted value for observation i from the fold in which observation i was excluded from the fit, at the jth value of lambda.}
 
 \item{trace}{If set to TRUE, inform the user of progress by announcing the beginning of each CV fold. Default is FALSE.}
@@ -45,7 +57,7 @@ cv.plmm(
 Performs k-fold cross validation for lasso-, MCP-, or SCAD-penalized penalized linear mixed models over a grid of values for the regularization parameter lambda.
 }
 \examples{
-cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+cv_fit <- cv.plmm(X = admix$X, y = admix$y)
 cv_s <- summary.cv.plmm(cv_fit, lambda = "1se")
 print(cv_s)
 }

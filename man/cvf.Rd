@@ -4,16 +4,10 @@
 \alias{cvf}
 \title{Cross-validation internal function for cv.plmm}
 \usage{
-cvf(i, XX, y, K, fold, type, cv.args, ...)
+cvf(i, fold, type, cv.args, ...)
 }
 \arguments{
 \item{i}{Fold number to be excluded from fit.}
-
-\item{XX}{Design matrix. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.}
-
-\item{y}{Original continuous outcome vector.}
-
-\item{K}{Known or estimated similarity matrix.}
 
 \item{fold}{n-length vector of fold-assignments.}
 
@@ -21,7 +15,7 @@ cvf(i, XX, y, K, fold, type, cv.args, ...)
 
 \item{cv.args}{List of additional arguments to be passed to plmm.}
 
-\item{...}{Optional arguments}
+\item{...}{Optional arguments to \code{predict.list}}
 }
 \description{
 Internal function for cv.plmm which calls plmm on a fold subset of the original data.

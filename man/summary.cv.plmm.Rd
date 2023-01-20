@@ -22,6 +22,7 @@ The return value is an object with S3 class \code{summary.cv.plmm}. The class ha
 \item \code{fit}: The \code{plmm} fit used in the cross validation
 \item \code{bias}: The mean bias of the cross validation
 \item \code{loss}: The loss (at each fold?) TODO: double-check this
+\item \code{penalty}: The penalty applied to the fitted model
 }
 }
 \description{

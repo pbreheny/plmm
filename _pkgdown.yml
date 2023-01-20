@@ -16,10 +16,13 @@ reference:
     
   - title: Fitting penalized linear mixed models (PLMMs) 
     contents:
-    - plmm
+    - plmm_fit
+    - plmm_format
     - plmm_lasso
     - plmm_mcp
+    - plmm_prep
     - plmm_scad
+    - plmm
     
   - title: Loss, information, and cross-validation for PLMMs
     contents:
@@ -34,6 +37,7 @@ reference:
     contents:
     - coef.cv.plmm
     - coef.plmm
+    - coef.list
     
   - title: Other model fitting methods (and some helper functions)
     contents: 
@@ -69,6 +73,7 @@ reference:
   - title: Prediction
     contents: 
     - predict.plmm
+    - predict.list
     
   - title: Data sets
     contents:

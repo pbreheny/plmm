@@ -23,8 +23,10 @@ cvf <- function(i, fold, type, cv.args, ...) {
   cv.args$prep$std_X <- cv.args$prep$std_X[fold!=i, ,drop=FALSE]
   cv.args$prep$U <- cv.args$prep$U[fold!=i, ,drop=FALSE]
   cv.args$prep$y <- cv.args$prep$y[fold!=i]
+  cv.args$eta_star <- NULL # we will re-estimate eta in each fold
   
   # NB: inside each fold, we are not re-doing the prep steps like SVD, rotation, etc.
+  # browser()
   fit.i <- do.call("plmm_fit", cv.args)
   
   beta <- coef.list(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
