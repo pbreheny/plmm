@@ -19,3 +19,4 @@ Generate nicely formatted lambda vec
 l <- c(1, 0.1, 0.01, 0.001) 
 lamNames(l)
 }
+\keyword{internal}

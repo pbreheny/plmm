@@ -19,7 +19,8 @@
 #' * ns: the indices for the nonsingular values of std_X
 #' * penalty.factor: the penalty factors for the penalized non-singular values 
 #' * snp_names: Formatted column names of the design matrix 
-#' @export
+#'
+#'@keywords internal
 #'
 #' @examples
 #' 

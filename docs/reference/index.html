@@ -6,7 +6,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-dark"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
@@ -79,15 +79,9 @@
 
       <dl><dt>
           
-          <code><a href="plmm_fit.html">plmm_fit()</a></code> 
+          <code><a href="plmm.html">plmm()</a></code> 
         </dt>
-        <dd>PLMM fit: a function that fits a PLMM using the values returned by plmm_prep()
-This is an internal function for <code>cv.plmm</code></dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm_format.html">plmm_format()</a></code> 
-        </dt>
-        <dd>PLMM format: a function to format the output of a model constructed with <code>plmm_fit</code></dd>
+        <dd>Fit a linear mixed model with non-convex regularization</dd>
       </dl><dl><dt>
           
           <code><a href="plmm_lasso.html">plmm_lasso()</a></code> 
@@ -100,20 +94,9 @@ This is an internal function for <code>cv.plmm</code></dd>
         <dd>Fit a penalizedLMM with MCP regularization using penalizedLMM</dd>
       </dl><dl><dt>
           
-          <code><a href="plmm_prep.html">plmm_prep()</a></code> 
-        </dt>
-        <dd>PLMM prep: a function to run checks, SVD, and rotation prior to fitting a PLMM model
-This is an internal function for <code>cv.plmm</code></dd>
-      </dl><dl><dt>
-          
           <code><a href="plmm_scad.html">plmm_scad()</a></code> 
         </dt>
         <dd>Fit a penalizedLMM with SCAD regularization using penalizedLMM</dd>
-      </dl><dl><dt>
-          
-          <code><a href="plmm.html">plmm()</a></code> 
-        </dt>
-        <dd>Fit a linear mixed model with non-convex regularization</dd>
       </dl></div><div class="section level2">
       <h2 id="loss-information-and-cross-validation-for-plmms">Loss, information, and cross-validation for PLMMs<a class="anchor" aria-label="anchor" href="#loss-information-and-cross-validation-for-plmms"></a></h2>
       
@@ -126,11 +109,6 @@ This is an internal function for <code>cv.plmm</code></dd>
       
 
       <dl><dt>
-          
-          <code><a href="cvf.html">cvf()</a></code> 
-        </dt>
-        <dd>Cross-validation internal function for cv.plmm</dd>
-      </dl><dl><dt>
           
           <code><a href="cv.plmm.html">cv.plmm()</a></code> 
         </dt>
@@ -176,11 +154,6 @@ This is an internal function for <code>cv.plmm</code></dd>
           <code><a href="coef.plmm.html">coef(<i>&lt;plmm&gt;</i>)</a></code> 
         </dt>
         <dd>Coef method for "plmm" class</dd>
-      </dl><dl><dt>
-          
-          <code><a href="coef.list.html">coef(<i>&lt;list&gt;</i>)</a></code> 
-        </dt>
-        <dd>Coef method for a list used in cross-validation (e.g. the <code>fit.i</code> within <code>cvf</code>)</dd>
       </dl></div><div class="section level2">
       <h2 id="other-model-fitting-methods-and-some-helper-functions-">Other model fitting methods (and some helper functions)<a class="anchor" aria-label="anchor" href="#other-model-fitting-methods-and-some-helper-functions-"></a></h2>
       
@@ -197,12 +170,6 @@ This is an internal function for <code>cv.plmm</code></dd>
           <code><a href="convexMin.html">convexMin()</a></code> 
         </dt>
         <dd>Calculate index for which objective function ceases to be locally convex</dd>
-      </dl><dl><dt>
-          
-          <code><a href="estimate_eta.html">estimate_eta()</a></code> 
-        </dt>
-        <dd>Estimate eta (to be used in rotating the data)
-This function is called internally by <code><a href="../reference/plmm.html">plmm()</a></code></dd>
       </dl><dl><dt>
           
           <code><a href="lasso.html">lasso()</a></code> 
@@ -223,11 +190,6 @@ This function is called internally by <code><a href="../reference/plmm.html">plm
           <code><a href="lmm_lasso.html">lmm_lasso()</a></code> 
         </dt>
         <dd>Fit a penalizedLMM with lasso regularization</dd>
-      </dl><dl><dt>
-          
-          <code><a href="setup_lambda.html">setup_lambda()</a></code> 
-        </dt>
-        <dd>Compute sequence of lambda values</dd>
       </dl></div><div class="section level2">
       <h2 id="data-pre-processing-and-wrangling">Data (pre)processing and wrangling<a class="anchor" aria-label="anchor" href="#data-pre-processing-and-wrangling"></a></h2>
       
@@ -264,21 +226,6 @@ This function is called internally by <code><a href="../reference/plmm.html">plm
           <code><a href="relatedness_mat.html">relatedness_mat()</a></code> 
         </dt>
         <dd>Calculate a relatedness matrix</dd>
-      </dl><dl><dt>
-          
-          <code><a href="scale_varp.html">scale_varp()</a></code> 
-        </dt>
-        <dd>Calculate scale by the population standard deviation, without centering</dd>
-      </dl><dl><dt>
-          
-          <code><a href="untransform.html">untransform()</a></code> 
-        </dt>
-        <dd>Untransform coefficient values back to the original scale</dd>
-      </dl><dl><dt>
-          
-          <code><a href="varp.html">varp()</a></code> 
-        </dt>
-        <dd>Calculate the population variance</dd>
       </dl></div><div class="section level2">
       <h2 id="plotting-summarizing-and-formatting">Plotting, summarizing, and formatting<a class="anchor" aria-label="anchor" href="#plotting-summarizing-and-formatting"></a></h2>
       
@@ -291,11 +238,6 @@ This function is called internally by <code><a href="../reference/plmm.html">plm
       
 
       <dl><dt>
-          
-          <code><a href="lamNames.html">lamNames()</a></code> 
-        </dt>
-        <dd>Generate nicely formatted lambda vec</dd>
-      </dl><dl><dt>
           
           <code><a href="summary.plmm.html">summary(<i>&lt;plmm&gt;</i>)</a></code> 
         </dt>
@@ -341,11 +283,6 @@ This function is called internally by <code><a href="../reference/plmm.html">plm
           <code><a href="predict.plmm.html">predict(<i>&lt;plmm&gt;</i>)</a></code> 
         </dt>
         <dd>Predict method for plmm class</dd>
-      </dl><dl><dt>
-          
-          <code><a href="predict.list.html">predict(<i>&lt;list&gt;</i>)</a></code> 
-        </dt>
-        <dd>Predict method for a list used in cross-validation (e.g. the <code>fit.i</code> within <code>cvf</code>)</dd>
       </dl></div><div class="section level2">
       <h2 id="data-sets">Data sets<a class="anchor" aria-label="anchor" href="#data-sets"></a></h2>
       

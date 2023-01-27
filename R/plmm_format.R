@@ -15,7 +15,7 @@
 #' * X: if returnX = TRUE and size SUX < 100 Mb, the original X will be returned
 #' 
 #' 
-#' @export
+#' @keywords internal
 #'
 #' @examples
 #' prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)

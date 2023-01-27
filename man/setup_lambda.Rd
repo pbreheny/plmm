@@ -39,3 +39,4 @@ fit <- plmm_lasso(X = admix$X, y = admix$y, K = RRM, p1 = 10)
  penalty.factor = fit$penalty.factor)) # use default lambda.min
 
 }
+\keyword{internal}

@@ -8,7 +8,7 @@
 #' @param lambda.min The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise. A value of lambda.min = 0 is not supported. 
 #' @param nlambda The desired number of lambda values in the sequence to be generated. 
 #' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
-#' @export
+#' @keywords internal
 #' 
 #' @examples 
 #' RRM <- relatedness_mat(X = scale(admix$X))

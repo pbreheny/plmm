@@ -54,3 +54,4 @@ This is an internal function for \code{cv.plmm}
 
 prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
 }
+\keyword{internal}

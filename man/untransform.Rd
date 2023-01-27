@@ -23,3 +23,4 @@ untransform(res_b, ns, ncol_X, std_X, SUX, std_SUX)
 This function unwinds both steps of the standardization process to obtain
 coefficient values on their original scale. It is called by plmm().
 }
+\keyword{internal}

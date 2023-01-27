@@ -34,3 +34,4 @@ prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
 fit1 <- plmm_fit(prep = prep1)
 res1 <- plmm_format(fit1)
 }
+\keyword{internal}

@@ -8,7 +8,7 @@
 #' @param prep Optional argument. Result of the call to `plmm_prep` which corresponds to the `fit` argument. Required if \code{type == 'blup'} and object is too large to be returned in `fit` object.
 #' @param covariance Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'blup'}.
 #' @param ... Additional optional arguments
-#' @export
+#' @keywords internal
 #'
 
 predict.list <- function(fit, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),

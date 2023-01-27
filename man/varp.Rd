@@ -16,3 +16,4 @@ This function allows you to calculate the population variance; we assume our sam
 v <- rnorm(5)
 varp(v)
 }
+\keyword{internal}

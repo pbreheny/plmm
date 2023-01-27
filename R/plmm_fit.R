@@ -28,7 +28,7 @@
 #' * ns: The indices of the non-singular columns of the ORIGINAL design matrix
 #' * ncol_X: The number of columns in the ORIGINAL design matrix 
 #' 
-#' @export
+#' @keywords internal 
 #'
 #' @examples
 #' prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)

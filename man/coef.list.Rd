@@ -20,3 +20,4 @@
 \description{
 Coef method for a list used in cross-validation (e.g. the \code{fit.i} within \code{cvf})
 }
+\keyword{internal}

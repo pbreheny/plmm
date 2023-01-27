@@ -5,7 +5,7 @@
 #' @param which Vector of lambda indices for which coefficients to return.
 #' @param drop Logical.
 #' @param ... Additional arguments.
-#' @export
+#' @keywords internal
 #' 
 
 coef.list <- function(fit, lambda, which, drop, ...){

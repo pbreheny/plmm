@@ -2,8 +2,7 @@ url: ~
 
 template:
     bootstrap: 5
-    bootswatch: superhero
-    theme: arrow-dark
+    bootswatch: minty
     bslib:
       pkgdown-nav-height: 100px
 
@@ -16,17 +15,13 @@ reference:
     
   - title: Fitting penalized linear mixed models (PLMMs) 
     contents:
-    - plmm_fit
-    - plmm_format
+    - plmm
     - plmm_lasso
     - plmm_mcp
-    - plmm_prep
     - plmm_scad
-    - plmm
     
   - title: Loss, information, and cross-validation for PLMMs
     contents:
-    - cvf
     - cv.plmm
     - gic
     - loss.plmm
@@ -37,17 +32,14 @@ reference:
     contents:
     - coef.cv.plmm
     - coef.plmm
-    - coef.list
     
   - title: Other model fitting methods (and some helper functions)
     contents: 
     - convexMin
-    - estimate_eta
     - lasso
     - lasso_pca10
     - lmm_ggmix
     - lmm_lasso
-    - setup_lambda
     
   - title: Data (pre)processing and wrangling
     contents:
@@ -56,13 +48,10 @@ reference:
     - process_plink
     - process_plink_2
     - relatedness_mat
-    - scale_varp
-    - untransform
-    - varp
+
     
   - title: Plotting, summarizing, and formatting
     contents:
-    - lamNames
     - summary.plmm
     - print.summary.plmm
     - summary.cv.plmm
@@ -73,9 +62,23 @@ reference:
   - title: Prediction
     contents: 
     - predict.plmm
-    - predict.list
     
   - title: Data sets
     contents:
     - admix
     
+  - title: internal
+    contents: 
+    - coef.list
+    - cvf
+    - estimate_eta
+    - lamNames
+    - plmm_format
+    - plmm_prep
+    - predict.list
+    - scale_varp
+    - setup_lambda
+    - untransform
+    - varp
+    
+  

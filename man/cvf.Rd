@@ -20,3 +20,4 @@ cvf(i, fold, type, cv.args, ...)
 \description{
 Internal function for cv.plmm which calls plmm on a fold subset of the original data.
 }
+\keyword{internal}

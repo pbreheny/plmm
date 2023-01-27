@@ -1,8 +1,8 @@
 #' Generate nicely formatted lambda vec
 #'
 #' @param l Vector of lambda values.
-#' @return A character vector of formatted lambda value names 
-#' @export
+#' @return A character vector of formatted lambda value names
+#' @keywords internal
 #' 
 #' @examples 
 #' l <- c(1, 0.1, 0.01, 0.001) 

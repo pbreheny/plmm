@@ -2,7 +2,7 @@
 #'
 #' This function allows you to scale vectors of a matrix by their population standard deviation without centering; we assume our sample is the population.
 #' @param X numeric matrix
-#' @export
+#' @keywords internal
 #' 
 #' @examples 
 #' M <- matrix(rnorm(25), 5, 5)

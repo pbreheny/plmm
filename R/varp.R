@@ -2,7 +2,7 @@
 #'
 #' This function allows you to calculate the population variance; we assume our sample is the population.
 #' @param x numeric vector
-#' @export
+#' @keywords internal
 #' 
 #' @examples 
 #' v <- rnorm(5)

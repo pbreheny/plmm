@@ -18,3 +18,4 @@ estimate_eta(S, U, y, eta_star)
 Estimate eta (to be used in rotating the data)
 This function is called internally by \code{plmm()}
 }
+\keyword{internal}

@@ -7,11 +7,7 @@
 #' @param cv.args List of additional arguments to be passed to plmm.
 #' @param ... Optional arguments to `predict.list`
 #' @importFrom zeallot %<-%
-#' @export
-#' 
-
-
-
+#' @keywords internal
 cvf <- function(i, fold, type, cv.args, ...) {
   
   # extract test set

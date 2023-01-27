@@ -10,7 +10,7 @@
 #' @param SUX The rotated design matrix (has the intercept)
 #' @param std_SUX The standardized design matrix AFTER rotation; this should have attribute 'scale'
 #' 
-#' @export
+#' @keywords internal
 
 
 untransform <- function(res_b, ns, ncol_X, std_X, SUX, std_SUX){

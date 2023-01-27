@@ -5,7 +5,7 @@
 #' @param y Continuous outcome vector.
 #' @importFrom zeallot %<-%
 #' @export
-#' 
+#' @keywords internal
 estimate_eta <- function(S, U, y, eta_star){
   # TODO: could also pass 'R' (the residuals... instead of y.)
   
