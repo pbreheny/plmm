@@ -144,4 +144,4 @@ cv.plmm <- function(X,
               null.dev=mean(loss.plmm(y, rep(mean(y), n))), Bias=Bias, Loss = E)
   if (returnY) val$Y <- Y
   structure(val, class="cv.plmm")
-}
+} 
