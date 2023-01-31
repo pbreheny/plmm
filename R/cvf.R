@@ -16,9 +16,12 @@ cvf <- function(i, fold, type, cv.args, ...) {
   
   # subset std_X, U, and y to match fold indices 
   #   (and in so doing, leave out the ith fold)
-  cv.args$prep$std_X <- cv.args$prep$std_X[fold!=i, ,drop=FALSE]
+  X_train <- cv.args$prep$std_X[fold!=i, ,drop=FALSE] 
+  y_train <- cv.args$prep$y[fold!=i]
+  
+  cv.args$prep$std_X <- X_train
   cv.args$prep$U <- cv.args$prep$U[fold!=i, ,drop=FALSE]
-  cv.args$prep$y <- cv.args$prep$y[fold!=i]
+  cv.args$prep$y <- y_train
   cv.args$eta_star <- NULL # we will re-estimate eta in each fold
   
   # NB: inside each fold, we are not re-doing the prep steps like SVD, rotation, etc.
@@ -28,12 +31,16 @@ cvf <- function(i, fold, type, cv.args, ...) {
   beta <- coef.list(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
   Xbeta <- predict.list(fit = fit.i, newX = X2, type = 'response', lambda = fit.i$lambda)
   yhat <- matrix(data = drop(Xbeta), nrow = length(y2))
+  cov_y <- plmm_fit$estimated_cov_y 
+  cov_y_train <- cov_y[fold!=i, fold!=i]
+  cov_y_train_y_test <- cov_y[fold!=i, fold=i]       # train set size by 1 
   
   if (type == 'blup'){
     yhat <- predict.list(fit = fit.i, newX = X2, type = 'blup',
                          lambda = fit.i$lambda, prep = cv.args$prep, ...)
-                        
+    
   }
   loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(y2, yhat[,ll]))
-  list(loss=loss, nl=length(fit.i$lambda), yhat=yhat)
+  bias <- cv_bias(X_train, X2, y_train, y2, cov_y_train, cov_y_train_y_test)
+  list(loss=loss, bias=bias, nl=length(fit.i$lambda), yhat=yhat)
 }
