@@ -132,6 +132,9 @@ plmm_fit <- function(prep,
     if(prep$trace){setTxtProgressBar(pb, ll)}
   }
   
+  # TODO: 
+  estimated_cov_y <- eta * tcrossprod(U, D) + (1-eta)
+    
   ret <- structure(list(
     std_X = prep$std_X,
     y = prep$y,
