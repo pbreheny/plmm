@@ -1,3 +1,8 @@
+<!-- badges: start -->
+[![GitHub version](https://img.shields.io/static/v1?label=GitHub&message=1.0.1&color=blue&logo=github)](https://github.com/areisett/penalizedLMM)
+[![R-CMD-check](https://github.com/areisett/penalizedLMM/workflows/R-CMD-check/badge.svg)](https://github.com/areisett/penalizedLMM/actions)
+<!-- badges: end -->
+
 ## Welcome 
 
 The `penalizedLMM` package contains functions that fit penalized linear mixed models to correct for unobserved confounding effects. Documentation for this package is in progress. 

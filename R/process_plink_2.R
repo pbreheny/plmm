@@ -106,7 +106,6 @@ process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", qu
 
     
   } else if (impute == "xgboost"){
-    browser()
     imp <- bigsnpr::snp_fastImpute(Gna = X,
                                    ncores = bigstatsr::nb_cores(),
                                    infos.chr = chr,

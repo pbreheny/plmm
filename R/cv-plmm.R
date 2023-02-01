@@ -109,7 +109,6 @@ cv.plmm <- function(X,
       res <- cvf(i = i, fold = fold, type = type, cv.args = cv.args)
       if (trace) {setTxtProgressBar(pb, i)}
     }
-    # browser()
     # update E and Y
     E[fold==i, 1:res$nl] <- res$loss
     Y[fold==i, 1:res$nl] <- res$yhat
@@ -132,8 +131,6 @@ cv.plmm <- function(X,
   within1se <- which(cve >= l.se & cve <= u.se)
   min1se <- which.max(lambda %in% lambda[within1se])
 
-  # browser()
-  
   # bias correction
   e <- sapply(1:nfolds, function(i) apply(E[fold==i, , drop=FALSE], 2, mean))
   Bias <- mean(e[min,] - apply(e, 2, min))
