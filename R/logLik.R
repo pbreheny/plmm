@@ -25,10 +25,12 @@ logLik <- function(eta, Uy, S){
   Sdi <- 1/Sd
   Uy <- as.vector(Uy)
   ss <- (1/n) * sum(Uy*Uy*Sdi)
+  # ss <- sum(Uy*Uy*Sdi)
 
   # evalue the negative log likelihood
   nLL <- 0.5*(n*log(2*pi) + ldet + n + n*log(ss))
-
+  # nLL <- 0.5*(ldet + ss)
+  
   return(nLL)
 
 }

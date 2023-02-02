@@ -126,7 +126,7 @@ cv.plmm <- function(X,
   # return min lambda idx
   cve <- apply(E, 2, mean)
   cvse <- apply(E, 2, stats::sd) / sqrt(n)
-  cv_bias_avg <- sum(bias_allfolds) # ???????????????????????? 
+  cv_bias_avg <- sum(bias_allfolds) 
   cve <- cve + cv_bias_avg
   min <- which.min(cve)
   

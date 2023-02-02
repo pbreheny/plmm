@@ -6,7 +6,7 @@
 #' @importFrom zeallot %<-%
 #' @export
 #' @keywords internal
-estimate_eta <- function(S, U, y, eta_star){
+estimate_eta <- function(S, U, y){
   # TODO: could also pass 'R' (the residuals... instead of y.)
   
   # coercion
