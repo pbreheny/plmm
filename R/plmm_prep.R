@@ -69,6 +69,8 @@ plmm_prep <- function(X,
     if (typeof(K)=="integer") storage.mode(X) <- "double" # change K to X 
     if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
     if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
+    # TODO: 
+    # check K is symmetric or not 
   }
   
   if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
@@ -85,7 +87,7 @@ plmm_prep <- function(X,
   penalty.factor <- penalty.factor[ns]
   
   # designate the dimensions of the design matrix 
-  p <- ncol(X) 
+  p <- ncol(X) # TODO: see if this should be ncol(std_X)
   n <- nrow(X)
   
   # calculate SVD
@@ -104,7 +106,7 @@ plmm_prep <- function(X,
 
   
   # return values to be passed into plmm_fit(): 
-  ret <- structure(list(ncol_X = ncol(X),
+  ret <- structure(list(ncol_X = ncol(X), # may need to make this ncol(std_X)
                         y = y,
                         std_X = std_X,
                         S = S,

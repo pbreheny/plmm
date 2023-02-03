@@ -66,14 +66,16 @@ cv.plmm <- function(X,
   cv.args <- fit.args
   cv.args$warn <- FALSE
   cv.args$lambda <- fit$lambda
-  cv.args$eta_star <- fit$eta
+  cv.args$K <- K 
   
   if (type == 'blup') {cv.args$returnX <- TRUE}
   
   # initialize objects to hold CV results 
-  n <- length(fit$y)
+  n <- length(y)
   E <- Y <- matrix(NA, nrow=nrow(X), ncol=length(fit$lambda))
-  bias_allfolds <- numeric(nfolds)
+  # TODO: 
+  # is this a matrix or vector???????????? 
+  # bias_allfolds <- numeric(nfolds) 
   
   
   # set up folds for cross validation 
@@ -106,6 +108,7 @@ cv.plmm <- function(X,
       res <- fold.results[[i]] # refers to lines from above
       if (trace) {setTxtProgressBar(pb, i)}
     } else {
+      # browser()
       # case 2: cluster NOT user specified 
       res <- cvf(i = i, fold = fold, type = type, cv.args = cv.args)
       if (trace) {setTxtProgressBar(pb, i)}
@@ -114,7 +117,7 @@ cv.plmm <- function(X,
     # update E and Y
     E[fold==i, 1:res$nl] <- res$loss
     Y[fold==i, 1:res$nl] <- res$yhat
-    bias_allfolds[i] <- res$bias
+    # bias_allfolds[i] <- res$bias
   }
   
   # eliminate saturated lambda values, if any
@@ -126,8 +129,8 @@ cv.plmm <- function(X,
   # return min lambda idx
   cve <- apply(E, 2, mean)
   cvse <- apply(E, 2, stats::sd) / sqrt(n)
-  cv_bias_avg <- sum(bias_allfolds) 
-  cve <- cve + cv_bias_avg
+  # cv_bias_avg <- sum(bias_allfolds) 
+  # cve <- cve + cv_bias_avg
   min <- which.min(cve)
   
   # return lambda 1se idx
@@ -142,10 +145,19 @@ cv.plmm <- function(X,
   e <- sapply(1:nfolds, function(i) apply(E[fold==i, , drop=FALSE], 2, mean))
   Bias <- mean(e[min,] - apply(e, 2, min))
   
-  val <- list(cve=cve, cvse=cvse, fold=fold, lambda=lambda, fit=fit,
-              min=min, lambda.min=lambda[min],
-              min1se = min1se, lambda.1se = lambda[min1se],
-              null.dev=mean(loss.plmm(y, rep(mean(y), n))), Bias=Bias, Loss = E)
+  val <- list(cve=cve,
+              cvse=cvse,
+              fold=fold,
+              lambda=lambda,
+              fit=fit,
+              min=min,
+              lambda.min=lambda[min],
+              min1se = min1se,
+              lambda.1se = lambda[min1se],
+              null.dev=mean(loss.plmm(y, rep(mean(y), n))),
+              Bias=Bias,
+              Loss = E)
+  
   if (returnY) val$Y <- Y
   structure(val, class="cv.plmm")
 }

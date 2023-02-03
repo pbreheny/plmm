@@ -14,23 +14,21 @@
 #' (logLik(eta = fit$eta, Uy = U%*%admix$y, S = ev$values ))
 
 logLik <- function(eta, Uy, S){
-
+  
   n <- dim(Uy)[1]
-
+  
   # evaluate log determinant
-  Sd <- eta * S + (1 - eta)
+  Sd <- eta * S + (1 - eta) # Thesis page 18 W^(-2)
   ldet <- sum(log(Sd))  # log of product = sum of the logs
-
+  
   # evaluate the variance
   Sdi <- 1/Sd
   Uy <- as.vector(Uy)
-  ss <- (1/n) * sum(Uy*Uy*Sdi)
-  # ss <- sum(Uy*Uy*Sdi)
-
+  ss <- sum(Uy*Uy*Sdi)
+  
   # evalue the negative log likelihood
-  nLL <- 0.5*(n*log(2*pi) + ldet + n + n*log(ss))
-  # nLL <- 0.5*(ldet + ss)
+  nLL <- 0.5*(ldet + log(ss)) # ss is on log scale for numerical stability reason 
   
   return(nLL)
-
+  
 }

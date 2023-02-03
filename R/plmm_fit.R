@@ -74,7 +74,8 @@ plmm_fit <- function(prep,
   SUX <- W %*% crossprod(prep$U, cbind(1, prep$std_X)) # add column of 1s for intercept
   SUy <- drop(W %*% crossprod(prep$U, prep$y))
   
-  # re-standardize rotated SUX
+  # re-standardize rotated SUX 
+  # center SUX here? 
   std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
   std_SUX_noInt <- std_SUX_temp$scaled_X
   std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
@@ -132,8 +133,8 @@ plmm_fit <- function(prep,
     if(prep$trace){setTxtProgressBar(pb, ll)}
   }
   
-  # TODO: 
-  estimated_cov_y <- eta * tcrossprod(U, D) + (1-eta)
+  # reconstruct K to calculate V 
+  estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S), prep$U) + (1-eta)
     
   ret <- structure(list(
     std_X = prep$std_X,
@@ -159,7 +160,8 @@ plmm_fit <- function(prep,
     warn = warn,
     init = init,
     returnX = prep$returnX,
-    trace = prep$trace
+    trace = prep$trace, 
+    estimated_V = estimated_V
   ))
   
   return(ret)
