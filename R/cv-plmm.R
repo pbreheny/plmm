@@ -61,6 +61,7 @@ cv.plmm <- function(X,
   # implement full model fit 
   fit.args <- c(list(prep = prep, penalty = penalty), list(...))
   fit <- do.call('plmm_fit', fit.args)
+  fit_to_return <- plmm_format(fit)
   
   # set up arguments for cv 
   cv.args <- fit.args
@@ -135,7 +136,7 @@ cv.plmm <- function(X,
   e <- sapply(1:nfolds, function(i) apply(E[fold==i, , drop=FALSE], 2, mean))
   Bias <- mean(e[min,] - apply(e, 2, min))
 
-  val <- list(cve=cve, cvse=cvse, fold=fold, lambda=lambda, fit=fit,
+  val <- list(cve=cve, cvse=cvse, fold=fold, lambda=lambda, fit=fit_to_return,
               min=min, lambda.min=lambda[min],
               min1se = min1se, lambda.1se = lambda[min1se],
               null.dev=mean(loss.plmm(y, rep(mean(y), n))), Bias=Bias, Loss = E)
