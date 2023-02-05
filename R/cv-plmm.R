@@ -67,6 +67,7 @@ cv.plmm <- function(X,
   cv.args$warn <- FALSE
   cv.args$lambda <- fit$lambda
   cv.args$K <- K 
+  cv.args$estimated_V <- fit$estimated_V
   
   if (type == 'blup') {cv.args$returnX <- TRUE}
   

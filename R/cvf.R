@@ -10,21 +10,20 @@
 #' @keywords internal
 cvf <- function(i, fold, type, cv.args, ...) {
  
-  # subset std_X, U, and y to match fold indices 
+  # subset std_X, and y to match fold indices 
   #   (and in so doing, leave out the ith fold)
   X_train <- cv.args$prep$std_X[fold!=i, ,drop=FALSE] 
   y_train <- cv.args$prep$y[fold!=i] 
   K_train <- cv.args$K[fold!=i, fold!=i, drop=FALSE]
   
-  # cv.args$prep$std_X <- X_train
-  # # cv.args$prep$U <- cv.args$prep$U[fold!=i, ,drop=FALSE]
-  # cv.args$prep$y <- y_train
+  V <- cv.args$estimated_V
+  V_train <- V[fold!=i, fold!=i]
+  V_train_test <- V[fold!=i, fold=i, drop = FALSE]   
   
   # do SVD inside each fold using training data 
   prep.args.i <- c(list(X = X_train,
                         y = y_train,
                         K = K_train,
-                        #penalty.factor = cv.args$penalty.factor,
                         returnX = cv.args$prep$returnX,
                         trace = cv.args$prep$trace))
 
@@ -32,7 +31,8 @@ cvf <- function(i, fold, type, cv.args, ...) {
   prep.i <- do.call('plmm_prep', prep.args.i)
   
   # fit a plmm within each fold 
-  fit.args.i <- c(list(prep.i, penalty = cv.args$penalty), list(...))
+  # lambda stays the same for each fold; comes from the overall fit in cv_plmm.R line 63 
+  fit.args.i <- c(list(prep.i, penalty = cv.args$penalty, lambda = cv.args$lambda), list(...))
   fit.i <- do.call("plmm_fit", fit.args.i)
   ns.i <- attr(fit.i$std_X, "nonsingular")
   
@@ -46,9 +46,7 @@ cvf <- function(i, fold, type, cv.args, ...) {
   beta <- coef.list(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
   Xbeta <- predict.list(fit = fit.i, newX = X_test, type = 'response', lambda = fit.i$lambda)
   yhat <- matrix(data = drop(Xbeta), nrow = length(y_test))
-  # V <- fit.i$estimated_V 
-  # V_train <- V[fold!=i, fold!=i]
-  # V_train_test <- V[fold!=i, fold=i]       # train set size by 1 
+  
   
   if (type == 'blup'){
     yhat <- predict.list(fit = fit.i, newX = X_test, type = 'blup',
@@ -56,9 +54,9 @@ cvf <- function(i, fold, type, cv.args, ...) {
     
   }
   loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(y_test, yhat[,ll]))
-  # bias <- cv_bias(X_train, X_test, y_train, y_test, V_train, V_train_test)
+  bias <- cv_bias(X_train, X_test, y_train, y_test, V_train, V_train_test)
   list(loss=loss,
-       #bias=bias,
+       bias=bias,
        nl=length(fit.i$lambda),
        yhat=yhat)
 }
