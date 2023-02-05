@@ -70,7 +70,8 @@ plmm_format <- function(fit,
                         ns_idx = c(1, 1 + fit$ns), # PAY ATTENTION HERE! 
                         ncol_X = fit$ncol_X,
                         iter = iter,
-                        converged = converged),
+                        converged = converged, 
+                        estimated_V = fit$estimated_V),
                    class = "plmm")
   if (fit$returnX) {
     if (utils::object.size(fit$SUX) > 1e8) {

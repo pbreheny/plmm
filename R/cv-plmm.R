@@ -61,6 +61,8 @@ cv.plmm <- function(X,
   # implement full model fit 
   fit.args <- c(list(prep = prep, penalty = penalty), list(...))
   fit <- do.call('plmm_fit', fit.args)
+  fit_to_return <- plmm_format(fit)
+  
   
   # set up arguments for cv 
   cv.args <- fit.args
@@ -150,7 +152,7 @@ cv.plmm <- function(X,
               cvse=cvse,
               fold=fold,
               lambda=lambda,
-              fit=fit,
+              fit=fit_to_return,
               min=min,
               lambda.min=lambda[min],
               min1se = min1se,

@@ -16,9 +16,9 @@ cvf <- function(i, fold, type, cv.args, ...) {
   y_train <- cv.args$prep$y[fold!=i] 
   K_train <- cv.args$K[fold!=i, fold!=i, drop=FALSE]
   
-  V <- cv.args$estimated_V
-  V_train <- V[fold!=i, fold!=i]
-  V_train_test <- V[fold!=i, fold=i, drop = FALSE]   
+  # V <- cv.args$estimated_V
+  # V_train <- V[fold!=i, fold!=i]
+  # V_train_test <- V[fold!=i, fold=i, drop = FALSE]   
   
   # do SVD inside each fold using training data 
   prep.args.i <- c(list(X = X_train,
@@ -54,9 +54,9 @@ cvf <- function(i, fold, type, cv.args, ...) {
     
   }
   loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(y_test, yhat[,ll]))
-  bias <- cv_bias(X_train, X_test, y_train, y_test, V_train, V_train_test)
+  # bias <- cv_bias(X_train, X_test, y_train, y_test, V_train, V_train_test)
   list(loss=loss,
-       bias=bias,
+       # bias=bias,
        nl=length(fit.i$lambda),
        yhat=yhat)
 }
