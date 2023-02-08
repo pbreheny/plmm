@@ -67,7 +67,12 @@ plmm_fit <- function(prep,
   if(prep$trace){cat("Beginning standardization + rotation.")}
   
   # estimate eta
-  eta <- estimate_eta(S = prep$S, U = prep$U, y = prep$y)
+  if (is.null(prep$eta)) {
+    eta <- estimate_eta(S = prep$S, U = prep$U, y = prep$y) 
+  } else {
+    eta <- prep$eta
+  }
+  
   
   # rotate data
   W <- diag((eta * prep$S + (1 - eta))^(-1/2))

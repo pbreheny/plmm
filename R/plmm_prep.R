@@ -34,9 +34,13 @@ plmm_prep <- function(X,
                       trace = FALSE, ...){
   
   
-  ## coersion
-  U <- S <- SUX <- SUy <- eta <- NULL
-  
+  ## coersion 
+  if (missing(eta_star)) {
+    U <- S <- SUX <- SUy <- eta <- NULL
+  } else {
+    U <- S <- SUX <- SUy <- NULL 
+    eta <- eta_star
+  }
   
   ## check types 
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
@@ -114,7 +118,8 @@ plmm_prep <- function(X,
                         ns = ns,
                         penalty.factor = penalty.factor,
                         trace = trace,
-                        returnX = returnX,
+                        returnX = returnX, 
+                        eta = eta, 
                         snp_names = if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)))
   
   return(ret)

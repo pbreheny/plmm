@@ -4,7 +4,7 @@
 #' @param X Design matrix for model fitting. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
 #' @param y Continuous outcome vector for model fitting.
 #' @param K Known or estimated similarity matrix.
-#' @param eta_star Optional arg. to \code{plmm_prep}. Defaults to NULL.
+#' @param eta_star Optional arg. to \code{plmm_prep}. Defaults to NULL, so eta will be estimated. 
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param penalty.factor Optional arg. to \code{plmm_prep}. Defaults to 1 for all predictors (except the intercept). 
 #' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
