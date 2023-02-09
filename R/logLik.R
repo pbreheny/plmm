@@ -22,7 +22,7 @@ logLik <- function(eta, Uy, S){
   ldet <- sum(log(Sd))  # log of product = sum of the logs
 
   # evaluate the variance
-  Sdi <- 1/Sd
+  Sdi <- 1/Sd 
   Uy <- as.vector(Uy)
   ss <- (1/n) * sum(Uy*Uy*Sdi)
 

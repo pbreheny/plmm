@@ -31,7 +31,7 @@ cvf <- function(i, fold, type, cv.args, ...) {
   if (type == 'blup'){
     yhat <- predict.list(fit = fit.i, newX = X2, type = 'blup',
                          lambda = fit.i$lambda, prep = cv.args$prep, ...)
-                        
+    
   }
   loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(y2, yhat[,ll]))
   list(loss=loss, nl=length(fit.i$lambda), yhat=yhat)
