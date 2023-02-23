@@ -19,7 +19,7 @@
 #' @export
 #' 
 #' @examples 
-#' cv_fit <- cv.plmm(X = admix$X, y = admix$y)
+#' cv_fit <- cv.plmm(X = admix$X, y = admix$y, seed = 321)
 #' cv_s <- summary.cv.plmm(cv_fit, lambda = "1se")
 #' print(cv_s)
 
@@ -67,7 +67,6 @@ cv.plmm <- function(X,
   cv.args <- fit.args
   cv.args$warn <- FALSE
   cv.args$lambda <- fit$lambda
-  cv.args$eta_star <- fit$eta
   
   if (type == 'blup') {cv.args$returnX <- TRUE}
   

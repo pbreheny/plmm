@@ -26,8 +26,11 @@ logLik <- function(eta, Uy, S){
   Uy <- as.vector(Uy)
   ss <- (1/n) * sum(Uy*Uy*Sdi)
 
-  # evalue the negative log likelihood
+  # evaluate the negative log likelihood
+  # NB: keep constant here to be consistent with logLik.lm() method
   nLL <- 0.5*(n*log(2*pi) + ldet + n + n*log(ss))
+  # TODO: double check the derivation for this. Do we need the factor of n 
+  #   in the last term? 
 
   return(nLL)
 

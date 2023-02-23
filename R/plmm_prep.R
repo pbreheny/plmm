@@ -110,6 +110,7 @@ plmm_prep <- function(X,
                         S = S,
                         U = U,
                         ns = ns,
+                        eta = eta_star, # carry eta over to fit 
                         penalty.factor = penalty.factor,
                         trace = trace,
                         returnX = returnX,
