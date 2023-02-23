@@ -57,7 +57,7 @@ cv.plmm(
 Performs k-fold cross validation for lasso-, MCP-, or SCAD-penalized penalized linear mixed models over a grid of values for the regularization parameter lambda.
 }
 \examples{
-cv_fit <- cv.plmm(X = admix$X, y = admix$y)
+cv_fit <- cv.plmm(X = admix$X, y = admix$y, seed = 321)
 cv_s <- summary.cv.plmm(cv_fit, lambda = "1se")
 print(cv_s)
 }
