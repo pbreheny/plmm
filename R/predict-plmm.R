@@ -12,6 +12,8 @@
 #' @param eta Optional argument. Estimated $eta$ value from object. Required if \code{type == 'blup'}.
 #' @param covariance Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'blup'}.
 #' @param ... Additional optional arguments
+#' 
+#' @rdname predict.plmm
 #' @export
 #'
 #' @examples
@@ -60,7 +62,7 @@
 #' 
 
 predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),
-                           lambda, idx=1:length(object$lambda), X, y, ...) {
+                           lambda, idx=1:length(object$lambda), X, y, U, S, eta, covariance, ...) {
   type <- match.arg(type)
   beta_vals <- coef.plmm(object, lambda=lambda, which=idx, drop=FALSE) # includes intercept 
   

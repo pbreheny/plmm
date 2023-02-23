@@ -1,7 +1,8 @@
 #' A function to print the summary of a \code{plmm} model
 #'
 #' @param x A `summary.plmm` object
-#'
+#' 
+#' @rdname print.summary.plmm
 #' @export
 #'
 #' @examples

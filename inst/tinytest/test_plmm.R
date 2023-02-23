@@ -24,7 +24,7 @@ B0 <- as.matrix(lasso0$beta[1:9, ]) # NB: glmnet() does not return intercept val
 dimnames(B0) <- NULL
 
 # test 0 - implementation 
-tinytest::expect_equal(A0, B0, tolerance = 0.01)
+expect_equal(A0, B0, tolerance = 0.01)
 
 
 # Test 1 Case where K is diagonal and lambda is 0 ---------------------------
@@ -56,7 +56,7 @@ names(B1) <- NULL
 B1 <- ifelse(is.na(B1), 0, B1)
 
 # test 1: implementation 
-tinytest::expect_equal(A1, B1, tolerance = 0.01)
+expect_equal(A1, B1, tolerance = 0.01)
 
 # check  
 # head(data.frame(A1, B1))
@@ -87,7 +87,7 @@ B2 <- as.matrix(lasso2$beta[1:9, ]) # NB: glmnet() does not return intercept val
 dimnames(B2) <- NULL
 
 # test 2 - implementation 
-tinytest::expect_equal(A2, B2, tolerance = 0.1)
+expect_equal(A2, B2, tolerance = 0.1)
 
 # Test 3: show that monomorphic SNPs are given beta values of 0s -------------
 monomorphic <- apply(admix$X[,1:15], 2, var) == 0
@@ -96,7 +96,7 @@ monomorphic_snps <- paste0("Feature ", which(monomorphic))
 fit3 <- plmm(X = admix$X[,1:15], y = admix$y)
 
 # test 3: implementation 
-tinytest::expect_equivalent(summary.plmm(fit3, idx = 99)$constant_features,
+expect_equivalent(summary.plmm(fit3, idx = 99)$constant_features,
                             monomorphic_snps)
 
 # Test 4: check the plmm_prep/fit functions -----------------------------------
@@ -110,10 +110,10 @@ plmm_admix <- plmm(X = admix$X, y = admix$y)
 # test A: see if SUX lines up 
 A4 <- fit$SUX
 B4 <- plmm_admix$SUX
-tinytest::expect_equivalent(A4, B4)
+expect_equivalent(A4, B4)
 
 # test B: if plmm_fit is working, it should give the same result as plmm: 
-tinytest::expect_equivalent(res$beta_vals, plmm_admix$beta_vals)
+expect_equivalent(res$beta_vals, plmm_admix$beta_vals)
 
 # Test 5: case where K is simulated to have no population structure ----------
 

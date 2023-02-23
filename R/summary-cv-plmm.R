@@ -13,7 +13,7 @@
 #' * `loss`: The loss (at each fold?) TODO: double-check this  
 #' * `penalty`: The penalty applied to the fitted model
 #' 
-#' 
+#' @rdname summary.cv.plmm
 #' @export
 #'
 #' @examples 

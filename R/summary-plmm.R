@@ -16,6 +16,8 @@
 #' * `nonzero`: The column names indicating the nonzero coefficients in the model at the specified value of `lambda`
 #' * `constant_features`: A character vector with the names of any columns in the design matrix 
 #'      whose values are constant in the whole sample (e.g., monomorphic SNPs in a genetics context)
+#' 
+#' @rdname summary.plmm
 #' @export
 #'
 #' @examples

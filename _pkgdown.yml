@@ -43,7 +43,6 @@ reference:
     
   - title: Data (pre)processing and wrangling
     contents:
-    - coerce_snpmatrix
     - plink_example 
     - process_plink
     - process_plink_2

@@ -29,7 +29,7 @@ process_plink(
 \value{
 A three element list object:
 \itemize{
-\item \code{genotypes} The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns. If coerce=T, this is a numeric matrix.
+\item \code{genotypes} The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns. This is a numeric matrix.
 \item \code{map} A matrix of SNP data.
 \item \code{fam} A matrix of subject data.
 }

@@ -4,6 +4,7 @@
 #' @param digits The number of digits to use in formatting output 
 #' @param ... 
 #'
+#' @rdname print.summary.cv.plmm 
 #' @export
 #'
 #' @examples

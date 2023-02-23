@@ -27,6 +27,6 @@ Imports:
     popkin,
     SNPRelate,
     stats,
+    tinytest,
     utils,
     zeallot
-

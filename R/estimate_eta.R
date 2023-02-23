@@ -3,7 +3,6 @@
 #' @param S The diagonal matrix whose nonzero values are the singular values of K, the realized relationship matrix
 #' @param U The left-singular vectors of the *standardized* design matrix
 #' @param y Continuous outcome vector.
-#' @importFrom zeallot %<-%
 #' @export
 #' @keywords internal
 estimate_eta <- function(S, U, y, eta_star){

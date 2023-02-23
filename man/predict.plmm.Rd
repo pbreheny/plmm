@@ -12,6 +12,10 @@
   idx = 1:length(object$lambda),
   X,
   y,
+  U,
+  S,
+  eta,
+  covariance,
   ...
 )
 }
@@ -30,8 +34,6 @@
 
 \item{y}{Optional argument. Original continuous outcome vector from object. Required if \code{type == 'blup'}.}
 
-\item{...}{Additional optional arguments}
-
 \item{U}{Optional argument. Eigenvectors from the similarity matrix from object. Required if \code{type == 'blup'}.}
 
 \item{S}{Optional argument. Eigenvalues from the similarity matrix from object. Required if \code{type == 'blup'}.}
@@ -39,6 +41,8 @@
 \item{eta}{Optional argument. Estimated $eta$ value from object. Required if \code{type == 'blup'}.}
 
 \item{covariance}{Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'blup'}.}
+
+\item{...}{Additional optional arguments}
 }
 \description{
 Predict method for plmm class

@@ -8,7 +8,7 @@
 #' @param impute Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.
 #' @param quiet Logical flag: should progress messages be printed? Defaults to FALSE. 
 #' @return A three element list object:
-#' * `genotypes` The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns. If coerce=T, this is a numeric matrix. 
+#' * `genotypes` The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns. This is a numeric matrix. 
 #' * `map` A matrix of SNP data.
 #' * `fam` A matrix of subject data.
 #' @export
