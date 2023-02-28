@@ -82,10 +82,11 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
     if ("X" %in% names(object) & ("SUX" %in% names(object))){
       
       # calculate covariance between new and old observations 
-      covariance <- cov(t(newX), t(object$X))
+      covariance <- cov(t(ncvreg::std(newX)), t(object$std_X))
 
-      ranef <- covariance %*% object$U %*% diag((1 + object$eta * (object$S - 1))^(-1)) %*% t(object$U) %*% (object$y - cbind(1, object$X) %*% beta_vals)
+      ranef <- covariance %*% object$U %*% diag((1 + object$eta * (object$S - 1))^(-1)) %*% t(object$U) %*% (object$y - cbind(1, object$std_X) %*% beta_vals)
       # NB: can't just use the rotated y and x here - need to scale by inverse of K, not sqrt(K)
+      ranef <- covariance %*% object$U %*% diag((1 + object$eta * (object$S - 1))^(-1)) %*% t(object$U) %*% (object$y - cbind(1, object$std_X) %*% object$b)
       
       # print(eta) 
       # TODO: need to create the Xbeta object 
@@ -104,7 +105,9 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
       # calculate covariance between new and old observations 
       covariance <- cov(t(newX), t(X))
       
-      ranef <- covariance %*% U %*% diag((1 + object$eta * (S - 1))^(-1)) %*% t(U) %*% (y - cbind(1, X) %*% beta_vals)
+      # ranef <- covariance %*% U %*% diag((1 + object$eta * (S - 1))^(-1)) %*% t(U) %*% (y - cbind(1, X) %*% beta_vals)
+      ranef <- covariance %*% U %*% diag((1 + object$eta * (S - 1))^(-1)) %*% t(U) %*% sweep(cbind(1, X) %*% beta_vals, 1, y, "-")*(-1)
+      
       # print(eta) 
       
       blup <- Xbeta + ranef
