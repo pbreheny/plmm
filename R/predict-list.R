@@ -39,7 +39,12 @@ predict.list <- function(fit, newX, type=c("response", "coefficients", "vars", "
     
       covariance <- cov(t(ncvreg::std(newX)), t(prep$std_X))
       
-      ranef <- covariance %*% prep$U %*% diag((1 + fit$eta * (prep$S - 1))^(-1)) %*% t(prep$U) %*% (fit$y - cbind(1, prep$std_X) %*% beta_vals)
+      # ranef <- covariance %*% prep$U %*% diag((1 + fit$eta * (prep$S - 1))^(-1)) %*% t(prep$U) %*% (fit$y - cbind(1, prep$std_X) %*% beta_vals)
+      
+      # beta_vals are already transformed back to the original scale of X, so should be using X instead of std_X here 
+      # or use std_X and fit$b 
+      ranef <- covariance %*% prep$U %*% diag((1 + fit$eta * (prep$S - 1))^(-1)) %*% t(prep$U) %*% (fit$y - cbind(1, prep$std_X) %*% fit$b)
+      
       # print(eta) 
       
       blup <- Xbeta + ranef
