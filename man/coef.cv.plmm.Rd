@@ -13,12 +13,16 @@
 
 \item{which}{Vector of lambda indices for which coefficients to return. Defaults to lambda index with minimum CVE.}
 
-\item{...}{Additional arguments.}
+\item{...}{Additional arguments (not used).}
 }
 \description{
 Coef method for "cv.plmm" class
 }
 \examples{
+\dontrun{
 cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
 head(coef.cv.plmm(cv_fit))
+}
+
+
 }

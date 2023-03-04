@@ -4,7 +4,7 @@
 \alias{summary.plmm}
 \title{A summary method for the plmm objects}
 \usage{
-\method{summary}{plmm}(object, lambda, idx, eps = 1e-05)
+\method{summary}{plmm}(object, lambda, idx, eps = 1e-05, ...)
 }
 \arguments{
 \item{object}{An object of class \code{plmm}}
@@ -15,6 +15,8 @@
 report inference for the 10th value of \code{lambda} along the regularization path. If both \code{lambda} and \code{idx} are specified, \code{lambda} takes precedence.}
 
 \item{eps}{If lambda is given, eps is the tolerance for difference between the given lambda value and a lambda value from the object. Defaults to 0.0001 (1e-5)}
+
+\item{...}{Not used}
 }
 \value{
 The return value is an object with S3 class \code{summary.plmm}. The class has its own print method and contains the following list elements:

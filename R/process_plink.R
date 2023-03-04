@@ -14,8 +14,9 @@
 #' @export
 #' 
 #' @examples 
-#' test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam", parent=T))
 #' \dontrun{
+#' # the output of calls to 'plink_example' will vary according to the users' directory structure
+#' test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam", parent=T))
 #' test2 <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam", parent=T))
 #' }
 #' 
@@ -37,18 +38,22 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
   
   
   # only consider SNPs on chromosomes 1-22
-  map <- subset(x = obj$map, subset = chromosome %in% 1:22)
+  map <- obj$map[obj$map$chromosome %in% 1:22,]
   genotypes <- genotypes[,rownames(map)]
   obj_col_summary <- obj_col_summary[colnames(genotypes),]
   
   # only keep polygenic SNPs 
-  obj_col_summary <- subset(x = obj_col_summary,
-                            # step 1: remove SNPs that are missing a genotype
-                            subset = !(is.na(P.AA) | is.na(P.AB) | is.na(P.BB)))
   
-  obj_col_summary <- subset(x = obj_col_summary,
-                            # step 2: remove SNPs that have no variation (i.e. only one genotype is present)
-                            subset = !(P.AA == 1 | P.AB == 1 | P.BB == 1))
+  # step 1: remove SNPs that are missing a genotype
+  missing_genotypes <- c(is.na(obj_col_summary$P.AA) |
+                           is.na(obj_col_summary$P.AB) |
+                           is.na(obj_col_summary$P.BB))
+  obj_col_summary <- obj_col_summary[!missing_genotypes,]
+  # step 2: remove SNPs that have no variation (i.e. only one genotype is present)
+  no_var <- c(obj_col_summary$P.AA == 1 | 
+               obj_col_summary$P.AB == 1 | 
+               obj_col_summary$P.BB == 1)
+  obj_col_summary <- obj_col_summary[!no_var,]
   
   # subset the genotypes data to remove the monogenic SNPs
   genotypes <- genotypes[, rownames(obj_col_summary)]

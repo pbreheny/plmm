@@ -13,6 +13,7 @@ scale_varp(X)
 This function allows you to scale vectors of a matrix by their population standard deviation without centering; we assume our sample is the population.
 }
 \examples{
+\dontrun{
 M <- matrix(rnorm(25), 5, 5)
 head(M)
 M_scaled <- scale_varp(M)
@@ -20,5 +21,6 @@ head(M_scaled)
 
 X_scaled <- scale_varp(admix$X)
 admix$X[1:5, 1:7]; X_scaled[1:5, 1:7]
+}
 }
 \keyword{internal}

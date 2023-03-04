@@ -13,6 +13,7 @@
 #' @param lambda.min The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.
 #' @param nlambda Length of the sequence of lambda. Default is 100. 
 #' @param lambda A user-specified sequence of lambda values. By default, a sequence of values of length nlambda is computed, equally spaced on the log scale.
+#' @param svd_details Logical: should the details from the SVD, such as the singular values (S) and singular vectors (U) be returned? Default is TRUE. 
 #' @param eps Convergence threshold. The algorithm iterates until the RMSD for the change in linear predictors for each coefficient is less than eps. Default is \code{1e-4}.
 #' @param max.iter Maximum number of iterations (total across entire path). Default is 10000.
 #' @param convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
@@ -64,7 +65,7 @@ plmm <- function(X,
                  y,
                  K = NULL,
                  k = NULL,
-                 eta_star,
+                 eta_star = NULL,
                  penalty = c("MCP", "SCAD", "lasso"),
                  gamma,
                  alpha = 1,
@@ -72,10 +73,11 @@ plmm <- function(X,
                  lambda.min,
                  nlambda = 100,
                  lambda,
+                 svd_details = TRUE,
                  eps = 1e-04,
                  max.iter = 10000,
                  convex = TRUE,
-                 dfmax = p + 1,
+                 dfmax = ncol(X) + 1,
                  warn = TRUE,
                  penalty.factor = rep(1, ncol(X)),
                  init = rep(0, ncol(X)),
@@ -97,6 +99,7 @@ plmm <- function(X,
                       lambda.min = lambda.min,
                       nlambda = nlambda,
                       lambda = lambda,
+                      svd_details = svd_details,
                       eps = eps,
                       max.iter = max.iter,
                       warn = warn,

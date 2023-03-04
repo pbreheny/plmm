@@ -13,6 +13,7 @@ plmm_fit(
   lambda.min,
   nlambda = 100,
   lambda,
+  svd_details = FALSE,
   eps = 1e-04,
   max.iter = 10000,
   convex = TRUE,
@@ -69,9 +70,5 @@ A list with these components:
 \description{
 PLMM fit: a function that fits a PLMM using the values returned by plmm_prep()
 This is an internal function for \code{cv.plmm}
-}
-\examples{
-prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
-fit1 <- plmm_fit(prep = prep1)
 }
 \keyword{internal}

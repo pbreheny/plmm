@@ -4,27 +4,25 @@
 \alias{gic}
 \title{General information criterion method of selecting lambda for "plmm" class}
 \usage{
-gic(fit, ic = c("bic", "hdbic"), SUX, SUy, S, eta)
+gic(fit, ic = c("bic", "hdbic"), SUX, SUy, S)
 }
 \arguments{
-\item{fit}{An object of class "plmm."}
+\item{fit}{An object of class "plmm" where svd_detail has been set to TRUE (the default)}
 
 \item{ic}{Information criterion that should be used to select lambda. Currently supports BIC or HDBIC. Defaults to BIC.}
 
-\item{SUX}{Rotated design matrix including rotated intercept and unpenalized columns, if present. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
+\item{SUX}{Optional: Rotated design matrix including rotated intercept and unpenalized columns, if present. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
 
-\item{SUy}{Rotated outcome vector. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
+\item{SUy}{Optional: Rotated outcome vector. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
 
-\item{S}{Eigenvalues from similarity matrix used for model fitting. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
-
-\item{eta}{Estimated $eta$ value from object fit.}
+\item{S}{Optional: Eigenvalues from similarity matrix used for model fitting. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
 }
 \description{
 General information criterion method of selecting lambda for "plmm" class
 }
 \examples{
 fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-gic_res <- gic(fit = fit, ic = "bic", SUX = fit$SUX, SUy = fit$SUy, S = fit$S, eta = fit$eta)
+gic_res <- gic(fit = fit, ic = "bic")
 names(gic_res)
-range(gic_res$gic, na.rm = T) # NAs will result from monomorphic SNPs
+range(gic_res$gic, na.rm = TRUE) # NAs will result from monomorphic SNPs
 }

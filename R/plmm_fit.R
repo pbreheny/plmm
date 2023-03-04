@@ -30,9 +30,7 @@
 #' 
 #' @keywords internal 
 #'
-#' @examples
-#' prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
-#' fit1 <- plmm_fit(prep = prep1)
+
 plmm_fit <- function(prep, 
                      penalty = c("MCP", "SCAD", "lasso"),
                      gamma,
@@ -41,6 +39,7 @@ plmm_fit <- function(prep,
                      lambda.min,
                      nlambda = 100,
                      lambda,
+                     svd_details = FALSE,
                      eps = 1e-04,
                      max.iter = 10000,
                      convex = TRUE,
@@ -142,6 +141,7 @@ plmm_fit <- function(prep,
     y = prep$y,
     std_SUX = std_SUX,
     SUX = SUX,
+    SUy = SUy,
     ncol_X = prep$ncol_X,
     lambda = lambda,
     b = b,
@@ -162,7 +162,9 @@ plmm_fit <- function(prep,
     init = init,
     returnX = prep$returnX,
     trace = prep$trace
-  ))
+  )) 
+  
+  if(svd_details){ret$S <- prep$S; ret$U <- prep$U}
   
   return(ret)
   

@@ -4,7 +4,7 @@
 \alias{plmm_format}
 \title{PLMM format: a function to format the output of a model constructed with \code{plmm_fit}}
 \usage{
-plmm_format(fit, convex = TRUE, dfmax = p + 1)
+plmm_format(fit, convex = TRUE, dfmax = fit$ncol_X + 1)
 }
 \arguments{
 \item{fit}{A list of parameters describing the output of a model constructed with \code{plmm_fit}}
@@ -30,8 +30,14 @@ A list with the components:
 PLMM format: a function to format the output of a model constructed with \code{plmm_fit}
 }
 \examples{
+
+\dontrun{
+# NB: this is an internal function (i.e. it's not exported)
+# these examples won't work unless you have penalizedLMM::: 
 prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
 fit1 <- plmm_fit(prep = prep1)
 res1 <- plmm_format(fit1)
+
+}
 }
 \keyword{internal}

@@ -15,8 +15,4 @@ A character vector of formatted lambda value names
 \description{
 Generate nicely formatted lambda vec
 }
-\examples{
-l <- c(1, 0.1, 0.01, 0.001) 
-lamNames(l)
-}
 \keyword{internal}

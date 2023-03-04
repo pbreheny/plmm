@@ -18,13 +18,20 @@
 #' @keywords internal
 #'
 #' @examples
+#' 
+#' \dontrun{
+#' # NB: this is an internal function (i.e. it's not exported)
+#' # these examples won't work unless you have penalizedLMM::: 
 #' prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
 #' fit1 <- plmm_fit(prep = prep1)
 #' res1 <- plmm_format(fit1)
+#' 
+#' }
+
 
 plmm_format <- function(fit,
                         convex = TRUE,
-                        dfmax = p + 1){
+                        dfmax = fit$ncol_X + 1){
   
   
   # eliminate saturated lambda values, if any
@@ -61,6 +68,8 @@ plmm_format <- function(fit,
   val <- structure(list(beta_vals = beta_vals,
                         lambda = lambda,
                         eta = fit$eta,
+                        SUX = fit$SUX,
+                        SUy = fit$SUy,
                         penalty = fit$penalty,
                         gamma = fit$gamma,
                         alpha = fit$alpha,
@@ -85,6 +94,12 @@ plmm_format <- function(fit,
     val$std_X <- fit$std_X # this is the standardized design matrix
     val$y <- fit$y
   } 
+  
+  if("S" %in% names(fit) & "U" %in% names(fit)){
+    val$S <- fit$S
+    val$U <- fit$U
+  }
+  
   return(val)
   
   

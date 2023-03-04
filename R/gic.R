@@ -1,33 +1,32 @@
 #' General information criterion method of selecting lambda for "plmm" class
 #'
-#' @param fit An object of class "plmm."
+#' @param fit An object of class "plmm" where svd_detail has been set to TRUE (the default)
 #' @param ic Information criterion that should be used to select lambda. Currently supports BIC or HDBIC. Defaults to BIC.
-#' @param SUX Rotated design matrix including rotated intercept and unpenalized columns, if present. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
-#' @param SUy Rotated outcome vector. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
-#' @param S Eigenvalues from similarity matrix used for model fitting. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
-#' @param eta Estimated $eta$ value from object fit.
+#' @param SUX Optional: Rotated design matrix including rotated intercept and unpenalized columns, if present. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
+#' @param SUy Optional: Rotated outcome vector. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
+#' @param S Optional: Eigenvalues from similarity matrix used for model fitting. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
 #' @importFrom zeallot %<-%
 #' @export
 #' 
 #' @examples
 #' fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' gic_res <- gic(fit = fit, ic = "bic", SUX = fit$SUX, SUy = fit$SUy, S = fit$S, eta = fit$eta)
+#' gic_res <- gic(fit = fit, ic = "bic")
 #' names(gic_res)
-#' range(gic_res$gic, na.rm = T) # NAs will result from monomorphic SNPs
+#' range(gic_res$gic, na.rm = TRUE) # NAs will result from monomorphic SNPs
 
 
-gic <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S, eta){
+gic <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S){
   UseMethod("gic")
 }
 
-gic.default <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S, eta){
+gic.default <- function(fit, ic=c("bic", "hdbic"), SUX, SUy, S){
   stop("This function should be used with an object of class plmm_fit")
 }
 
 #' @export
-gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), SUX, SUy, S, eta){
+gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), SUX, SUy, S){
 
-  #need to deal with situations where dim SUX != dim X because of singularity
+  # TODO: need to deal with situations where dim SUX != dim X because of singularity
 
   n <- p <- NULL
 
@@ -49,12 +48,12 @@ gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), SUX, SUy, S, eta){
 
 c(n, p) %<-% dim(SUX[,-1]) # this assumes there is an intercept column
 eta <- fit$eta
-ll <- logLik_nonnull(fit, SUX, SUy, S, eta)
+ll <- logLik(eta = eta, Uy = crossprod(fit$U, fit$y), S = S) # TODO: what difference does it make if this is logLik_nonnull?
 j <- predict.plmm(fit, type='nvars')
 jj <- pmin(j, p/2) # dont' give smaller penalties for larger models
 df <- j + 2 # +1 for intercept, +1 for sigma2
 # ts <-  choose(p, j) # no penalty if selecting all bc this value is small
-# limit this to select at most half the vars?
+# TODO: consider -- should I limit this to select at most half the vars?
 
 
   if (ic == "bic"){

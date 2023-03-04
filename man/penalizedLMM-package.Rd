@@ -19,6 +19,7 @@ Authors:
 Other contributors:
 \itemize{
   \item Tabitha K. Peter [contributor]
+  \item Yujiing Lu [contributor]
 }
 
 }

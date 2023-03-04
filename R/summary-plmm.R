@@ -5,6 +5,7 @@
 #' @param idx Alternatively, `lambda` may be specified by an index; `idx=10` means: 
 #'      report inference for the 10th value of `lambda` along the regularization path. If both `lambda` and `idx` are specified, `lambda` takes precedence.
 #' @param eps If lambda is given, eps is the tolerance for difference between the given lambda value and a lambda value from the object. Defaults to 0.0001 (1e-5)
+#' @param ... Not used
 #' @return The return value is an object with S3 class `summary.plmm`. The class has its own print method and contains the following list elements: 
 #' * `penalty`: The penalty used by `plmm` (e.g. SCAD, MCP, lasso)
 #' * `n`: Number of instances/observations
@@ -25,7 +26,7 @@
 #' s1 <- summary(fit, idx = 97)
 #' s2 <- summary(fit, lambda = 0.0005957590)
 
-summary.plmm <- function(object, lambda, idx, eps = 1e-5){
+summary.plmm <- function(object, lambda, idx, eps = 1e-5, ...){
 
   # lambda/which 
   if(missing(lambda) & missing(idx)) stop("One of the arguments 'lambda' or 'idx' must be provided.")
@@ -42,7 +43,7 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5){
     
   
   # nvars (tells number of non-zero coefficients)
-  nvars <- predict(object, type="nvars", lambda=lambda, idx=idx)
+  nvars <- predict(object, type="nvars", lambda=lambda, idx=idx, ...)
   
   # error checking 
   if(length(nvars) > 1) stop("You must specify a single model (i.e., a single value of lambda)", call. = FALSE)

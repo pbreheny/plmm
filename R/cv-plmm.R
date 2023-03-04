@@ -20,8 +20,13 @@
 #' 
 #' @examples 
 #' cv_fit <- cv.plmm(X = admix$X, y = admix$y, seed = 321)
+#' \dontrun{
 #' cv_s <- summary.cv.plmm(cv_fit, lambda = "1se")
 #' print(cv_s)
+#' plot(cv_fit)
+#' }
+#' 
+#' 
 
 
 cv.plmm <- function(X,

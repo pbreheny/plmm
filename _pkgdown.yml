@@ -13,12 +13,9 @@ reference:
     - sim_environ_eff
     - sim_ps_x
     
-  - title: Fitting penalized linear mixed models (PLMMs) 
+  - title: Fitting penalized linear mixed models (PLMMs - the featured presentation) 
     contents:
     - plmm
-    - plmm_lasso
-    - plmm_mcp
-    - plmm_scad
     
   - title: Loss, information, and cross-validation for PLMMs
     contents:
@@ -36,16 +33,11 @@ reference:
   - title: Other model fitting methods (and some helper functions)
     contents: 
     - convexMin
-    - lasso
-    - lasso_pca10
-    - lmm_ggmix
-    - lmm_lasso
     
   - title: Data (pre)processing and wrangling
     contents:
     - plink_example 
     - process_plink
-    - process_plink_2
     - relatedness_mat
 
     

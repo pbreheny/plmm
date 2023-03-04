@@ -4,10 +4,12 @@
 \alias{print.summary.plmm}
 \title{A function to print the summary of a \code{plmm} model}
 \usage{
-\method{print}{summary.plmm}(x)
+\method{print}{summary.plmm}(x, ...)
 }
 \arguments{
 \item{x}{A \code{summary.plmm} object}
+
+\item{...}{Not used}
 }
 \description{
 A function to print the summary of a \code{plmm} model
@@ -18,7 +20,7 @@ fit2 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), penalty = "
 s1 <- summary(fit, idx = 97)
 s2 <- summary(fit, lambda = fit$lambda[97])
 s3 <- summary(fit2, idx = 25)
-print.summary.plmm(s1)
-print.summary.plmm(s2)
-print.summary.plmm(s3)
+print(s1)
+print(s2)
+print(s3)
 }

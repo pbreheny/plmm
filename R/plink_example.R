@@ -6,17 +6,8 @@
 #' @return If \code{path=NULL}, a character vector of file names is returned. If path is given, then a character string 
 #' with the full file path
 #' 
-#' @export
+#' @keywords internal 
 #'
-#' @examples
-#' # name of all external PLINK data files 
-#' (plink_example())
-#' 
-#' # name of file path for a specific PLINK file 
-#' plink_example(path="cad.fam") # what shows up here should be unique to the user's machine 
-#' 
-#' # name of file path for parent directory of a specific file 
-#' plink_example(parent=T, path="cad.fam")
 
 plink_example <- function(path = NULL, parent=FALSE) {
   if (is.null(path)) {

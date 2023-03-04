@@ -38,8 +38,9 @@ A three element list object:
 This function allows you to preprocess PLINK bed/bim/fam files for use with \code{penalizedLMM} functions. Unreliable SNPs are removed and missing values are imptued using either \code{snpStats}, or if not tagged, the HWE mean value.
 }
 \examples{
-test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam", parent=T))
 \dontrun{
+# the output of calls to 'plink_example' will vary according to the users' directory structure
+test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam", parent=T))
 test2 <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam", parent=T))
 }
 

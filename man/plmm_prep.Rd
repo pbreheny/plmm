@@ -9,7 +9,7 @@ plmm_prep(
   X,
   y,
   K = NULL,
-  eta_star,
+  eta_star = NULL,
   penalty.factor = rep(1, ncol(X)),
   returnX = TRUE,
   trace = FALSE,
@@ -52,6 +52,11 @@ This is an internal function for \code{cv.plmm}
 }
 \examples{
 
+\dontrun{
+# this is an internal function; to call this, you would need to use the triple 
+# colon, eg penalizedLMM:::plmm_prep()
 prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
+}
+
 }
 \keyword{internal}

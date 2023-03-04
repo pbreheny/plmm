@@ -4,14 +4,14 @@
 \alias{logLik_nonnull}
 \title{Evaluate the negative log-likelihood of a non-null Gaussian plmm model}
 \usage{
-logLik_nonnull(fit, SUX, SUy, S, eta)
+logLik_nonnull(fit)
 }
 \arguments{
 \item{fit}{An object of class plmm_fit.}
 
 \item{SUX}{Rotated design matrix including rotated intercept and unpenalized columns, if present.}
 
-\item{SUy}{Rotated outcome vector.}
+\item{SUy}{Rotated outcome vector. See pp. 16-18 in A.R.'s thesis for details}
 
 \item{S}{Eigenvalues from similarity matrix used for model fitting.}
 
@@ -20,11 +20,4 @@ logLik_nonnull(fit, SUX, SUy, S, eta)
 \description{
 Evaluate the negative log-likelihood of a non-null Gaussian plmm model
 }
-\examples{
-admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix 
-my_fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
-LL <- logLik_nonnull(fit = my_fit, SUX = my_fit$SUX, SUy = my_fit$SUy, 
-S = my_fit$S, eta = my_fit$eta)
-head(LL)
-# See pp. 16-18 in A.R.'s thesis for details 
-}
+\keyword{internal}

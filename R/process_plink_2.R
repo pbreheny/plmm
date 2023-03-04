@@ -12,6 +12,7 @@
 #' * X: the fully-imputed design matrix 
 #' * constants_idx: A numeric vector with the indices of the constant features. An index of 5 indicates that the 5th feature is constant (i.e. has zero variance)
 #' 
+#' @keywords internal
 #' 
 #' @examples 
 #' 
@@ -26,6 +27,8 @@
 #' cad_lite <- process_plink_2(data_dir = plink_example(path = "cad_lite.bed", parent = T), prefix = "cad_lite", rds = F, impute = "xgboost")
 #' }
 process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", quiet = FALSE, ...){
+  
+  warning("This method is under construction. Use process_plink() for best results")
   
   if(!quiet){
     cat("\nPreprocessing", prefix, "data:\n")
@@ -56,7 +59,7 @@ process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", qu
     new_dim <- dim(obj$genotypes)[2]
     
     if(!quiet){
-      cat("\nRemoved ", old_dim - new_dim, "SNPs that are outside of chromosomes 1-22.\n")
+      cat("\nRemoved ", original_dim - new_dim, "SNPs that are outside of chromosomes 1-22.\n")
       
     }
   }

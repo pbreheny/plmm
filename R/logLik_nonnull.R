@@ -1,22 +1,24 @@
 #' Evaluate the negative log-likelihood of a non-null Gaussian plmm model
-#'
+#' 
 #' @param fit An object of class plmm_fit.
 #' @param SUX Rotated design matrix including rotated intercept and unpenalized columns, if present.
-#' @param SUy Rotated outcome vector.
+#' @param SUy Rotated outcome vector. See pp. 16-18 in A.R.'s thesis for details 
 #' @param S Eigenvalues from similarity matrix used for model fitting.
 #' @param eta Estimated $eta$ value from object fit.
-#' @export
+#' @keywords internal
 #' 
-#' @examples 
-#' admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix 
-#' my_fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
-#' LL <- logLik_nonnull(fit = my_fit, SUX = my_fit$SUX, SUy = my_fit$SUy, 
-#' S = my_fit$S, eta = my_fit$eta)
-#' head(LL)
-#' # See pp. 16-18 in A.R.'s thesis for details 
 
-logLik_nonnull <- function(fit, SUX, SUy, S, eta){
+logLik_nonnull <- function(fit){
 
+  if(is.null(fit$SUX) | is.null(fit$SUy) | is.null(fit$S)){
+    stop("SUX, SUy, and S must all be supplied directly if not returned in fit")
+  }
+  
+  S <- fit$S
+  SUX <- fit$SUX
+  SUy <- fit$SUy
+  eta <- fit$eta
+  
   n <- dim(SUX)[1]
   beta_vals <- coef.plmm(fit, drop = FALSE) # don't drop - keep names
   n_betas <- dim(coef.plmm(fit))[1]

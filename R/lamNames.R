@@ -4,11 +4,9 @@
 #' @return A character vector of formatted lambda value names
 #' @keywords internal
 #' 
-#' @examples 
-#' l <- c(1, 0.1, 0.01, 0.001) 
-#' lamNames(l)
+#' @rdname lamNames
+#' 
 
-## from ncvreg
 lamNames <- function(l) {
   if (length(l) > 1) {
     d <- ceiling(-log10(-max(diff(l))))

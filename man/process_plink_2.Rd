@@ -50,3 +50,4 @@ cad_full <- process_plink_2(data_dir = plink_example(path = "og_cad.bed", parent
 cad_lite <- process_plink_2(data_dir = plink_example(path = "cad_lite.bed", parent = T), prefix = "cad_lite", rds = F, impute = "xgboost")
 }
 }
+\keyword{internal}

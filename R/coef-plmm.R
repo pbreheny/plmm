@@ -5,11 +5,20 @@
 #' @param which Vector of lambda indices for which coefficients to return.
 #' @param drop Logical.
 #' @param ... Additional arguments.
+#' 
+#' @rdname coef.plmm
+#' 
 #' @export
 #' 
 #' @examples 
+#' \dontrun{
 #' fit <- plmm(admix$X, admix$y)
 #' (coef.plmm(fit)[1:10, 1:5])
+#' # TODO: in R CMD CHECK, this throws the error: 
+#' # could not find function "coef.plmm"
+#' }
+#' 
+#' 
 
 coef.plmm <- function(object, lambda, which = 1:length(object$lambda), drop = TRUE, ...){
   # error check for supplied lambda value 

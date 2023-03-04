@@ -4,20 +4,20 @@
 \alias{print.summary.cv.plmm}
 \title{Print method for summary.cv.plmm objects}
 \usage{
-\method{print}{summary.cv.plmm}(obj, digits, ...)
+\method{print}{summary.cv.plmm}(x, digits, ...)
 }
 \arguments{
-\item{obj}{An object of class \code{summary.cv.plmm}}
+\item{x}{An object of class \code{summary.cv.plmm}}
 
 \item{digits}{The number of digits to use in formatting output}
 
-\item{...}{}
+\item{...}{Not used}
 }
 \description{
 Print method for summary.cv.plmm objects
 }
 \examples{
 cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-s <- summary.cv.plmm(cv_fit)
-print.summary.cv.plmm(s)
+print(summary(cv_fit))
+
 }

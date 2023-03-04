@@ -24,11 +24,16 @@
 #'
 #' @examples
 #' 
+#' \dontrun{
+#' # this is an internal function; to call this, you would need to use the triple 
+#' # colon, eg penalizedLMM:::plmm_prep()
 #' prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
+#' }
+#' 
 plmm_prep <- function(X,
                       y,
                       K = NULL,
-                      eta_star,
+                      eta_star = NULL,
                       penalty.factor = rep(1, ncol(X)),
                       returnX = TRUE,
                       trace = FALSE, ...){

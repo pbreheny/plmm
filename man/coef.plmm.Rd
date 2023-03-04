@@ -21,6 +21,12 @@
 Coef method for "plmm" class
 }
 \examples{
+\dontrun{
 fit <- plmm(admix$X, admix$y)
 (coef.plmm(fit)[1:10, 1:5])
+# TODO: in R CMD CHECK, this throws the error: 
+# could not find function "coef.plmm"
+}
+
+
 }

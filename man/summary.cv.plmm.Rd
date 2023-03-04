@@ -4,12 +4,14 @@
 \alias{summary.cv.plmm}
 \title{A summary function for cv.plmm objects}
 \usage{
-\method{summary}{cv.plmm}(obj, lambda = "min")
+\method{summary}{cv.plmm}(object, lambda = "min", ...)
 }
 \arguments{
-\item{obj}{A \code{cv.plmm} object}
+\item{object}{A \code{cv.plmm} object}
 
 \item{lambda}{The regularization parameter value at which inference should be reported. Can choose a numeric value, 'min', or '1se'. Defaults to 'min.'}
+
+\item{...}{Not used}
 }
 \value{
 The return value is an object with S3 class \code{summary.cv.plmm}. The class has its own print method and contains the following list elements:
@@ -30,6 +32,5 @@ A summary function for cv.plmm objects
 }
 \examples{
 cv_fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-s <- summary.cv.plmm(cv_fit)
-print.summary.cv.plmm(s)
+summary(cv_fit)
 }

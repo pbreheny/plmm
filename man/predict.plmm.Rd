@@ -61,13 +61,15 @@ newX <- sim_ps_x(n = nrow(admix$X), nJ = 4, p = ncol(admix$X),
  # make predictions for a select number of lambda values 
  pred2 <- predict(object = fit, newX = newX, type = "response", idx=98)
  
+ \dontrun{
  # make prediction using blup 
+ # TODO: The 'blup' option is still under construction 
  pred3 <- predict(object = fit, newX = newX, type = "blup", idx=98)
 
  # compare y predictions 
   compare_y <- data.frame(y = admix$y, yhat_response = pred2, yhat_blup = pred3)
  
- \dontrun{
+ 
  fit_noX <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X),
   returnX = FALSE)
  
@@ -76,19 +78,4 @@ newX <- sim_ps_x(n = nrow(admix$X), nJ = 4, p = ncol(admix$X),
  }
  
  
-# make predictions when X is big
-cad_mid <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam", parent=T))
-cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
-# for the sake of illustration, I use a simple mean imputation for the outcome 
-cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
-fit_cad <- plmm(X = cad_mid$genotypes, y = cad_clinical$hdl_impute, k = 5)
-cad_X <- cad_mid$genotypes
-cad_y <- cad_clinical$hdl_impute
-newX_cad <- sim_ps_x(n = nrow(cad_X), nJ = 4, p = ncol(cad_X),
- structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
-pred_cad <- predict(object = fit_cad, newX = newX_cad, type='blup', idx = 95, X = cad_X, y = cad_y)
-head(data.frame(cad_y, pred_cad))
-
- 
-
 }
