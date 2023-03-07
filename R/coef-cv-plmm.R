@@ -19,5 +19,5 @@
 
 
 coef.cv.plmm <- function(object, lambda, which = object$min, ...){
-  coef.plmm(object$fit_to_return, lambda = lambda, which = which, ...)
+  coef.plmm(object$fit, lambda = lambda, which = which, ...)
 }
