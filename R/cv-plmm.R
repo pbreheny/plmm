@@ -28,7 +28,6 @@
 #' 
 #' 
 
-
 cv.plmm <- function(X,
                     y,
                     K = NULL,
@@ -71,9 +70,13 @@ cv.plmm <- function(X,
   # set up arguments for cv 
   cv.args <- fit.args
   cv.args$warn <- FALSE
-  cv.args$lambda <- fit$lambda
+  cv.args$lambda <- fit$lambda 
   
-  if (type == 'blup') {cv.args$returnX <- TRUE}
+  estimated_V <- NULL 
+  if (type == 'blup') {
+    cv.args$returnX <- TRUE 
+    estimated_V <- fit$estimated_V
+  }
   
   # initialize objects to hold CV results 
   n <- length(fit$y)
@@ -96,9 +99,10 @@ cv.plmm <- function(X,
   # set up cluster if user-specified
   if (!missing(cluster)) {
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
-    parallel::clusterExport(cluster, c("X", "y", "K", "fold", "type", "cv.args"), envir=environment())
+    parallel::clusterExport(cluster, c("X", "y", "K", "fold", "type", "cv.args", "estimated_V"), envir=environment())
     parallel::clusterCall(cluster, function() library(penalizedLMM))
-    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, X=X, y=y, fold=fold, type=type, cv.args=cv.args)
+    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, X=X, y=y, fold=fold, type=type, cv.args=cv.args, 
+                                        estimated_V = estimated_V)
   }
 
   if (trace) cat("\nStarting cross validation\n")  
@@ -111,7 +115,7 @@ cv.plmm <- function(X,
       if (trace) {setTxtProgressBar(pb, i)}
     } else {
       # case 2: cluster NOT user specified 
-      res <- cvf(i = i, fold = fold, type = type, cv.args = cv.args)
+      res <- cvf(i = i, fold = fold, type = type, cv.args = cv.args, estimated_V = estimated_V)
       if (trace) {setTxtProgressBar(pb, i)}
     }
     # update E and Y

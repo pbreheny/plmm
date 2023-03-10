@@ -110,6 +110,7 @@ plmm_prep <- function(X,
   
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(ncol_X = ncol(X),
+                        nrow_X = nrow(X), 
                         y = y,
                         std_X = std_X,
                         S = S,

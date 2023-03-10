@@ -39,7 +39,7 @@ plmm_fit <- function(prep,
                      lambda.min,
                      nlambda = 100,
                      lambda,
-                     svd_details = FALSE,
+                     svd_details = FALSE, 
                      eps = 1e-04,
                      max.iter = 10000,
                      convex = TRUE,
@@ -136,13 +136,17 @@ plmm_fit <- function(prep,
     if(prep$trace){setTxtProgressBar(pb, ll)}
   }
   
+  # reconstruct K to calculate V 
+  estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S), prep$U) + (1-eta)*diag(nrow(prep$U))
+  
   ret <- structure(list(
     std_X = prep$std_X,
     y = prep$y,
     std_SUX = std_SUX,
     SUX = SUX,
     SUy = SUy,
-    ncol_X = prep$ncol_X,
+    ncol_X = prep$ncol_X, 
+    nrow_X = prep$nrow_X, 
     lambda = lambda,
     b = b,
     eta = eta,
@@ -161,7 +165,8 @@ plmm_fit <- function(prep,
     warn = warn,
     init = init,
     returnX = prep$returnX,
-    trace = prep$trace
+    trace = prep$trace, 
+    estimated_V = estimated_V
   )) 
   
   if(svd_details){ret$S <- prep$S; ret$U <- prep$U}

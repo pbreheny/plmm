@@ -10,7 +10,6 @@
 #' @param U Optional argument. Eigenvectors from the similarity matrix from object. Required if \code{type == 'blup'}.
 #' @param S Optional argument. Eigenvalues from the similarity matrix from object. Required if \code{type == 'blup'}.
 #' @param eta Optional argument. Estimated $eta$ value from object. Required if \code{type == 'blup'}.
-#' @param covariance Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'blup'}.
 #' @param ... Additional optional arguments
 #' 
 #' @rdname predict.plmm
@@ -30,9 +29,7 @@
 #'  # make predictions for a select number of lambda values 
 #'  pred2 <- predict(object = fit, newX = newX, type = "response", idx=98)
 #'  
-#'  \dontrun{
 #'  # make prediction using blup 
-#'  # TODO: The 'blup' option is still under construction 
 #'  pred3 <- predict(object = fit, newX = newX, type = "blup", idx=98)
 #'
 #'  # compare y predictions 
@@ -48,10 +45,14 @@
 #'  
 #'  
 
+
 predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),
-                           lambda, idx=1:length(object$lambda), X, y, U, S, eta, covariance, ...) {
+                           lambda, idx=1:length(object$lambda), X, y, U, S, eta, ...) {
+  
   type <- match.arg(type)
   beta_vals <- coef.plmm(object, lambda=lambda, which=idx, drop=FALSE) # includes intercept 
+  p <- object$ncol_X 
+  n <- object$nrow_X 
   
   # addressing each type: 
   
@@ -66,7 +67,28 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
   if (type=="response") return(drop(Xbeta))
   
   if (type == "blup"){
+    
+    # aggregate X and newX to compute V 
+    X_all <- rbind(X, newX)
+    c(S_all, U_all) %<-% svd(X_all, nv = 0) # D, U
+    S_all <- S_all^2 / p
+    
+    # assuming newX has the same eta as X 
+    eta_all <- object$eta
+    Vhat_all <- eta_all * tcrossprod(U_all %*% diag(S_all), U_all) + (1-eta_all)*diag(nrow(U_all)) 
+    V21 <- Vhat_all[-c(1:n), 1:n, drop = FALSE] 
+    V11 <- Vhat_all[1:n, 1:n, drop = FALSE] 
+    # V11 <- object$estimated_V
+
+    ranef <- V21 %*% chol2inv(chol(V11)) %*% (drop(y) - cbind(1, X) %*% beta_vals)
+    # print(eta) 
+    
+    blup <- Xbeta + ranef
+    
+    
+    
     warning("The BLUP option is under development. Rely on these estimates at your own risk.")
+    
     # case 1: the object contains all items needed for blup prediction 
     if ("X" %in% names(object) & ("SUX" %in% names(object))){
       

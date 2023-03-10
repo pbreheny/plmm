@@ -12,7 +12,7 @@
 #'
 
 predict.list <- function(fit, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),
-                         lambda, idx=1:length(fit$lambda), prep = NULL, ...) {
+                         lambda, idx=1:length(fit$lambda), prep = NULL, V11, V21, ...) {
   type <- match.arg(type)
   beta_vals <- coef.list(fit, lambda=lambda, which=idx, drop=FALSE) # includes intercept 
   
@@ -29,21 +29,18 @@ predict.list <- function(fit, newX, type=c("response", "coefficients", "vars", "
   if (type=="response") return(drop(Xbeta))
   
   if (type == "blup"){
-    warning("The BLUP option is under development. Rely on these estimates at your own risk.")
+    # warning("The BLUP option is under development. Rely on these estimates at your own risk.")
     
-      if(is.null(prep)) stop("The 'prep' argument is required for BLUP calculation.")
+    if(is.null(prep)) stop("The 'prep' argument is required for BLUP calculation.")
       
-      # calculate covariance between new and old observations 
-     # TODO: ask Patrick if using standardized design matrices in the 
-    # covariance calculation below is appropriate.... 
+    # covariance comes from selected rows and columns from estimated_V that is generated in the overall fit (V11, V21)
+      
+    # test1 <- V21 %*% chol2inv(chol(V11)) # true 
+    # TODO: to find the inverse of V11 using svd results of K, i.e., the inverse of a submatrix, might need to use Woodbury's formula 
     
-      covariance <- cov(t(ncvreg::std(newX)), t(prep$std_X))
+    ranef <- V21 %*% chol2inv(chol(V11)) %*% (fit$y - cbind(1, prep$std_X) %*% beta_vals)
       
-      ranef <- covariance %*% prep$U %*% diag((1 + fit$eta * (prep$S - 1))^(-1)) %*% t(prep$U) %*% (fit$y - cbind(1, prep$std_X) %*% beta_vals)
-      # print(eta) 
-      
-      blup <- Xbeta + ranef
-      
+    blup <- Xbeta + ranef
     
     return(blup)
   }

@@ -28,7 +28,6 @@
 #' 
 #' }
 
-
 plmm_format <- function(fit,
                         convex = TRUE,
                         dfmax = fit$ncol_X + 1){
@@ -78,6 +77,8 @@ plmm_format <- function(fit,
                         penalty.factor = fit$penalty.factor,
                         ns_idx = c(1, 1 + fit$ns), # PAY ATTENTION HERE! 
                         ncol_X = fit$ncol_X,
+                        nrow_X = fit$nrow_X, 
+                        estimated_V = fit$estimated_V, 
                         iter = iter,
                         converged = converged),
                    class = "plmm")
