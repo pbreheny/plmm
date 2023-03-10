@@ -50,7 +50,7 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
                            lambda, idx=1:length(object$lambda), X, y, U, S, eta, ...) {
   
   type <- match.arg(type)
-  beta_vals <- coef.plmm(object, lambda=lambda, which=idx, drop=FALSE) # includes intercept 
+  beta_vals <- coef.plmm(object, lambda, which=idx, drop=FALSE) # includes intercept 
   p <- object$ncol_X 
   n <- object$nrow_X 
   
@@ -66,7 +66,16 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
   
   if (type=="response") return(drop(Xbeta))
   
-  if (type == "blup"){
+  if (type == "blup"){ # assuming eta of X and newX are the same 
+    
+    warning("The BLUP option is under development. Rely on these estimates at your own risk.") 
+    
+    if (!("X" %in% names(object))) stop("The design matrix X is required for BLUP calculation.") 
+    if (!(c("S", "U") %in% names(object))) stop("SVD results are required for BLUP calculation. Use 'svd_details = TRUE' in the 'plmm' function.")
+    
+    #################
+    # used to check #
+    #################
     
     # aggregate X and newX to compute V 
     X_all <- rbind(X, newX)
@@ -76,56 +85,33 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
     # assuming newX has the same eta as X 
     eta_all <- object$eta
     Vhat_all <- eta_all * tcrossprod(U_all %*% diag(S_all), U_all) + (1-eta_all)*diag(nrow(U_all)) 
-    V21 <- Vhat_all[-c(1:n), 1:n, drop = FALSE] 
-    V11 <- Vhat_all[1:n, 1:n, drop = FALSE] 
+    V21_check <- Vhat_all[-c(1:n), 1:n, drop = FALSE] 
+    V11_check <- Vhat_all[1:n, 1:n, drop = FALSE] 
     # V11 <- object$estimated_V
 
-    ranef <- V21 %*% chol2inv(chol(V11)) %*% (drop(y) - cbind(1, X) %*% beta_vals)
+    ranef_check <- V21_check %*% chol2inv(chol(V11_check)) %*% (drop(y) - cbind(1, X) %*% beta_vals)
     # print(eta) 
     
+    blup_check <- Xbeta + ranef_check
+    
+    ###################
+    # used to compute #
+    ################### 
+    
+    V11 <- object$estimated_V # not the same as test because S and U are from std_X 
+    test <- object$eta * (1/p) * tcrossprod(X, X) + (1-object$eta)*diag(nrow(X)) # same as V11_check 
+    
+    # cannot use U, S when computing V21, because nv=0. V is needed to restore X 
+    V21 <- object$eta * (1/p) * tcrossprod(newX, X) # same as V21_check 
+    
+    ranef <- V21 %*% object$U %*% diag((1 + object$eta * (object$S - 1))^(-1)) %*% t(object$U) %*% (drop(object$y) - cbind(1, X) %*% beta_vals)
     blup <- Xbeta + ranef
-    
-    
-    
-    warning("The BLUP option is under development. Rely on these estimates at your own risk.")
-    
-    # case 1: the object contains all items needed for blup prediction 
-    if ("X" %in% names(object) & ("SUX" %in% names(object))){
-      
-      # calculate covariance between new and old observations 
-      covariance <- cov(t(newX), t(object$X))
-
-      ranef <- covariance %*% object$U %*% diag((1 + object$eta * (object$S - 1))^(-1)) %*% t(object$U) %*% (object$y - cbind(1, object$X) %*% beta_vals)
-      # NB: can't just use the rotated y and x here - need to scale by inverse of K, not sqrt(K)
-      
-      # print(eta) 
-      # TODO: need to create the Xbeta object 
-      blup <- Xbeta + ranef
-    } 
-    
-    # case 2: some calculations must be done before the blup prediction
-   if (!("X" %in% names(object) & ("SUX" %in% names(object)))) {
-      if(missing(X) | missing(y)) stop("The design matrix is required for BLUP calculation, but is not available in the plmm object.\n This is ususally because X is large.\n Please supply the no-intercept design matrix to the X argument, and the vector of outcomes to the y argument.")
-      # calculate K 
-      K <- relatedness_mat(X)
-      # calculate S and U 
-      c(S, U) %<-% svd(K)[1:2]
-      # TODO: consider how to incorporate RSpectra here 
-      
-      # calculate covariance between new and old observations 
-      covariance <- cov(t(newX), t(X))
-      
-      ranef <- covariance %*% U %*% diag((1 + object$eta * (S - 1))^(-1)) %*% t(U) %*% (y - cbind(1, X) %*% beta_vals)
-      # print(eta) 
-      
-      blup <- Xbeta + ranef
-      
-    }
     
     return(blup)
   }
 
 }
+
 
 
 

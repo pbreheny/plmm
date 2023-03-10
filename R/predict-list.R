@@ -12,7 +12,7 @@
 #'
 
 predict.list <- function(fit, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),
-                         lambda, idx=1:length(fit$lambda), prep = NULL, V11, V21, ...) {
+                         lambda, idx=1:length(fit$lambda), prep = NULL, V11 = NULL, V21 = NULL, ...) {
   type <- match.arg(type)
   beta_vals <- coef.list(fit, lambda=lambda, which=idx, drop=FALSE) # includes intercept 
   

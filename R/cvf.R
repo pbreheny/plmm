@@ -21,11 +21,6 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   
   # eta used in each fold comes from the overall fit.args. If user-supplied, then use that in all fold; if not, estimate eta in each fold 
   
-  # create copies of the training sets (to be used in cv_bias)
-  # TODO: could this be more efficient/readable? 
-  X_train <- full_cv_prep$std_X[fold!=i, ,drop=FALSE] 
-  y_train <- full_cv_prep$y[fold!=i] 
-  
   # extract test set (comes from cv prep on full data)
   X_test <- full_cv_prep$std_X[fold==i, , drop=FALSE] 
   y_test <- full_cv_prep$y[fold==i]
