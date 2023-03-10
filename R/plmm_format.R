@@ -78,7 +78,7 @@ plmm_format <- function(fit,
                         ns_idx = c(1, 1 + fit$ns), # PAY ATTENTION HERE! 
                         ncol_X = fit$ncol_X,
                         nrow_X = fit$nrow_X, 
-                        estimated_V = fit$estimated_V, 
+                        estimated_V = fit$estimated_V, # this is using the standardized X scale 
                         iter = iter,
                         converged = converged),
                    class = "plmm")

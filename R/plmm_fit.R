@@ -137,6 +137,7 @@ plmm_fit <- function(prep,
   }
   
   # reconstruct K to calculate V 
+  # this is on the standardized X scale 
   estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S), prep$U) + (1-eta)*diag(nrow(prep$U))
   
   ret <- structure(list(
