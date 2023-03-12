@@ -70,43 +70,42 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
     
     warning("The BLUP option is under development. Rely on these estimates at your own risk.") 
     
-    if (!("X" %in% names(object))) stop("The design matrix X is required for BLUP calculation.") 
-    if (!(c("S", "U") %in% names(object))) stop("SVD results are required for BLUP calculation. Use 'svd_details = TRUE' in the 'plmm' function.")
-    
-    #################
-    # used to check #
-    #################
-    
-    # aggregate X and newX to compute V 
-    X_all <- rbind(X, newX)
-    c(S_all, U_all) %<-% svd(X_all, nv = 0) # D, U
-    S_all <- S_all^2 / p
-    
-    # assuming newX has the same eta as X 
-    eta_all <- object$eta
-    Vhat_all <- eta_all * tcrossprod(U_all %*% diag(S_all), U_all) + (1-eta_all)*diag(nrow(U_all)) 
-    V21_check <- Vhat_all[-c(1:n), 1:n, drop = FALSE] 
-    V11_check <- Vhat_all[1:n, 1:n, drop = FALSE] 
-    # V11 <- object$estimated_V
-
-    ranef_check <- V21_check %*% chol2inv(chol(V11_check)) %*% (drop(y) - cbind(1, X) %*% beta_vals)
-    # print(eta) 
-    
-    blup_check <- Xbeta + ranef_check
+    if (missing(X) | missing(y)) stop("The design matrix is required for BLUP calculation. Please supply the no-intercept design matrix to the X argument, and the vector of outcomes to the y argument.") 
+    # if (!(c("S", "U") %in% names(object))) stop("SVD results are required for BLUP calculation. Use 'svd_details = TRUE' in the 'plmm' function.")
     
     ###################
     # used to compute #
     ################### 
     
-    V11 <- object$estimated_V # not the same as test because S and U are from std_X 
-    test <- object$eta * (1/p) * tcrossprod(X, X) + (1-object$eta)*diag(nrow(X)) # same as V11_check 
+    V11 <- object$Vhat # same as V11_check 
     
     # cannot use U, S when computing V21, because nv=0. V is needed to restore X 
     V21 <- object$eta * (1/p) * tcrossprod(newX, X) # same as V21_check 
-    
-    ranef <- V21 %*% object$U %*% diag((1 + object$eta * (object$S - 1))^(-1)) %*% t(object$U) %*% (drop(object$y) - cbind(1, X) %*% beta_vals)
+
+    ranef <- V21 %*% chol2inv(chol(V11)) %*% (drop(object$y) - cbind(1, X) %*% beta_vals)
     blup <- Xbeta + ranef
     
+    # #################
+    # # used to check #
+    # #################
+    # 
+    # # aggregate X and newX to compute V 
+    # X_all <- rbind(X, newX)
+    # c(S_all, U_all) %<-% svd(X_all, nv = 0) # D, U
+    # S_all <- S_all^2 / p
+    # 
+    # # assuming newX has the same eta as X 
+    # eta_all <- object$eta
+    # Vhat_all <- eta_all * tcrossprod(U_all %*% diag(S_all), U_all) + (1-eta_all)*diag(nrow(U_all)) 
+    # V21_check <- Vhat_all[-c(1:n), 1:n, drop = FALSE] 
+    # V11_check <- Vhat_all[1:n, 1:n, drop = FALSE] 
+    # # V11 <- object$estimated_V
+    # 
+    # ranef_check <- V21_check %*% chol2inv(chol(V11_check)) %*% (drop(y) - cbind(1, X) %*% beta_vals)
+    # # print(eta) 
+    # 
+    # blup_check <- Xbeta + ranef_check
+
     return(blup)
   }
 

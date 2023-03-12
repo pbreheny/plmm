@@ -30,7 +30,8 @@
 
 plmm_format <- function(fit,
                         convex = TRUE,
-                        dfmax = fit$ncol_X + 1){
+                        dfmax = fit$ncol_X + 1, 
+                        X){
   
   
   # eliminate saturated lambda values, if any
@@ -78,7 +79,8 @@ plmm_format <- function(fit,
                         ns_idx = c(1, 1 + fit$ns), # PAY ATTENTION HERE! 
                         ncol_X = fit$ncol_X,
                         nrow_X = fit$nrow_X, 
-                        estimated_V = fit$estimated_V, # this is using the standardized X scale 
+                        # estimated_V = fit$estimated_V, # this is using the standardized X scale, used in cv-plmm 
+                        Vhat = fit$eta * (1/fit$ncol_X) * tcrossprod(X) + (1-fit$eta) * diag(fit$nrow_X), 
                         iter = iter,
                         converged = converged),
                    class = "plmm")
