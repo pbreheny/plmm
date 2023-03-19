@@ -46,7 +46,7 @@ plmm_prep <- function(X,
   ## check types 
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
   if (!inherits(X, "matrix")) {
-    tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
+    tmp <- try(X <- stats::model.matrix(~0+., data=data.frame(X)), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
   }
   if (typeof(X)=="integer") storage.mode(X) <- "double"
@@ -68,7 +68,7 @@ plmm_prep <- function(X,
   # working with user-specified K
   if (!is.null(K)){
     if (!inherits(K, "matrix")) {
-      tmp <- try(K <- stats::model.matrix(~0+., data=K), silent=TRUE)
+      tmp <- try(K <- stats::model.matrix(~0+., data=data.frame(K)), silent=TRUE)
       if (inherits(tmp, "try-error")) stop("K must be a matrix or able to be coerced to a matrix", call.=FALSE)
     }
     if (typeof(K)=="integer") storage.mode(X) <- "double" # change K to X 
