@@ -74,7 +74,7 @@ plmm_fit <- function(prep,
   }
   
   # rotate data
-  W <- diag((eta * prep$S + (1 - eta))^(-1/2))
+  W <- diag((eta * prep$S + (1 - eta))^(-1/2), nrow = nrow(prep$U))
   SUX <- W %*% crossprod(prep$U, cbind(1, prep$std_X)) # add column of 1s for intercept
   SUy <- drop(W %*% crossprod(prep$U, prep$y))
   
@@ -152,7 +152,8 @@ plmm_fit <- function(prep,
     b = b,
     eta = eta,
     iter = iter,
-    converged = converged,
+    converged = converged, 
+    loss = loss, 
     penalty = penalty, 
     penalty.factor = new.penalty.factor,
     gamma = gamma,
