@@ -33,7 +33,6 @@ plmm_format <- function(fit,
                         dfmax = fit$ncol_X + 1, 
                         X){
   
-  
   # eliminate saturated lambda values, if any
   ind <- !is.na(fit$iter)
   iter <- fit$iter[ind]
