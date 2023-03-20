@@ -45,7 +45,7 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   # set up a fit from which to derive residuals 
   if (length(ind) != p) { # case 1: not all `p` columns are to be penalized
     fit <- stats::glm(y ~ -1 + X[, -ind, drop = FALSE], family='gaussian')
-  } else { # case 2: no columns are penalized 
+  } else { # case 2: all columns are penalized 
     fit <- stats::glm(y ~ 1, family='gaussian')
   }
 
