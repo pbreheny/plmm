@@ -42,42 +42,6 @@ plmm_prep <- function(X,
   ## coersion
   U <- S <- SUX <- SUy <- eta <- NULL
   
-  
-  ## check types 
-  if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
-  if (!inherits(X, "matrix")) {
-    tmp <- try(X <- stats::model.matrix(~0+., data=data.frame(X)), silent=TRUE)
-    if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
-  }
-  if (typeof(X)=="integer") storage.mode(X) <- "double"
-  if (typeof(X)=="character") stop("X must be a numeric matrix", call.=FALSE)
-  if (!is.double(y)) {
-    op <- options(warn=2)
-    on.exit(options(op))
-    y <- tryCatch(
-      error = function(cond) stop("y must be numeric or able to be coerced to numeric", call.=FALSE),
-      as.double(y))
-    options(op)
-  }
-
-  # error checking 
-  if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
-  if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
-  if (length(penalty.factor)!=ncol(X)) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
-  
-  # working with user-specified K
-  if (!is.null(K)){
-    if (!inherits(K, "matrix")) {
-      tmp <- try(K <- stats::model.matrix(~0+., data=data.frame(K)), silent=TRUE)
-      if (inherits(tmp, "try-error")) stop("K must be a matrix or able to be coerced to a matrix", call.=FALSE)
-    }
-    if (typeof(K)=="integer") storage.mode(X) <- "double" # change K to X 
-    if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
-    if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
-  }
-  
-  if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
-  
   # standardize X
   # NB: the following line will eliminate singular columns (eg monomorphic SNPs)
   #  from the design matrix. 
@@ -97,14 +61,14 @@ plmm_prep <- function(X,
   ## case 1: K is not specified (default to realized relatedness matrix)
   if (is.null(K)){
     if(trace){cat("No K specified - will use default definition of the \n realized relatedness matrix.\n")}
-    c(D, U) %<-% svd(std_X, nv = 0) # don't need V
+    c(D, U) %<-% svd(std_X, nv = 0, nu = n) # don't need V
     # TODO: add RSpectra option here (or, use bigsnpr SVD method)
     S <- (D^2)/p # singular values of K, the realized relationship matrix
     
   } else {
     ## case 2: K is user-specified 
     S <- U <- NULL
-    c(S, U) %<-% svd(K, nv = 0) # again, don't need V 
+    c(S, U) %<-% svd(K, nv = 0, nu = n) # again, don't need V 
   }
 
   
