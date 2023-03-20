@@ -84,6 +84,41 @@ plmm <- function(X,
                  returnX = TRUE,
                  trace = FALSE) {
 
+  ## check types 
+  if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
+  if (!inherits(X, "matrix")) {
+    tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
+    if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
+  }
+  if (typeof(X)=="integer") storage.mode(X) <- "double"
+  if (typeof(X)=="character") stop("X must be a numeric matrix", call.=FALSE)
+  if (!is.double(y)) {
+    op <- options(warn=2)
+    on.exit(options(op))
+    y <- tryCatch(
+      error = function(cond) stop("y must be numeric or able to be coerced to numeric", call.=FALSE),
+      as.double(y))
+    options(op)
+  }
+  
+  # error checking 
+  if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
+  if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
+  if (length(penalty.factor)!=ncol(X)) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
+  
+  # working with user-specified K
+  if (!is.null(K)){
+    if (!inherits(K, "matrix")) {
+      tmp <- try(K <- stats::model.matrix(~0+., data=K), silent=TRUE)
+      if (inherits(tmp, "try-error")) stop("K must be a matrix or able to be coerced to a matrix", call.=FALSE)
+    }
+    if (typeof(K)=="integer") storage.mode(X) <- "double" # change K to X 
+    if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
+    if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
+  }
+  
+  if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
+  
   the_prep <- plmm_prep(X = X,
                         y = y,
                         K = K,
