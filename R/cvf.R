@@ -16,7 +16,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   # subset std_X, and y to match fold indices 
   #   (and in so doing, leave out the ith fold)
   cv.args$prep$std_X <- full_cv_prep$std_X[fold!=i, ,drop=FALSE]
-  cv.args$prep$U <- full_cv_prep$U[fold!=i, ,drop=FALSE]
+  cv.args$prep$U <- full_cv_prep$U[fold!=i, fold!=i, drop=FALSE]
   cv.args$prep$y <- full_cv_prep$y[fold!=i] 
   
   # eta used in each fold comes from the overall fit.args. If user-supplied, then use that in all fold; if not, estimate eta in each fold 
