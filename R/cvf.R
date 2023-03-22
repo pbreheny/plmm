@@ -16,7 +16,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   # subset std_X, and y to match fold indices 
   #   (and in so doing, leave out the ith fold)
   cv.args$prep$std_X <- full_cv_prep$std_X[fold!=i, ,drop=FALSE]
-  cv.args$prep$U <- full_cv_prep$U[fold!=i, fold!=i, drop=FALSE]
+  cv.args$prep$U <- full_cv_prep$U[fold!=i, , drop=FALSE]
   cv.args$prep$y <- full_cv_prep$y[fold!=i] 
   
   # eta used in each fold comes from the overall fit.args. If user-supplied, then use that in all fold; if not, estimate eta in each fold 
@@ -24,7 +24,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   # extract test set (comes from cv prep on full data)
   X_test <- full_cv_prep$std_X[fold==i, , drop=FALSE] 
   y_test <- full_cv_prep$y[fold==i]
-  
+
   # fit a plmm within each fold 
   # lambda stays the same for each fold; comes from the overall fit in cv_plmm.R line 63 
   fit.i <- do.call("plmm_fit", cv.args)
@@ -34,7 +34,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   yhat <- matrix(data = drop(Xbeta), nrow = length(y_test))
   
   if (type == 'blup'){
-    # used as V21 when computing blup (V_test_train)
+    # estimated_V here comes from the overall fit in cv_plmm.R, an n*n matrix 
     V21 <- estimated_V[fold==i, fold!=i, drop = FALSE] 
     V11 <- estimated_V[fold!=i, fold!=i, drop = FALSE] 
     
