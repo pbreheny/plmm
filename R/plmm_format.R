@@ -31,7 +31,7 @@
 plmm_format <- function(fit,
                         convex = TRUE,
                         dfmax = fit$ncol_X + 1, 
-                        X){
+                        X, K){
   
   # eliminate saturated lambda values, if any
   ind <- !is.na(fit$iter)
@@ -63,6 +63,14 @@ plmm_format <- function(fit,
   varnames <- c("(Intercept)", fit$snp_names)
   dimnames(beta_vals) <- list(varnames, lamNames(fit$lambda))
   
+  if (is.null(K)) {
+    Vhat <- fit$eta * (1/fit$ncol_X) * tcrossprod(X) + (1-fit$eta) * diag(fit$nrow_X) 
+  } else {
+    Vhat <- fit$eta * K + (1-fit$eta) * diag(fit$nrow_X)
+  }
+  
+  
+  
   ## output
   val <- structure(list(beta_vals = beta_vals,
                         lambda = lambda,
@@ -79,7 +87,7 @@ plmm_format <- function(fit,
                         ncol_X = fit$ncol_X,
                         nrow_X = fit$nrow_X, 
                         # estimated_V = fit$estimated_V, # this is using the standardized X scale, used in cv-plmm 
-                        Vhat = fit$eta * (1/fit$ncol_X) * tcrossprod(X) + (1-fit$eta) * diag(fit$nrow_X), 
+                        Vhat = Vhat, 
                         iter = iter,
                         converged = converged),
                    class = "plmm")

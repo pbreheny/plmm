@@ -70,8 +70,11 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
     
     warning("The BLUP option is under development. Rely on these estimates at your own risk.") 
     
-    if (missing(X) | missing(y)) stop("The design matrix is required for BLUP calculation. Please supply the no-intercept design matrix to the X argument, and the vector of outcomes to the y argument.") 
+    if (missing(X)) stop("The design matrix is required for BLUP calculation. Please supply the no-intercept design matrix to the X argument.") 
+    if (missing(y) & is.null(object$y)) stop("The vector of outcomes is required for BLUP calculation. Please either supply it to the y argument, or set returnX=TRUE in the plmm function.")
     # if (!(c("S", "U") %in% names(object))) stop("SVD results are required for BLUP calculation. Use 'svd_details = TRUE' in the 'plmm' function.")
+    
+    if (!is.null(object$y)) y <- object$y
     
     ###################
     # used to compute #
@@ -82,8 +85,8 @@ predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars"
     # cannot use U, S when computing V21, because nv=0. V is needed to restore X 
     V21 <- object$eta * (1/p) * tcrossprod(newX, X) # same as V21_check 
 
-    ranef <- V21 %*% chol2inv(chol(V11)) %*% (drop(object$y) - cbind(1, X) %*% beta_vals)
-    blup <- Xbeta + ranef
+    ranef <- V21 %*% chol2inv(chol(V11)) %*% (drop(y) - cbind(1, X) %*% beta_vals)
+    blup <- drop(Xbeta + ranef)
     
     # #################
     # # used to check #
