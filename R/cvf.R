@@ -43,6 +43,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
                          V11 = V11, V21 = V21, ...)
     
   }
+  
   loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(y_test, yhat[,ll]))
   list(loss=loss, nl=length(fit.i$lambda), yhat=yhat)
 }

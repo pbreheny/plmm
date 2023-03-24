@@ -65,7 +65,7 @@ cv.plmm <- function(X,
   # implement full model fit 
   fit.args <- c(list(prep = prep, penalty = penalty), list(...))
   fit <- do.call('plmm_fit', fit.args)
-  fit_to_return <- plmm_format(fit, X = X)
+  fit_to_return <- plmm_format(fit, X = X, K = K)
   
   # set up arguments for cv 
   cv.args <- fit.args
@@ -104,7 +104,7 @@ cv.plmm <- function(X,
     fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, X=X, y=y, fold=fold, type=type, cv.args=cv.args, 
                                         estimated_V = estimated_V)
   }
-
+  
   if (trace) cat("\nStarting cross validation\n")  
   # set up progress bar -- this can take a while
   if(trace){pb <- txtProgressBar(min = 0, max = nfolds, style = 3)}
