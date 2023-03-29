@@ -7,6 +7,8 @@
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
 #' @param prep Optional argument. Result of the call to `plmm_prep` which corresponds to the `fit` argument. Required if \code{type == 'blup'} and object is too large to be returned in `fit` object.
 #' @param covariance Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'blup'}.
+#' @param V11 Variance-covariance matrix of the training data. Extracted from `estimated_V` that is generated using all observations. 
+#' @param V21 Covariance matrix between the training and the testing data. Extracted from `estimated_V` that is generated using all observations. 
 #' @param ... Additional optional arguments
 #' @keywords internal
 #'

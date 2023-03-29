@@ -3,6 +3,8 @@
 #' @param fit A list of parameters describing the output of a model constructed with \code{plmm_fit}
 #' @param convex convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
 #' @param dfmax dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
+#' @param X Design matrix. May include clinical covariates and other non-SNP data. 
+#' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)} when using K=NULL).
 #' 
 #' @return A list with the components: 
 #' * beta_vals: The estimated beta values at each value of lambda
