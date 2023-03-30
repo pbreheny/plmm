@@ -27,4 +27,4 @@ The branches of this repo are organized in the following way:
   
   - `blup` is a development branch focused on improving the implementation of the Best Linear Unbiased Predictor method 
   
-  -`develop/Yujing` is an **archived** branch. We will be deleting this branch soon -- for internal use only. 
+  - `develop/Yujing` is an **archived** branch. We will be deleting this branch soon -- for internal use only. 
