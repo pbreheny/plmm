@@ -11,6 +11,7 @@
 #' * `genotypes` The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns. This is a numeric matrix. 
 #' * `map` A matrix of SNP data.
 #' * `fam` A matrix of subject data.
+#' 
 #' @export
 #' 
 #' @examples 
@@ -28,6 +29,16 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
     cat("\nPreprocessing", prefix, "data:\n")
   }
 
+  # check for compressed files 
+  if (!quiet){
+    if (substr(x = file.path(dataDir, prefix), 
+               start = nchar(file.path(dataDir, prefix)) - 2, 
+               stop = nchar(file.path(dataDir, prefix))) == ".gz") {
+      cat("Unzipping .gz files - this could take a second") 
+      system(paste0("gunzip -k ", file.path(dataDir, prefix)))
+    }
+  }
+  
   obj <- snpStats::read.plink(file.path(dataDir, prefix), na.strings = na.strings)
   
   # save snpStats::colsummary() result - this is a data frame with numeric columns

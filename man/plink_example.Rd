@@ -7,7 +7,7 @@
 plink_example(path = NULL, parent = FALSE)
 }
 \arguments{
-\item{path}{Optional argument specifying a path (filename) for an external data file in \code{inst/extdata}}
+\item{path}{Optional argument specifying a path (filename) for an external data file in \code{extdata/}}
 
 \item{parent}{If \code{path=TRUE} and the user wants the name of the parent directory where that file is located, set \code{parent=TRUE}. Defaults to FALSE.}
 }
@@ -18,4 +18,3 @@ with the full file path
 \description{
 A function to help with accessing example PLINK files
 }
-\keyword{internal}

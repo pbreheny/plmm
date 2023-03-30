@@ -48,7 +48,7 @@ gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), SUX, SUy, S){
 
 c(n, p) %<-% dim(SUX[,-1]) # this assumes there is an intercept column
 eta <- fit$eta
-ll <- logLik(eta = eta, Uy = crossprod(fit$U, fit$y), S = S) # TODO: what difference does it make if this is logLik_nonnull?
+ll <- log_lik(eta = eta, Uy = crossprod(fit$U, fit$y), S = S) # TODO: what difference does it make if this is log_lik_nonnull?
 j <- predict.plmm(fit, type='nvars')
 jj <- pmin(j, p/2) # dont' give smaller penalties for larger models
 df <- j + 2 # +1 for intercept, +1 for sigma2

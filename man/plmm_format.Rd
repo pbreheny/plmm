@@ -4,7 +4,7 @@
 \alias{plmm_format}
 \title{PLMM format: a function to format the output of a model constructed with \code{plmm_fit}}
 \usage{
-plmm_format(fit, convex = TRUE, dfmax = fit$ncol_X + 1)
+plmm_format(fit, convex = TRUE, dfmax = fit$ncol_X + 1, X, K)
 }
 \arguments{
 \item{fit}{A list of parameters describing the output of a model constructed with \code{plmm_fit}}
@@ -12,6 +12,10 @@ plmm_format(fit, convex = TRUE, dfmax = fit$ncol_X + 1)
 \item{convex}{convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.}
 
 \item{dfmax}{dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.}
+
+\item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
+
+\item{K}{Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)} when using K=NULL).}
 }
 \value{
 A list with the components:

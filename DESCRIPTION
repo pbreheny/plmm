@@ -10,6 +10,7 @@ Authors@R: c(
         comment = c(ORCID = "0000-0002-0650-1119")),
     person("Tabitha K.", "Peter", role = "ctb"),
     person("Yujiing", "Lu", role = "ctb"))
+VignetteBuilder: knitr 
 Description: Fit a penalized linear mixed model that corrects for unobserved confounding factors. penalizedLMM infers and corrects for the presence of unobserved confounding effects such as population stratification and environmental heterogeneity. It then fits a linear model via lasso penalized maximum likelihood. Originally designed for the multivariate analysis of SNP data, penalizedLMM eliminates the need for LD pruning and subpopulation-specific analyses. Functions for the appropriate processing of PLINK files are also supplied. 
 Depends: R (>= 3.5.0)
 License: GPL-3
@@ -17,7 +18,17 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-Suggests: snpStats, ggmix, graphics, grDevices, parallel, MASS, bigsnpr, bigstatsr
+Suggests: 
+    snpStats, 
+    ggmix, 
+    graphics, 
+    grDevices, 
+    parallel, 
+    MASS, 
+    bigsnpr, 
+    bigstatsr, 
+    knitr, 
+    rmarkdown
 Imports: 
     bnpsd,
     data.table,

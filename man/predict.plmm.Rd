@@ -15,7 +15,6 @@
   U,
   S,
   eta,
-  covariance,
   ...
 )
 }
@@ -40,14 +39,13 @@
 
 \item{eta}{Optional argument. Estimated $eta$ value from object. Required if \code{type == 'blup'}.}
 
-\item{covariance}{Optional argument. $q times n$ covariance matrix between new and old observations. Required if \code{type == 'blup'}.}
-
 \item{...}{Additional optional arguments}
 }
 \description{
 Predict method for plmm class
 }
 \examples{
+\dontrun{
 # fit a model 
 fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
 
@@ -61,9 +59,7 @@ newX <- sim_ps_x(n = nrow(admix$X), nJ = 4, p = ncol(admix$X),
  # make predictions for a select number of lambda values 
  pred2 <- predict(object = fit, newX = newX, type = "response", idx=98)
  
- \dontrun{
  # make prediction using blup 
- # TODO: The 'blup' option is still under construction 
  pred3 <- predict(object = fit, newX = newX, type = "blup", idx=98)
 
  # compare y predictions 

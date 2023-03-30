@@ -38,9 +38,6 @@ A list of two components:
 An updated function for processing PLINK files
 }
 \examples{
-
-
-
 \dontrun{
 cad_mid <- process_plink_2(data_dir = plink_example(path = "cad_mid.bed", parent = T), prefix = "cad_mid", rds = T, impute = "simple", method = "mean0")
 str(cad_mid) 

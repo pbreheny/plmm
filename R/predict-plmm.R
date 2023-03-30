@@ -15,7 +15,8 @@
 #' @rdname predict.plmm
 #' @export
 #'
-#' @examples
+#' @examples 
+#' \dontrun{
 #' # fit a model 
 #' fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
 #' 

@@ -4,16 +4,16 @@
 #' @param eta The proportion of variance in the outcome that is attributable to causal SNP effects. In other words, SNR. Sometimes referred to as the narrow-sense heritability.
 #' @param Uy The the continuous outcome, y, rotated by the eigenvectors of the similarity matrix, K.
 #' @param S The eigenvalues of the similarity matrix, K.
-#' @export
+#' @keywords internal
 #' 
 #' @examples 
 #' admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix 
 #' ev <- eigen(admix$K)
 #' U <- ev$vectors
 #' fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
-#' (logLik(eta = fit$eta, Uy = U%*%admix$y, S = ev$values ))
+#' (log_lik(eta = fit$eta, Uy = U%*%admix$y, S = ev$values ))
 
-logLik <- function(eta, Uy, S){
+log_lik <- function(eta, Uy, S){
 
   n <- dim(Uy)[1]
 
@@ -27,7 +27,7 @@ logLik <- function(eta, Uy, S){
   ss <- (1/n) * sum(Uy*Uy*Sdi)
 
   # evaluate the negative log likelihood
-  # NB: keep constant here to be consistent with logLik.lm() method
+  # NB: keep constant here to be consistent with log_lik.lm() method
   nLL <- 0.5*(n*log(2*pi) + ldet + n + n*log(ss))
   # TODO: double check the derivation for this. Do we need the factor of n 
   #   in the last term? 

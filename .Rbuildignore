@@ -8,4 +8,7 @@
 ^\.Rproj\.user$
 ^.*\.bk
 ^.*\.rds
+^.*\.bed
+^.*\.bim
+^.*\.fam
 ^scratch.R$

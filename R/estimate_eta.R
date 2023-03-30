@@ -13,7 +13,7 @@ estimate_eta <- function(S, U, y, eta_star){
   
   # estimate eta 
   Uy <- crossprod(U, y)
-  opt <- stats::optimize(f=logLik, c(0.01, 0.99), Uy=Uy, S=S)
+  opt <- stats::optimize(f=log_lik, c(0.01, 0.99), Uy=Uy, S=S)
   eta <- opt$minimum 
   
   

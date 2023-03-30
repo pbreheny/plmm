@@ -17,3 +17,14 @@ devtools::install_github("areisett/penalizedLMM")
 ```
 
 For a description of the motivation of the functions in this package (along with examples) refer to the second module of [this GWAS data tutorial](https://pbreheny.github.io/adv-gwas-tutorial/index.html)
+
+
+## Note on branches 
+
+The branches of this repo are organized in the following way: 
+
+  - `master` is the main branch with all the latest updates 
+  
+  - `blup` is a development branch focused on improving the implementation of the Best Linear Unbiased Predictor method 
+  
+  -`develop/Yujing` is an **archived** branch. We will be deleting this branch soon -- for internal use only. 
