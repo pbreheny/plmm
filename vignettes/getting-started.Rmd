@@ -1,5 +1,5 @@
 ---
-title: "getting-started"
+title: "Getting started with penalizedLMM"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{getting-started}
@@ -49,7 +49,7 @@ summary(admix_fit, lambda = admix_fit$lambda[95])
 
 The `cad_lite` data is in the bed/bim/fam format, so I need to do some preprocessing first: 
 
-```{r cad_lite_process}
+```{r cad_lite_process, eval=FALSE}
 cad_lite <- process_plink(prefix = "cad_lite",
                           dataDir = plink_example(path="cad_lite.fam.gz",
                                                   parent=T))
@@ -65,26 +65,26 @@ cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl),
 
 Now that we have the data processed, we can fit a model. 
 
-```{r cad_lite_fit}
-# cad_lite_fit <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute)
-# names(cad_lite_fit)
+```{r cad_lite_fit, eval=FALSE}
+cad_lite_fit <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute)
+names(cad_lite_fit)
 ```
 
 The returned `beta_vals` item is a matrix whose rows are $\beta$ coefficients and whose columns represent values of the penalization parameter $\lambda$. By default, `plmm` fits 100 values of $\lambda$ (see the `setup_lambda` function for details). 
 
 We can summarize this fit at the 25th $\lambda$ value:  
 
-```{r summary1}
-# summary(cad_lite_fit, lambda = cad_lite_fit$lambda[25])
+```{r summary1, eval=FALSE}
+summary(cad_lite_fit, lambda = cad_lite_fit$lambda[25])
 ```
 
 Notice that a notable number of these SNPs are constant features -- that is, SNPs whose values do not vary among the members of this population. For such features, a value of $\beta=0$ is returned for all values of $\lambda$. 
 
-In order to make this model run faster on my laptop (which is a 2015 MacBook Pro), I am going to re-run this model with an additional argument $k$. If $k$ is specified and the package `RSpectra` is installed, the singular value decomposition algorithm is `RSpectra::svds(k, ...)` -- this will be more efficient.  
+In order to make this model run faster on my laptop (which is a 2015 MacBook Pro), I am going to re-run this model with an additional argument $k$. If $k$ is specified and the package `RSpectra` is installed, the singular value decomposition algorithm is `RSpectra::svds(k, ...)` -- this will be more efficient.  **NOTE**: this functionality with `RSpectra is under development`. 
 
-```{r cad_lite_fit2}
-# cad_lite_fit2 <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute, k = 5)
-# names(cad_lite_fit2)
+```{r cad_lite_fit2, eval=FALSE}
+cad_lite_fit2 <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute, k = 5)
+names(cad_lite_fit2)
 ```
 
 Let's summarize this new fit -- 
