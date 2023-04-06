@@ -74,7 +74,7 @@ plmm_fit <- function(prep,
   }
   
   # rotate data
-  W <- diag((eta * prep$S + (1 - eta))^(-1/2), nrow = prep$nrow_X) # n*n matrix, stays intact during cross-validation 
+  W <- diag((eta * prep$S + (1 - eta))^(-1/2), nrow = length(prep$S)) 
   SUX <- W %*% crossprod(prep$U, cbind(1, prep$std_X)) # add column of 1s for intercept
   SUy <- drop(W %*% crossprod(prep$U, prep$y))
   
@@ -138,7 +138,7 @@ plmm_fit <- function(prep,
   
   # reconstruct K to calculate V 
   # this is on the standardized X scale 
-  estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S, nrow = prep$nrow_X), prep$U) + (1-eta)*diag(nrow = prep$nrow_X) 
+  estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S), prep$U) + (1-eta)*diag(nrow = nrow(prep$U)) 
   
   ret <- structure(list(
     std_X = prep$std_X,

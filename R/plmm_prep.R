@@ -61,14 +61,14 @@ plmm_prep <- function(X,
   ## case 1: K is not specified (default to realized relatedness matrix)
   if (is.null(K)){
     if(trace){cat("No K specified - will use default definition of the \n realized relatedness matrix.\n")}
-    c(D, U) %<-% svd(std_X, nv = 0, nu = n) # don't need V
+    c(D, U) %<-% svd(std_X, nv = 0) # don't need V
     # TODO: add RSpectra option here (or, use bigsnpr SVD method)
     S <- (D^2)/p # singular values of K, the realized relationship matrix
     
   } else {
     ## case 2: K is user-specified 
     S <- U <- NULL
-    c(S, U) %<-% svd(K, nv = 0, nu = n) # again, don't need V 
+    c(S, U) %<-% svd(K, nv = 0) # again, don't need V 
   }
 
   

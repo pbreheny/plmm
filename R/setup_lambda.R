@@ -45,7 +45,7 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   if (length(ind) != (p-1)) { # case 1: not all `p` columns are to be penalized
     fit <- stats::glm(y ~ -1 + X[, -ind, drop = FALSE], family='gaussian')
   } else { # case 2: all columns are penalized 
-    fit <- stats::glm(y ~ X[, 1, drop = FALSE], family='gaussian')
+    fit <- stats::glm(y ~ -1 + X[, 1, drop = FALSE], family='gaussian')
   }
 
   # determine the maximum value for lambda 
