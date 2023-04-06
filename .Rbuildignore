@@ -6,9 +6,9 @@
 ^\.version\.json$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^.*\.bk
-^.*\.rds
-^.*\cad_mid.bed
-^.*\cad_mid.bim
-^.*\cad_mid.fam
+^.*\.bk$
+^.*\.rds$
+^.*\cad_mid.bed$
+^.*\cad_mid.bim$
+^.*\cad_mid.fam$
 ^scratch.R$
