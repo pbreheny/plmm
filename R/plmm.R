@@ -4,6 +4,7 @@
 #' NB: this function is simply a wrapper for plmm_prep -> plmm_fit -> plmm_format
 #' @param X Design matrix. May include clinical covariates and other non-SNP data.
 #' @param y Continuous outcome vector.
+#' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p)`
 #' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param k An integer between 1 and \code{nrow(K)} indicating the number of singular values requested *if* package \code{RSpectra} is installed. Defaults to NULL. 
@@ -34,12 +35,10 @@
 #' s1 <- summary(fit_admix1, idx = 99)
 #' print(s1)
 #' 
-#' \dontrun{
-#' fit_admix2 <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X), k = 3)
+#' # using admix data and k = 50 
+#' fit_admix2 <- plmm(X = admix$X, y = admix$y, k = 50)
 #' s2 <- summary(fit_admix2, idx = 99)
 #' print(s2)
-#' }
-#' 
 #' 
 #' # now use PLINK data files
 #' \dontrun{
@@ -64,7 +63,9 @@
 plmm <- function(X,
                  y,
                  K = NULL,
-                 k = NULL,
+                 k = min(nrow(X), ncol(X)), 
+                 # TODO: think more deeply about what the best choice is for the 
+                 # default value of k
                  eta_star = NULL,
                  penalty = c("MCP", "SCAD", "lasso"),
                  gamma,
@@ -122,6 +123,7 @@ plmm <- function(X,
   the_prep <- plmm_prep(X = X,
                         y = y,
                         K = K,
+                        k = k,
                         eta_star = eta_star,
                         penalty.factor = penalty.factor,
                         returnX = returnX,

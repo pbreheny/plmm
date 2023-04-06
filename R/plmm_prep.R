@@ -32,6 +32,7 @@
 #' 
 plmm_prep <- function(X,
                       y,
+                      k,
                       K = NULL,
                       eta_star = NULL,
                       penalty.factor = rep(1, ncol(X)),
@@ -61,14 +62,34 @@ plmm_prep <- function(X,
   ## case 1: K is not specified (default to realized relatedness matrix)
   if (is.null(K)){
     if(trace){cat("No K specified - will use default definition of the \n realized relatedness matrix.\n")}
-    c(D, U) %<-% svd(std_X, nv = 0) # don't need V
-    # TODO: add RSpectra option here (or, use bigsnpr SVD method)
+    
+    # if I want all the singular values (which is k = min(n,p)), use base::svd
+    if(k == min(n,p)){
+      decomp <- svd(std_X, nv = 0)
+    }
+    # otherwise, if I want fewer singular values than min(n,p), use RSpectra decomposition method:
+    if (k < min(n,p)){
+      decomp <- RSpectra::svds(A = std_X, nv = 0, k = k)
+    }
+    
+    D <- decomp$d
+    U <- decomp$u
     S <- (D^2)/p # singular values of K, the realized relationship matrix
     
   } else {
     ## case 2: K is user-specified 
     S <- U <- NULL
-    c(S, U) %<-% svd(K, nv = 0) # again, don't need V 
+    
+    # again, decomposition depends on choice of k
+    if(k == min(n,p)){
+      decomp <- svd(K, nv = 0)
+    } 
+    
+    if(k < min(n,p)){
+      decomp <- RSpectra::svds(A = K, nv = 0, k = k)
+    }
+    S <- decomp$d
+    U <- decomp$u
   }
 
   
