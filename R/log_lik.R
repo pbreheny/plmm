@@ -7,11 +7,13 @@
 #' @keywords internal
 #' 
 #' @examples 
+#' \dontrun{
 #' admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix 
 #' ev <- eigen(admix$K)
 #' U <- ev$vectors
 #' fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
 #' (log_lik(eta = fit$eta, Uy = U%*%admix$y, S = ev$values ))
+#' }
 
 log_lik <- function(eta, Uy, S){
 
