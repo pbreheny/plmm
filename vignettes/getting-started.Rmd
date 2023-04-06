@@ -1,6 +1,7 @@
 ---
 title: "Getting started with penalizedLMM"
 output: rmarkdown::html_vignette
+author: "Tabitha Peter"
 vignette: >
   %\VignetteIndexEntry{getting-started}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,7 +19,7 @@ knitr::opts_chunk$set(
 library(penalizedLMM)
 ```
 
-**NOTE**: This vignette is under development -- not all of the examples here are fully worked through. In fact, as of this writing, most of them are not working yet. My work here is an example of [working with the garage door open](https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu).
+**NOTE**: This vignette is under development -- not all of the examples here are fully worked through. In fact, as of this writing, several of them are not working yet. My work here is an example of [working with the garage door open](https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu).
 
 
 ## Introduction 
@@ -50,6 +51,7 @@ summary(admix_fit, lambda = admix_fit$lambda[95])
 The `cad_lite` data is in the bed/bim/fam format, so I need to do some preprocessing first: 
 
 ```{r cad_lite_process, eval=FALSE}
+# TODO: make process_plink handle gzipped PLINK files
 cad_lite <- process_plink(prefix = "cad_lite",
                           dataDir = plink_example(path="cad_lite.fam.gz",
                                                   parent=T))

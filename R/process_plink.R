@@ -3,6 +3,7 @@
 #' This function allows you to preprocess PLINK bed/bim/fam files for use with \code{penalizedLMM} functions. Unreliable SNPs are removed and missing values are imptued using either \code{snpStats}, or if not tagged, the HWE mean value.
 #' @param prefix Character argument that is the prefix of your bed/bim/fam files.
 #' @param dataDir Directory where plink files (and .sexcheck files are located if \code{sexcheck = TRUE}) are located
+#' @param gz A logical: are the PLINK files g-zipped (i.e. are the file endings '.gz')?. Defaults to FALSE. NOTE: process_plink will unzip your zipped files! 
 #' @param sexcheck Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck"
 #' @param na.strings For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"
 #' @param impute Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.
@@ -23,21 +24,23 @@
 #' 
 #' 
 
-process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", impute = TRUE, quiet=FALSE){
+process_plink <- function(prefix,
+                          dataDir,
+                          gz = FALSE,
+                          sexcheck = FALSE,
+                          na.strings = "-9",
+                          impute = TRUE,
+                          quiet=FALSE){
 
   if(!quiet){
     cat("\nPreprocessing", prefix, "data:\n")
   }
 
   # check for compressed files 
-  if (!quiet){
-    if (substr(x = file.path(dataDir, prefix), 
-               start = nchar(file.path(dataDir, prefix)) - 2, 
-               stop = nchar(file.path(dataDir, prefix))) == ".gz") {
-      cat("Unzipping .gz files - this could take a second") 
+    if (gz){
+      if (!quiet){cat("Unzipping .gz files - this could take a second")}
       system(paste0("gunzip -k ", file.path(dataDir, prefix)))
     }
-  }
   
   obj <- snpStats::read.plink(file.path(dataDir, prefix), na.strings = na.strings)
   
