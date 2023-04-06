@@ -8,10 +8,6 @@ admixture_data.R
 cad_raw.R
 inst/extdata/og_cad.*
 inst/extdata/cad_mid.*
-inst/extdata/cad_lite.log 
-inst/extdata/cad_lite.bed
-inst/extdata/cad_lite.bim
-inst/extdata/cad_lite.fam
 Rprof.*
 scratch.R
 R/_*

@@ -51,7 +51,7 @@ The `cad_lite` data is in the bed/bim/fam format, so I need to do some preproces
 
 ```{r cad_lite_process}
 cad_lite <- process_plink(prefix = "cad_lite",
-                          dataDir = plink_example(path="cad_lite.fam",
+                          dataDir = plink_example(path="cad_lite.fam.gz",
                                                   parent=T))
 # NB: the 'quiet' option in process_plink()  will silence the printed messages
 
