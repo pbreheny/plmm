@@ -7,6 +7,7 @@
 process_plink(
   prefix,
   dataDir,
+  gz = FALSE,
   sexcheck = FALSE,
   na.strings = "-9",
   impute = TRUE,
@@ -17,6 +18,8 @@ process_plink(
 \item{prefix}{Character argument that is the prefix of your bed/bim/fam files.}
 
 \item{dataDir}{Directory where plink files (and .sexcheck files are located if \code{sexcheck = TRUE}) are located}
+
+\item{gz}{A logical: are the PLINK files g-zipped (i.e. are the file endings '.gz')?. Defaults to FALSE. NOTE: process_plink will unzip your zipped files!}
 
 \item{sexcheck}{Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck"}
 
