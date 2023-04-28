@@ -127,6 +127,8 @@ plmm <- function(X,
                         returnX = returnX,
                         trace = trace)
   
+  
+  if(trace){cat("Beginning model fitting.\n")}
   the_fit <- plmm_fit(prep = the_prep,
                       penalty = penalty,
                       gamma = gamma,
@@ -141,6 +143,7 @@ plmm <- function(X,
                       init = init,
                       returnX = returnX)
   
+  if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   the_final_product <- plmm_format(fit = the_fit, 
                                    convex = convex,
                                    dfmax = dfmax, 

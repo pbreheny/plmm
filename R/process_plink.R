@@ -3,8 +3,8 @@
 #' This function allows you to preprocess PLINK bed/bim/fam files for use with \code{penalizedLMM} functions. Unreliable SNPs are removed and missing values are imptued using either \code{snpStats}, or if not tagged, the HWE mean value.
 #' @param prefix Character argument that is the prefix of your bed/bim/fam files.
 #' @param dataDir Directory where plink files (and .sexcheck files are located if \code{sexcheck = TRUE}) are located
-#' @param gz A logical: are the PLINK files g-zipped (i.e. are the file endings '.gz')?. Defaults to FALSE. NOTE: process_plink will unzip your zipped files! 
-#' @param sexcheck Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck"
+#' @param gz A logical: are the PLINK files g-zipped (i.e. are the file endings '.gz')?. Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files 
+#' @param sexcheck Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck" in the same directory as the bed/fam files
 #' @param na.strings For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"
 #' @param impute Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.
 #' @param quiet Logical flag: should progress messages be printed? Defaults to FALSE. 
@@ -18,7 +18,7 @@
 #' @examples 
 #' \dontrun{
 #' # the output of calls to 'plink_example' will vary according to the users' directory structure
-#' test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam.gz", parent=T))
+#' test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam.gz", parent=T), gz = TRUE)
 #' test2 <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam.gz", parent=T))
 #' }
 #' 
@@ -39,7 +39,7 @@ process_plink <- function(prefix,
   # check for compressed files 
     if (gz){
       if (!quiet){cat("Unzipping .gz files - this could take a second")}
-      system(paste0("gunzip -k ", file.path(dataDir, prefix)))
+      system(paste0("gunzip -k ", file.path(dataDir, paste0(prefix, "*"))))
     }
   
   obj <- snpStats::read.plink(file.path(dataDir, prefix), na.strings = na.strings)

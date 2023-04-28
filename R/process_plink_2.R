@@ -3,10 +3,10 @@
 #' @param data_dir The path to the bed/bim/fam data files 
 #' @param prefix The prefix (as a character string) of the bed/fam data files 
 #' @param rds Logical: does an rds file for these data files already exist in \code{data_dir}? Defaults to FALSE
-#' @param impute Character string indicating type of imputation to use. "simple" will use \code{bigsnpr::snp_fastImputeSimple}, and "xgboost" will use \code{bigsnpr::snp_fastImpute}. Defaults to "simple."
-#' Note: 'impute' argument is still under construction. Only "simple" method is available at this time.
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
+#' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
 #' @param ... Other arguments to bigsnpr::snp_fastImpute or bigsnpr::snp_fastImputeSimple (depending on choice of \code{impute})
+#' #' Note: an 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.
 #' 
 #' @return A list of two components: 
 #' * X: the fully-imputed design matrix 
@@ -16,16 +16,9 @@
 #' 
 #' @examples 
 #' \dontrun{
-#' cad_mid <- process_plink_2(data_dir = plink_example(path = "cad_mid.bed", parent = T), prefix = "cad_mid", rds = T, impute = "simple", method = "mean0")
-#' str(cad_mid) 
-#' 
-#' cad_full <- process_plink_2(data_dir = plink_example(path = "og_cad.bed", parent = T), prefix = "og_cad", rds = F, impute = "simple", method = "mean0")
-#' 
-#' cad_lite <- process_plink_2(data_dir = plink_example(path = "cad_lite.bed", parent = T), prefix = "cad_lite", rds = F, impute = "xgboost")
+#' cad_lite <- process_plink_2(data_dir = plink_example(path = "cad_lite.bed", parent = T), prefix = "cad_lite", rds = F, gz = TRUE)
 #' }
-process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", quiet = FALSE, ...){
-  
-  warning("This method is under construction. Use process_plink() for best results")
+process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", quiet = FALSE, gz = FALSE, ...){
   
   if(!quiet){
     cat("\nPreprocessing", prefix, "data:\n")
@@ -42,6 +35,13 @@ process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", qu
     if(!quiet){
       cat("\nCreating ", prefix, ".rds\n")
     }
+
+    # check for compressed files 
+    if (gz){
+      if (!quiet){cat("Unzipping .gz files - this could take a second")}
+      system(paste0("gunzip -k ", file.path(data_dir, paste0(prefix, "*"))))
+    }
+    
     bigsnpr::snp_readBed(bedfile = paste0(data_dir, "/", prefix, ".bed"))
     obj <- bigsnpr::snp_attach(path)
   }
@@ -95,31 +95,41 @@ process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", qu
   }
   
   # impute missing values
-  if(impute == "simple"){
-    # NB: this will overwite obj$genotypes
-    obj$genotypes <- bigsnpr::snp_fastImputeSimple(Gna = X,
-                                                   ncores = bigstatsr::nb_cores(),
-                                                   ...) # dots can pass method
-    
-    # now, save the imputed values
-    obj <- bigsnpr::snp_save(obj)
-
-    
-  } else if (impute == "xgboost"){
-    imp <- bigsnpr::snp_fastImpute(Gna = X,
-                                   ncores = bigstatsr::nb_cores(),
-                                   infos.chr = chr,
-                                   seed = as.numeric(Sys.Date()),
-                                   ...) # dots can pass method
-    
-    # save imputed values (NB: will overwrite obj$genotypes)
-    obj$genotypes$code256 <- bigsnpr::CODE_IMPUTE_PRED
-    obj <- bigsnpr::snp_save(obj)
+  # NB: this will overwrite obj$genotypes
+  obj$genotypes <- bigsnpr::snp_fastImputeSimple(Gna = X,
+                                                 ncores = bigstatsr::nb_cores(),
+                                                 ...) # dots can pass method
   
-    
-  } else stop("Argument impute must be either simple or xgboost.")
+  # now, save the imputed values
+  obj <- bigsnpr::snp_save(obj)
   
   
+  # TODO: come back here and try to get the 'xgboost' method to work
+  # if(impute == "simple"){
+  #   # NB: this will overwrite obj$genotypes
+  #   obj$genotypes <- bigsnpr::snp_fastImputeSimple(Gna = X,
+  #                                                  ncores = bigstatsr::nb_cores(),
+  #                                                  ...) # dots can pass method
+  #   
+  #   # now, save the imputed values
+  #   obj <- bigsnpr::snp_save(obj)
+  # 
+  #   
+  # } else if (impute == "xgboost"){
+  #   imp <- bigsnpr::snp_fastImpute(Gna = X,
+  #                                  ncores = bigstatsr::nb_cores(),
+  #                                  infos.chr = chr,
+  #                                  seed = as.numeric(Sys.Date()),
+  #                                  ...) # dots can pass method
+  #   
+  #   # save imputed values (NB: will overwrite obj$genotypes)
+  #   obj$genotypes$code256 <- bigsnpr::CODE_IMPUTE_PRED
+  #   obj <- bigsnpr::snp_save(obj)
+  # 
+  #   
+  # } else stop("Argument impute must be either simple or xgboost.")
+  # 
+  # 
   
   
   if(!quiet){cat("\nDone!\n")}
