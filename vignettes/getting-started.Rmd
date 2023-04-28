@@ -4,8 +4,10 @@ output: rmarkdown::html_vignette
 author: "Tabitha Peter"
 vignette: >
   %\VignetteIndexEntry{getting-started}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -50,11 +52,11 @@ summary(admix_fit, lambda = admix_fit$lambda[95])
 
 The `cad_lite` data is in the bed/bim/fam format, so I need to do some preprocessing first: 
 
-```{r cad_lite_process, eval=FALSE}
-# TODO: make process_plink handle gzipped PLINK files
+```{r cad_lite_process}
 cad_lite <- process_plink(prefix = "cad_lite",
                           dataDir = plink_example(path="cad_lite.fam.gz",
-                                                  parent=T))
+                                                  parent=T),
+                          gz = TRUE)
 # NB: the 'quiet' option in process_plink()  will silence the printed messages
 
 cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
@@ -67,8 +69,10 @@ cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl),
 
 Now that we have the data processed, we can fit a model. 
 
-```{r cad_lite_fit, eval=FALSE}
-cad_lite_fit <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute)
+```{r cad_lite_fit}
+cad_lite_fit <- plmm(X = cad_lite$genotypes,
+                     y = cad_clinical$hdl_impute,
+                     trace = TRUE)
 names(cad_lite_fit)
 ```
 
@@ -76,7 +80,7 @@ The returned `beta_vals` item is a matrix whose rows are $\beta$ coefficients an
 
 We can summarize this fit at the 25th $\lambda$ value:  
 
-```{r summary1, eval=FALSE}
+```{r summary1}
 summary(cad_lite_fit, lambda = cad_lite_fit$lambda[25])
 ```
 

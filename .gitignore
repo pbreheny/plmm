@@ -13,5 +13,8 @@ scratch.R
 R/_*
 *.rds
 *.bk
+*.bed
+*.bim
+*.fam
 vignettes/*.html
 inst/doc
