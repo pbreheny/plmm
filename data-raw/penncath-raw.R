@@ -36,10 +36,10 @@ penncath_og_bim <- fread('penncath_og.bim')
 # gzip the _lite and _mid versions & save the gzipped files in inst/extdata/
 # ^ did this on command line 
 
-
+# TODO: try this in the future: 
 # create .rda object for penncath_lite
-penncath_lite <- list(
-  bim = penncath_lite_bim,
-  fam = penncath_lite_fam
-)
-usethis::use_data(penncath_lite)
+# penncath_lite <- list(
+#   bim = penncath_lite_bim,
+#   fam = penncath_lite_fam
+# )
+# usethis::use_data(penncath_lite)
