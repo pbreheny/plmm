@@ -33,10 +33,13 @@ penncath_og_bim <- fread('penncath_og.bim')
 
 # Step 4: Save these files in a way that is consistent with the best practices 
 # outlined in R-pkgs 2nd edition: 
-# gzip the _lite and _mid versions 
+# gzip the _lite and _mid versions & save the gzipped files in inst/extdata/
+# ^ did this on command line 
 
 
-# save the gzipped files in inst/extdata/
-
-
-# create .rda object for penncath_mid
+# create .rda object for penncath_lite
+penncath_lite <- list(
+  bim = penncath_lite_bim,
+  fam = penncath_lite_fam
+)
+usethis::use_data(penncath_lite)

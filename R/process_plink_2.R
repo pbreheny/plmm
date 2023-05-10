@@ -5,20 +5,29 @@
 #' @param rds Logical: does an rds file for these data files already exist in \code{data_dir}? Defaults to FALSE
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
 #' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
+#' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL. 
 #' @param ... Other arguments to bigsnpr::snp_fastImpute or bigsnpr::snp_fastImputeSimple (depending on choice of \code{impute})
 #' #' Note: an 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.
 #' 
 #' @return A list of two components: 
-#' * X: the fully-imputed design matrix 
+#' * X: the fully-imputed design matrix, whose columns are the features and whose rows are the observations. 
 #' * constants_idx: A numeric vector with the indices of the constant features. An index of 5 indicates that the 5th feature is constant (i.e. has zero variance)
 #' 
-#' @keywords internal
+#' @export
 #' 
 #' @examples 
 #' \dontrun{
-#' cad_lite <- process_plink_2(data_dir = plink_example(path = "cad_lite.bed", parent = T), prefix = "cad_lite", rds = F, gz = TRUE)
+#' lite <- process_plink_2(data_dir = plink_example(path = "penncath_lite.bed.gz", parent = T), prefix = "penncath_lite", rds = F, gz = TRUE)
+#' mid <- process_plink_2(data_dir = "/Users/tabithapeter/Desktop/penalizedLMM/data-raw", prefix = "penncath_mid", rds = F, gz = F, row_id = "fid", method = "mode")
 #' }
-process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", quiet = FALSE, gz = FALSE, ...){
+process_plink_2 <- function(data_dir,
+                            prefix,
+                            rds = FALSE,
+                            impute = "simple",
+                            quiet = FALSE,
+                            gz = FALSE,
+                            row_id = NULL,
+                            ...){
   
   if(!quiet){
     cat("\nPreprocessing", prefix, "data:\n")
@@ -91,14 +100,16 @@ process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", qu
   }
   
   if(!quiet){
-    cat("\nImputing the missing values using ", impute, "method\n")
+    # TODO: add detail (mean, mode, etc.) to the output here
+    # impute_type <- ifelse(missing(method), impute, method)
+    cat("\nImputing the missing values using ",impute, "method\n")
   }
   
   # impute missing values
   # NB: this will overwrite obj$genotypes
   obj$genotypes <- bigsnpr::snp_fastImputeSimple(Gna = X,
                                                  ncores = bigstatsr::nb_cores(),
-                                                 ...) # dots can pass method
+                                                 ...) # dots can pass method (mean, mode, etc.)
   
   # now, save the imputed values
   obj <- bigsnpr::snp_save(obj)
@@ -137,9 +148,22 @@ process_plink_2 <- function(data_dir, prefix, rds = FALSE, impute = "simple", qu
   # return data in a tractable format 
   # NB: this assumes that X will fit into memory!! 
   # TODO: add nuance here 
-  return(list(X = obj$genotypes[,],
+  X <- obj$genotypes[,]
+  if(!is.null(row_id)){
+    if(row_id == "iid"){row_names <- obj$fam$sample.ID}
+    if(row_id == "fid"){row_names <- obj$fam$family.ID}
+  } else {
+    row_names <- 1:length(obj$fam$sample.ID)
+  }
+  
+  dimnames(X) <- list(row_names,
+                      obj$map$marker.ID)
+  
+  
+  return(list(X = X,
               constants_idx = which(constants_idx == "TRUE")))
   
+  # TODO: create a .log file? 
   
 }
 

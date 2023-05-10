@@ -7,6 +7,7 @@
 process_plink(
   prefix,
   dataDir,
+  gz = FALSE,
   sexcheck = FALSE,
   na.strings = "-9",
   impute = TRUE,
@@ -18,7 +19,9 @@ process_plink(
 
 \item{dataDir}{Directory where plink files (and .sexcheck files are located if \code{sexcheck = TRUE}) are located}
 
-\item{sexcheck}{Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck"}
+\item{gz}{A logical: are the PLINK files g-zipped (i.e. are the file endings '.gz')?. Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files}
+
+\item{sexcheck}{Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck" in the same directory as the bed/fam files}
 
 \item{na.strings}{For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"}
 
@@ -40,7 +43,7 @@ This function allows you to preprocess PLINK bed/bim/fam files for use with \cod
 \examples{
 \dontrun{
 # the output of calls to 'plink_example' will vary according to the users' directory structure
-test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam.gz", parent=T))
+test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam.gz", parent=T), gz = TRUE)
 test2 <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam.gz", parent=T))
 }
 
