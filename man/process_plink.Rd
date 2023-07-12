@@ -2,50 +2,50 @@
 % Please edit documentation in R/process_plink.R
 \name{process_plink}
 \alias{process_plink}
-\title{Preprocess PLINK files}
+\title{Preprocess PLINK files using the \code{bigsnpr} package}
 \usage{
 process_plink(
+  data_dir,
   prefix,
-  dataDir,
-  gz = FALSE,
-  sexcheck = FALSE,
-  na.strings = "-9",
+  rds = FALSE,
   impute = TRUE,
-  quiet = FALSE
+  quiet = FALSE,
+  gz = FALSE,
+  row_id = NULL,
+  ...
 )
 }
 \arguments{
-\item{prefix}{Character argument that is the prefix of your bed/bim/fam files.}
+\item{data_dir}{The path to the bed/bim/fam data files}
 
-\item{dataDir}{Directory where plink files (and .sexcheck files are located if \code{sexcheck = TRUE}) are located}
+\item{prefix}{The prefix (as a character string) of the bed/fam data files}
 
-\item{gz}{A logical: are the PLINK files g-zipped (i.e. are the file endings '.gz')?. Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files}
+\item{rds}{Logical: does an rds file for these data files already exist in \code{data_dir}? Defaults to FALSE}
 
-\item{sexcheck}{Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck" in the same directory as the bed/fam files}
+\item{impute}{Logical: should data be imputed? Default to TRUE.}
 
-\item{na.strings}{For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"}
+\item{quiet}{Logical: should messages be printed to the console? Defaults to TRUE}
 
-\item{impute}{Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.}
+\item{gz}{Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.}
 
-\item{quiet}{Logical flag: should progress messages be printed? Defaults to FALSE.}
+\item{row_id}{Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL.}
+
+\item{...}{Other arguments to bigsnpr::snp_fastImpute or bigsnpr::snp_fastImputeSimple (depending on choice of \code{impute})
+#' Note: a more nuanced 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.}
 }
 \value{
-A three element list object:
+A list of two components:
 \itemize{
-\item \code{genotypes} The filtered and imputed genotypes in a snpMatrix object with subjects in rows and SNPs in columns. This is a numeric matrix.
-\item \code{map} A matrix of SNP data.
-\item \code{fam} A matrix of subject data.
+\item X: the fully-imputed design matrix, whose columns are the features and whose rows are the observations.
+\item constants_idx: A numeric vector with the indices of the constant features. An index of 5 indicates that the 5th feature is constant (i.e. has zero variance)
 }
 }
 \description{
-This function allows you to preprocess PLINK bed/bim/fam files for use with \code{penalizedLMM} functions. Unreliable SNPs are removed and missing values are imptued using either \code{snpStats}, or if not tagged, the HWE mean value.
+Preprocess PLINK files using the \code{bigsnpr} package
 }
 \examples{
 \dontrun{
-# the output of calls to 'plink_example' will vary according to the users' directory structure
-test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam.gz", parent=T), gz = TRUE)
-test2 <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam.gz", parent=T))
+lite <- process_plink(data_dir = plink_example(path = "penncath_lite.bed.gz", parent = T), prefix = "penncath_lite", rds = F, gz = TRUE)
+mid <- process_plink(data_dir = "/Users/tabithapeter/Desktop/penalizedLMM/data-raw", prefix = "penncath_mid", rds = F, gz = F, row_id = "fid", method = "mode")
 }
-
-
 }

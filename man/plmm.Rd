@@ -10,7 +10,7 @@ plmm(
   K = NULL,
   k = NULL,
   eta_star = NULL,
-  penalty = c("MCP", "Spenncath", "lasso"),
+  penalty = c("MCP", "SCAD", "lasso"),
   gamma,
   alpha = 1,
   lambda.min,
@@ -39,7 +39,7 @@ plmm(
 
 \item{eta_star}{Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.}
 
-\item{penalty}{The penalty to be applied to the model. Either "MCP" (the default), "Spenncath", or "lasso".}
+\item{penalty}{The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".}
 
 \item{gamma}{The tuning parameter of the MCP/Spenncath penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.}
 

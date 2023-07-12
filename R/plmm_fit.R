@@ -32,7 +32,7 @@
 #'
 
 plmm_fit <- function(prep, 
-                     penalty = c("MCP", "SCAD", "lasso"),
+                     penalty = "MCP",
                      gamma,
                      alpha = 1,
                      # lambda.min = ifelse(n>p, 0.001, 0.05),
@@ -47,10 +47,7 @@ plmm_fit <- function(prep,
                      init = NULL,
                      returnX = TRUE){
   
-  # coercion
-  penalty <- match.arg(penalty)
-  
-  # set default gamma
+  # set default gamma (will need this for cv.plmm)
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
   # set default init

@@ -11,7 +11,6 @@ inst/extdata/cad_mid.*
 Rprof.*
 scratch.R
 R/_*
-*.rds
 *.bk
 *.bed
 *.bim

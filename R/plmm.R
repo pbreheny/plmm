@@ -7,7 +7,7 @@
 #' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param k An integer between 1 and \code{nrow(K)} indicating the number of singular values requested *if* package \code{RSpectra} is installed. Defaults to NULL. 
-#' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "Spenncath", or "lasso".
+#' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/Spenncath penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/Spenncath penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/Spenncath penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
 #' @param lambda.min The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.
@@ -66,7 +66,7 @@ plmm <- function(X,
                  K = NULL,
                  k = NULL,
                  eta_star = NULL,
-                 penalty = c("MCP", "Spenncath", "lasso"),
+                 penalty = c("MCP", "SCAD", "lasso"),
                  gamma,
                  alpha = 1,
                  # lambda.min = ifelse(n>p, 0.001, 0.05),
@@ -116,6 +116,13 @@ plmm <- function(X,
     if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
     if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
   }
+  
+  # coercion for penalty
+  penalty <- match.arg(penalty)
+  
+  # set default gamma
+  if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
+  
   
   if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
   
