@@ -49,7 +49,7 @@ plmm_format <- function(fit,
                                       l2 = fit$lambda*(1-fit$alpha),
                                       family = 'gaussian',
                                       penalty.factor = fit$penalty.factor) else NULL
-  
+  # browser()
   # reverse the transformations of the beta values 
   beta_vals <- untransform(res_b = fit$b,
                            ns = fit$ns,

@@ -41,9 +41,9 @@ plmm(
 
 \item{penalty}{The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".}
 
-\item{gamma}{The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for SCAD.}
+\item{gamma}{The tuning parameter of the MCP/Spenncath penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.}
 
-\item{alpha}{Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.}
+\item{alpha}{Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/Spenncath penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/Spenncath penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.}
 
 \item{lambda.min}{The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.}
 
@@ -94,18 +94,18 @@ print(s2)
 # now use PLINK data files
 \dontrun{
 
-cad_mid <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam", parent=T))
-cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
+penncath_mid <- process_plink(prefix = "penncath_mid", dataDir = plink_example(path="penncath_mid.fam", parent=T))
+penncath_clinical <- read.csv(plink_example(path="penncath_clinical.csv"))
 # for the sake of illustration, I use a simple mean imputation for the outcome 
-cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
+penncath_clinical$hdl_impute <- ifelse(is.na(penncath_clinical$hdl), mean(penncath_clinical$hdl, na.rm = T), penncath_clinical$hdl)
 
 # fit with no 'k' specified
-fit_plink1 <- plmm(X = cad_mid$genotypes, y = cad_clinical$hdl_impute, trace = TRUE)
+fit_plink1 <- plmm(X = penncath_mid$genotypes, y = penncath_clinical$hdl_impute, trace = TRUE)
 summary(fit_plink1, idx = 5)
 # Runs in ~219 seconds (3.65 mins) on my 2015 MacBook Pro
 
 # fit with 'k = 5' specified (so using RSpectra::svds())
-fit_plink2 <- plmm(X = cad_mid$genotypes, y = cad_clinical$hdl_impute, k = 5, trace = TRUE)
+fit_plink2 <- plmm(X = penncath_mid$genotypes, y = penncath_clinical$hdl_impute, k = 5, trace = TRUE)
 # Runs in ~44 seconds on my 2015 MacBook Pro
 summary(fit_plink2, idx = 5);summary(fit_plink2, idx = 95)
 }

@@ -9,8 +9,8 @@
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param k An integer between 1 and \code{nrow(K)} indicating the number of singular values requested *if* package \code{RSpectra} is installed. Defaults to NULL. 
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
-#' @param gamma The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for SCAD.
-#' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
+#' @param gamma The tuning parameter of the MCP/Spenncath penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.
+#' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/Spenncath penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/Spenncath penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
 #' @param lambda.min The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.
 #' @param nlambda Length of the sequence of lambda. Default is 100. 
 #' @param lambda A user-specified sequence of lambda values. By default, a sequence of values of length nlambda is computed, equally spaced on the log scale.
@@ -43,18 +43,18 @@
 #' # now use PLINK data files
 #' \dontrun{
 #' 
-#' cad_mid <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam", parent=T))
-#' cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
+#' penncath_mid <- process_plink(prefix = "penncath_mid", dataDir = plink_example(path="penncath_mid.fam", parent=T))
+#' penncath_clinical <- read.csv(plink_example(path="penncath_clinical.csv"))
 #' # for the sake of illustration, I use a simple mean imputation for the outcome 
-#' cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl), mean(cad_clinical$hdl, na.rm = T), cad_clinical$hdl)
+#' penncath_clinical$hdl_impute <- ifelse(is.na(penncath_clinical$hdl), mean(penncath_clinical$hdl, na.rm = T), penncath_clinical$hdl)
 #' 
 #' # fit with no 'k' specified
-#' fit_plink1 <- plmm(X = cad_mid$genotypes, y = cad_clinical$hdl_impute, trace = TRUE)
+#' fit_plink1 <- plmm(X = penncath_mid$genotypes, y = penncath_clinical$hdl_impute, trace = TRUE)
 #' summary(fit_plink1, idx = 5)
 #' # Runs in ~219 seconds (3.65 mins) on my 2015 MacBook Pro
 #' 
 #' # fit with 'k = 5' specified (so using RSpectra::svds())
-#' fit_plink2 <- plmm(X = cad_mid$genotypes, y = cad_clinical$hdl_impute, k = 5, trace = TRUE)
+#' fit_plink2 <- plmm(X = penncath_mid$genotypes, y = penncath_clinical$hdl_impute, k = 5, trace = TRUE)
 #' # Runs in ~44 seconds on my 2015 MacBook Pro
 #' summary(fit_plink2, idx = 5);summary(fit_plink2, idx = 95)
 #' }
@@ -87,6 +87,7 @@ plmm <- function(X,
 
   ## check types 
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
+  if("FBM.code256" %in% class(X)) stop("plmm does not work with FBM objects at this time. This option is in progress. For now, X must be a numeric matrix.")
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
@@ -118,6 +119,13 @@ plmm <- function(X,
     if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
   }
   
+  # coercion for penalty
+  penalty <- match.arg(penalty)
+  
+  # set default gamma
+  if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
+  
+  
   if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
   
   the_prep <- plmm_prep(X = X,
@@ -129,6 +137,8 @@ plmm <- function(X,
                         returnX = returnX,
                         trace = trace)
   
+  
+  if(trace){cat("Beginning model fitting.\n")}
   the_fit <- plmm_fit(prep = the_prep,
                       penalty = penalty,
                       gamma = gamma,
@@ -143,6 +153,7 @@ plmm <- function(X,
                       init = init,
                       returnX = returnX)
   
+  if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   the_final_product <- plmm_format(fit = the_fit, 
                                    convex = convex,
                                    dfmax = dfmax, 

@@ -1,0 +1,111 @@
+---
+title: "Working with PLINK files"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with PLINK files}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+```{r setup}
+library(penalizedLMM)
+```
+
+
+The `penncath_lite` data is in the PLINK format (i.e., bed/bim/fam files), so I need to do some preprocessing first. The `process_plink` function uses functions from the [bigsnpr package](https://privefl.github.io/bigsnpr/reference/index.html) to do some quality control filtering steps. The result of the `process_plink` function is an object with 1) a matrix of genotypes and 2) a vector with the indices of any constant features (e.g., SNPs with no variation across the sample). 
+
+```{r penncath_lite_process}
+# preprocess PLINK files
+penncath_lite <- process_plink(
+  data_dir = plink_example(path = "penncath_lite.rds", parent = T),
+  prefix = "penncath_lite",
+  # Note my choices here -- make changes depending on your data 
+  rds = TRUE,
+  gz = FALSE,
+  impute = FALSE)
+
+# NB: the 'quiet' option in process_plink()  will silence the printed messages
+penncath_clinical <- read.csv(plink_example(path="penncath_clinical.csv"))
+
+# for the sake of illustration, I use a simple mean imputation for the outcome 
+penncath_clinical$hdl_impute <- ifelse(is.na(penncath_clinical$hdl),
+                                       mean(penncath_clinical$hdl, na.rm = T),
+                                       penncath_clinical$hdl)
+```
+
+Now that we have the data processed, we can fit a model. 
+
+```{r penncath_lite_fit}
+penncath_lite_fit <- plmm(X = penncath_lite$X,
+                     y = penncath_clinical$hdl_impute,
+                     trace = TRUE)
+names(penncath_lite_fit)
+```
+
+We can summarize this fit at the 25th $\lambda$ value:  
+
+```{r summary1}
+summary(penncath_lite_fit, lambda = penncath_lite_fit$lambda[25])
+```
+
+In order to make this model run faster on my laptop (which is a 2015 MacBook Pro), I am going to re-run this model with an additional argument $k$. If $k$ is specified and the package `RSpectra` is installed, the singular value decomposition algorithm is `RSpectra::svds(k, ...)` -- this will be more efficient.  **NOTE**: this functionality with `RSpectra is under development`. 
+
+```{r penncath_lite_fit2, eval=FALSE}
+penncath_lite_fit2 <- plmm(X = penncath_lite$genotypes, y = penncath_clinical$hdl_impute, k = 5)
+names(penncath_lite_fit2)
+```
+
+Let's summarize this new fit -- 
+
+```{r summary2}
+# summary(penncath_lite_fit2, lambda = penncath_lite_fit2$lambda[25])
+#TODO: examine why there is only one nonzero beta value returned here  
+
+# Notice that the two $\lambda$ values at which we examined `penncath_lite_fit` and `penncath_lite_fit2` were not the same; those values were `r penncath_lite_fit$lambda[25]` and `r penncath_lite_fit2$lambda[25]` respectively. 
+# 
+
+```
+
+We can implement cross-validation for this model using the code below: 
+
+```{r penncath_cv, eval=FALSE}
+# FIXME: this is taking several minutes -- need to come back here 
+penncath_lite_cv <- cv.plmm(X = penncath_lite$X,
+                       y = penncath_clinical$hdl_impute,
+                       K = relatedness_mat(penncath_lite$X))
+# to see progress bar, run the above with the trace = TRUE argument; this will
+#   show a progress bar for each fold. 
+
+print.summary.cv.plmm(summary.cv.plmm(penncath_lite_cv, lambda = "min"))
+```
+
+Finally, we can compare the observed and predicted values: 
+
+```{r penncath_pred, eval=FALSE}
+# make predictions when X is bigger
+penncath_lite_pred <- predict(object = penncath_lite_fit,
+                         newX = penncath_lite$X,
+                         type='blup',
+                         idx = which(penncath_lite_fit$lambda == penncath_lite_cv$lambda.1se),
+                         # for BLUP prediction method, must supply X and y
+                         X = penncath_lite$X,
+                         y = penncath_clinical$hdl_impute)
+# FIXME: revisit BLUP method; something is off here. 
+# compare the observed and predicted values 
+compare_penncath_lite_y <- data.frame(penncath_clinical$hdl_impute, penncath_lite_pred)
+colnames(compare_penncath_lite_y) <- c("Y", "Y hat BLUP")
+
+print(head(compare_penncath_lite_y))
+```
+
+More to come...

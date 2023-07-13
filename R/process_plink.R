@@ -1,9 +1,217 @@
-#' Preprocess PLINK files
-#'
-#' This function allows you to preprocess PLINK bed/bim/fam files for use with \code{penalizedLMM} functions. Unreliable SNPs are removed and missing values are imptued using either \code{snpStats}, or if not tagged, the HWE mean value.
+#' Preprocess PLINK files using the `bigsnpr` package
+#' 
+#' @param data_dir The path to the bed/bim/fam data files 
+#' @param prefix The prefix (as a character string) of the bed/fam data files 
+#' @param rds Logical: does an rds file for these data files already exist in \code{data_dir}? Defaults to FALSE
+#' @param impute Logical: should data be imputed? Default to TRUE.
+#' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
+#' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
+#' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL. 
+#' @param returnX Logical: should the design matrix be returned as a numeric matrix, or an FBM (as defined in `bigstatsr`)? Unless specified, X will be returned as a numeric matrix only if object.size() < 1e8 (100 Mb). 
+#' @param outfile Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'plink', i.e. you will get 'plink.log' as the outfile.
+#' @param ... Other arguments to bigsnpr::snp_fastImputeSimple (depending on choice of \code{impute}). Note: the default imputation method is `mode`. See ?bigsnpr::snp_fastImputeSimple() for other options/more details.
+#' #' Note: a more nuanced 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.
+#' 
+#' @return A list of two components: 
+#' * X: the fully-imputed design matrix, whose columns are the features from the _autosomes only_ and whose rows are the observations. 
+#' * constants_idx: A numeric vector with the indices of the constant features. An index of 5 indicates that the 5th feature is constant (i.e. has zero variance)
+#' 
+#' @export
+#' 
+#' @examples 
+#' \dontrun{
+#' lite <- process_plink(data_dir = plink_example(path = "penncath_lite.bed.gz", parent = T), prefix = "penncath_lite", rds = F, gz = TRUE)
+#' mid <- process_plink(data_dir = "/Users/tabithapeter/Desktop/penalizedLMM/data-raw", prefix = "penncath_mid", rds = F, gz = F, row_id = "fid", method = "mode")
+#' }
+process_plink <- function(data_dir,
+                          prefix,
+                          rds = FALSE,
+                          impute = TRUE,
+                          quiet = FALSE,
+                          gz = FALSE,
+                          row_id = NULL,
+                          returnX,
+                          outfile, 
+                          ...){
+  
+  # start log 
+  if(missing(outfile)){
+    outfile = "plink.log"
+    } else {
+      outfile = paste0(outfile, ".log")
+    }
+  log_con <- file(outfile)
+  cat("### Processing PLINK files for PLMM ###", file = log_con)
+  cat("\nLogging to ", outfile, file = outfile, append = TRUE)
+  cat("\nPreprocessing", prefix, "data:", file = outfile, append = TRUE)
+  
+  if(!quiet){
+    cat("\nLogging to", outfile)
+    cat("\nPreprocessing", prefix, "data:")
+  }
+  
+  # read in PLINK files 
+  path <- paste0(data_dir, "/", prefix, ".rds")
+  
+  if(rds){
+    # if an RDS file already exists, use it 
+    cat("Attaching data from", path, file = outfile, append = TRUE)
+    obj <- bigsnpr::snp_attach(path)
+  } else {
+    # else create the RDS file first 
+    cat("\nCreating ", prefix, ".rds\n", file = outfile, append = TRUE)
+    if(!quiet){
+      cat("\nCreating ", prefix, ".rds\n")
+    }
+    
+    # check for compressed files 
+    if (gz){
+      cat("\nUnzipping .gz files - this could take a second", file = outfile, append = TRUE)
+      if (!quiet){cat("\nUnzipping .gz files - this could take a second")}
+      system(paste0("gunzip -k ", file.path(data_dir, paste0(prefix, "*"))))
+    }
+    
+    bigsnpr::snp_readBed(bedfile = paste0(data_dir, "/", prefix, ".bed"))
+    obj <- bigsnpr::snp_attach(path)
+  }
+  
+  # only consider SNPs on chromosomes 1-22
+  chr_range <- range(obj$map$chromosome)
+  
+  if(chr_range[1] != 1 | chr_range[2] != 22){
+    original_dim <- dim(obj$genotypes)[2]
+    chr_filtered <- bigsnpr::snp_subset(obj, ind.col = chr %in% 1:22)
+    obj <- bigsnpr::snp_attach(chr_filtered)
+    new_dim <- dim(obj$genotypes)[2]
+    
+    cat("\nRemoved ", original_dim - new_dim, "SNPs that are outside of chromosomes 1-22.",
+        file = outfile, append = TRUE)
+    if(!quiet){
+      cat("\nRemoved ", original_dim - new_dim, "SNPs that are outside of chromosomes 1-22.")
+      
+    }
+  }
+  
+  # TODO: figure out how to add a 'sexcheck' with bigsnpr functions
+  # e.g., if sexcheck = TRUE, remove subjects with sex discrepancies
+   
+  
+  chr <- obj$map$chromosome
+  X   <- obj$genotypes
+  pos <- obj$map$physical.pos
+  
+  
+  # save these counts (like 'col_summary' obj from snpStats package)
+  counts <- bigstatsr::big_counts(X) # NB this is a matrix 
+  
+  # identify monomorphic SNPs 
+  constants_idx <- apply(X = counts[1:3,],
+                         MARGIN = 2,
+                         # see which ~called~ features have all same value
+                         FUN = function(c){sum(c == sum(c)) > 0})
+  
+  cat("\nThere are ", sum(constants_idx), " constant features in the data",
+      file = outfile, append = TRUE)
+  if(!quiet){
+    cat("\nThere are ", sum(constants_idx), " constant features in the data")
+  }
+  
+  # notify about missing values
+  na_idx <- counts[4,] > 0
+  prop_na <- counts[4,]/nrow(X)
+  
+  cat("\nThere are a total of ", sum(na_idx), "SNPs with missing values",
+      file = outfile, append = TRUE)
+  cat("\nOf these, ", sum(prop_na > 0.5),
+      " are missing in at least 50% of the samples",
+      file = outfile, append = TRUE)
+  if(!quiet){
+    cat("\nThere are a total of ", sum(na_idx), "SNPs with missing values")
+    cat("\nOf these, ", sum(prop_na > 0.5), " are missing in at least 50% of the samples")
+  }
+  
+  if(impute){cat("\nImputing the missing values using ", method, " method",
+                 file = outfile, append = TRUE)}
+  if(!quiet & impute){
+    # set default method 
+    if(missing(method)){method = 'mode'}
+    cat("\nImputing the missing values using ", method, " method\n")
+  }
+  
+  # impute missing values
+  if(impute){
+    # NB: this will overwrite obj$genotypes
+    obj$genotypes <- bigsnpr::snp_fastImputeSimple(Gna = X,
+                                                   ncores = bigstatsr::nb_cores(),
+                                                   ...) # dots can pass method (mean, mode, etc.)
+    
+    # TODO: come back here and try to get the 'xgboost' method to work
+    # } else if (impute == "xgboost"){
+    #   imp <- bigsnpr::snp_fastImpute(Gna = X,
+    #                                  ncores = bigstatsr::nb_cores(),
+    #                                  infos.chr = chr,
+    #                                  seed = as.numeric(Sys.Date()),
+    #                                  ...) # dots can pass method
+    #   
+    #   # save imputed values (NB: will overwrite obj$genotypes)
+    #   obj$genotypes$code256 <- bigsnpr::CODE_IMPUTE_PRED
+    #   obj <- bigsnpr::snp_save(obj)
+    # 
+    #   
+    # } else stop("Argument impute must be either simple or xgboost.")
+    
+    # now, save the imputed values
+    obj <- bigsnpr::snp_save(obj)
+  }
+  
+  if(impute){cat("\nDone with imputation. File formatting in progress.",
+                 file = outfile, append = TRUE)}
+  if(!quiet & impute){cat("\nDone with imputation. File formatting in progress.")}
+  
+  # return data in a tractable format 
+  if (missing(returnX)) {
+    if (utils::object.size(obj$genotypes) > 1e8) {
+      cat("\nDue to the large size of X (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).",
+          file = outfile, append = TRUE)
+      warning("\nDue to the large size of X (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).")
+      returnX <- FALSE
+    } else {
+      # if it fits, it ships 
+      returnX <- TRUE
+    }
+  }
+  
+  if(returnX){
+    X <- obj$genotypes[,]
+    if(!is.null(row_id)){
+      if(row_id == "iid"){row_names <- obj$fam$sample.ID}
+      if(row_id == "fid"){row_names <- obj$fam$family.ID}
+    } else {
+      row_names <- 1:length(obj$fam$sample.ID)
+    }
+    
+    dimnames(X) <- list(row_names,
+                        obj$map$marker.ID)
+    
+    return(list(X = X,
+                constants_idx = which(constants_idx)))
+  } else {
+    return(list(X = obj$genotypes,
+                fam = obj$fam,
+                map = obj$map,
+                constants_idx = which(constants_idx)
+                ))
+  }
+  
+}
+
+
+
+#' This function allows you to preprocess PLINK bed/bim/fam files using `snpStats`, an older package compared to `bigsnpr`. Unreliable SNPs are removed and missing values are imptued using either \code{snpStats}, or if not tagged, the HWE mean value.
 #' @param prefix Character argument that is the prefix of your bed/bim/fam files.
 #' @param dataDir Directory where plink files (and .sexcheck files are located if \code{sexcheck = TRUE}) are located
-#' @param sexcheck Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck"
+#' @param gz A logical: are the PLINK files g-zipped (i.e. are the file endings '.gz')?. Defaults to FALSE. NOTE: if TRUE, process_plink_snpStats will unzip your zipped files 
+#' @param sexcheck Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck" in the same directory as the bed/fam files
 #' @param na.strings For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"
 #' @param impute Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.
 #' @param quiet Logical flag: should progress messages be printed? Defaults to FALSE. 
@@ -12,31 +220,33 @@
 #' * `map` A matrix of SNP data.
 #' * `fam` A matrix of subject data.
 #' 
-#' @export
+#' @keywords internal
 #' 
 #' @examples 
 #' \dontrun{
 #' # the output of calls to 'plink_example' will vary according to the users' directory structure
-#' test <- process_plink(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam.gz", parent=T))
-#' test2 <- process_plink(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam.gz", parent=T))
+#' test <- process_plink_snpStats(prefix = "cad_lite", dataDir = plink_example(path="cad_lite.fam.gz", parent=T), gz = TRUE)
+#' test2 <- process_plink_snpStats(prefix = "cad_mid", dataDir = plink_example(path="cad_mid.fam.gz", parent=T))
 #' }
 #' 
 #' 
 
-process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", impute = TRUE, quiet=FALSE){
-
+process_plink_snpStats <- function(prefix,
+                          dataDir,
+                          gz = FALSE,
+                          sexcheck = FALSE,
+                          na.strings = "-9",
+                          impute = TRUE,
+                          quiet=FALSE){
+  
   if(!quiet){
     cat("\nPreprocessing", prefix, "data:\n")
   }
-
+  
   # check for compressed files 
-  if (!quiet){
-    if (substr(x = file.path(dataDir, prefix), 
-               start = nchar(file.path(dataDir, prefix)) - 2, 
-               stop = nchar(file.path(dataDir, prefix))) == ".gz") {
-      cat("Unzipping .gz files - this could take a second") 
-      system(paste0("gunzip -k ", file.path(dataDir, prefix)))
-    }
+  if (gz){
+    if (!quiet){cat("Unzipping .gz files - this could take a second")}
+    system(paste0("gunzip -k ", file.path(dataDir, paste0(prefix, "*"))))
   }
   
   obj <- snpStats::read.plink(file.path(dataDir, prefix), na.strings = na.strings)
@@ -62,8 +272,8 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
   obj_col_summary <- obj_col_summary[!missing_genotypes,]
   # step 2: remove SNPs that have no variation (i.e. only one genotype is present)
   no_var <- c(obj_col_summary$P.AA == 1 | 
-               obj_col_summary$P.AB == 1 | 
-               obj_col_summary$P.BB == 1)
+                obj_col_summary$P.AB == 1 | 
+                obj_col_summary$P.BB == 1)
   obj_col_summary <- obj_col_summary[!no_var,]
   
   # subset the genotypes data to remove the monogenic SNPs
@@ -86,22 +296,22 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
     }
     
   }
-
+  
   if (impute) {
-
+    
     # Now how many SNPs have missing data?
     missing <- table(obj_col_summary$Call.rate == 1)
     if(!quiet){
       cat("\nThere are", ifelse(length(missing) == 2, missing[1], 0), "SNPs with missing data that we will attempt to impute.\n")
       
-      }
-
+    }
+    
     # Impute missing values
     rules <- snpStats::snp.imputation(obj$genotypes[,colnames(genotypes)], minA=0)
     Imp <- snpStats::impute.snps(rules = rules, snps = obj$genotypes[,colnames(genotypes)])
     to_fill_in <- is.na(genotypes) # these are the indices marking which values to 'fill in' with the imputation 
     genotypes[to_fill_in] <- Imp[to_fill_in] # this step fills in the missing values with imputed values
-
+    
     # How many SNPs have missing data after imputation?
     still_na <- apply(genotypes, MARGIN = 2, FUN = function(x){sum(is.na(x))})
     if(!quiet){
@@ -121,7 +331,7 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
     
     # Throw out SNPs that have >= 50% missingness, even after imputation
     genotypes_keep <- genotypes[, which(call_rates > 0.5)]
-
+    
     # How many SNPs will be imputed with mean values?
     imp_hwe <- apply(genotypes_keep, MARGIN = 2, FUN = function(x){sum(is.na(x))})
     if(!quiet){
@@ -131,24 +341,24 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
     
     # keep snp order for later
     order_snps <- colnames(genotypes_keep)
-
+    
     # which SNPs have missingness
     call_rates_keep <- apply(genotypes_keep, MARGIN = 2, FUN = function(x){sum(!is.na(x))/length(x)})
     to_impute <- which(call_rates_keep < 1)
     Imp_hwe <- genotypes_keep[, to_impute]
-
+    
     imputed_mean <- apply(Imp_hwe, 2, function(s){
       na_vals <- which(is.na(s))
       s[na_vals] <- mean(s, na.rm = TRUE)
       
       return(s)
     })
-
+    
     genotypes_none_missing <- genotypes_keep
     genotypes_none_missing[, to_impute] <- imputed_mean
     genotypes <- genotypes_none_missing
   }
-
+  
   # make sure there are no missing values remaining / count missing values
   missing <- 0
   chunks <- ceiling(nrow(genotypes) / 100)
@@ -163,14 +373,14 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
   if(all.equal(order_snps, colnames(genotypes))){cat("Imputation complete; alignment check passed")} else {
     warning("Alignment issue has occured - SNPs in supplied data and imputed data do not match.")
   }
-
+  
   # keep corresponding map data
   map <- obj$map[colnames(genotypes),]
-
+  
   # keep corresponding fam data
   fam <- obj$fam[rownames(genotypes),]
   fam$prefix <- prefix
-
+  
   
   # done...
   if(!quiet){
@@ -185,4 +395,6 @@ process_plink <- function(prefix, dataDir, sexcheck = FALSE, na.strings = "-9", 
               map = map,
               fam = fam))
 }
+
+
 

@@ -25,6 +25,12 @@ The branches of this repo are organized in the following way:
 
   - `master` is the main branch with all the latest updates 
   
-  - `blup` is a development branch focused on improving the implementation of the Best Linear Unbiased Predictor method 
+  - `rspectra` is a branch where we are working to make our singular value decomposition approach in `plmm` scale up to GWAS-sized data using [RSpectra](https://github.com/yixuan/RSpectra). 
+  
+  - `setup-lambda` is a branch where we are resolving a bug in `setup_lambda`. Stay tuned for updates on this. 
+  
+  - `process-plink` is a branch where we are toying with how to make the package better process [PLINK](https://www.cog-genomics.org/plink/1.9/) files. 
+  
+  - `blup` is an **archived** branch previously focused on improving the implementation of the Best Linear Unbiased Predictor method 
   
   - `develop/Yujing` is an **archived** branch. We will be deleting this branch soon -- for internal use only. 

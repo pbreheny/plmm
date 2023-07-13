@@ -7,7 +7,7 @@ This is an internal function for \code{cv.plmm}}
 \usage{
 plmm_fit(
   prep,
-  penalty = c("MCP", "SCAD", "lasso"),
+  penalty = "MCP",
   gamma,
   alpha = 1,
   lambda.min,

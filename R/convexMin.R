@@ -28,10 +28,7 @@ convexMin <- function(b, X, penalty, gamma, l2, family = "gaussian", penalty.fac
 
   val <- NULL
   for (i in 1:l) {
-    # A1 <- if (i==1) rep(1,p) else b[,i]==0
-    A1 <- ifelse(test = i == 1,
-                 yes = rep(1,p),
-                 no = b[,i]==0)
+    A1 <- if (i==1) rep(1,p) else b[,i]==0
     if (i==l) {
       L2 <- l2[i]
       U <- A1

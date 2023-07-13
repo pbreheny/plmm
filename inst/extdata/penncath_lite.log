@@ -1,0 +1,28 @@
+PLINK v1.90b6.26 64-bit (2 Apr 2022)
+Options in effect:
+  --bfile penncath_og
+  --make-bed
+  --out penncath_lite
+  --thin 0.005
+
+Hostname: wireless-nat-inside.uiowa.edu
+Working directory: /Users/tabithapeter/Desktop/penalizedLMM/data-raw
+Start time: Tue May  9 09:53:14 2023
+
+Random number seed: 1683643994
+16384 MB RAM detected; reserving 8192 MB for main workspace.
+861473 variants loaded from .bim file.
+1401 people (937 males, 464 females) loaded from .fam.
+933 phenotype values loaded from .fam.
+--thin: 857106 variants removed (4367 remaining).
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 1401 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.976519.
+4367 variants and 1401 people pass filters and QC.
+Among remaining phenotypes, 463 are cases and 470 are controls.  (468
+phenotypes are missing.)
+--make-bed to penncath_lite.bed + penncath_lite.bim + penncath_lite.fam ...
+done.
+
+End time: Tue May  9 09:53:14 2023

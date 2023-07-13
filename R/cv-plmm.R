@@ -84,7 +84,11 @@ cv.plmm <- function(X,
 
   
   # set up folds for cross validation 
-  if (!missing(seed)){set.seed(seed)}
+  if (!missing(seed)) {
+    original_seed <- .GlobalEnv$.Random.seed
+    on.exit(.GlobalEnv$.Random.seed <- original_seed)
+    set.seed(seed)
+  }
   
   sde <- sqrt(.Machine$double.eps)
   

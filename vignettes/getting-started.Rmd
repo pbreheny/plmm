@@ -1,10 +1,13 @@
 ---
 title: "Getting started with penalizedLMM"
 output: rmarkdown::html_vignette
+author: "Tabitha Peter"
 vignette: >
   %\VignetteIndexEntry{getting-started}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -18,7 +21,7 @@ knitr::opts_chunk$set(
 library(penalizedLMM)
 ```
 
-**NOTE**: This vignette is under development -- not all of the examples here are fully worked through. In fact, as of this writing, most of them are not working yet. My work here is an example of [working with the garage door open](https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu).
+**NOTE**: This vignette is under development -- not all of the examples here are fully worked through. In fact, as of this writing, several of them are not working yet. My work here is an example of [working with the garage door open](https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu).
 
 
 ## Introduction 
@@ -27,15 +30,15 @@ library(penalizedLMM)
 
 At this time, the package is designed for linear regression only -- that is, we are considering only continuous (numeric) outcomes. In the future, I would like to extend this package to handle logistic regression (to handle dichotomous outcomes). 
 
-Since we are focused on penalized regression in this package, `penalizedLMM` offers 3 choices of penalty: the minimax concave (MCP), the smoothly clipped absolute deviation (SCAD), and the least absolute shrinkage and selection operator (LASSO).  Much of the work in this package is built on the concepts/techniques provided in the `ncvreg` [package](https://github.com/pbreheny/ncvreg), whose author is [my thesis advisor](https://myweb.uiowa.edu/pbreheny/). 
+Since we are focused on penalized regression in this package, `penalizedLMM` offers 3 choices of penalty: the minimax concave (MCP), the smoothly clipped absolute deviation (Spenncath), and the least absolute shrinkage and selection operator (LASSO).  Much of the work in this package is built on the concepts/techniques provided in the `ncvreg` [package](https://github.com/pbreheny/ncvreg), whose author is [my thesis advisor](https://myweb.uiowa.edu/pbreheny/). 
 
 `penalizedLMM` currently includes three example data sets: 
 
   * `admix` is a small data set (197 observations, 100 SNPs) that describes individuals of different racial backgrounds. The outcome of `admix` is simulated to include population structure effects (*i.e.* race/ethnicity have an impact on the SNP associations). 
   
-  * `cad_lite` (acronym for **c**oronary **a**rtery **d**isease) is a lower mid-sized data set (1401 observations, 4217 SNPs) with several health outcomes as well as age and sex information. This data set is a subset of a much larger data set (the original data has over 800K SNPs). For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
+  * `penncath_lite` (data on coronary artery disease from the [PennCath study](https://pubmed.ncbi.nlm.nih.gov/21239051/)) is a lower mid-sized data set (1401 observations, 4217 SNPs) with several health outcomes as well as age and sex information. This data set is a subset of a much larger data set (the original data has over 800K SNPs). For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
   
-In this overview, I will provide a demo of the main functions in `penalizedLMM` using both of these data sets. 
+In this overview, I will provide a demo of the main functions in `penalizedLMM` using the `admix` data. Checkout the 'Working with PLINK files' vignette to see a demo of processing data from PLINK file formats. 
 
 
 ## Basic model fitting 
@@ -47,56 +50,17 @@ admix_fit <- plmm(X = admix$X, y = admix$y)
 summary(admix_fit, lambda = admix_fit$lambda[95])
 ```
 
-The `cad_lite` data is in the bed/bim/fam format, so I need to do some preprocessing first: 
-
-```{r cad_lite_process, eval=FALSE}
-cad_lite <- process_plink(prefix = "cad_lite",
-                          dataDir = plink_example(path="cad_lite.fam.gz",
-                                                  parent=T))
-# NB: the 'quiet' option in process_plink()  will silence the printed messages
-
-cad_clinical <- read.csv(plink_example(path="cad_clinical.csv"))
-
-# for the sake of illustration, I use a simple mean imputation for the outcome 
-cad_clinical$hdl_impute <- ifelse(is.na(cad_clinical$hdl),
-                                       mean(cad_clinical$hdl, na.rm = T),
-                                       cad_clinical$hdl)
-```
-
-Now that we have the data processed, we can fit a model. 
-
-```{r cad_lite_fit, eval=FALSE}
-cad_lite_fit <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute)
-names(cad_lite_fit)
-```
-
 The returned `beta_vals` item is a matrix whose rows are $\beta$ coefficients and whose columns represent values of the penalization parameter $\lambda$. By default, `plmm` fits 100 values of $\lambda$ (see the `setup_lambda` function for details). 
 
 We can summarize this fit at the 25th $\lambda$ value:  
 
-```{r summary1, eval=FALSE}
-summary(cad_lite_fit, lambda = cad_lite_fit$lambda[25])
+```{r summary1}
+summary(admix_fit, lambda = admix_fit$lambda[25])
 ```
 
 Notice that a notable number of these SNPs are constant features -- that is, SNPs whose values do not vary among the members of this population. For such features, a value of $\beta=0$ is returned for all values of $\lambda$. 
 
-In order to make this model run faster on my laptop (which is a 2015 MacBook Pro), I am going to re-run this model with an additional argument $k$. If $k$ is specified and the package `RSpectra` is installed, the singular value decomposition algorithm is `RSpectra::svds(k, ...)` -- this will be more efficient.  **NOTE**: this functionality with `RSpectra is under development`. 
 
-```{r cad_lite_fit2, eval=FALSE}
-cad_lite_fit2 <- plmm(X = cad_lite$genotypes, y = cad_clinical$hdl_impute, k = 5)
-names(cad_lite_fit2)
-```
-
-Let's summarize this new fit -- 
-
-```{r summary2}
-# summary(cad_lite_fit2, lambda = cad_lite_fit2$lambda[25])
-#TODO: examine why there is only one nonzero beta value returned here  
-
-# Notice that the two $\lambda$ values at which we examined `cad_lite_fit` and `cad_lite_fit2` were not the same; those values were `r cad_lite_fit$lambda[25]` and `r cad_lite_fit2$lambda[25]` respectively. 
-# 
-
-```
 
 
 
@@ -112,17 +76,6 @@ plot(admix_cv)
 ```
 
 
-To see how this would work for our `cad_lite` data, we can use the lines below: 
-
-```{r cad_cv, eval=FALSE}
-# FIXME: this is taking several minutes -- need to come back here 
-# cad_lite_cv <- cv.plmm(X = cad_lite$genotypes, 
-#                        y = cad_clinical$hdl_impute,
-#                        K = relatedness_mat(cad_lite$genotypes))
-# to see progress bar, run the above with the trace = TRUE argument
-
-# print.summary.cv.plmm(summary.cv.plmm(cad_lite_cv, lambda = "min"))
-```
 
 ## Plots 
 
@@ -154,21 +107,4 @@ admix_pred1 <- predict(object = admix_fit,
 ```
 
 
-```{r cad_pred, eval=FALSE}
-# make predictions when X is bigger
-cad_lite_pred <- predict(x = cad_lite_fit,
-                         newX = cad_lite$genotypes,
-                         type='blup',
-                         idx = which(cad_lite_fit$lambda == cad_lite_cv$lambda.1se),
-                         # for BLUP prediction method, must supply X and y
-                         X = cad_lite$genotypes,
-                         y = cad_clinical$hdl_impute)
-
-# compare the observed and predicted values 
-compare_cad_lite_y <- data.frame(cad_clinical$hdl_impute, cad_lite_pred)
-colnames(compare_cad_lite_y) <- c("Y", "Y hat BLUP")
-
-print(head(compare_cad_lite_y))
-```
-
-< More to come... >
+More to come.... 
