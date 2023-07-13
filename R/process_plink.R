@@ -3,15 +3,17 @@
 #' @param data_dir The path to the bed/bim/fam data files 
 #' @param prefix The prefix (as a character string) of the bed/fam data files 
 #' @param rds Logical: does an rds file for these data files already exist in \code{data_dir}? Defaults to FALSE
+#' @param impute Logical: should data be imputed? Default to TRUE.
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
 #' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
 #' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL. 
-#' @param impute Logical: should data be imputed? Default to TRUE.
-#' @param ... Other arguments to bigsnpr::snp_fastImpute or bigsnpr::snp_fastImputeSimple (depending on choice of \code{impute})
+#' @param returnX Logical: should the design matrix be returned as a numeric matrix, or an FBM (as defined in `bigstatsr`)? Unless specified, X will be returned as a numeric matrix only if object.size() < 1e8 (100 Mb). 
+#' @param outfile Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'plink', i.e. you will get 'plink.log' as the outfile.
+#' @param ... Other arguments to bigsnpr::snp_fastImputeSimple (depending on choice of \code{impute}). Note: the default imputation method is `mode`. See ?bigsnpr::snp_fastImputeSimple() for other options/more details.
 #' #' Note: a more nuanced 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.
 #' 
 #' @return A list of two components: 
-#' * X: the fully-imputed design matrix, whose columns are the features and whose rows are the observations. 
+#' * X: the fully-imputed design matrix, whose columns are the features from the _autosomes only_ and whose rows are the observations. 
 #' * constants_idx: A numeric vector with the indices of the constant features. An index of 5 indicates that the 5th feature is constant (i.e. has zero variance)
 #' 
 #' @export
@@ -22,16 +24,30 @@
 #' mid <- process_plink(data_dir = "/Users/tabithapeter/Desktop/penalizedLMM/data-raw", prefix = "penncath_mid", rds = F, gz = F, row_id = "fid", method = "mode")
 #' }
 process_plink <- function(data_dir,
-                            prefix,
-                            rds = FALSE,
-                            impute = TRUE,
-                            quiet = FALSE,
-                            gz = FALSE,
-                            row_id = NULL,
-                            ...){
+                          prefix,
+                          rds = FALSE,
+                          impute = TRUE,
+                          quiet = FALSE,
+                          gz = FALSE,
+                          row_id = NULL,
+                          returnX,
+                          outfile, 
+                          ...){
+  
+  # start log 
+  if(missing(outfile)){
+    outfile = "plink.log"
+    } else {
+      outfile = paste0(outfile, ".log")
+    }
+  log_con <- file(outfile)
+  cat("### Processing PLINK files for PLMM ###", file = log_con)
+  cat("\nLogging to ", outfile, file = outfile, append = TRUE)
+  cat("\nPreprocessing", prefix, "data:", file = outfile, append = TRUE)
   
   if(!quiet){
-    cat("\nPreprocessing", prefix, "data:\n")
+    cat("\nLogging to", outfile)
+    cat("\nPreprocessing", prefix, "data:")
   }
   
   # read in PLINK files 
@@ -39,16 +55,19 @@ process_plink <- function(data_dir,
   
   if(rds){
     # if an RDS file already exists, use it 
+    cat("Attaching data from", path, file = outfile, append = TRUE)
     obj <- bigsnpr::snp_attach(path)
   } else {
     # else create the RDS file first 
+    cat("\nCreating ", prefix, ".rds\n", file = outfile, append = TRUE)
     if(!quiet){
       cat("\nCreating ", prefix, ".rds\n")
     }
     
     # check for compressed files 
     if (gz){
-      if (!quiet){cat("Unzipping .gz files - this could take a second")}
+      cat("\nUnzipping .gz files - this could take a second", file = outfile, append = TRUE)
+      if (!quiet){cat("\nUnzipping .gz files - this could take a second")}
       system(paste0("gunzip -k ", file.path(data_dir, paste0(prefix, "*"))))
     }
     
@@ -65,15 +84,17 @@ process_plink <- function(data_dir,
     obj <- bigsnpr::snp_attach(chr_filtered)
     new_dim <- dim(obj$genotypes)[2]
     
+    cat("\nRemoved ", original_dim - new_dim, "SNPs that are outside of chromosomes 1-22.",
+        file = outfile, append = TRUE)
     if(!quiet){
-      cat("\nRemoved ", original_dim - new_dim, "SNPs that are outside of chromosomes 1-22.\n")
+      cat("\nRemoved ", original_dim - new_dim, "SNPs that are outside of chromosomes 1-22.")
       
     }
   }
   
-  
-  # if sexcheck = TRUE, remove subjects with sex discrepancies
-  # TODO: figure out how to do this with bigsnpr functions 
+  # TODO: figure out how to add a 'sexcheck' with bigsnpr functions
+  # e.g., if sexcheck = TRUE, remove subjects with sex discrepancies
+   
   
   chr <- obj$map$chromosome
   X   <- obj$genotypes
@@ -88,22 +109,33 @@ process_plink <- function(data_dir,
                          MARGIN = 2,
                          # see which ~called~ features have all same value
                          FUN = function(c){sum(c == sum(c)) > 0})
+  
+  cat("\nThere are ", sum(constants_idx), " constant features in the data",
+      file = outfile, append = TRUE)
   if(!quiet){
-    cat("\nThere are ", sum(constants_idx), " constant features in the data\n")
+    cat("\nThere are ", sum(constants_idx), " constant features in the data")
   }
   
   # notify about missing values
   na_idx <- counts[4,] > 0
   prop_na <- counts[4,]/nrow(X)
+  
+  cat("\nThere are a total of ", sum(na_idx), "SNPs with missing values",
+      file = outfile, append = TRUE)
+  cat("\nOf these, ", sum(prop_na > 0.5),
+      " are missing in at least 50% of the samples",
+      file = outfile, append = TRUE)
   if(!quiet){
-    cat("\nThere are a total of ", sum(na_idx), "SNPs with missing values\n")
-    cat("\nOf these, ", sum(prop_na > 0.5), " are missing in at least 50% of the samples\n")
+    cat("\nThere are a total of ", sum(na_idx), "SNPs with missing values")
+    cat("\nOf these, ", sum(prop_na > 0.5), " are missing in at least 50% of the samples")
   }
   
-  if(!quiet){
-    # TODO: add detail (mean, mode, etc.) to the output here
-    # impute_type <- ifelse(missing(method), impute, method)
-    cat("\nImputing the missing values using ",impute, "method\n")
+  if(impute){cat("\nImputing the missing values using ", method, " method",
+                 file = outfile, append = TRUE)}
+  if(!quiet & impute){
+    # set default method 
+    if(missing(method)){method = 'mode'}
+    cat("\nImputing the missing values using ", method, " method\n")
   }
   
   # impute missing values
@@ -113,61 +145,63 @@ process_plink <- function(data_dir,
                                                    ncores = bigstatsr::nb_cores(),
                                                    ...) # dots can pass method (mean, mode, etc.)
     
+    # TODO: come back here and try to get the 'xgboost' method to work
+    # } else if (impute == "xgboost"){
+    #   imp <- bigsnpr::snp_fastImpute(Gna = X,
+    #                                  ncores = bigstatsr::nb_cores(),
+    #                                  infos.chr = chr,
+    #                                  seed = as.numeric(Sys.Date()),
+    #                                  ...) # dots can pass method
+    #   
+    #   # save imputed values (NB: will overwrite obj$genotypes)
+    #   obj$genotypes$code256 <- bigsnpr::CODE_IMPUTE_PRED
+    #   obj <- bigsnpr::snp_save(obj)
+    # 
+    #   
+    # } else stop("Argument impute must be either simple or xgboost.")
+    
     # now, save the imputed values
     obj <- bigsnpr::snp_save(obj)
   }
   
-  
-  
-  # TODO: come back here and try to get the 'xgboost' method to work
-  # if(impute == "simple"){
-  #   # NB: this will overwrite obj$genotypes
-  #   obj$genotypes <- bigsnpr::snp_fastImputeSimple(Gna = X,
-  #                                                  ncores = bigstatsr::nb_cores(),
-  #                                                  ...) # dots can pass method
-  #   
-  #   # now, save the imputed values
-  #   obj <- bigsnpr::snp_save(obj)
-  # 
-  #   
-  # } else if (impute == "xgboost"){
-  #   imp <- bigsnpr::snp_fastImpute(Gna = X,
-  #                                  ncores = bigstatsr::nb_cores(),
-  #                                  infos.chr = chr,
-  #                                  seed = as.numeric(Sys.Date()),
-  #                                  ...) # dots can pass method
-  #   
-  #   # save imputed values (NB: will overwrite obj$genotypes)
-  #   obj$genotypes$code256 <- bigsnpr::CODE_IMPUTE_PRED
-  #   obj <- bigsnpr::snp_save(obj)
-  # 
-  #   
-  # } else stop("Argument impute must be either simple or xgboost.")
-  # 
-  # 
-  
-  
-  if(!quiet){cat("\nDone!\n")}
+  if(impute){cat("\nDone with imputation. File formatting in progress.",
+                 file = outfile, append = TRUE)}
+  if(!quiet & impute){cat("\nDone with imputation. File formatting in progress.")}
   
   # return data in a tractable format 
-  # NB: this assumes that X will fit into memory!! 
-  # TODO: add nuance here 
-  X <- obj$genotypes[,]
-  if(!is.null(row_id)){
-    if(row_id == "iid"){row_names <- obj$fam$sample.ID}
-    if(row_id == "fid"){row_names <- obj$fam$family.ID}
-  } else {
-    row_names <- 1:length(obj$fam$sample.ID)
+  if (missing(returnX)) {
+    if (utils::object.size(obj$genotypes) > 1e8) {
+      cat("\nDue to the large size of X (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).",
+          file = outfile, append = TRUE)
+      warning("\nDue to the large size of X (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).")
+      returnX <- FALSE
+    } else {
+      # if it fits, it ships 
+      returnX <- TRUE
+    }
   }
   
-  dimnames(X) <- list(row_names,
-                      obj$map$marker.ID)
-  
-  
-  return(list(X = X,
-              constants_idx = which(constants_idx == "TRUE")))
-  
-  # TODO: create a .log file? 
+  if(returnX){
+    X <- obj$genotypes[,]
+    if(!is.null(row_id)){
+      if(row_id == "iid"){row_names <- obj$fam$sample.ID}
+      if(row_id == "fid"){row_names <- obj$fam$family.ID}
+    } else {
+      row_names <- 1:length(obj$fam$sample.ID)
+    }
+    
+    dimnames(X) <- list(row_names,
+                        obj$map$marker.ID)
+    
+    return(list(X = X,
+                constants_idx = which(constants_idx)))
+  } else {
+    return(list(X = obj$genotypes,
+                fam = obj$fam,
+                map = obj$map,
+                constants_idx = which(constants_idx)
+                ))
+  }
   
 }
 

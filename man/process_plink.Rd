@@ -12,6 +12,8 @@ process_plink(
   quiet = FALSE,
   gz = FALSE,
   row_id = NULL,
+  returnX,
+  outfile,
   ...
 )
 }
@@ -30,13 +32,17 @@ process_plink(
 
 \item{row_id}{Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL.}
 
-\item{...}{Other arguments to bigsnpr::snp_fastImpute or bigsnpr::snp_fastImputeSimple (depending on choice of \code{impute})
+\item{returnX}{Logical: should the design matrix be returned as a numeric matrix, or an FBM (as defined in \code{bigstatsr})? Unless specified, X will be returned as a numeric matrix only if object.size() < 1e8 (100 Mb).}
+
+\item{outfile}{Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'plink', i.e. you will get 'plink.log' as the outfile.}
+
+\item{...}{Other arguments to bigsnpr::snp_fastImputeSimple (depending on choice of \code{impute}). Note: the default imputation method is \code{mode}. See ?bigsnpr::snp_fastImputeSimple() for other options/more details.
 #' Note: a more nuanced 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.}
 }
 \value{
 A list of two components:
 \itemize{
-\item X: the fully-imputed design matrix, whose columns are the features and whose rows are the observations.
+\item X: the fully-imputed design matrix, whose columns are the features from the \emph{autosomes only} and whose rows are the observations.
 \item constants_idx: A numeric vector with the indices of the constant features. An index of 5 indicates that the 5th feature is constant (i.e. has zero variance)
 }
 }

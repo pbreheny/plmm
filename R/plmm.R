@@ -86,6 +86,7 @@ plmm <- function(X,
 
   ## check types 
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
+  if("FBM.code256" %in% class(X)) stop("plmm does not work with FBM objects at this time. This option is in progress. For now, X must be a numeric matrix.")
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
