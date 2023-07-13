@@ -4,10 +4,9 @@
 #' NB: this function is simply a wrapper for plmm_prep -> plmm_fit -> plmm_format
 #' @param X Design matrix. May include clinical covariates and other non-SNP data.
 #' @param y Continuous outcome vector.
-#' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p)`
+#' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
-#' @param k An integer between 1 and \code{nrow(K)} indicating the number of singular values requested *if* package \code{RSpectra} is installed. Defaults to NULL. 
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/Spenncath penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/Spenncath penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/Spenncath penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
@@ -49,12 +48,12 @@
 #' penncath_clinical$hdl_impute <- ifelse(is.na(penncath_clinical$hdl), mean(penncath_clinical$hdl, na.rm = T), penncath_clinical$hdl)
 #' 
 #' # fit with no 'k' specified
-#' fit_plink1 <- plmm(X = penncath_mid$genotypes, y = penncath_clinical$hdl_impute, trace = TRUE)
+#' fit_plink1 <- plmm(X = penncath_mid$X, y = penncath_clinical$hdl_impute, trace = TRUE)
 #' summary(fit_plink1, idx = 5)
 #' # Runs in ~219 seconds (3.65 mins) on my 2015 MacBook Pro
 #' 
 #' # fit with 'k = 5' specified (so using RSpectra::svds())
-#' fit_plink2 <- plmm(X = penncath_mid$genotypes, y = penncath_clinical$hdl_impute, k = 5, trace = TRUE)
+#' fit_plink2 <- plmm(X = penncath_mid$X, y = penncath_clinical$hdl_impute, k = 5, trace = TRUE)
 #' # Runs in ~44 seconds on my 2015 MacBook Pro
 #' summary(fit_plink2, idx = 5);summary(fit_plink2, idx = 95)
 #' }
@@ -62,10 +61,8 @@
 
 plmm <- function(X,
                  y,
+                 k = NULL, 
                  K = NULL,
-                 k = min(nrow(X), ncol(X)), 
-                 # TODO: think more deeply about what the best choice is for the 
-                 # default value of k
                  eta_star = NULL,
                  penalty = c("MCP", "SCAD", "lasso"),
                  gamma,

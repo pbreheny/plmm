@@ -8,6 +8,7 @@ This is an internal function for \code{cv.plmm}}
 plmm_prep(
   X,
   y,
+  k = NULL,
   K = NULL,
   eta_star = NULL,
   penalty.factor = rep(1, ncol(X)),
@@ -20,6 +21,8 @@ plmm_prep(
 \item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
 
 \item{y}{Continuous outcome vector.}
+
+\item{k}{An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to \code{RSpectra::svds()}. Defaults to \code{min(n, p) - 1}, where n and p are the dimensions of the \emph{standardized} design matrix.}
 
 \item{K}{Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}, where X is standardized).}
 

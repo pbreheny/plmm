@@ -3,6 +3,7 @@
 #' Performs k-fold cross validation for lasso-, MCP-, or SCAD-penalized penalized linear mixed models over a grid of values for the regularization parameter lambda.
 #' @param X Design matrix for model fitting. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
 #' @param y Continuous outcome vector for model fitting.
+#' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Known or estimated similarity matrix.
 #' @param eta_star Optional arg. to \code{plmm_prep}. Defaults to NULL.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
@@ -30,6 +31,7 @@
 
 cv.plmm <- function(X,
                     y,
+                    k = NULL,
                     K = NULL,
                     eta_star = NULL,
                     penalty = c("MCP", "SCAD", "lasso"),
@@ -53,11 +55,13 @@ cv.plmm <- function(X,
   # implement preparation steps for model fitting 
   prep.args <- c(list(X = X,
                       y = y,
+                      k = k,
                       K = K,
                       eta_star = eta_star,
                       penalty.factor = penalty.factor,
                       returnX = returnX,
-                      trace))
+                      trace,
+                      ...)) # ... lets user pass arguments like k
   
   prep <- do.call('plmm_prep', prep.args)
   

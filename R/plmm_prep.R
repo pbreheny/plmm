@@ -3,6 +3,7 @@
 #'
 #' @param X Design matrix. May include clinical covariates and other non-SNP data.
 #' @param y Continuous outcome vector.
+#' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}, where X is standardized).
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
@@ -32,7 +33,7 @@
 #' 
 plmm_prep <- function(X,
                       y,
-                      k,
+                      k = NULL,
                       K = NULL,
                       eta_star = NULL,
                       penalty.factor = rep(1, ncol(X)),
@@ -47,6 +48,11 @@ plmm_prep <- function(X,
   # NB: the following line will eliminate singular columns (eg monomorphic SNPs)
   #  from the design matrix. 
   std_X <- ncvreg::std(X) 
+  
+  # set default k 
+  if(is.null(k)){
+    k <- min(nrow(std_X),ncol(std_X))
+  }
   
   # identify nonsingular values in the standardized X matrix  
   ns <- attr(std_X, "nonsingular")
@@ -64,11 +70,11 @@ plmm_prep <- function(X,
     if(trace){cat("No K specified - will use default definition of the \n realized relatedness matrix.\n")}
     
     # if I want all the singular values (which is k = min(n,p)), use base::svd
-    if(k == min(n,p)){
+    if(k == min(nrow(std_X),ncol(std_X))){
       decomp <- svd(std_X, nv = 0)
     }
     # otherwise, if I want fewer singular values than min(n,p), use RSpectra decomposition method:
-    if (k < min(n,p)){
+    if (k < min(nrow(std_X),ncol(std_X))){
       decomp <- RSpectra::svds(A = std_X, nv = 0, k = k)
     }
     
@@ -81,14 +87,14 @@ plmm_prep <- function(X,
     S <- U <- NULL
     
     # again, decomposition depends on choice of k
-    if(k == min(n,p)){
+    if(k == min(nrow(std_X),ncol(std_X))){
       decomp <- svd(K, nv = 0)
     } 
     
-    if(k < min(n,p)){
+    if(k < min(nrow(std_X),ncol(std_X))){
       decomp <- RSpectra::svds(A = K, nv = 0, k = k)
     }
-    S <- decomp$d
+    S <- decomp$d # if K was user-specified, then no need to transform D here
     U <- decomp$u
   }
 
