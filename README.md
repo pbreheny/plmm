@@ -18,18 +18,21 @@ devtools::install_github("areisett/penalizedLMM")
 
 For a description of the motivation of the functions in this package (along with examples) refer to the second module of [this GWAS data tutorial](https://pbreheny.github.io/adv-gwas-tutorial/index.html)
 
+## Latest changes 
 
+The newest features of `penalizedLMM` are: 
+
+  - The main model-fitting function `plmm` now has an argument `k` to approximate the decomposition of relationship matrix $\mathbf{K}$. Specifying `k` can **make model fitting faster by orders of magnitude**, with the caveat that choosing a 'best' value `k` is not trivial and will depend on the structure and size of the data. The approximate singular value decomposition is implemented with [RSpectra](https://github.com/yixuan/RSpectra); check out `RSpectra::svds()` for details.  
+
+  - Processing data from [PLINK](https://www.cog-genomics.org/plink/1.9/) files is now done with `bigsnpr` functions (see `process_plink`). This is faster than the previous version. 
+  
 ## Note on branches 
 
 The branches of this repo are organized in the following way: 
 
-  - `master` is the main branch with all the latest updates 
-  
-  - `rspectra` is a branch where we are working to make our singular value decomposition approach in `plmm` scale up to GWAS-sized data using [RSpectra](https://github.com/yixuan/RSpectra). 
+  - `master` is the main branch with all the latest updates
   
   - `setup-lambda` is a branch where we are resolving a bug in `setup_lambda`. Stay tuned for updates on this. 
-  
-  - `process-plink` is a branch where we are toying with how to make the package better process [PLINK](https://www.cog-genomics.org/plink/1.9/) files. 
   
   - `blup` is an **archived** branch previously focused on improving the implementation of the Best Linear Unbiased Predictor method 
   
