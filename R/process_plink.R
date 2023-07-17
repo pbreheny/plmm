@@ -141,8 +141,7 @@ process_plink <- function(data_dir,
     # NB: this will overwrite obj$genotypes
     obj$genotypes <- bigsnpr::snp_fastImputeSimple(Gna = X,
                                                    ncores = bigstatsr::nb_cores(),
-                                                   method = impute_method,
-                                                   ...) # dots can pass other args
+                                                   method = impute_method) # dots can pass other args
     
     
     # TODO: come back here and try to get the 'xgboost' method to work
