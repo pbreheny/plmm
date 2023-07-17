@@ -9,6 +9,7 @@ process_plink(
   prefix,
   rds = FALSE,
   impute = TRUE,
+  impute_method = "mode",
   quiet = FALSE,
   gz = FALSE,
   row_id = NULL,
@@ -25,6 +26,8 @@ process_plink(
 \item{rds}{Logical: does an rds file for these data files already exist in \code{data_dir}? Defaults to FALSE}
 
 \item{impute}{Logical: should data be imputed? Default to TRUE.}
+
+\item{impute_method}{If 'impute' = TRUE, this argument will specify the kind of imputation desired. This is passed directly to \code{bigsnpr::snp_fastImputeSimple()}. Defaults to 'mode'.}
 
 \item{quiet}{Logical: should messages be printed to the console? Defaults to TRUE}
 

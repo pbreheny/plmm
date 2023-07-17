@@ -4,6 +4,7 @@
 #' @param prefix The prefix (as a character string) of the bed/fam data files 
 #' @param rds Logical: does an rds file for these data files already exist in \code{data_dir}? Defaults to FALSE
 #' @param impute Logical: should data be imputed? Default to TRUE.
+#' @param impute_method If 'impute' = TRUE, this argument will specify the kind of imputation desired. This is passed directly to `bigsnpr::snp_fastImputeSimple()`. Defaults to 'mode'. 
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
 #' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
 #' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL. 
@@ -27,6 +28,7 @@ process_plink <- function(data_dir,
                           prefix,
                           rds = FALSE,
                           impute = TRUE,
+                          impute_method = 'mode',
                           quiet = FALSE,
                           gz = FALSE,
                           row_id = NULL,
@@ -130,20 +132,22 @@ process_plink <- function(data_dir,
     cat("\nOf these, ", sum(prop_na > 0.5), " are missing in at least 50% of the samples")
   }
   
-  if(impute){cat("\nImputing the missing values using ", method, " method",
-                 file = outfile, append = TRUE)}
   if(!quiet & impute){
     # set default method 
     if(missing(method)){method = 'mode'}
-    cat("\nImputing the missing values using ", method, " method\n")
+    cat("\nImputing the missing values using ", impute_method, " method\n")
   }
   
-  # impute missing values
   if(impute){
+    cat("\nImputing the missing values using ", impute_method, " method",
+        file = outfile, append = TRUE)
+    
     # NB: this will overwrite obj$genotypes
     obj$genotypes <- bigsnpr::snp_fastImputeSimple(Gna = X,
                                                    ncores = bigstatsr::nb_cores(),
-                                                   ...) # dots can pass method (mean, mode, etc.)
+                                                   method = impute_method,
+                                                   ...) # dots can pass other args
+    
     
     # TODO: come back here and try to get the 'xgboost' method to work
     # } else if (impute == "xgboost"){
@@ -162,10 +166,12 @@ process_plink <- function(data_dir,
     
     # now, save the imputed values
     obj <- bigsnpr::snp_save(obj)
+    
+    cat("\nDone with imputation. File formatting in progress.",
+        file = outfile, append = TRUE)
+    
   }
   
-  if(impute){cat("\nDone with imputation. File formatting in progress.",
-                 file = outfile, append = TRUE)}
   if(!quiet & impute){cat("\nDone with imputation. File formatting in progress.")}
   
   # return data in a tractable format 
