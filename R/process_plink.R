@@ -77,10 +77,13 @@ process_plink <- function(data_dir,
   
   # only consider SNPs on chromosomes 1-22
   chr_range <- range(obj$map$chromosome)
-  
-  if(chr_range[1] != 1 | chr_range[2] != 22){
+  cat("PLMM only analyzes autosomes -- removing chromosomes outside 1-22")
+  cat("PLMM only analyzes autosomes -- removing chromosomes outside 1-22",
+      file = outfile, append = TRUE)
+  if(chr_range[1] < 1 | chr_range[2] > 22){
     original_dim <- dim(obj$genotypes)[2]
-    chr_filtered <- bigsnpr::snp_subset(obj, ind.col = chr %in% 1:22)
+    chr_filtered <- bigsnpr::snp_subset(obj,
+                                        ind.col = obj$map$chromosome %in% 1:22)
     obj <- bigsnpr::snp_attach(chr_filtered)
     new_dim <- dim(obj$genotypes)[2]
     
