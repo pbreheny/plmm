@@ -66,7 +66,7 @@ plmm_prep <- function(X,
     S <- (D^2)/p # singular values of K, the realized relationship matrix
     
   } else {
-    ## case 2: K is user-specified 
+    ## case 2: K is a user-specified matrix
     S <- U <- NULL
     
     # again, decomposition depends on choice of k
@@ -79,6 +79,11 @@ plmm_prep <- function(X,
     }
     S <- decomp$d # if K was user-specified, then no need to transform D here
     U <- decomp$u
+  }  else if(!is.null(K) & is.list(K)){
+    # case 3: K is a user-supplied list, as returned from choose_k()
+    S <- ((K$d)^2)/p
+    U <- K$u
+    
   }
   
   

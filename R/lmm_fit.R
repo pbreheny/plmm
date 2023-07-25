@@ -30,7 +30,6 @@
 #'
 
 plmm_fit <- function(prep, 
-                     svd_details = FALSE, 
                      eps = 1e-04,
                      max.iter = 10000,
                      warn = TRUE,
@@ -96,6 +95,8 @@ plmm_fit <- function(prep,
   ret <- structure(list(
     std_X = prep$std_X,
     y = prep$y,
+    S = prep$S,
+    U = prep$U,
     std_SUX = std_SUX,
     SUX = SUX,
     SUy = SUy,
@@ -117,8 +118,6 @@ plmm_fit <- function(prep,
     trace = prep$trace, 
     estimated_V = estimated_V
   )) 
-  
-  if(svd_details){ret$S <- prep$S; ret$U <- prep$U}
   
   return(ret)
   
