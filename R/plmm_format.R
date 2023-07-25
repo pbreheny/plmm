@@ -4,7 +4,7 @@
 #' @param convex convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
 #' @param dfmax dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
 #' @param X Design matrix. May include clinical covariates and other non-SNP data. 
-#' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)} when using K=NULL).
+#' @param K Similarity matrix used to rotate the data. This will be passed from plmm() as (1) NULL, in which case relatedness_mat(std(X)) is used, (2) a matrix or (3) a list with components d and u (eigenvalues and eigenvectors, respectively).
 #' 
 #' @return A list with the components: 
 #' * beta_vals: The estimated beta values at each value of lambda
@@ -33,7 +33,8 @@
 plmm_format <- function(fit,
                         convex = TRUE,
                         dfmax = fit$ncol_X + 1, 
-                        X, K){
+                        X,
+                        K){
   
   # eliminate saturated lambda values, if any
   ind <- !is.na(fit$iter)
@@ -67,12 +68,12 @@ plmm_format <- function(fit,
   
   if (is.null(K)) {
     Vhat <- fit$eta * (1/fit$ncol_X) * tcrossprod(X) + (1-fit$eta) * diag(fit$nrow_X) 
-  } else {
+  } else if (is.list(K)){
+    K <- fit$U %*% tcrossprod(diag(fit$S), fit$U)
+    Vhat <- fit$eta * K + (1-fit$eta) * diag(fit$nrow_X)
+  } else if (is.matrix(K)){
     Vhat <- fit$eta * K + (1-fit$eta) * diag(fit$nrow_X)
   }
-  
-  
-  
   ## output
   val <- structure(list(beta_vals = beta_vals,
                         lambda = lambda,

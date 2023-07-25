@@ -117,6 +117,15 @@ K_independent <- sim_ps_x(n = nrow(admix$X),
 # TODO come back here
 
 
+# Test 5: user-supplied K is a list --------------------------------
+fit1 <- plmm(X = admix$X, y = admix$y, k = 40)
+K_admix <- choose_k(X = admix$X, start = 10, step = 10, eps = 2, trace = T)
+fit2 <- plmm(X = admix$X, y = admix$y, K = K_admix$K_svd)
+
+# if one of these passes, then both of them should -- this is somewhat redundant
+tinytest::expect_equivalent(fit1$S, fit2$S)
+tinytest::expect_equivalent(fit1$beta_vals, fit2$beta_vals)
+
 ## Appendix: Code from previous version of the package -----------------------
 # library(tinytest)
 # library(parallel)

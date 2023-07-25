@@ -15,7 +15,7 @@ plmm_format(fit, convex = TRUE, dfmax = fit$ncol_X + 1, X, K)
 
 \item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
 
-\item{K}{Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)} when using K=NULL).}
+\item{K}{Similarity matrix used to rotate the data. This will be passed from plmm() as (1) NULL, in which case relatedness_mat(std(X)) is used, (2) a matrix or (3) a list with components d and u (eigenvalues and eigenvectors, respectively).}
 }
 \value{
 A list with the components:
