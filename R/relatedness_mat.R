@@ -1,8 +1,7 @@
 #' Calculate a relatedness matrix
 #'
 #' This function allows you to generate an n by n genetic relatedness matrix. If a numeric matrix is supplied, the RRM (Hayes, 2009) is used
-#' and is computed XX'/p, where X is standardized. If a character argument which describes the location and prefix of PLINK bed/bim/bam files is supplied,
-#' a GRM is computed using the GCTA method of SNPrelate, unless another method is specified as an optional argument.
+#' and is computed XX'/p, where X is standardized. 
 #' @param X Either a numeric matrix of genotypes (subjects in rows, SNPs in columns), or a character prefix for PLINK bed/bim/fam files.
 #' @param ... Optional arguments in the case that a character prefix is specified.
 #' @importFrom SNPRelate snpgdsBED2GDS snpgdsGRM snpgdsOpen snpgdsClose
