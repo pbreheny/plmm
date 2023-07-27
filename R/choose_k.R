@@ -37,7 +37,7 @@ choose_k <- function(X,
   # set defaults 
   if(is.null(start)){start <- floor(nrow(X)/10)}
   if(trace){cat("\nStarting k value is", start)}
-  if(is.null(step)){step <- floor(nrow(X))/10}
+  if(is.null(step)){step <- floor(nrow(X)/10)}
   if(trace){cat("\nStep size is", step)}
   
   # calculate true K 
