@@ -29,7 +29,7 @@
 #' @keywords internal 
 #'
 
-plmm_fit <- function(prep, 
+lmm_fit <- function(prep, 
                      eps = 1e-04,
                      max.iter = 10000,
                      warn = TRUE,
@@ -64,7 +64,7 @@ plmm_fit <- function(prep,
   attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
   
   # calculate population var without mean 0; will need this for call to lmm()
-  xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
+  # xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
   
   if(prep$trace){cat("Setup complete. Beginning model fitting.\n")}
   
@@ -72,16 +72,18 @@ plmm_fit <- function(prep,
   init <- init[prep$ns] 
   
   # placeholders for results
-  init <- c(0, init) # add initial value for intercept
-  resid <- drop(SUy - std_SUX %*% init)
+  # init <- c(0, init) # add initial value for intercept
+  # resid <- drop(SUy - std_SUX %*% init)
   b <- matrix(NA, nrow=ncol(std_SUX), ncol=ncol(std_SUX)) 
   # TODO: decide how to adjust what is below
   # iter <- integer(nlambda)
   # converged <- logical(nlambda)
   # loss <- numeric(nlambda)
   
+  browser()
   # main attraction 
-  res <- lm(SUy ~ std_SUX, init, resid, xtx, eps, max.iter, new.penalty.factor, warn)
+  res <- lm(SUy ~ std_SUX) 
+  # FIXME: when testing this function with oav data, why is KDR gene giving a singular value here? 
   b <- init <- res$beta
   iter <- res$iter
   converged <- ifelse(res$iter < max.iter, TRUE, FALSE)
@@ -102,7 +104,6 @@ plmm_fit <- function(prep,
     SUy = SUy,
     ncol_X = prep$ncol_X, 
     nrow_X = prep$nrow_X, 
-    lambda = lambda,
     b = b,
     eta = eta,
     iter = iter,

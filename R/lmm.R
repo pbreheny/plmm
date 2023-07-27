@@ -1,7 +1,7 @@
 #' a function to implement a mixed model for structured data *without* penalization
 #' 
 #' NB: this function is simply a wrapper for lmm_prep -> lmm_fit -> lmm_format
-#' @param X Design matrix. May include clinical covariates and other non-SNP data.
+#' @param X Design matrix. MUST NOT be high dimensional -- the modeling here will call `lm()`. For high-dimensional data, use `plmm()` instead.
 #' @param y Continuous outcome vector.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list as created by choose_k.
@@ -17,6 +17,9 @@
 #' 
 #' @importFrom zeallot %<-%
 #' @export
+#' 
+#' @examples 
+#' fit <- lmm(X = oav$X, y = oav$y, K = oav$K)
 lmm <- function(X,
                  y,
                  k = NULL, 
@@ -93,7 +96,7 @@ lmm <- function(X,
                       returnX = returnX)
   
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
-  the_final_product <- plmm_format(fit = the_fit, 
+  the_final_product <- lmm_format(fit = the_fit, 
                                    dfmax = dfmax, 
                                    X = X,
                                    K = K)

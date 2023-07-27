@@ -18,7 +18,7 @@
 #' * snp_names: Formatted column names of the design matrix 
 #'
 #'@keywords internal
-plmm_prep <- function(X,
+lmm_prep <- function(X,
                       y,
                       k = NULL,
                       K = NULL,
@@ -65,7 +65,7 @@ plmm_prep <- function(X,
     U <- decomp$u
     S <- (D^2)/p # singular values of K, the realized relationship matrix
     
-  } else {
+  } else if (!is.null(K) & is.matrix(K)){
     ## case 2: K is a user-specified matrix
     S <- U <- NULL
     

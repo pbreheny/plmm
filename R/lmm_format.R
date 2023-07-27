@@ -23,11 +23,15 @@ lmm_format <- function(fit,
                         X,
                         K){
   
-  if (fit$warn & sum(iter) == fit$max.iter) warning("Maximum number of iterations reached")
+  #if (fit$warn & sum(iter) == fit$max.iter) warning("Maximum number of iterations reached")
+
   # TODO: determine if I should just take out the lines below 
+  # if (fit$warn & sum(iter) == fit$max.iter) warning("Maximum number of iterations reached")
   # convex.min <- if (convex) convexMin(b = fit$b,
   #                                     X = fit$std_SUX,
   #                                     family = 'gaussian') else NULL
+  
+  browser()
   
   # reverse the transformations of the beta values 
   beta_vals <- untransform(res_b = fit$b,

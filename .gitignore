@@ -15,5 +15,6 @@ R/_*
 *.bed
 *.bim
 *.fam
+*.log
 vignettes/*.html
 inst/doc
