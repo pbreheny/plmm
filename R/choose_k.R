@@ -3,7 +3,7 @@
 #' @param X can be either:
 #'  *  the fully-imputed design matrix, or 
 #'  *  a string specifying the path to an .rds object created by process_plink
-#' @param start The starting number of eigenvalues. Defaults to floor(nrow(X)/3)
+#' @param start The starting number of eigenvalues. Defaults to floor(nrow(X)/10)
 #' @param step The size (with respect to the number of observations) of the increments of increase in choosing k. Defaults to floor(nrow(X)/10).
 #' @param eps The largest permissible difference between the true and approximate relatedness matrices. Defaults to 2.
 #' @param trace Logical: should progress bars and messages be printed to the console? Defaults to TRUE. 
@@ -35,7 +35,7 @@ choose_k <- function(X,
                      returnK = FALSE){
   
   # set defaults 
-  if(is.null(start)){start <- floor(nrow(X)/3)}
+  if(is.null(start)){start <- floor(nrow(X)/10)}
   if(trace){cat("\nStarting k value is", start)}
   if(is.null(step)){step <- floor(nrow(X))/10}
   if(trace){cat("\nStep size is", step)}
