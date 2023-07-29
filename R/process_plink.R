@@ -2,35 +2,27 @@
 #' 
 #' @param data_dir The path to the bed/bim/fam data files 
 #' @param prefix The prefix (as a character string) of the bed/fam data files 
-#' @param rds Logical: does an rds file for these data files already exist in \code{data_dir}? Defaults to FALSE
 #' @param impute Logical: should data be imputed? Default to TRUE.
 #' @param impute_method If 'impute' = TRUE, this argument will specify the kind of imputation desired. This is passed directly to `bigsnpr::snp_fastImputeSimple()`. Defaults to 'mode'. 
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
 #' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
-#' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL. 
 #' @param returnX Logical: should the design matrix be returned as a numeric matrix, or an FBM (as defined in `bigstatsr`)? Unless specified, X will be returned as a numeric matrix only if object.size() < 1e8 (100 Mb). 
 #' @param outfile Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.
 #' #' Note: a more nuanced 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.
-#' 
-#' @return A list of two components: 
-#' * X: the fully-imputed design matrix, whose columns are the features from the _autosomes only_ and whose rows are the observations. 
-#' * constants_idx: A numeric vector with the indices of the constant features. An index of 5 indicates that the 5th feature is constant (i.e. has zero variance)
 #' 
 #' @export
 #' 
 #' @examples 
 #' \dontrun{
-#' lite <- process_plink(data_dir = plink_example(path = "penncath_lite.bed.gz", parent = T), prefix = "penncath_lite", rds = F, gz = TRUE)
-#' mid <- process_plink(data_dir = "/Users/tabithapeter/Desktop/penalizedLMM/data-raw", prefix = "penncath_mid", rds = F, gz = F, row_id = "fid", method = "mode")
+#' lite <- process_plink(data_dir = plink_example(path = "penncath_lite.bed.gz", parent = T), prefix = "penncath_lite", gz = TRUE)
+#' mid <- process_plink(data_dir = "/Users/tabithapeter/Desktop/penalizedLMM/data-raw", prefix = "penncath_mid", gz = F, method = "mean2")
 #' }
 process_plink <- function(data_dir,
                           prefix,
-                          rds = FALSE,
                           impute = TRUE,
                           impute_method = 'mode',
                           quiet = FALSE,
                           gz = FALSE,
-                          row_id = NULL,
                           returnX,
                           outfile){
   
@@ -53,16 +45,11 @@ process_plink <- function(data_dir,
   # read in PLINK files 
   path <- paste0(data_dir, "/", prefix, ".rds")
   
-  if(rds){
-    # if an RDS file already exists, use it 
-    cat("Attaching data from", path, file = outfile, append = TRUE)
-    obj <- bigsnpr::snp_attach(path)
-  } else {
-    # else create the RDS file first 
-    cat("\nCreating ", prefix, ".rds\n", file = outfile, append = TRUE)
-    if(!quiet){
-      cat("\nCreating ", prefix, ".rds\n")
-    }
+  
+  # Create the RDS file first 
+  cat("\nCreating ", prefix, ".rds\n", file = outfile, append = TRUE)
+  if(!quiet){
+    cat("\nCreating ", prefix, ".rds\n")
     
     # check for compressed files 
     if (gz){
@@ -162,7 +149,8 @@ process_plink <- function(data_dir,
     #   
     # } else stop("Argument impute must be either simple or xgboost.")
     
-    # now, save the imputed values
+    # now, save the new object -- this will have imputed values and constants_idx
+    obj$constants_idx <- constants_idx
     obj <- bigsnpr::snp_save(obj)
     
     cat("\nDone with imputation. File formatting in progress.",
@@ -170,43 +158,8 @@ process_plink <- function(data_dir,
     
   }
   
-  if(!quiet & impute){cat("\nDone with imputation. File formatting in progress.")}
-  
-  # return data in a tractable format 
-  if (missing(returnX)) {
-    if (utils::object.size(obj$genotypes) > 1e8) {
-      cat("\nDue to the large size of X (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).",
-          file = outfile, append = TRUE)
-      warning("\nDue to the large size of X (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).")
-      returnX <- FALSE
-    } else {
-      # if it fits, it ships 
-      returnX <- TRUE
-    }
-  }
-  
-  if(returnX){
-    X <- obj$genotypes[,]
-    if(!is.null(row_id)){
-      if(row_id == "iid"){row_names <- obj$fam$sample.ID}
-      if(row_id == "fid"){row_names <- obj$fam$family.ID}
-    } else {
-      row_names <- 1:length(obj$fam$sample.ID)
-    }
-    
-    dimnames(X) <- list(row_names,
-                        obj$map$marker.ID)
-    
-    return(list(X = X,
-                constants_idx = which(constants_idx)))
-  } else {
-    return(list(X = obj$genotypes,
-                fam = obj$fam,
-                map = obj$map,
-                constants_idx = which(constants_idx)
-                ))
-  }
-  
+  if(!quiet & impute){cat("\nDone with imputation. Processed files now saved as .rds object.")}
+  close(log_con)
 }
 
 
