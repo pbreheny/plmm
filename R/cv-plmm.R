@@ -4,7 +4,7 @@
 #' @param X Design matrix for model fitting. May include clinical covariates and other non-SNP data. If this is the case, X_for_K should be supplied witha  matrix containing only SNP data for computation of GRM.
 #' @param y Continuous outcome vector for model fitting.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
-#' @param K Known or estimated similarity matrix.
+#' @param K Similarity matrix, in the form of (1) the relatedness matrix estimated from the data (default), (2) a user-supplied matrix, or (3) a user-supplied list with components 'd' and 'u' as created by choose_k().
 #' @param eta_star Optional arg. to \code{plmm_prep}. Defaults to NULL.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param penalty.factor Optional arg. to \code{plmm_prep}. Defaults to 1 for all predictors (except the intercept). 
@@ -61,7 +61,7 @@ cv.plmm <- function(X,
                       penalty.factor = penalty.factor,
                       returnX = returnX,
                       trace,
-                      ...)) # ... lets user pass arguments like k
+                      ...)) # ... additional arguments to plmm_prep()
   
   prep <- do.call('plmm_prep', prep.args)
   

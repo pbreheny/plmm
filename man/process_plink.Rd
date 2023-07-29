@@ -7,12 +7,10 @@
 process_plink(
   data_dir,
   prefix,
-  rds = FALSE,
   impute = TRUE,
   impute_method = "mode",
   quiet = FALSE,
   gz = FALSE,
-  row_id = NULL,
   returnX,
   outfile
 )
@@ -22,8 +20,6 @@ process_plink(
 
 \item{prefix}{The prefix (as a character string) of the bed/fam data files}
 
-\item{rds}{Logical: does an rds file for these data files already exist in \code{data_dir}? Defaults to FALSE}
-
 \item{impute}{Logical: should data be imputed? Default to TRUE.}
 
 \item{impute_method}{If 'impute' = TRUE, this argument will specify the kind of imputation desired. This is passed directly to \code{bigsnpr::snp_fastImputeSimple()}. Defaults to 'mode'.}
@@ -32,26 +28,17 @@ process_plink(
 
 \item{gz}{Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.}
 
-\item{row_id}{Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL.}
-
 \item{returnX}{Logical: should the design matrix be returned as a numeric matrix, or an FBM (as defined in \code{bigstatsr})? Unless specified, X will be returned as a numeric matrix only if object.size() < 1e8 (100 Mb).}
 
 \item{outfile}{Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.
 #' Note: a more nuanced 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.}
-}
-\value{
-A list of two components:
-\itemize{
-\item X: the fully-imputed design matrix, whose columns are the features from the \emph{autosomes only} and whose rows are the observations.
-\item constants_idx: A numeric vector with the indices of the constant features. An index of 5 indicates that the 5th feature is constant (i.e. has zero variance)
-}
 }
 \description{
 Preprocess PLINK files using the \code{bigsnpr} package
 }
 \examples{
 \dontrun{
-lite <- process_plink(data_dir = plink_example(path = "penncath_lite.bed.gz", parent = T), prefix = "penncath_lite", rds = F, gz = TRUE)
-mid <- process_plink(data_dir = "/Users/tabithapeter/Desktop/penalizedLMM/data-raw", prefix = "penncath_mid", rds = F, gz = F, row_id = "fid", method = "mode")
+lite <- process_plink(data_dir = plink_example(path = "penncath_lite.bed.gz", parent = T), prefix = "penncath_lite", gz = TRUE)
+mid <- process_plink(data_dir = "/Users/tabithapeter/Desktop/penalizedLMM/data-raw", prefix = "penncath_mid", gz = F, method = "mean2")
 }
 }
