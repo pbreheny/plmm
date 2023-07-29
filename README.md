@@ -31,8 +31,14 @@ The newest features of `penalizedLMM` are:
 The branches of this repo are organized in the following way: 
 
   - `master` is the main branch with all the latest updates
+
+  - `get_data` is a development branch where I am re-thinking how data are processed and loaded. I am separating data processing (which will happen once) from load the data (which will happen each time data are analyzed). 
+
+  - `choose_k` is a development branch where I am thinking about how to choose the tuning parameter for truncated singular value decomposition. 
+
+  - `fam_lmm` is a development branch where I am thinking about how the framework `plmm()` uses for analyzing relationships can be used in contexts where penalization is not necessary. Example: family-based data which are not high-dimensional. 
   
-  - `setup-lambda` is a branch where we are resolving a bug in `setup_lambda`. Stay tuned for updates on this. 
+  - `setup-lambda` is a development branch where we are resolving a bug in `setup_lambda`. Stay tuned for updates on this. 
   
   - `blup` is an **archived** branch previously focused on improving the implementation of the Best Linear Unbiased Predictor method 
   

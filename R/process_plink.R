@@ -159,7 +159,7 @@ process_plink <- function(data_dir,
   }
   
   if(!quiet & impute){cat("\nDone with imputation. Processed files now saved as .rds object.")}
-  
+  close(log_con)
 }
 
 
