@@ -8,7 +8,7 @@ choose_k(
   X,
   start = NULL,
   step = NULL,
-  eps = 2,
+  eps = 0.1,
   trace = TRUE,
   type = "F",
   returnKapprox = FALSE,
@@ -22,11 +22,11 @@ choose_k(
 \item a string specifying the path to an .rds object created by process_plink
 }}
 
-\item{start}{The starting number of eigenvalues. Defaults to floor(nrow(X)/3)}
+\item{start}{The starting number of eigenvalues. Defaults to floor(nrow(X)/10)}
 
 \item{step}{The size (with respect to the number of observations) of the increments of increase in choosing k. Defaults to floor(nrow(X)/10).}
 
-\item{eps}{The largest permissible difference between the true and approximate relatedness matrices. Defaults to 2.}
+\item{eps}{A percentage indicating the largest permissible approximation error between the true and approximate relatedness matrices. Defaults to 0.1 (10\% error).}
 
 \item{trace}{Logical: should progress bars and messages be printed to the console? Defaults to TRUE.}
 
@@ -41,7 +41,9 @@ A list with at least 3 items:
 \itemize{
 \item K_svd: a list with the SVD components (d and u) for the approximated relatedness matrix K that can be passed to \code{plmm()}
 \item k, the chosen number of eigenvalues
-\item delt, the distance between the true and approximated K matrices
+\item delt, the distance between the true and approximated K matrices at chosen k
+\item k_vals, a vector of all k values evaluated
+\item inv_delt_vals, a vector of 1-delta at all k values evaluated. See \code{delta()} for details.
 \item optional: if returnKapprox, K_approx will be returned
 \item optional: if returnK, K will be returned
 }
@@ -51,7 +53,8 @@ a function to choose k, the number of eigenvalues to use in truncated SVD
 }
 \examples{
 \dontrun{
-choose_k(X = admix$X, start = 10, step = 10, trace = TRUE)
+res <- choose_k(X = admix$X, start = 10, step = 10, trace = TRUE)
+plot(x = res$k_vals, y = res$inv_delt_vals, type = "l")
 }
  
 }
