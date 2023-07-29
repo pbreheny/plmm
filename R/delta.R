@@ -6,7 +6,7 @@
 #' @keywords internal
 #' 
 delta <- function(A, B, type = "F"){
-  Matrix::norm(A, type = type) - Matrix::norm(B, type = type)
+  (Matrix::norm(A - B, type = type))/Matrix::norm(A, type = type)
 }
 
 
