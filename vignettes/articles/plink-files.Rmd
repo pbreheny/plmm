@@ -1,26 +1,17 @@
 ---
-title: "Working with PLINK files"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Working with PLINK files}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  chunk_output_type: console
+title: "Processing PLINK files"
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  eval = FALSE
+  comment = "#>"
 )
 ```
 
 ```{r setup}
 library(penalizedLMM)
 ```
-
 
 The `penncath_lite` data is in the PLINK format (i.e., bed/bim/fam files), so I need to do some preprocessing first. The `process_plink` function uses functions from the [bigsnpr package](https://privefl.github.io/bigsnpr/reference/index.html) to do some quality control filtering steps. The result of the `process_plink` function is an object with 1) a matrix of genotypes and 2) a vector with the indices of any constant features (e.g., SNPs with no variation across the sample). 
 
