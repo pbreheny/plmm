@@ -12,3 +12,4 @@
 ^.*\cad_mid.bim$
 ^.*\cad_mid.fam$
 ^scratch.R$
+^vignettes/articles$

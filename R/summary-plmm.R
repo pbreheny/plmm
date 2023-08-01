@@ -61,11 +61,13 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5, ...){
     constant_features <- paste0("Feature ",
                                 setdiff(1:object$ncol_X,
                                         attr(object$std_X, "nonsingular")))
-  } 
+  } else {
+    constant_features <- NA
+  }
   
   out <- structure(list(
     penalty=object$penalty,
-    n=object$n, # TODO: fix this (need to return n somewhere before this...)
+    n=object$nrow_X, 
     p=nrow(object$beta_vals),
     converged=object$converged[idx],
     lambda=lambda, 

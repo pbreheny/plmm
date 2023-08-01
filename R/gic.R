@@ -10,7 +10,9 @@
 #' 
 #' @examples
 #' fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' gic_res <- gic(fit = fit, ic = "bic")
+#' std_X <- ncvreg::std(admix$X)
+#' SU <- diag(fit$S)%*%fit$U
+#' gic_res <- gic(fit = fit, ic = "bic", SUX = SU%*%std_X, SUy = SU%*%admix$y, S = fit$S)
 #' names(gic_res)
 #' range(gic_res$gic, na.rm = TRUE) # NAs will result from monomorphic SNPs
 

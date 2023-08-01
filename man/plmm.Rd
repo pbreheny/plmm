@@ -16,7 +16,6 @@ plmm(
   lambda.min,
   nlambda = 100,
   lambda,
-  svd_details = TRUE,
   eps = 1e-04,
   max.iter = 10000,
   convex = TRUE,
@@ -24,7 +23,7 @@ plmm(
   warn = TRUE,
   penalty.factor = rep(1, ncol(X)),
   init = rep(0, ncol(X)),
-  returnX = TRUE,
+  returnX = FALSE,
   trace = FALSE
 )
 }
@@ -51,8 +50,6 @@ plmm(
 
 \item{lambda}{A user-specified sequence of lambda values. By default, a sequence of values of length nlambda is computed, equally spaced on the log scale.}
 
-\item{svd_details}{Logical: should the details from the SVD, such as the singular values (S) and singular vectors (U) be returned? Default is TRUE.}
-
 \item{eps}{Convergence threshold. The algorithm iterates until the RMSD for the change in linear predictors for each coefficient is less than eps. Default is \code{1e-4}.}
 
 \item{max.iter}{Maximum number of iterations (total across entire path). Default is 10000.}
@@ -67,7 +64,7 @@ plmm(
 
 \item{init}{Initial values for coefficients. Default is 0 for all columns of X.}
 
-\item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
+\item{returnX}{Return the standardized design matrix along with the fit? Defaults to FALSE.}
 
 \item{trace}{If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.}
 }

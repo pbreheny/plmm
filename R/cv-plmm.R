@@ -14,8 +14,9 @@
 #' @param nfolds The number of cross-validation folds. Default is 10.
 #' @param fold Which fold each observation belongs to. By default the observations are randomly assigned.
 #' @param seed You may set the seed of the random number generator in order to obtain reproducible results.
-#' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
+#' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned off to preserve memory.
 #' @param returnY Should cv.plmm return the linear predictors from the cross-validation folds? Default is FALSE; if TRUE, this will return a matrix in which the element for row i, column j is the fitted value for observation i from the fold in which observation i was excluded from the fit, at the jth value of lambda.
+#' @param returnBiasDetails Logical: should the cross-validation bias (numeric value) and loss (n x p matrix) be returned? Defaults to FALSE. 
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each CV fold. Default is FALSE.
 #' @export
 #' 
@@ -42,8 +43,9 @@ cv.plmm <- function(X,
                     nfolds=10,
                     seed,
                     fold,
-                    returnX = TRUE,
+                    returnX = FALSE,
                     returnY=FALSE,
+                    returnBiasDetails = FALSE,
                     trace=FALSE) {
 
   # default type is 'response'
@@ -61,7 +63,7 @@ cv.plmm <- function(X,
                       penalty.factor = penalty.factor,
                       returnX = returnX,
                       trace,
-                      ...)) # ... lets user pass arguments like k
+                      ...)) # ... lets user pass arguments to prep
   
   prep <- do.call('plmm_prep', prep.args)
   
@@ -78,6 +80,7 @@ cv.plmm <- function(X,
   
   estimated_V <- NULL 
   if (type == 'blup') {
+    if(!cv.args$returnX)warning("Since BLUP method was chosen, returnX is turned on. This can make the returned object large (with respect to memory).")
     cv.args$returnX <- TRUE 
     estimated_V <- fit$estimated_V
   }
@@ -152,10 +155,20 @@ cv.plmm <- function(X,
   e <- sapply(1:nfolds, function(i) apply(E[fold==i, , drop=FALSE], 2, mean))
   Bias <- mean(e[min,] - apply(e, 2, min))
 
-  val <- list(cve=cve, cvse=cvse, fold=fold, lambda=lambda, fit=fit_to_return,
-              min=min, lambda.min=lambda[min],
-              min1se = min1se, lambda.1se = lambda[min1se],
-              null.dev=mean(loss.plmm(y, rep(mean(y), n))), Bias=Bias, Loss = E)
+  val <- list(cve=cve,
+              cvse=cvse,
+              fold=fold,
+              lambda=lambda,
+              fit=fit_to_return,
+              min=min,
+              lambda.min=lambda[min],
+              min1se = min1se,
+              lambda.1se = lambda[min1se],
+              null.dev=mean(loss.plmm(y, rep(mean(y), n))))
   if (returnY) val$Y <- Y
+  if (returnBiasDetails){
+    val$Bias <- Bias
+    val$Loss <- E
+  }
   structure(val, class="cv.plmm")
 }

@@ -13,7 +13,6 @@
 #' @param lambda.min The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.
 #' @param nlambda Length of the sequence of lambda. Default is 100. 
 #' @param lambda A user-specified sequence of lambda values. By default, a sequence of values of length nlambda is computed, equally spaced on the log scale.
-#' @param svd_details Logical: should the details from the SVD, such as the singular values (S) and singular vectors (U) be returned? Default is TRUE. 
 #' @param eps Convergence threshold. The algorithm iterates until the RMSD for the change in linear predictors for each coefficient is less than eps. Default is \code{1e-4}.
 #' @param max.iter Maximum number of iterations (total across entire path). Default is 10000.
 #' @param convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
@@ -21,7 +20,7 @@
 #' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
-#' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
+#' @param returnX Return the standardized design matrix along with the fit? Defaults to FALSE.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
 #' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
 #' 
@@ -71,7 +70,6 @@ plmm <- function(X,
                  lambda.min,
                  nlambda = 100,
                  lambda,
-                 svd_details = TRUE,
                  eps = 1e-04,
                  max.iter = 10000,
                  convex = TRUE,
@@ -79,7 +77,7 @@ plmm <- function(X,
                  warn = TRUE,
                  penalty.factor = rep(1, ncol(X)),
                  init = rep(0, ncol(X)),
-                 returnX = TRUE,
+                 returnX = FALSE,
                  trace = FALSE) {
 
   ## check types 
@@ -143,7 +141,6 @@ plmm <- function(X,
                       lambda.min = lambda.min,
                       nlambda = nlambda,
                       lambda = lambda,
-                      svd_details = svd_details,
                       eps = eps,
                       max.iter = max.iter,
                       warn = warn,

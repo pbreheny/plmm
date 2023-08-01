@@ -143,6 +143,8 @@ plmm_fit <- function(prep,
     std_SUX = std_SUX,
     SUX = SUX,
     SUy = SUy,
+    S = prep$S,
+    U = prep$U,
     ncol_X = prep$ncol_X, 
     nrow_X = prep$nrow_X, 
     lambda = lambda,
@@ -167,8 +169,6 @@ plmm_fit <- function(prep,
     trace = prep$trace, 
     estimated_V = estimated_V
   )) 
-  
-  if(svd_details){ret$S <- prep$S; ret$U <- prep$U}
   
   return(ret)
   
