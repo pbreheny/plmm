@@ -1,13 +1,14 @@
 ---
 title: "Choosing k -- an eigenproblem"
-subtitle: "How close is close enough??"
+subtitle: "Close is only good in horseshoes and handgrenades..."
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  eval = FALSE
+  comment = "#>"
 )
 ```
 
@@ -49,13 +50,25 @@ approx2 <- choose_k(X = admix$X, start = 30, eps = 0.05, returnKapprox = T)
 
 Notice that these apparent 'tweaks' in parameters have a notable impact on the choice of $k$ -- the balance of these parameters is both an art and a science. 
 
-We can look at the $\mathbf{A}_k$ matrices produced by both approximations above, comparing to the true $\mathbf{K}$ (at far left):
+We can look at the $\mathbf{A}_k$ matrices produced by both approximations above, comparing to the true $\mathbf{K}$ (at far right):
 
 ```{r}
 par(mfrow=c(1,3))
-corrplot(approx1$K, is.corr = F)
-corrplot(approx1$K_approx, is.corr = F)
-corrplot(approx2$K_approx)
+corrplot(cov2cor(approx1$K_approx),
+         title = "Approx. 1",
+         tl.col = 'grey40',
+         addgrid.col = NA, 
+         tl.pos = "n")
+corrplot(cov2cor(approx2$K_approx),
+         title = "Approx. 2",
+         tl.col = 'grey40',
+         addgrid.col = NA, 
+         tl.pos = "n")
+corrplot(cov2cor(approx1$K),
+         title = "True K",
+         tl.col = 'grey40',
+         addgrid.col = NA, 
+         tl.pos = "n")
 ```
 
 
