@@ -13,7 +13,6 @@ plmm_fit(
   lambda.min,
   nlambda = 100,
   lambda,
-  svd_details = FALSE,
   eps = 1e-04,
   max.iter = 10000,
   convex = TRUE,

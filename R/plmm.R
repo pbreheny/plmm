@@ -6,7 +6,7 @@
 #' * Note: X may include clinical covariates and other non-SNP data, but no missing values are allowed.
 #' @param y Continuous outcome vector. Logistic regression modeling is still in development.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
-#' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).
+#' @param K Similarity matrix used to rotate the data. This should either be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list with components 'd' and 'u', as returned by choose_k().
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/Spenncath penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.
@@ -110,13 +110,23 @@ plmm <- function(X,
   
   # working with user-specified K
   if (!is.null(K)){
-    if (!inherits(K, "matrix")) {
+    # first, check type/class:
+    if (!inherits(K, "matrix") & !is.list(K)) {
       tmp <- try(K <- stats::model.matrix(~0+., data=K), silent=TRUE)
-      if (inherits(tmp, "try-error")) stop("K must be a matrix or able to be coerced to a matrix", call.=FALSE)
+      if (inherits(tmp, "try-error")) stop("K must be either (1) able to be coerced to a matrix or (2) be a list.", call.=FALSE)
     }
     if (typeof(K)=="integer") storage.mode(X) <- "double" # change K to X 
     if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
-    if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
+    if (is.list(K)) {
+      if(!('d' %in% names(K) & 'u' %in% names(K))){stop('Components d and u not both found in list supplied for K.')}
+    }
+    # last thing: check dimensions
+    if (is.matrix(K)){
+      if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
+    } else if (is.list(K)) {
+      if (nrow(X) != nrow(K$u)) stop("Dimensions of K and X do not match.")
+    }
+   
   }
   
   # coercion for penalty

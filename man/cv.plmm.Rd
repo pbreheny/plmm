@@ -31,7 +31,7 @@ cv.plmm(
 
 \item{k}{An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to \code{RSpectra::svds()}. Defaults to \code{min(n, p) - 1}, where n and p are the dimensions of the \emph{standardized} design matrix.}
 
-\item{K}{Known or estimated similarity matrix.}
+\item{K}{Similarity matrix, in the form of (1) the relatedness matrix estimated from the data (default), (2) a user-supplied matrix, or (3) a user-supplied list with components 'd' and 'u' as created by choose_k().}
 
 \item{eta_star}{Optional arg. to \code{plmm_prep}. Defaults to NULL.}
 

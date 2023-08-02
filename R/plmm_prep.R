@@ -4,7 +4,7 @@
 #' @param X Design matrix. May include clinical covariates and other non-SNP data.
 #' @param y Continuous outcome vector.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
-#' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}, where X is standardized).
+#' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}, where X is standardized). This can also be a list, with components d and u (as returned by choose_k)
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
@@ -82,8 +82,8 @@ plmm_prep <- function(X,
     U <- decomp$u
     S <- (D^2)/p # singular values of K, the realized relationship matrix
     
-  } else {
-    ## case 2: K is user-specified 
+  } else if (!is.null(K) & 'matrix' %in% class(K)){
+    ## case 2: K is a user-specified matrix
     S <- U <- NULL
     
     # again, decomposition depends on choice of k
@@ -94,8 +94,13 @@ plmm_prep <- function(X,
     if(k < min(nrow(std_X),ncol(std_X))){
       decomp <- RSpectra::svds(A = K, nv = 0, k = k)
     }
-    S <- decomp$d # if K was user-specified, then no need to transform D here
+    S <- decomp$d # if K matrix was user-specified, then no need to transform D here
     U <- decomp$u
+  } else if(!is.null(K) & is.list(K)){
+    # case 3: K is a user-supplied list, as returned from choose_k()
+      S <- ((K$d)^2)/p
+      U <- K$u
+
   }
 
   
