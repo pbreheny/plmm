@@ -2,8 +2,9 @@
 #'
 #' This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
 #' NB: this function is simply a wrapper for plmm_prep -> plmm_fit -> plmm_format
-#' @param X Design matrix. May include clinical covariates and other non-SNP data.
-#' @param y Continuous outcome vector.
+#' @param X Design matrix object or a string with the file path to a design matrix. If a string, string will be passed to `get_data()`. 
+#' * Note: X may include clinical covariates and other non-SNP data, but no missing values are allowed.
+#' @param y Continuous outcome vector. Logistic regression modeling is still in development.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}).
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
@@ -81,8 +82,12 @@ plmm <- function(X,
                  trace = FALSE) {
 
   ## check types 
+  if("character" %in% class(X)){
+    dat <- get_data(path = X, returnX = TRUE, trace = trace)
+    X <- dat$X
+  }
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
-  if("FBM.code256" %in% class(X)) stop("plmm does not work with FBM objects at this time. This option is in progress. For now, X must be a numeric matrix.")
+  if("FBM.code256" %in% class(X)) stop("plmm does not work with FBM objects at this time. This option is in progress. For now, design matrix X must be a numeric matrix.")
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)

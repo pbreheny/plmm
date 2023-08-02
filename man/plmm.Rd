@@ -28,9 +28,12 @@ plmm(
 )
 }
 \arguments{
-\item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
+\item{X}{Design matrix object or a string with the file path to a design matrix. If a string, string will be passed to \code{get_data()}.
+\itemize{
+\item Note: X may include clinical covariates and other non-SNP data, but no missing values are allowed.
+}}
 
-\item{y}{Continuous outcome vector.}
+\item{y}{Continuous outcome vector. Logistic regression modeling is still in development.}
 
 \item{k}{An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to \code{RSpectra::svds()}. Defaults to \code{min(n, p) - 1}, where n and p are the dimensions of the \emph{standardized} design matrix.}
 

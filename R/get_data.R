@@ -13,6 +13,11 @@
 #'  * constants_idx A vector indicating the which columns of X contain constant features (features with no variance). 
 #' @export
 #' 
+#' @examples
+#' \dontrun{
+#' pen <- get_data(path = "inst/extdata/penncath_lite")
+#' }
+#' 
 get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
   
   rds <- paste0(path, ".rds")
@@ -53,6 +58,10 @@ get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
                 constants_idx = which(obj$constants_idx)
                 ))
   } else {
+    cat("Note: X is being returned as a file-backed matrix (FBM) -- see bigstatsr::FBM() for details.
+        \n At this time, plmm() cannot analyze design matrix X in this FBM format. Allowing such an option will
+        \n require writing the 'meat and potatoes' of plmm() in C++, which is a work in progress. For now, 
+        \n functions from package bigsnpr may be used for analyzing FBM data.")
     return(list(X = obj$genotypes,
                 fam = obj$fam,
                 map = obj$map,

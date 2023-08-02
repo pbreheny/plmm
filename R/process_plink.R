@@ -6,7 +6,6 @@
 #' @param impute_method If 'impute' = TRUE, this argument will specify the kind of imputation desired. This is passed directly to `bigsnpr::snp_fastImputeSimple()`. Defaults to 'mode'. 
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
 #' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
-#' @param returnX Logical: should the design matrix be returned as a numeric matrix, or an FBM (as defined in `bigstatsr`)? Unless specified, X will be returned as a numeric matrix only if object.size() < 1e8 (100 Mb). 
 #' @param outfile Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.
 #' #' Note: a more nuanced 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.
 #' 
@@ -23,7 +22,6 @@ process_plink <- function(data_dir,
                           impute_method = 'mode',
                           quiet = FALSE,
                           gz = FALSE,
-                          returnX,
                           outfile){
   
   # start log 
@@ -64,10 +62,11 @@ process_plink <- function(data_dir,
   
   # only consider SNPs on chromosomes 1-22
   chr_range <- range(obj$map$chromosome)
-  cat("PLMM only analyzes autosomes -- removing chromosomes outside 1-22")
-  cat("PLMM only analyzes autosomes -- removing chromosomes outside 1-22",
-      file = outfile, append = TRUE)
   if(chr_range[1] < 1 | chr_range[2] > 22){
+    cat("PLMM only analyzes autosomes -- removing chromosomes outside 1-22")
+    cat("PLMM only analyzes autosomes -- removing chromosomes outside 1-22",
+        file = outfile, append = TRUE)
+    
     original_dim <- dim(obj$genotypes)[2]
     chr_filtered <- bigsnpr::snp_subset(obj,
                                         ind.col = obj$map$chromosome %in% 1:22)
@@ -169,7 +168,7 @@ process_plink <- function(data_dir,
 #' @param dataDir Directory where plink files (and .sexcheck files are located if \code{sexcheck = TRUE}) are located
 #' @param gz A logical: are the PLINK files g-zipped (i.e. are the file endings '.gz')?. Defaults to FALSE. NOTE: if TRUE, process_plink_snpStats will unzip your zipped files 
 #' @param sexcheck Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck" in the same directory as the bed/fam files
-#' @param na.strings For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"
+#' @param na.strings For \code{snpStats}. Strings in .bim and .fam files to be recoded as NA. Defaults to "-9"
 #' @param impute Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.
 #' @param quiet Logical flag: should progress messages be printed? Defaults to FALSE. 
 #' @return A three element list object:
