@@ -14,7 +14,6 @@
 #' * ns_idx: COME BACK HERE
 #' * iter: The number of iterations at each value of lambda (MAYBE take this out)
 #' * converged: The convergence status at each value of lambda
-#' * X: if returnX = TRUE and size SUX < 100 Mb, the original X will be returned
 #' 
 #' 
 #' @keywords internal
@@ -55,7 +54,7 @@ plmm_format <- function(fit,
   beta_vals <- untransform(res_b = fit$b,
                            ns = fit$ns,
                            ncol_X = fit$ncol_X,
-                           std_X = fit$std_X,
+                           std_X = ncvreg::std(X),
                            SUX = fit$SUX,
                            std_SUX = fit$std_SUX)
   
@@ -93,18 +92,7 @@ plmm_format <- function(fit,
                         iter = iter,
                         converged = converged),
                    class = "plmm")
-  if (fit$returnX) {
-    if (utils::object.size(fit$SUX) > 1e8) {
-      warning("Be aware that SUX is large (>100 Mb)")
-    }
-    val$std_X <- fit$std_X # this is the standardized design matrix
-    val$y <- fit$y
-  }
   
-  if("S" %in% names(fit) & "U" %in% names(fit)){
-    val$S <- fit$S
-    val$U <- fit$U
-  }
   
   return(val)
   

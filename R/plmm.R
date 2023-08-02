@@ -21,7 +21,6 @@
 #' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
-#' @param returnX Return the standardized design matrix along with the fit? Defaults to FALSE.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
 #' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
 #' 
@@ -78,7 +77,6 @@ plmm <- function(X,
                  warn = TRUE,
                  penalty.factor = rep(1, ncol(X)),
                  init = rep(0, ncol(X)),
-                 returnX = FALSE,
                  trace = FALSE) {
 
   ## check types 
@@ -87,7 +85,7 @@ plmm <- function(X,
     X <- dat$X
   }
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
-  if("FBM.code256" %in% class(X)) stop("plmm does not work with FBM objects at this time. This option is in progress. For now, design matrix X must be a numeric matrix.")
+  if("FBM.code256" %in% class(X)) stop("plmm does not work with FBM objects at this time. This option is in progress. \nFor now, design matrix X must be a numeric matrix.")
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
@@ -144,7 +142,6 @@ plmm <- function(X,
                         k = k,
                         eta_star = eta_star,
                         penalty.factor = penalty.factor,
-                        returnX = returnX,
                         trace = trace)
   
   
@@ -159,14 +156,14 @@ plmm <- function(X,
                       eps = eps,
                       max.iter = max.iter,
                       warn = warn,
-                      init = init,
-                      returnX = returnX)
+                      init = init)
   
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   the_final_product <- plmm_format(fit = the_fit, 
                                    convex = convex,
                                    dfmax = dfmax, 
-                                   X = X, K = K)
+                                   X = X,
+                                   K = K)
   
   return(the_final_product)
   

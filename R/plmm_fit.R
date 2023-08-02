@@ -137,15 +137,12 @@ plmm_fit <- function(prep,
   estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S), prep$U) + (1-eta)*diag(nrow = nrow(prep$U)) 
   
   ret <- structure(list(
-    std_X = prep$std_X,
     y = prep$y,
     S = prep$S,
     U = prep$U,
     std_SUX = std_SUX,
     SUX = SUX,
     SUy = SUy,
-    S = prep$S,
-    U = prep$U,
     ncol_X = prep$ncol_X, 
     nrow_X = prep$nrow_X, 
     lambda = lambda,
@@ -166,7 +163,6 @@ plmm_fit <- function(prep,
     max.iter = max.iter,
     warn = warn,
     init = init,
-    returnX = prep$returnX,
     trace = prep$trace, 
     estimated_V = estimated_V
   )) 

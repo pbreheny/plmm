@@ -18,7 +18,6 @@ cv.plmm(
   nfolds = 10,
   seed,
   fold,
-  returnX = FALSE,
   returnY = FALSE,
   returnBiasDetails = FALSE,
   trace = FALSE
@@ -50,8 +49,6 @@ cv.plmm(
 \item{seed}{You may set the seed of the random number generator in order to obtain reproducible results.}
 
 \item{fold}{Which fold each observation belongs to. By default the observations are randomly assigned.}
-
-\item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned off to preserve memory.}
 
 \item{returnY}{Should cv.plmm return the linear predictors from the cross-validation folds? Default is FALSE; if TRUE, this will return a matrix in which the element for row i, column j is the fitted value for observation i from the fold in which observation i was excluded from the fit, at the jth value of lambda.}
 

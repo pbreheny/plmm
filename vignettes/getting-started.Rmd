@@ -61,9 +61,6 @@ summary(admix_fit, lambda = admix_fit$lambda[25])
 Notice that a notable number of these SNPs are constant features -- that is, SNPs whose values do not vary among the members of this population. For such features, a value of $\beta=0$ is returned for all values of $\lambda$. 
 
 
-
-
-
 ## Cross validation 
 
 To select a $\lambda$ value, we often use cross validation. Below is an example of using `cv.plmm` to select a $\lambda$ that minimizes cross-validation error: 

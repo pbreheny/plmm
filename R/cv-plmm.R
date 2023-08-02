@@ -14,7 +14,6 @@
 #' @param nfolds The number of cross-validation folds. Default is 10.
 #' @param fold Which fold each observation belongs to. By default the observations are randomly assigned.
 #' @param seed You may set the seed of the random number generator in order to obtain reproducible results.
-#' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned off to preserve memory.
 #' @param returnY Should cv.plmm return the linear predictors from the cross-validation folds? Default is FALSE; if TRUE, this will return a matrix in which the element for row i, column j is the fitted value for observation i from the fold in which observation i was excluded from the fit, at the jth value of lambda.
 #' @param returnBiasDetails Logical: should the cross-validation bias (numeric value) and loss (n x p matrix) be returned? Defaults to FALSE. 
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each CV fold. Default is FALSE.
@@ -43,7 +42,6 @@ cv.plmm <- function(X,
                     nfolds=10,
                     seed,
                     fold,
-                    returnX = FALSE,
                     returnY=FALSE,
                     returnBiasDetails = FALSE,
                     trace=FALSE) {
@@ -61,7 +59,6 @@ cv.plmm <- function(X,
                       K = K,
                       eta_star = eta_star,
                       penalty.factor = penalty.factor,
-                      returnX = returnX,
                       trace,
                       ...)) # ... additional arguments to plmm_prep()
   
@@ -80,8 +77,6 @@ cv.plmm <- function(X,
   
   estimated_V <- NULL 
   if (type == 'blup') {
-    if(!cv.args$returnX)warning("Since BLUP method was chosen, returnX is turned on. This can make the returned object large (with respect to memory).")
-    cv.args$returnX <- TRUE 
     estimated_V <- fit$estimated_V
   }
   
@@ -126,7 +121,11 @@ cv.plmm <- function(X,
       if (trace) {setTxtProgressBar(pb, i)}
     } else {
       # case 2: cluster NOT user specified 
-      res <- cvf(i = i, fold = fold, type = type, cv.args = cv.args, estimated_V = estimated_V)
+      res <- cvf(i = i,
+                 fold = fold,
+                 type = type,
+                 cv.args = cv.args,
+                 estimated_V = estimated_V)
       if (trace) {setTxtProgressBar(pb, i)}
     }
     # update E and Y

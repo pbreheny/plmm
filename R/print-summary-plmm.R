@@ -30,21 +30,6 @@ print.summary.plmm <- function(x, ...){
   cat("-------------------------------------------------\n")
   # nonzero coefficients 
   cat("# of non-zero coefficients: ", x$nvars, "\n")
-
-  # constant features 
-  if(!is.na(x$constant_features)){if(length(x$constant_features) > 0){
-    if(length(x$constant_features) < 10){
-      cat("Constant features (features without variation): ",
-          x$constant_features, "\n")
-    } else {
-      cat("Number of constant features (features without variation): ",
-          length(x$constant_features), "\n")
-    }
-    
-  }
-  } 
-  
-  
   cat("-------------------------------------------------\n")
   
   
