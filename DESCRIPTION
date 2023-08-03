@@ -1,14 +1,14 @@
 Package: penalizedLMM
 Title: Fit nonconvex-penalized linear mixed models to account for the presence of unobserved confounding effects
-Version: 1.1
-Date: 2023-02-01
+Version: 2.0.0
+Date: 2023-08-03
 Authors@R: c(
-    person("Anna C.","Reisetter", role = c("aut", "cre"),
+    person("Anna C.","Reisetter", role = c("aut"),
         email = "anna-reisetter@uiowa.edu",
         comment = c(ORCID = "0000-0001-8332-4585")), 
     person("Patrick J.", "Breheny", role = "aut", 
         comment = c(ORCID = "0000-0002-0650-1119")),
-    person("Tabitha K.", "Peter", role = "ctb"),
+    person("Tabitha K.", "Peter", role = c("aut", "cre")),
     person("Yujiing", "Lu", role = "ctb"))
 VignetteBuilder: knitr 
 Description: Fit a penalized linear mixed model that corrects for unobserved confounding factors. penalizedLMM infers and corrects for the presence of unobserved confounding effects such as population stratification and environmental heterogeneity. It then fits a linear model via lasso penalized maximum likelihood. Originally designed for the multivariate analysis of SNP data, penalizedLMM eliminates the need for LD pruning and subpopulation-specific analyses. Functions for the appropriate processing of PLINK files are also supplied. 
@@ -26,7 +26,8 @@ Suggests:
     parallel, 
     MASS, 
     knitr, 
-    rmarkdown
+    rmarkdown,
+    SNPRelate,
 Imports: 
     bnpsd,
     data.table,
@@ -35,7 +36,6 @@ Imports:
     methods,
     ncvreg,
     popkin,
-    SNPRelate,
     stats,
     utils,
     zeallot,

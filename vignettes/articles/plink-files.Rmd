@@ -7,7 +7,8 @@ editor_options:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
@@ -45,8 +46,6 @@ pen_cl$hdl_impute <- ifelse(is.na(pen_cl$hdl),
 ```
 
 
-
-
 Now that we have the data processed, we can fit a model. 
 
 ```{r penncath_lite_fit}
@@ -62,7 +61,7 @@ We can summarize this fit at the 25th $\lambda$ value:
 summary(pen_fit, lambda = pen_fit$lambda[25])
 ```
 
-And we can plot the coefficient paths; note that in the graph below, the region shaded in grey corresponds to values of $\lambda$ for which the model fit is nonconvex. See `ncvreg::plot.ncvreg()` for details.
+And we can plot the coefficient paths; note that in these graphs, regions shaded in grey corresponds to values of $\lambda$ for which the model fit is nonconvex. See `ncvreg::plot.ncvreg()` for details.
 
 ```{r}
 plot(pen_fit)
