@@ -9,16 +9,16 @@
 Fit a penalized linear mixed model that corrects for unobserved confounding factors. penalizedLMM infers and corrects for the presence of unobserved confounding effects such as population stratification and environmental heterogeneity. It then fits a linear model via lasso penalized maximum likelihood. Originally designed for the multivariate analysis of SNP data, penalizedLMM eliminates the need for LD pruning and subpopulation-specific analyses. Functions for the appropriate processing of PLINK files are also supplied.
 }
 \author{
-\strong{Maintainer}: Anna C. Reisetter \email{anna-reisetter@uiowa.edu} (\href{https://orcid.org/0000-0001-8332-4585}{ORCID})
+\strong{Maintainer}: Tabitha K. Peter \email{tabitha-peter@uiowa.edu}
 
 Authors:
 \itemize{
+  \item Anna C. Reisetter \email{anna-reisetter@uiowa.edu} (\href{https://orcid.org/0000-0001-8332-4585}{ORCID})
   \item Patrick J. Breheny (\href{https://orcid.org/0000-0002-0650-1119}{ORCID})
 }
 
 Other contributors:
 \itemize{
-  \item Tabitha K. Peter [contributor]
   \item Yujiing Lu [contributor]
 }
 
