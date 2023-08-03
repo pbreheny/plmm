@@ -54,9 +54,7 @@ get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
     
     return(list(X = X,
                 fam = obj$fam,
-                map = obj$map,
-                constants_idx = which(obj$constants_idx)
-                ))
+                map = obj$map))
   } else {
     cat("Note: X is being returned as a file-backed matrix (FBM) -- see bigstatsr::FBM() for details.
         \n At this time, plmm() cannot analyze design matrix X in this FBM format. Allowing such an option will
@@ -64,9 +62,7 @@ get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
         \n functions from package bigsnpr may be used for analyzing FBM data.")
     return(list(X = obj$genotypes,
                 fam = obj$fam,
-                map = obj$map,
-                constants_idx = which(obj$constants_idx)
-    ))
+                map = obj$map))
   }
   
 }
