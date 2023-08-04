@@ -88,8 +88,8 @@ choose_k <- function(X,
   )
   
   # optional items to return:
-  if(returnK){ret$K_approx = A_k}
-  if(returnKapprox){ret$K = K}
+  if(returnKapprox){ret$K_approx = A_k}
+  if(returnK){ret$K = K}
   
   return(ret)
   

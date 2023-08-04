@@ -23,7 +23,7 @@ process_plink_snpStats(
 
 \item{sexcheck}{Logical flag for whether or not PLINK sexcheck files should be incorporated. Defaults to FALSE. If TRUE, sexcheck files must be of the form "prefix.sexcheck" in the same directory as the bed/fam files}
 
-\item{na.strings}{For \code{snpStats}. Strings in .bam and .fam files to be recoded as NA. Defaults to "-9"}
+\item{na.strings}{For \code{snpStats}. Strings in .bim and .fam files to be recoded as NA. Defaults to "-9"}
 
 \item{impute}{Logical flag for whether imputation should be performed. Defaults to TRUE since plmm cannot handle missing values.}
 

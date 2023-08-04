@@ -49,10 +49,13 @@ summary.cv.plmm <- function(object, lambda = "min", ...){
                         nvars = nvars,
                         cve = object$cve,
                         min = object$min,
-                        fit = object$fit,
-                        bias = object$Bias,
-                        loss = object$Loss), 
+                        fit = object$fit), 
                    class = "summary.cv.plmm")
+  if("Bias" %in% names(object)){
+    out$bias <- object$Bias
+    out$loss <- object$Loss
+  }
+  
   return(out)
   
 }

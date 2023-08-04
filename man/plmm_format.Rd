@@ -27,7 +27,6 @@ A list with the components:
 \item ns_idx: COME BACK HERE
 \item iter: The number of iterations at each value of lambda (MAYBE take this out)
 \item converged: The convergence status at each value of lambda
-\item X: if returnX = TRUE and size SUX < 100 Mb, the original X will be returned
 }
 }
 \description{

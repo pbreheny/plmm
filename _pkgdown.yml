@@ -15,6 +15,7 @@ reference:
     
   - title: Fitting penalized linear mixed models (PLMMs - the featured presentation) 
     contents:
+    - choose_k
     - plmm
     
   - title: Loss, information, and cross-validation for PLMMs
@@ -22,7 +23,7 @@ reference:
     - cv.plmm
     - gic
     - loss.plmm
-    - logLik
+    - log_lik
     - logLik_nonnull
     
   - title: Coefficient methods for PLMMs
@@ -36,6 +37,7 @@ reference:
     
   - title: Data (pre)processing and wrangling
     contents:
+    - get_data
     - plink_example 
     - process_plink
     - relatedness_mat
@@ -62,6 +64,7 @@ reference:
     contents: 
     - coef.list
     - cvf
+    - delta
     - estimate_eta
     - lamNames
     - plmm_format

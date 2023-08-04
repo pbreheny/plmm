@@ -7,9 +7,6 @@
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
 #' @param X Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'blup'} and object is too large to be returned in `plmm` object.
 #' @param y Optional argument. Original continuous outcome vector from object. Required if \code{type == 'blup'}.
-#' @param U Optional argument. Eigenvectors from the similarity matrix from object. Required if \code{type == 'blup'}.
-#' @param S Optional argument. Eigenvalues from the similarity matrix from object. Required if \code{type == 'blup'}.
-#' @param eta Optional argument. Estimated $eta$ value from object. Required if \code{type == 'blup'}.
 #' @param ... Additional optional arguments
 #' 
 #' @rdname predict.plmm
@@ -29,26 +26,19 @@
 #'  
 #'  # make predictions for a select number of lambda values 
 #'  pred2 <- predict(object = fit, newX = newX, type = "response", idx=98)
-#'  
-#'  # make prediction using blup 
-#'  pred3 <- predict(object = fit, newX = newX, type = "blup", idx=98)
-#'
-#'  # compare y predictions 
-#'   compare_y <- data.frame(y = admix$y, yhat_response = pred2, yhat_blup = pred3)
-#'  
-#'  
-#'  fit_noX <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X),
-#'   returnX = FALSE)
-#'  
-#'  pred4 <- predict(object = fit_noX, newX = newX, type = "blup", idx=98)
-#'  
 #'  }
 #'  
 #'  
 
 
-predict.plmm <- function(object, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),
-                           lambda, idx=1:length(object$lambda), X, y, U, S, eta, ...) {
+predict.plmm <- function(object,
+                         newX,
+                         type=c("response", "coefficients", "vars", "nvars", "blup"),
+                         lambda,
+                         idx=1:length(object$lambda),
+                         X,
+                         y,
+                         ...) {
   
   type <- match.arg(type)
   beta_vals <- coef.plmm(object, lambda, which=idx, drop=FALSE) # includes intercept 

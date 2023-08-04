@@ -56,23 +56,16 @@ summary.plmm <- function(object, lambda, idx, eps = 1e-5, ...){
   nonzero <- rownames(object$beta_vals[nz,lambda_char,drop=F])
   # don't drop, because we need the dimnames here ^ 
   
-  # if there were any monomorphic SNPs, say so: 
-  if("std_X" %in% names(object)){
-    constant_features <- paste0("Feature ",
-                                setdiff(1:object$ncol_X,
-                                        attr(object$std_X, "nonsingular")))
-  } 
-  
+ 
   out <- structure(list(
     penalty=object$penalty,
-    n=object$n, # TODO: fix this (need to return n somewhere before this...)
+    n=object$nrow_X, 
     p=nrow(object$beta_vals),
     converged=object$converged[idx],
     lambda=lambda, 
     lambda_char=lambda_char,
     nvars=nvars,
-    nonzero=nonzero,
-    constant_features=constant_features
+    nonzero=nonzero
   ),
   class = "summary.plmm")
   

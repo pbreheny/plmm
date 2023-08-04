@@ -14,7 +14,6 @@
 #' * ns_idx: COME BACK HERE
 #' * iter: The number of iterations at each value of lambda (MAYBE take this out)
 #' * converged: The convergence status at each value of lambda
-#' * X: if returnX = TRUE and size SUX < 100 Mb, the original X will be returned
 #' 
 #' 
 #' @keywords internal
@@ -55,7 +54,7 @@ plmm_format <- function(fit,
   beta_vals <- untransform(res_b = fit$b,
                            ns = fit$ns,
                            ncol_X = fit$ncol_X,
-                           std_X = fit$std_X,
+                           std_X = ncvreg::std(X),
                            SUX = fit$SUX,
                            std_SUX = fit$std_SUX)
   
@@ -78,8 +77,8 @@ plmm_format <- function(fit,
   val <- structure(list(beta_vals = beta_vals,
                         lambda = lambda,
                         eta = fit$eta,
-                        SUX = fit$SUX,
-                        SUy = fit$SUy,
+                        S = fit$S,
+                        U = fit$U,
                         penalty = fit$penalty,
                         gamma = fit$gamma,
                         alpha = fit$alpha,
@@ -89,29 +88,11 @@ plmm_format <- function(fit,
                         ns_idx = c(1, 1 + fit$ns), # PAY ATTENTION HERE! 
                         ncol_X = fit$ncol_X,
                         nrow_X = fit$nrow_X, 
-                        # estimated_V = fit$estimated_V, # this is using the standardized X scale, used in cv-plmm 
                         Vhat = Vhat, 
                         iter = iter,
                         converged = converged),
                    class = "plmm")
-  if (fit$returnX) {
-    if (utils::object.size(fit$SUX) > 1e8) {
-      warning("Due to the large size of SUX (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).")
-      returnX <- FALSE
-    } else {
-      # if it fits, it ships 
-      returnX <- TRUE
-    }
-  }
-  if(fit$returnX) {
-    val$std_X <- fit$std_X # this is the standardized design matrix
-    val$y <- fit$y
-  } 
   
-  if("S" %in% names(fit) & "U" %in% names(fit)){
-    val$S <- fit$S
-    val$U <- fit$U
-  }
   
   return(val)
   

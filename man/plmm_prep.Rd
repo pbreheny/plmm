@@ -12,7 +12,6 @@ plmm_prep(
   K = NULL,
   eta_star = NULL,
   penalty.factor = rep(1, ncol(X)),
-  returnX = TRUE,
   trace = FALSE,
   ...
 )
@@ -29,8 +28,6 @@ plmm_prep(
 \item{eta_star}{Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.}
 
 \item{penalty.factor}{A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.}
-
-\item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
 
 \item{trace}{If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.}
 

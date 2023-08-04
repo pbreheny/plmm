@@ -2,8 +2,9 @@
 #'
 #' This function allows you to fit a linear mixed model via non-convex penalized maximum likelihood.
 #' NB: this function is simply a wrapper for plmm_prep -> plmm_fit -> plmm_format
-#' @param X Design matrix. May include clinical covariates and other non-SNP data.
-#' @param y Continuous outcome vector.
+#' @param X Design matrix object or a string with the file path to a design matrix. If a string, string will be passed to `get_data()`. 
+#' * Note: X may include clinical covariates and other non-SNP data, but no missing values are allowed.
+#' @param y Continuous outcome vector. Logistic regression modeling is still in development.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list with components 'd' and 'u', as returned by choose_k().
 #' @param diag_K Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE. 
@@ -14,7 +15,6 @@
 #' @param lambda.min The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.
 #' @param nlambda Length of the sequence of lambda. Default is 100. 
 #' @param lambda A user-specified sequence of lambda values. By default, a sequence of values of length nlambda is computed, equally spaced on the log scale.
-#' @param svd_details Logical: should the details from the SVD, such as the singular values (S) and singular vectors (U) be returned? Default is TRUE. 
 #' @param eps Convergence threshold. The algorithm iterates until the RMSD for the change in linear predictors for each coefficient is less than eps. Default is \code{1e-4}.
 #' @param max.iter Maximum number of iterations (total across entire path). Default is 10000.
 #' @param convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
@@ -22,7 +22,6 @@
 #' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
-#' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
 #' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
 #' 
@@ -73,7 +72,6 @@ plmm <- function(X,
                  lambda.min,
                  nlambda = 100,
                  lambda,
-                 svd_details = TRUE,
                  eps = 1e-04,
                  max.iter = 10000,
                  convex = TRUE,
@@ -81,12 +79,15 @@ plmm <- function(X,
                  warn = TRUE,
                  penalty.factor = rep(1, ncol(X)),
                  init = rep(0, ncol(X)),
-                 returnX = TRUE,
                  trace = FALSE) {
 
   ## check types 
+  if("character" %in% class(X)){
+    dat <- get_data(path = X, returnX = TRUE, trace = trace)
+    X <- dat$X
+  }
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
-  if("FBM.code256" %in% class(X)) stop("plmm does not work with FBM objects at this time. This option is in progress. For now, X must be a numeric matrix.")
+  if("FBM.code256" %in% class(X)) stop("plmm does not work with FBM objects at this time. This option is in progress. \nFor now, design matrix X must be a numeric matrix.")
   if (!inherits(X, "matrix")) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
@@ -129,7 +130,7 @@ plmm <- function(X,
     } else if (is.list(K)) {
       if (nrow(X) != nrow(K$u)) stop("Dimensions of K and X do not match.")
     }
-   
+  
   }
   # warn about computational time for large K 
   if(is.null(k) & (nrow(X) > 1000) & (is.null(diag_K))){
@@ -137,10 +138,6 @@ plmm <- function(X,
     \nThis can dramatically increase computational time -- the SVD calculation is expensive.
             \nIf the observations are unrelated, please set diag_K = TRUE. SVD is not needed in this case.
             \nOtherwise, consider using choose_k() first to get an approximation for your relatedness matrix.")
-  }
-  # if(is.null(K) & diag_K){
-  #   K <- diag(nrow(X))
-  # }
   
   # coercion for penalty
   penalty <- match.arg(penalty)
@@ -158,7 +155,6 @@ plmm <- function(X,
                         diag_K = diag_K,
                         eta_star = eta_star,
                         penalty.factor = penalty.factor,
-                        returnX = returnX,
                         trace = trace)
   
   
@@ -173,14 +169,14 @@ plmm <- function(X,
                       eps = eps,
                       max.iter = max.iter,
                       warn = warn,
-                      init = init,
-                      returnX = returnX)
+                      init = init)
   
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   the_final_product <- plmm_format(fit = the_fit, 
                                    convex = convex,
                                    dfmax = dfmax, 
-                                   X = X, K = K)
+                                   X = X,
+                                   K = K)
   
   return(the_final_product)
   
