@@ -6,6 +6,7 @@
 #' @param y Continuous outcome vector.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list with components 'd' and 'u', as returned by choose_k().
+#' @param diag_K Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE. 
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/Spenncath penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.
@@ -63,6 +64,7 @@ plmm <- function(X,
                  y,
                  k = NULL, 
                  K = NULL,
+                 diag_K = FALSE,
                  eta_star = NULL,
                  penalty = c("MCP", "SCAD", "lasso"),
                  gamma,
@@ -106,6 +108,10 @@ plmm <- function(X,
   if (length(penalty.factor)!=ncol(X)) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
   
   # working with user-specified K
+  if(diag_K & !is.null(K)){
+    stop("diag_K is true, but a K is also supplied. 
+         If using diag_K, you cannot also pass a K argument.")
+  }
   if (!is.null(K)){
     # first, check type/class:
     if (!inherits(K, "matrix") & !is.list(K)) {
@@ -125,6 +131,16 @@ plmm <- function(X,
     }
    
   }
+  # warn about computational time for large K 
+  if(is.null(k) & (nrow(X) > 1000) & (!diag_K)){
+    warning("The number of observations is large, and k is not specified.
+    \nThis can dramatically increase computational time -- the SVD calculation is expensive.
+            \nIf the observations are unrelated, please set diag_K = TRUE. SVD is not needed in this case.
+            \nOtherwise, consider using choose_k() first to get an approximation for your relatedness matrix.")
+  }
+  # if(is.null(K) & diag_K){
+  #   K <- diag(nrow(X))
+  # }
   
   # coercion for penalty
   penalty <- match.arg(penalty)
@@ -139,6 +155,7 @@ plmm <- function(X,
                         y = y,
                         K = K,
                         k = k,
+                        diag_K = diag_K,
                         eta_star = eta_star,
                         penalty.factor = penalty.factor,
                         returnX = returnX,

@@ -87,7 +87,7 @@ plmm_fit <- function(prep,
   
   # remove initial values for coefficients representing columns with singular values
   init <- init[prep$ns] 
-  
+  browser()
   # set up lambda
   if (missing(lambda)) {
     lambda <- setup_lambda(X = std_SUX,
