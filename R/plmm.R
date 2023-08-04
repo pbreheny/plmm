@@ -64,7 +64,7 @@ plmm <- function(X,
                  y,
                  k = NULL, 
                  K = NULL,
-                 diag_K = FALSE,
+                 diag_K = NULL,
                  eta_star = NULL,
                  penalty = c("MCP", "SCAD", "lasso"),
                  gamma,
@@ -108,7 +108,7 @@ plmm <- function(X,
   if (length(penalty.factor)!=ncol(X)) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
   
   # working with user-specified K
-  if(diag_K & !is.null(K)){
+  if(!is.null(diag_K)& !is.null(K)){
     stop("diag_K is true, but a K is also supplied. 
          If using diag_K, you cannot also pass a K argument.")
   }
@@ -132,7 +132,7 @@ plmm <- function(X,
    
   }
   # warn about computational time for large K 
-  if(is.null(k) & (nrow(X) > 1000) & (!diag_K)){
+  if(is.null(k) & (nrow(X) > 1000) & (is.null(diag_K))){
     warning("The number of observations is large, and k is not specified.
     \nThis can dramatically increase computational time -- the SVD calculation is expensive.
             \nIf the observations are unrelated, please set diag_K = TRUE. SVD is not needed in this case.

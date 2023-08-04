@@ -87,7 +87,7 @@ plmm_fit <- function(prep,
   
   # remove initial values for coefficients representing columns with singular values
   init <- init[prep$ns] 
-  browser()
+
   # set up lambda
   if (missing(lambda)) {
     lambda <- setup_lambda(X = std_SUX,
@@ -131,7 +131,7 @@ plmm_fit <- function(prep,
     resid <- res$resid
     if(prep$trace){setTxtProgressBar(pb, ll)}
   }
-  
+  browser()
   # reconstruct K to calculate V 
   # this is on the standardized X scale 
   estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S), prep$U) + (1-eta)*diag(nrow = nrow(prep$U)) 

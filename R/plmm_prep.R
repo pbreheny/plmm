@@ -37,7 +37,7 @@ plmm_prep <- function(X,
                       y,
                       k = NULL,
                       K = NULL,
-                      diag_K,
+                      diag_K = NULL,
                       eta_star = NULL,
                       penalty.factor = rep(1, ncol(X)),
                       returnX = TRUE,
@@ -57,6 +57,12 @@ plmm_prep <- function(X,
     k <- min(nrow(std_X),ncol(std_X))
   }
   
+  if(is.null(diag_K)){
+    diag_K <- FALSE
+  } else {
+    diag_K <- TRUE
+  }
+  
   # identify nonsingular values in the standardized X matrix  
   ns <- attr(std_X, "nonsingular")
   
@@ -66,7 +72,6 @@ plmm_prep <- function(X,
   # designate the dimensions of the design matrix 
   p <- ncol(X) 
   n <- nrow(X)
-  
   # calculate SVD
   if(!(k %in% 1:min(n,p))){stop("k value is out of bounds. \nIf specified, k must be in the range from 1 to min(nrow(X), ncol(X))")}
   ## case 1: K is not specified (default to realized relatedness matrix)
