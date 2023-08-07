@@ -7,8 +7,7 @@ editor_options:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  eval = FALSE
+  comment = "#>"
 )
 ```
 
@@ -18,16 +17,20 @@ library(penalizedLMM)
 
 The `penncath_lite` data is in the PLINK format (i.e., bed/bim/fam files), so I need to do some preprocessing first. The `process_plink` function uses functions from the [bigsnpr package](https://privefl.github.io/bigsnpr/reference/index.html) to do some quality control filtering steps. The result of the `process_plink` function is an object with 1) a matrix of genotypes and 2) a vector with the indices of any constant features (e.g., SNPs with no variation across the sample). 
 
+Note: I am reading in the data using `plink_example()`, a function that serves as a wrapper to `base::system.file()`. This is simply because the exact filepath is different for the user than for the developer. If you save the PLINK files in a location other than the directory where you installed `penalizedLMM`, just adjust your choice of directory in the following function calls. 
+
 ```{r penncath_lite_process}
 # preprocess PLINK files
 penncath_lite <- process_plink(
-  data_dir = "~/Desktop/temp_files",
+  data_dir = plink_example(parent = TRUE),
   prefix = "penncath_lite",
+  gz = TRUE, # NB: PLINK data that ships with package comes gzipped
   impute = TRUE, # mode imputation is default 
   outfile = "process_penncath")
 
+
 # read in the data to global environment
-pen <- get_data(path = "~/Desktop/temp_files/penncath_lite")
+pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"))
 
 str(pen) # Three objects here
 ```
@@ -37,7 +40,7 @@ In addition to the genotype data, I want to analyze a continuous phenotype store
 
 ```{r}
 # NB: the 'quiet' option in process_plink()  will silence the printed messages
-pen_cl <- read.csv("~/Desktop/temp_files/penncath_clinical.csv")
+pen_cl <- read.csv(plink_example(path = 'penncath_clinical.csv'))
 
 # for the sake of illustration, I use a simple mean imputation for the outcome 
 pen_cl$hdl_impute <- ifelse(is.na(pen_cl$hdl),
@@ -50,8 +53,8 @@ Now that we have the data processed, we can fit a model.
 
 ```{r penncath_lite_fit}
 pen_fit <- plmm(X = pen$X,
-                     y = pen_cl$hdl_impute,
-                     trace = TRUE)
+                     y = pen_cl$hdl_impute)
+# to see a progress bar and progress messages, set trace = TRUE
 names(pen_fit)
 ```
 
@@ -69,7 +72,7 @@ plot(pen_fit)
 
 We can implement cross-validation for this model using the code below: 
 
-```{r penncath_cv, eval=FALSE}
+```{r penncath_cv}
 pen_cv <- cv.plmm(X = pen$X,
                        y = pen_cl$hdl_impute)
 # to see progress bar, run the above with the trace = TRUE argument; this will
