@@ -4,10 +4,19 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/articles/choose_k.html</loc>
+  </url>
+  <url>
+    <loc>/articles/getting-started.html</loc>
+  </url>
+  <url>
     <loc>/articles/getting_started.html</loc>
   </url>
   <url>
     <loc>/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>/articles/plink-files.html</loc>
   </url>
   <url>
     <loc>/authors.html</loc>
@@ -17,6 +26,9 @@
   </url>
   <url>
     <loc>/reference/admix.html</loc>
+  </url>
+  <url>
+    <loc>/reference/choose_k.html</loc>
   </url>
   <url>
     <loc>/reference/coef.cv.plmm.html</loc>
@@ -40,6 +52,9 @@
     <loc>/reference/cvf.html</loc>
   </url>
   <url>
+    <loc>/reference/delta.html</loc>
+  </url>
+  <url>
     <loc>/reference/estimate_eta.html</loc>
   </url>
   <url>
@@ -53,6 +68,9 @@
   </url>
   <url>
     <loc>/reference/genXps.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_data.html</loc>
   </url>
   <url>
     <loc>/reference/gic.html</loc>
@@ -80,6 +98,9 @@
   </url>
   <url>
     <loc>/reference/logLik_nonnull.html</loc>
+  </url>
+  <url>
+    <loc>/reference/log_lik.html</loc>
   </url>
   <url>
     <loc>/reference/loss.plmm.html</loc>
@@ -146,6 +167,9 @@
   </url>
   <url>
     <loc>/reference/process_plink_2.html</loc>
+  </url>
+  <url>
+    <loc>/reference/process_plink_snpStats.html</loc>
   </url>
   <url>
     <loc>/reference/relatedness_mat.html</loc>

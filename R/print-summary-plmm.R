@@ -16,7 +16,7 @@
 #' print(s3)
 print.summary.plmm <- function(x, ...){
   
-  cat(x$penalty, "-penalized regression model with n=", x$std |> nrow(), ", p=", x$p, sep="")
+  cat(x$penalty, "-penalized regression model with n=", x$n, ", p=", x$p, sep="")
   cat(" at lambda=", x$lambda_char, "\n", sep="")
   cat("-------------------------------------------------\n")
 
@@ -30,20 +30,6 @@ print.summary.plmm <- function(x, ...){
   cat("-------------------------------------------------\n")
   # nonzero coefficients 
   cat("# of non-zero coefficients: ", x$nvars, "\n")
-
-  # constant features 
-  if(length(x$constant_features) > 0){
-    if(length(x$constant_features) < 10){
-      cat("Constant features (features without variation): ",
-          x$constant_features, "\n")
-    } else {
-      cat("Number of constant features (features without variation): ",
-          length(x$constant_features), "\n")
-    }
-    
-  } 
-  
-  
   cat("-------------------------------------------------\n")
   
   

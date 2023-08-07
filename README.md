@@ -32,7 +32,7 @@ The branches of this repo are organized in the following way:
 
   - `master` is the main branch with all the latest updates
 
-  - `get_data` is a development branch where I am re-thinking how data are processed and loaded. I am separating data processing (which will happen once) from load the data (which will happen each time data are analyzed). 
+  - `check_size` is a development branch where I am re-thinking how data are saved/return, so that object size is manageable.
 
   - `choose_k` is a development branch where I am thinking about how to choose the tuning parameter for truncated singular value decomposition. 
 

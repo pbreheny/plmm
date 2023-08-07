@@ -1,24 +1,25 @@
 ---
 title: "Choosing k -- an eigenproblem"
-subtitle: "How close is close enough??"
+subtitle: "Close is only good in horseshoes..."
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  eval = FALSE
-  
+  comment = "#>"
 )
 ```
 
 ```{r setup}
 library(penalizedLMM)
+library(corrplot)
 ```
 
 ## Context & motivation 
 
-One of the novel features of the `penalizedLMM` package is in the way our methods address the relationships among samples (e.g., patients/participants) in the data. Unlike other mixed models packages like `lme4`, our package does not based relationships on a grouping factor. Rather, relationships are described as a matrix with cell values capturing the degree of relationship among each pair of samples. Let $\mathbf{X}$ represent the $n \times p$ design matrix of the data, and let $\tilde{\mathbf{X}}$ be the standardized $\mathbf{X}$ [1]. We call the $n \times n$ relationship matrix $\mathbf{K}$. By default, $\mathbf{K}$ is estimated from the data using the from data using $\mathbf{K} = \frac{1}{p}\mathbf{X}\mathbf{X}^\top$ [2]. 
+One of the novel features of the `penalizedLMM` package is in the way our methods address the relationships among samples (e.g., patients/participants) in the data. Unlike other mixed models packages like `lme4`, our package does not based relationships on a grouping factor. Rather, relationships are described as a matrix with cell values capturing the degree of relationship among each pair of samples. Let $\mathbf{X}$ represent the $n \times p$ design matrix of the data, and let $\tilde{\mathbf{X}}$ be the standardized $\mathbf{X}$ [1]. We call the $n \times n$ relationship matrix $\mathbf{K}$. By default, $\mathbf{K}$ is estimated from the data using the from data using $\mathbf{K} = \frac{1}{p} \tilde{\mathbf{X}}\tilde{\mathbf{X}}^\top$ [2]. 
 
 The rotation that is used in `plmm_prep()` (an internal function in `plmm`) requires a singular value decomposition (SVD) of $\mathbf{K}$. This becomes an expensive calculation when $n$ is large. To improve the computational time of this calculation, we include an optional argument $k$ in our `plmm()` function -- this $k$ is the parameter to invoke *truncated* SVD. The truncated SVD of a matrix has been shown to be the optimal rank $k$ approximation to that matrix (Eckart-Young-Mirsky theorem) [3]. We use $\mathbf{A}_k$ to represent the rank $k$ approximation of $\mathbf{K}$, and we implement this approximation using truncated SVD using `RSpectra::svds()`.
 
@@ -31,7 +32,7 @@ To help users choose a suitable $k$ value to use, we offer the function `choose_
 Consider again the `admix` genotype data with the simulated continuous outcome. Suppose I want to approximate $\mathbf{K}$. I could use the following: 
 
 ```{r}
-approx1 <- choose_k(X = admix$X)
+approx1 <- choose_k(X = admix$X, returnKapprox = T, returnK = T)
 ```
 
 Here we see that the starting value for $k$ is 19 -- by default, `choose_k()` makes the following 'decisions': 
@@ -39,15 +40,40 @@ Here we see that the starting value for $k$ is 19 -- by default, `choose_k()` ma
   - The starting value for $k$ is set to be a tenth of the $n$ value. This is controlled by the `start` argument. 
   - Similarly, the default stepsize is also one tenth of the $n$ value. This is controlled by the `step` argument. 
   - The metric used to assess the quality of the approximation is the Frobenius norm. This is controlled by the `type` argument (see `Matrix::norm`). 
-  - The $\epsilon$ value used to determine when $||\mathbf{K} - \mathbf{A}_k||_{\text{F}}$ is satisfactorily small enough is automatically set to 2. This is controlled by the `eps` argument. 
+  - The $\epsilon$ value used to determine when $\delta \equiv \frac{||\mathbf{K} - \mathbf{A}_k||_{\text{F}}}{||\mathbf{K}||_{\text{F}}}$ is satisfactorily small enough is automatically set to 2. This is controlled by the `eps` argument. 
   
 If the user wants to have a smaller $\epsilon$ and start at a higher value, this is another option: 
 
 ```{r}
-approx2 <- choose_k(X = admix$X, start = 30, eps = 1)
+approx2 <- choose_k(X = admix$X, start = 30, eps = 0.05, returnKapprox = T)
 ```
 
 Notice that these apparent 'tweaks' in parameters have a notable impact on the choice of $k$ -- the balance of these parameters is both an art and a science. 
+
+We can look at the $\mathbf{A}_k$ matrices produced by both approximations above, comparing to the true $\mathbf{K}$ (at far right):
+
+```{r}
+par(mfrow=c(1,3))
+corrplot(cov2cor(approx1$K_approx),
+         title = "Approx. 1",
+         mar = c(0,0,2,0),
+         tl.col = 'grey40',
+         addgrid.col = NA, 
+         tl.pos = "n")
+corrplot(cov2cor(approx2$K_approx),
+         title = "Approx. 2",
+         mar = c(0,0,2,0),
+         tl.col = 'grey40',
+         addgrid.col = NA, 
+         tl.pos = "n")
+corrplot(cov2cor(approx1$K),
+         title = "True K",
+         mar = c(0,0,2,0),
+         tl.col = 'grey40',
+         addgrid.col = NA, 
+         tl.pos = "n")
+```
+
 
 Now that we have some approximations, we can use `cv.plmm` to see the results: 
 

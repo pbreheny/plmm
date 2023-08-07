@@ -29,3 +29,9 @@ A list with four components:
 Read in processed data
 This function is intended to be called after \code{process_plink()} has been called once.
 }
+\examples{
+\dontrun{
+pen <- get_data(path = "inst/extdata/penncath_lite")
+}
+
+}

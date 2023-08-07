@@ -91,19 +91,14 @@ expect_equivalent(A2, B2, tolerance = 0.1)
 
 # Test 3: show that monomorphic SNPs are given beta values of 0s -------------
 monomorphic <- apply(admix$X[,1:15], 2, var) == 0
-monomorphic_snps <- paste0("Feature ", which(monomorphic))
-# SNPs 8 and 14 are monomorphic 
+monomorphic_snps <- paste0("Snp", which(monomorphic))
+# NB: SNPs 8 and 14 are monomorphic 
 fit3 <- plmm(X = admix$X[,1:15], y = admix$y)
-
-# test 3: implementation 
-# s3 <- summary.plmm(fit3, idx = 99)
-
-# expect_equivalent(s3$constant_features,
-                            # monomorphic_snps)
-
-# TODO: figure out R CMD CHECK error that says 
-# "could not find function "summary.plmm" " 
-
+tinytest::expect_equivalent(matrix(0,
+                 nrow = length(monomorphic_snps),
+                 ncol = length(fit3$lambda)
+                 ),
+          fit3$beta_vals[monomorphic_snps,])
 # Test 4: case where K is simulated to have no population structure ----------
 
 K_independent <- sim_ps_x(n = nrow(admix$X),
@@ -118,8 +113,8 @@ K_independent <- sim_ps_x(n = nrow(admix$X),
 
 
 # Test 5: user-supplied K is a list --------------------------------
-fit1 <- plmm(X = admix$X, y = admix$y, k = 40)
-K_admix <- choose_k(X = admix$X, start = 10, step = 10, eps = 2, trace = T)
+fit1 <- plmm(X = admix$X, y = admix$y, k = 70)
+K_admix <- choose_k(X = admix$X, start = 10, step = 10, trace = T)
 fit2 <- plmm(X = admix$X, y = admix$y, K = K_admix$K_svd)
 
 # if one of these passes, then both of them should -- this is somewhat redundant

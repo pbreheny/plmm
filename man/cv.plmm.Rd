@@ -18,8 +18,8 @@ cv.plmm(
   nfolds = 10,
   seed,
   fold,
-  returnX = TRUE,
   returnY = FALSE,
+  returnBiasDetails = FALSE,
   trace = FALSE
 )
 }
@@ -50,9 +50,9 @@ cv.plmm(
 
 \item{fold}{Which fold each observation belongs to. By default the observations are randomly assigned.}
 
-\item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
-
 \item{returnY}{Should cv.plmm return the linear predictors from the cross-validation folds? Default is FALSE; if TRUE, this will return a matrix in which the element for row i, column j is the fitted value for observation i from the fold in which observation i was excluded from the fit, at the jth value of lambda.}
+
+\item{returnBiasDetails}{Logical: should the cross-validation bias (numeric value) and loss (n x p matrix) be returned? Defaults to FALSE.}
 
 \item{trace}{If set to TRUE, inform the user of progress by announcing the beginning of each CV fold. Default is FALSE.}
 }

@@ -13,3 +13,4 @@
 ^.*\cad_mid.fam$
 ^scratch.R$
 ^vignettes/articles$
+^.*\.log$

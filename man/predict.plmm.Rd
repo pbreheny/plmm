@@ -12,9 +12,6 @@
   idx = 1:length(object$lambda),
   X,
   y,
-  U,
-  S,
-  eta,
   ...
 )
 }
@@ -32,12 +29,6 @@
 \item{X}{Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'blup'} and object is too large to be returned in \code{plmm} object.}
 
 \item{y}{Optional argument. Original continuous outcome vector from object. Required if \code{type == 'blup'}.}
-
-\item{U}{Optional argument. Eigenvectors from the similarity matrix from object. Required if \code{type == 'blup'}.}
-
-\item{S}{Optional argument. Eigenvalues from the similarity matrix from object. Required if \code{type == 'blup'}.}
-
-\item{eta}{Optional argument. Estimated $eta$ value from object. Required if \code{type == 'blup'}.}
 
 \item{...}{Additional optional arguments}
 }
@@ -58,19 +49,6 @@ newX <- sim_ps_x(n = nrow(admix$X), nJ = 4, p = ncol(admix$X),
  
  # make predictions for a select number of lambda values 
  pred2 <- predict(object = fit, newX = newX, type = "response", idx=98)
- 
- # make prediction using blup 
- pred3 <- predict(object = fit, newX = newX, type = "blup", idx=98)
-
- # compare y predictions 
-  compare_y <- data.frame(y = admix$y, yhat_response = pred2, yhat_blup = pred3)
- 
- 
- fit_noX <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X),
-  returnX = FALSE)
- 
- pred4 <- predict(object = fit_noX, newX = newX, type = "blup", idx=98)
- 
  }
  
  

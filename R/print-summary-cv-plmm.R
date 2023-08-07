@@ -13,7 +13,7 @@
 #' 
 print.summary.cv.plmm <- function(x, digits, ...){
   digits <- if (missing(digits)) digits <- c(2, 4, 2, 2, 3) else rep(digits, length.out=5)
-  cat(x$fit$penalty, "-penalized model with n=", nrow(x$fit$std_X),"\n", sep="")
+  cat(x$fit$penalty, "-penalized model with n=", x$fit$nrow_X, "and p=", x$fit$ncol_X,"\n", sep="")
   cat("At minimum cross-validation error (lambda=", formatC(x$lambda.min, digits[2], format="f"), "):\n", sep="")
   cat("-------------------------------------------------\n")
   cat("  Nonzero coefficients: ", x$nvars, "\n", sep="")

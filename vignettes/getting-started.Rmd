@@ -15,14 +15,15 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+# TODO: figure out where to add this line --
+# options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 ```{r setup}
 library(penalizedLMM)
 ```
 
-**NOTE**: This vignette is under development -- not all of the examples here are fully worked through. In fact, as of this writing, several of them are not working yet. My work here is an example of [working with the garage door open](https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu).
-
+**NOTE**: This vignette is under development -- not all of the examples here are fully worked through. My work here is an example of [working with the garage door open](https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu).
 
 ## Introduction 
 
@@ -30,20 +31,20 @@ library(penalizedLMM)
 
 At this time, the package is designed for linear regression only -- that is, we are considering only continuous (numeric) outcomes. In the future, I would like to extend this package to handle logistic regression (to handle dichotomous outcomes). 
 
-Since we are focused on penalized regression in this package, `penalizedLMM` offers 3 choices of penalty: the minimax concave (MCP), the smoothly clipped absolute deviation (Spenncath), and the least absolute shrinkage and selection operator (LASSO).  Much of the work in this package is built on the concepts/techniques provided in the `ncvreg` [package](https://github.com/pbreheny/ncvreg), whose author is [my thesis advisor](https://myweb.uiowa.edu/pbreheny/). 
+Since we are focused on penalized regression in this package, `penalizedLMM` offers 3 choices of penalty: the minimax concave (MCP), the smoothly clipped absolute deviation (SCAD), and the least absolute shrinkage and selection operator (LASSO).  Much of the work in this package is built on the concepts/techniques provided in the `ncvreg` [package](https://github.com/pbreheny/ncvreg), whose author is [my dissertation advisor](https://myweb.uiowa.edu/pbreheny/). 
 
-`penalizedLMM` currently includes three example data sets: 
+`penalizedLMM` currently includes two example data sets: 
 
   * `admix` is a small data set (197 observations, 100 SNPs) that describes individuals of different racial backgrounds. The outcome of `admix` is simulated to include population structure effects (*i.e.* race/ethnicity have an impact on the SNP associations). 
   
-  * `penncath_lite` (data on coronary artery disease from the [PennCath study](https://pubmed.ncbi.nlm.nih.gov/21239051/)) is a lower mid-sized data set (1401 observations, 4217 SNPs) with several health outcomes as well as age and sex information. This data set is a subset of a much larger data set (the original data has over 800K SNPs). For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
+  * `penncath_lite` (data on coronary artery disease from the [PennCath study](https://pubmed.ncbi.nlm.nih.gov/21239051/)) is a mid-sized, high dimensional data set (1401 observations, 4217 SNPs) with several health outcomes as well as age and sex information. This data set is a subset of a much larger data set (the original data has over 800K SNPs). For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
   
-In this overview, I will provide a demo of the main functions in `penalizedLMM` using the `admix` data. Checkout the 'Working with PLINK files' vignette to see a demo of processing data from PLINK file formats. 
+In this overview, I will provide a demo of the main functions in `penalizedLMM` using the `admix` data. Checkout the 'Working with PLINK files' vignette to see a demo of processing the `penncath_lite` data from the original PLINK file formats. 
 
 
 ## Basic model fitting 
 
-The `admix` data is already formatted to have an $X$ and $y$, so I can jump right in with a call to `plmm`:
+The `admix` data is already formatted to have elements $X$ and $y$, so I can jump right in with a call to `plmm`:
 
 ```{r admix_fit}
 admix_fit <- plmm(X = admix$X, y = admix$y)
@@ -52,39 +53,44 @@ summary(admix_fit, lambda = admix_fit$lambda[95])
 
 The returned `beta_vals` item is a matrix whose rows are $\beta$ coefficients and whose columns represent values of the penalization parameter $\lambda$. By default, `plmm` fits 100 values of $\lambda$ (see the `setup_lambda` function for details). 
 
-We can summarize this fit at the 25th $\lambda$ value:  
+```{r}
+admix_fit$beta_vals[1:10, 97:100]
+```
+
+Note that for all values of $\lambda$, SNP 8 has $\hat \beta = 0$. This is because SNP 8 is a constant feature, a feature (column) whose values do not vary among the members of this population.
+
+We can summarize our fit at the nth $\lambda$ value:  
 
 ```{r summary1}
+# for n = 25 
 summary(admix_fit, lambda = admix_fit$lambda[25])
 ```
 
-Notice that a notable number of these SNPs are constant features -- that is, SNPs whose values do not vary among the members of this population. For such features, a value of $\beta=0$ is returned for all values of $\lambda$. 
-
-
-
-
-
-## Cross validation 
-
-To select a $\lambda$ value, we often use cross validation. Below is an example of using `cv.plmm` to select a $\lambda$ that minimizes cross-validation error: 
-
-```{r admix_cv, warning=FALSE}
-admix_cv <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-admix_cv_s <- summary(admix_cv, lambda = "1se")
-print(admix_cv_s)
-plot(admix_cv)
-```
-
-
-
-## Plots 
+We can also plot the path of the fit to see how model coefficients vary with $\lambda$:
 
 ```{r admix_plots}
 plot(admix_fit)
 ```
 
+## Cross validation 
+
+To select a $\lambda$ value, we often use cross validation. Below is an example of using `cv.plmm` to select a $\lambda$ that minimizes cross-validation error: 
+
+```{r admix_cv}
+admix_cv <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+admix_cv_s <- summary(admix_cv, lambda = "min")
+print(admix_cv_s)
+```
+
+We can also plot the cross-validation error (CVE) versus $\lambda$ (on the log scale):
+
+```{r}
+plot(admix_cv)
+```
 
 ## Predicted values 
+
+The `predict()` methods for PLMMs are in development (we are working on a Best Linear Unbiased Predictor); below is an example of where we are for now: 
 
 ```{r admix_pred}
 # make predictions for select lambda value(s)
@@ -92,18 +98,6 @@ admix_pred1 <- predict(object = admix_fit,
                        newX = admix$X,
                        type = "response",
                        idx=98)
-
-# make prediction using blup 
-# admix_pred2 <- predict.list(fit = admix_fit,
-#                             prep = plmm_prep(admix$X, admix$y),
-#                             newX = admix$X,
-#                             type = "blup",
-#                             idx=98)
-
-# compare y predictions 
-# admix_compare_y <- data.frame(y = admix$y, yhat_response = admix_pred1, yhat_blup = admix_pred2)
-# colnames(admix_compare_y) <- c("Y", "Y hat response", "Y hat BLUP")
-# print(head(admix_compare_y))
 ```
 
 

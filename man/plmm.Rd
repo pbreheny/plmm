@@ -16,7 +16,6 @@ plmm(
   lambda.min,
   nlambda = 100,
   lambda,
-  svd_details = TRUE,
   eps = 1e-04,
   max.iter = 10000,
   convex = TRUE,
@@ -24,14 +23,16 @@ plmm(
   warn = TRUE,
   penalty.factor = rep(1, ncol(X)),
   init = rep(0, ncol(X)),
-  returnX = TRUE,
   trace = FALSE
 )
 }
 \arguments{
-\item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
+\item{X}{Design matrix object or a string with the file path to a design matrix. If a string, string will be passed to \code{get_data()}.
+\itemize{
+\item Note: X may include clinical covariates and other non-SNP data, but no missing values are allowed.
+}}
 
-\item{y}{Continuous outcome vector.}
+\item{y}{Continuous outcome vector. Logistic regression modeling is still in development.}
 
 \item{k}{An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to \code{RSpectra::svds()}. Defaults to \code{min(n, p) - 1}, where n and p are the dimensions of the \emph{standardized} design matrix.}
 
@@ -51,8 +52,6 @@ plmm(
 
 \item{lambda}{A user-specified sequence of lambda values. By default, a sequence of values of length nlambda is computed, equally spaced on the log scale.}
 
-\item{svd_details}{Logical: should the details from the SVD, such as the singular values (S) and singular vectors (U) be returned? Default is TRUE.}
-
 \item{eps}{Convergence threshold. The algorithm iterates until the RMSD for the change in linear predictors for each coefficient is less than eps. Default is \code{1e-4}.}
 
 \item{max.iter}{Maximum number of iterations (total across entire path). Default is 10000.}
@@ -66,8 +65,6 @@ plmm(
 \item{penalty.factor}{A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.}
 
 \item{init}{Initial values for coefficients. Default is 0 for all columns of X.}
-
-\item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
 
 \item{trace}{If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.}
 }
