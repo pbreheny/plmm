@@ -15,6 +15,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+# TODO: figure out where to add this line --
+# options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 ```{r setup}
