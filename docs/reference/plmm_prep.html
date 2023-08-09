@@ -29,6 +29,7 @@ This is an internal function for cv.plmm"><!-- mathjax --><script src="https://c
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
     <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
   </div>
@@ -61,6 +62,7 @@ This is an internal function for <code>cv.plmm</code></p>
 <span>  <span class="va">y</span>,</span>
 <span>  k <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  K <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  diag_K <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  eta_star <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  penalty.factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -84,6 +86,10 @@ This is an internal function for <code>cv.plmm</code></p>
 
 <dt>K</dt>
 <dd><p>Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \(\frac{1}{p}(XX^T)\), where X is standardized). This can also be a list, with components d and u (as returned by choose_k)</p></dd>
+
+
+<dt>diag_K</dt>
+<dd><p>Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Passed from <code><a href="plmm.html">plmm()</a></code>.</p></dd>
 
 
 <dt>eta_star</dt>
@@ -123,6 +129,7 @@ This is an internal function for <code>cv.plmm</code></p>
 <span class="r-in"><span><span class="co"># this is an internal function; to call this, you would need to use the triple </span></span></span>
 <span class="r-in"><span><span class="co"># colon, eg penalizedLMM:::plmm_prep()</span></span></span>
 <span class="r-in"><span><span class="va">prep1</span> <span class="op">&lt;-</span> <span class="fu">plmm_prep</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, trace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">prep2</span> <span class="op">&lt;-</span> <span class="fu">plmm_prep</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, diag_K <span class="op">=</span> <span class="cn">TRUE</span>, trace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -3,7 +3,8 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   choose_k: choose_k.html
+  explore_options: explore_options.html
   plink-files: plink-files.html
   getting-started: getting-started.html
-last_built: 2023-08-07T15:55Z
+last_built: 2023-08-09T16:33Z
 

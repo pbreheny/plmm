@@ -7,6 +7,9 @@
     <loc>/articles/choose_k.html</loc>
   </url>
   <url>
+    <loc>/articles/explore_options.html</loc>
+  </url>
+  <url>
     <loc>/articles/getting-started.html</loc>
   </url>
   <url>
@@ -206,6 +209,9 @@
   </url>
   <url>
     <loc>/reference/untransform.html</loc>
+  </url>
+  <url>
+    <loc>/reference/v_hat.html</loc>
   </url>
   <url>
     <loc>/reference/varp.html</loc>
