@@ -22,19 +22,8 @@ lmm_format <- function(fit,
                         dfmax = fit$ncol_X + 1, 
                         X,
                         K){
-  
-  #if (fit$warn & sum(iter) == fit$max.iter) warning("Maximum number of iterations reached")
-
-  # TODO: determine if I should just take out the lines below 
-  # if (fit$warn & sum(iter) == fit$max.iter) warning("Maximum number of iterations reached")
-  # convex.min <- if (convex) convexMin(b = fit$b,
-  #                                     X = fit$std_SUX,
-  #                                     family = 'gaussian') else NULL
-  
-  browser()
-  
   # reverse the transformations of the beta values 
-  beta_vals <- untransform(res_b = fit$b,
+  beta_vals <- lmm_untransform(res_b = fit$res$coefficients,
                            ns = fit$ns,
                            ncol_X = fit$ncol_X,
                            std_X = fit$std_X,
@@ -45,8 +34,7 @@ lmm_format <- function(fit,
   
   # give the matrix of beta_values readable names 
   # SNPs (or covariates) on the rows
-  varnames <- c("(Intercept)", fit$snp_names)
-  dimnames(beta_vals) <- list(varnames, 'Coeff.')
+  names(beta_vals) <- c("(Intercept)", fit$snp_names)
   
   if (is.null(K)) {
     Vhat <- fit$eta * (1/fit$ncol_X) * tcrossprod(X) + (1-fit$eta) * diag(fit$nrow_X) 
@@ -58,19 +46,15 @@ lmm_format <- function(fit,
   }
   ## output
   val <- structure(list(beta_vals = beta_vals,
+                        lm.fit = fit$res,
                         eta = fit$eta,
-                        SUX = fit$SUX,
-                        SUy = fit$SUy,
-                        convex.min = convex.min, # TODO: may need to take out convex.min
-                        loss = loss,
-                        penalty.factor = fit$penalty.factor,
+                        S = fit$S,
+                        U = fit$U,
                         ns_idx = c(1, 1 + fit$ns), # PAY ATTENTION HERE! 
                         ncol_X = fit$ncol_X,
                         nrow_X = fit$nrow_X, 
                         # estimated_V = fit$estimated_V, # this is using the standardized X scale, used in cv-plmm 
-                        Vhat = Vhat, 
-                        iter = iter,
-                        converged = converged),
+                        Vhat = Vhat),
                    class = "lmm")
   if (fit$returnX) {
     if (utils::object.size(fit$SUX) > 1e8) {
@@ -85,11 +69,6 @@ lmm_format <- function(fit,
     val$std_X <- fit$std_X # this is the standardized design matrix
     val$y <- fit$y
   } 
-  
-  if("S" %in% names(fit) & "U" %in% names(fit)){
-    val$S <- fit$S
-    val$U <- fit$U
-  }
   
   return(val)
   

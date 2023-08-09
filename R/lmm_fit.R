@@ -68,33 +68,20 @@ lmm_fit <- function(prep,
   
   if(prep$trace){cat("Setup complete. Beginning model fitting.\n")}
   
-  # remove initial values for coefficients representing columns with singular values
-  init <- init[prep$ns] 
-  
-  # placeholders for results
-  # init <- c(0, init) # add initial value for intercept
-  # resid <- drop(SUy - std_SUX %*% init)
-  b <- matrix(NA, nrow=ncol(std_SUX), ncol=ncol(std_SUX)) 
-  # TODO: decide how to adjust what is below
-  # iter <- integer(nlambda)
-  # converged <- logical(nlambda)
-  # loss <- numeric(nlambda)
-  
-  browser()
-  # main attraction 
-  res <- lm(SUy ~ std_SUX) 
-  # FIXME: when testing this function with oav data, why is KDR gene giving a singular value here? 
-  b <- init <- res$beta
-  iter <- res$iter
-  converged <- ifelse(res$iter < max.iter, TRUE, FALSE)
-  loss <- res$loss
-  resid <- res$resid
+  # main attraction
+  res <- lm.fit(x = std_SUX, y = SUy) 
+  if(any(is.na(res$coefficients))){
+    stop("One or more coefficients is NA. This is usually due to one predictor 
+         (one column of the X matrix) being a linear combination of the others.
+         Check your design matrix to address this issue.")
+  }
   
   # reconstruct K to calculate V 
   # this is on the standardized X scale 
   estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S), prep$U) + (1-eta)*diag(nrow = nrow(prep$U)) 
   
   ret <- structure(list(
+    res = res,
     std_X = prep$std_X,
     y = prep$y,
     S = prep$S,
@@ -104,17 +91,10 @@ lmm_fit <- function(prep,
     SUy = SUy,
     ncol_X = prep$ncol_X, 
     nrow_X = prep$nrow_X, 
-    b = b,
     eta = eta,
-    iter = iter,
-    converged = converged, 
-    loss = loss, 
     ns = prep$ns,
     snp_names = prep$snp_names,
     eps = eps,
-    max.iter = max.iter,
-    warn = warn,
-    init = init,
     returnX = prep$returnX,
     trace = prep$trace, 
     estimated_V = estimated_V

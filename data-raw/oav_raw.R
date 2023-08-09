@@ -13,10 +13,8 @@ library(corrplot)
 
 
 # read in data ------------------------------------------------------
-oav <- process_plink(data_dir = "data-raw",
-                     prefix = "oav",
-                     rds = TRUE,
-                     impute = FALSE)
+process_plink(data_dir = "data-raw", prefix = "oav", impute = FALSE)
+oav <- get_data(path = "data-raw/oav")
 fam <- read.delim(file = "data-raw/oav.fam", sep = "", header = FALSE)
 
 # create K, the relatedness matrix -------------------------------------
@@ -79,7 +77,12 @@ Kplot <- corrplot(K,
                   tl.col = "grey50",
                   is.corr = FALSE,
                   col = COL1('Purples', 200)) # looks right
-
+# address multicollinearity issue ----------
+# genes KDR and PDGFRA are perfectly correlated (everyone that has a mutation in 
+# KDR also has a mutation in PDGFRA). Since the purpose of including this data 
+# in the package is primarily didactic, I will simply remove KDR from the design matrix.
+colnames(oav$X)
+oav$X <- oav$X[,-5]
 
 # create rda object -------------------------
 oav$K <- K
