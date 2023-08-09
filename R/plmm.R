@@ -10,7 +10,7 @@
 #' @param diag_K Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE. 
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
-#' @param gamma The tuning parameter of the MCP/Spenncath penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.
+#' @param gamma The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/Spenncath penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/Spenncath penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
 #' @param lambda.min The smallest value for lambda, as a fraction of lambda.max. Default is .001 if the number of observations is larger than the number of covariates and .05 otherwise.
 #' @param nlambda Length of the sequence of lambda. Default is 100. 
@@ -133,12 +133,12 @@ plmm <- function(X,
   
   }
   # warn about computational time for large K 
-  if(is.null(k) & (nrow(X) > 1000) & (is.null(diag_K))){
+  if(is.null(k) & is.null(diag_K) & (nrow(X) > 1000)){
     warning("The number of observations is large, and k is not specified.
     \nThis can dramatically increase computational time -- the SVD calculation is expensive.
             \nIf the observations are unrelated, please set diag_K = TRUE. SVD is not needed in this case.
             \nOtherwise, consider using choose_k() first to get an approximation for your relatedness matrix.")
-  
+  }
   # coercion for penalty
   penalty <- match.arg(penalty)
   

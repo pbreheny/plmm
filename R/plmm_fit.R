@@ -131,11 +131,6 @@ plmm_fit <- function(prep,
     resid <- res$resid
     if(prep$trace){setTxtProgressBar(pb, ll)}
   }
-  browser()
-  # reconstruct K to calculate V 
-  # this is on the standardized X scale 
-  estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S), prep$U) + (1-eta)*diag(nrow = nrow(prep$U)) 
-  
   ret <- structure(list(
     y = prep$y,
     S = prep$S,
@@ -163,9 +158,7 @@ plmm_fit <- function(prep,
     max.iter = max.iter,
     warn = warn,
     init = init,
-    trace = prep$trace, 
-    estimated_V = estimated_V
-  )) 
+    trace = prep$trace)) 
   
   return(ret)
   
