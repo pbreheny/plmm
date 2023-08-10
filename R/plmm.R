@@ -147,7 +147,6 @@ plmm <- function(X,
   
   
   if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
-  
   the_prep <- plmm_prep(X = X,
                         y = y,
                         K = K,
