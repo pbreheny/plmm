@@ -34,8 +34,6 @@ The branches of this repo are organized in the following way:
 
   - `check_size` is a development branch where I am re-thinking how data are saved/return, so that object size is manageable.
 
-  - `choose_k` is a development branch where I am thinking about how to choose the tuning parameter for truncated singular value decomposition. 
-
   - `fam_lmm` is a development branch where I am thinking about how the framework `plmm()` uses for analyzing relationships can be used in contexts where penalization is not necessary. Example: family-based data which are not high-dimensional. 
   
   - `setup-lambda` is a development branch where we are resolving a bug in `setup_lambda`. Stay tuned for updates on this. 

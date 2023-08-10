@@ -15,11 +15,7 @@ Authors:
 \itemize{
   \item Anna C. Reisetter \email{anna-reisetter@uiowa.edu} (\href{https://orcid.org/0000-0001-8332-4585}{ORCID})
   \item Patrick J. Breheny (\href{https://orcid.org/0000-0002-0650-1119}{ORCID})
-}
-
-Other contributors:
-\itemize{
-  \item Yujiing Lu [contributor]
+  \item Yujiing Lu
 }
 
 }
