@@ -154,7 +154,8 @@ cv.plmm <- function(X,
   e <- sapply(1:nfolds, function(i) apply(E[fold==i, , drop=FALSE], 2, mean))
   Bias <- mean(e[min,] - apply(e, 2, min))
 
-  val <- list(cve=cve,
+  val <- list(type=type, 
+              cve=cve,
               cvse=cvse,
               fold=fold,
               lambda=lambda,
