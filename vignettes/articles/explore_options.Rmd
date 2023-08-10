@@ -27,7 +27,7 @@ As the number of observations (e.g., number of participants) increases, the comp
 
 We can visualize the impact of two approaches for choosing $\mathbf{K}$: on the left is the default option (as in `relatedness_mat()`), and on the right is the option `diag_K = T`.
 
-```{r, eval=FALSE}
+```{r diag_K}
 # add this plot 
 fit_admix1 <- plmm(X = admix$X, y = admix$y)
 fit_admix2 <- plmm(X = admix$X, y = admix$y, diag_K = T)
@@ -74,7 +74,7 @@ ggplot(K_dat2,
 
 The computation associated with calculating $\mathbf{K}$ can become quite expensive, as the code below illustrates: 
 
-```{r, warning=FALSE, eval=FALSE}
+```{r svd_example, warning=FALSE}
 #TODO: add these plots 
 K_dim <- c(100, 1000, 1500, 2000, 3000, 4000)
 true_times <- approx_times <- rep(NA, length(K_dim))
@@ -99,14 +99,13 @@ ggplot(K_dat,
 
 You can use `choose_k()` to implement truncated singular value decomposition (SVD). This is what is shown above via `RSpectra::svds()`.
   
-
 # Options for 'type' in CV 
 
 There are two options for the `type` argument in the `cv.plmm()` function: 'response' and 'blup'. The latter is an acronym stands for the Best Linear Unbiased Predictor. While the 'response' method attributes all the variation to ..., the 'blup' method .... (FILL IN). 
 
 We can compare results from these options here: 
 
-```{r}
+```{r blup_example}
 set.seed(615)
 cv_admix1 <- cv.plmm(X = admix$X, y = admix$y)
 set.seed(615)
