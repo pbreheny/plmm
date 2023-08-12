@@ -87,8 +87,8 @@ plmm <- function(X,
     X <- dat$X
   }
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
-  if("FBM.code256" %in% class(X)) stop("plmm does not work with FBM objects at this time. This option is in progress. \nFor now, design matrix X must be a numeric matrix.")
-  if (!inherits(X, "matrix")) {
+  if("FBM.code256" %in% class(X)){fbm_flag <- TRUE} else {fbm_flag <- FALSE}
+  if (!inherits(X, "matrix") & !fbm_flag) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
   }
@@ -147,35 +147,57 @@ plmm <- function(X,
   
   
   if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
-  the_prep <- plmm_prep(X = X,
-                        y = y,
-                        K = K,
-                        k = k,
-                        diag_K = diag_K,
-                        eta_star = eta_star,
-                        penalty.factor = penalty.factor,
-                        trace = trace)
+  if(fbm_flag){
+    the_prep <- plmm_prep_fbm(X = X,
+                          y = y,
+                          K = K,
+                          k = k,
+                          diag_K = diag_K,
+                          eta_star = eta_star,
+                          penalty.factor = penalty.factor,
+                          trace = trace)
+  } else {
+    the_prep <- plmm_prep(X = X,
+                          y = y,
+                          K = K,
+                          k = k,
+                          diag_K = diag_K,
+                          eta_star = eta_star,
+                          penalty.factor = penalty.factor,
+                          trace = trace)
+  }
+  
   
   
   if(trace){cat("Beginning model fitting.\n")}
-  the_fit <- plmm_fit(prep = the_prep,
-                      penalty = penalty,
-                      gamma = gamma,
-                      alpha = alpha,
-                      lambda.min = lambda.min,
-                      nlambda = nlambda,
-                      lambda = lambda,
-                      eps = eps,
-                      max.iter = max.iter,
-                      warn = warn,
-                      init = init)
+  if(fbm_flag){
+    
+  } else {
+    the_fit <- plmm_fit(prep = the_prep,
+                        penalty = penalty,
+                        gamma = gamma,
+                        alpha = alpha,
+                        lambda.min = lambda.min,
+                        nlambda = nlambda,
+                        lambda = lambda,
+                        eps = eps,
+                        max.iter = max.iter,
+                        warn = warn,
+                        init = init)
+  }
+  
   
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
-  the_final_product <- plmm_format(fit = the_fit, 
-                                   convex = convex,
-                                   dfmax = dfmax, 
-                                   X = X,
-                                   K = K)
+  if(fbm_flag){
+    
+  } else {
+    the_final_product <- plmm_format(fit = the_fit, 
+                                     convex = convex,
+                                     dfmax = dfmax, 
+                                     X = X,
+                                     K = K)
+    
+  }
   
   return(the_final_product)
   
