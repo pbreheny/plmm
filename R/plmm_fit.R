@@ -68,18 +68,17 @@ plmm_fit <- function(prep,
     # otherwise, use the user-supplied value (this is mainly for simulation)
     eta <- prep$eta
   }
-  
   # rotate data
-  W <- diag((eta * prep$S + (1 - eta))^(-1/2), nrow = length(prep$S)) 
-  SUX <- W %*% crossprod(prep$U, cbind(1, prep$std_X)) # add column of 1s for intercept
-  SUy <- drop(W %*% crossprod(prep$U, prep$y))
-  
+  w <- (eta * prep$S + (1 - eta))^(-1/2)
+  WU <- tcrossprod(diag(w, nrow = length(prep$S)), prep$U)
+  SUX <- WU %*% cbind(1, prep$std_X)
+  browser() # trying to figure out how to optimize the multiplications here
+  SUy <- diag(w) %*% crossprod(prep$U, prep$y)
   # re-standardize rotated SUX
   std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
   std_SUX_noInt <- std_SUX_temp$scaled_X
   std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
   attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
-  
   # calculate population var without mean 0; will need this for call to ncvfit()
   xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
   

@@ -15,15 +15,15 @@ library(data.table)
 library(ggplot2)
 ```
 
-The `plmm()` function has many options, so this article aims to provide an overview (and comparison) of several of these model fitting options. This is a more detailed presentation than what is provided in the "Getting started" vignette. 
-
+The `plmm()` function has many options, so this article aims to provide an overview (and comparison) of several of these model fitting options. This is a more detailed presentation than what is provided in the "Getting started" vignette.
 
 # Options for K matrix
 
-One of the 'coolest' aspects of the `plmm` approach is its ability to incorporate complex relationships into the model-fitting process. In our framework, the relational structure of a data set is represented in the matrix we call $\mathbf{K}$. Imagine this matrix as a quilt with a symmetric, checkered pattern. The more complex the relational structure of the data, the more intricate the pattern of the quilt becomes. The relational structure in a data set could include broad and loosely related groups, (like ancestry groups), or smaller and highly correlated groups (like family units). 
+One of the 'coolest' aspects of the `plmm` approach is its ability to incorporate complex relationships into the model-fitting process. In our framework, the relational structure of a data set is represented in the matrix we call $\mathbf{K}$. Imagine this matrix as a quilt with a symmetric, checkered pattern. The more complex the relational structure of the data, the more intricate the pattern of the quilt becomes. The relational structure in a data set could include broad and loosely related groups, (like ancestry groups), or smaller and highly correlated groups (like family units).
 
-## Structure 
-As the number of observations (e.g., number of participants) increases, the computational time needed to calculate the entire $\mathbf{K}$ increases exponentially. For this reason, `plmm()` has several options for approximating  $\mathbf{K}$. First, there are research contexts in which it may be appropriate to assume the data are from unrelated observations. For such cases, `plmm()` offers the argument `diag_K = T`. This will use the simplest possible 'quilt pattern', in which  $\mathbf{K} = \mathbf{I}_n$ with $n$ being the number of observations. 
+## Structure
+
+As the number of observations (e.g., number of participants) increases, the computational time needed to calculate the entire $\mathbf{K}$ increases exponentially. For this reason, `plmm()` has several options for approximating $\mathbf{K}$. First, there are research contexts in which it may be appropriate to assume the data are from unrelated observations. For such cases, `plmm()` offers the argument `diag_K = T`. This will use the simplest possible 'quilt pattern', in which $\mathbf{K} = \mathbf{I}_n$ with $n$ being the number of observations.
 
 We can visualize the impact of two approaches for choosing $\mathbf{K}$: on the left is the default option (as in `relatedness_mat()`), and on the right is the option `diag_K = T`.
 
@@ -34,8 +34,6 @@ fit_admix2 <- plmm(X = admix$X, y = admix$y, diag_K = T)
 par(mfrow=c(1,2))
 plot(fit_admix1);plot(fit_admix2)
 ```
-
-
 
 ```{r, warning = FALSE, eval=FALSE, include=FALSE}
 # TODO: should I add these plots? 
@@ -70,9 +68,9 @@ ggplot(K_dat2,
 
 ```
 
-## SVD implementation 
+## SVD implementation
 
-The computation associated with calculating $\mathbf{K}$ can become quite expensive, as the code below illustrates: 
+The computation associated with calculating $\mathbf{K}$ can become quite expensive, as the code below illustrates:
 
 ```{r svd_example, warning=FALSE}
 #TODO: add these plots 
@@ -97,13 +95,17 @@ ggplot(K_dat,
        y = "SVD time in seconds")
 ```
 
-You can use `choose_k()` to implement truncated singular value decomposition (SVD). This is what is shown above via `RSpectra::svds()`.
-  
-# Options for 'type' in CV 
+You can use [choose_k](docs/articles/choose_K.html) to implement truncated singular value decomposition (SVD). This is what is shown above via `RSpectra::svds()`.
 
-There are two options for the `type` argument in the `cv.plmm()` function: 'response' and 'blup'. The latter is an acronym stands for the Best Linear Unbiased Predictor. While the 'response' method attributes all the variation to ..., the 'blup' method .... (FILL IN). 
+# Options for 'type' in CV
 
-We can compare results from these options here: 
+There are two options for the `type` argument in the `cv.plmm()` function: 'response' and 'blup'. In PLMMs (as well as other contexts), a goal in model building is to predict outcomes in new data $X_2$ based on data and outcomes $X_1, y_1$. The linear predictor *(LP)* is $X_2 \hat \beta(\lambda)$, whereas the Best Linear Unbiased Predictor (*BLUP*) is $X_2 \hat \beta(\lambda) + V_{21} V_{11}^{\frac{-1}{2}}(\tilde y_1 - \tilde X_1 \hat \beta(\lambda))$. The 'response' option is simply an alias for LP.
+
+Note that the BLUP includes the LP as its first term, and adds a second term representing the predicted random effect. This means that the BLUP accounts for the covariance structure in the data, whereas the LP does not incorporate that structure. (CITATION NEEDED)
+
+## Application to PLMM
+
+We can compare results from these options here:
 
 ```{r blup_example}
 set.seed(615)
@@ -115,8 +117,6 @@ par(mfrow=c(1,2)); plot(cv_admix1); plot(cv_admix1_blup)
 summary(cv_admix1);summary(cv_admix1_blup)
 ```
 
-# Options for looking at bias and variance 
+# Options for looking at bias and variance
 
-It may be of interest to examine the bias and variance that result from cross-validated model fitting. `cv.plmm()` has the option `returnBiasDetails`; if set to `TRUE`, this will make the returned object include bias (a vector) and loss (a matrix). Moreover, for a `plmm` model fit, the function `v_hat` will construct the approximated matrix $\mathbf{\hat V} \equiv \eta \mathbf{K} + (1 - \eta)\mathbf{I}_n$. 
-
-
+It may be of interest to examine the bias and variance that result from cross-validated model fitting. `cv.plmm()` has the option `returnBiasDetails`; if set to `TRUE`, this will make the returned object include bias (a vector) and loss (a matrix). Moreover, for a `plmm` model fit, the function `v_hat` will construct the approximated matrix $\mathbf{\hat V} \equiv \eta \mathbf{K} + (1 - \eta)\mathbf{I}_n$.
