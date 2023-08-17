@@ -46,6 +46,9 @@ plmm_prep_fbm <- function(X,
   p <- meta$X$nrow 
   n <- meta$X$ncol
   
+  # note what values are non-singular
+  ns <- meta$ns
+  
   # set default k 
   if(is.null(k)){
     k <- min(n,p)
@@ -58,7 +61,7 @@ plmm_prep_fbm <- function(X,
   }
   
   # keep only those penalty factors which penalize non-singular values 
-  penalty.factor <- penalty.factor[meta$ns]
+  penalty.factor <- penalty.factor[ns]
   # browser()
   # calculate SVD
   if(!(k %in% 1:min(n,p))){stop("k value is out of bounds. \nIf specified, k must be in the range from 1 to min(nrow(X), ncol(X))")}
@@ -83,7 +86,7 @@ plmm_prep_fbm <- function(X,
                               # standardization happens because of the line below
                               fun.scaling = bigstatsr::as_scaling_fun(center.col = meta$center, scale.col = meta$scale),
                               k = k,
-                              ind.col = meta$ns,
+                              ind.col = ns,
                               ...)
 
     
@@ -118,9 +121,10 @@ plmm_prep_fbm <- function(X,
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(ncol_X = n,
                         nrow_X = p, 
+                        X = X,
                         y = y,
                         # NB: watch the line below; different from plmm_prep()
-                        std_X = ifelse(exists(decomp),
+                        std_X = ifelse(exists('decomp'),
                                        list(center = decomp$center,
                                             scale = decomp$scale),
                                        list(center = meta$center,

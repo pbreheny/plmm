@@ -67,17 +67,19 @@ plmm_fit_fbm <- function(prep,
     # otherwise, use the user-supplied value (this is mainly for simulation)
     eta <- prep$eta
   }
-  
-  # rotate data
-  w <- (eta * prep$S + (1 - eta))^(-1/2)
-  SUX <- w %*% crossprod(A.row = prep$U,
-                         X = X,
-                         center = std_X$center,
-                         scale = std_X$scale)
-  # TODO: in the above, I need to add column of 1s for intercept!
-  SUy <- w %*% crossprod(prep$U, prep$y)
   browser()
-  # PICK UP HERE! 
+  # rotate data
+  W <- diag((eta * prep$S + (1 - eta))^(-1/2), nrow = length(prep$S))
+  SUX <- W %*% bigstatsr::crossprod(x = prep$U,
+                                       y = prep$X,
+                                       ind.col = prep$ns,
+                                       center = prep$std_X$center,
+                                       scale = prep$std_X$scale,
+                                       ncores = nb_cores())
+  # TODO: in the above, I need to add column of 1s for intercept!
+  SUy <- drop(W %*% crossprod(prep$U, prep$y))
+  
+  
   # re-standardize rotated SUX
   std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
   std_SUX_noInt <- std_SUX_temp$scaled_X

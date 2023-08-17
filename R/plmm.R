@@ -193,7 +193,17 @@ plmm <- function(X,
   if(trace){cat("Beginning model fitting.\n")}
 
   if(fbm_flag){
-    
+    the_fit <- plmm_fit_fbm(prep = the_prep,
+                            penalty = penalty,
+                            gamma = gamma,
+                            alpha = alpha,
+                            lambda.min = lambda.min,
+                            nlambda = nlambda,
+                            lambda = lambda,
+                            eps = eps,
+                            max.iter = max.iter,
+                            warn = warn,
+                            init = init)
   } else {
     the_fit <- plmm_fit(prep = the_prep,
                         penalty = penalty,
@@ -208,7 +218,7 @@ plmm <- function(X,
                         init = init)
   }
   
-  
+  # browser()
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   if(fbm_flag){
     
