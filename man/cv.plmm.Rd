@@ -17,7 +17,7 @@ cv.plmm(
   cluster,
   nfolds = 10,
   seed,
-  fold,
+  fold = NULL,
   returnY = FALSE,
   returnBiasDetails = FALSE,
   trace = FALSE

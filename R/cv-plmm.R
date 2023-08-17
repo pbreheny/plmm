@@ -41,7 +41,7 @@ cv.plmm <- function(X,
                     cluster,
                     nfolds=10,
                     seed,
-                    fold,
+                    fold = NULL,
                     returnY=FALSE,
                     returnBiasDetails = FALSE,
                     trace=FALSE) {
@@ -94,7 +94,7 @@ cv.plmm <- function(X,
   
   sde <- sqrt(.Machine$double.eps)
   
-  if(missing(fold) | is.null(fold)) {
+  if(is.null(fold)) {
     if(trace){
       cat("'Fold' argument is either NULL or missing; assigning folds randomly (by default). 
           \nTo specify folds for each observation, supply a vector with fold assignments.")
