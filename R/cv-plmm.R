@@ -5,6 +5,7 @@
 #' @param y Continuous outcome vector for model fitting.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix, in the form of (1) the relatedness matrix estimated from the data (default), (2) a user-supplied matrix, or (3) a user-supplied list with components 'd' and 'u' as created by choose_k().
+#' @param diag_K Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE. 
 #' @param eta_star Optional arg. to \code{plmm_prep}. Defaults to NULL.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param penalty.factor Optional arg. to \code{plmm_prep}. Defaults to 1 for all predictors (except the intercept). 
@@ -33,6 +34,7 @@ cv.plmm <- function(X,
                     y,
                     k = NULL,
                     K = NULL,
+                    diag_K = NULL,
                     eta_star = NULL,
                     penalty = c("MCP", "SCAD", "lasso"),
                     penalty.factor = rep(1, ncol(X)),
@@ -46,9 +48,10 @@ cv.plmm <- function(X,
                     returnBiasDetails = FALSE,
                     trace=FALSE) {
 
+
   # default type is 'response'
   if(missing(type)) {type == 'response'} 
-  
+
   # determine penalty 
   penalty <- match.arg(penalty)
   
@@ -57,6 +60,7 @@ cv.plmm <- function(X,
                       y = y,
                       k = k,
                       K = K,
+                      diag_K = diag_K,
                       eta_star = eta_star,
                       penalty.factor = penalty.factor,
                       trace,
@@ -79,7 +83,7 @@ cv.plmm <- function(X,
   if (type == 'blup') {
     estimated_V <- fit$eta * tcrossprod(fit$U %*% diag(fit$S), fit$U) + (1-fit$eta)*diag(nrow = nrow(fit$U)) 
   }
-  
+
   # initialize objects to hold CV results 
   n <- length(fit$y)
   E <- Y <- matrix(NA, nrow=nrow(X), ncol=length(fit$lambda))
