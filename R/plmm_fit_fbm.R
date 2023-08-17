@@ -30,7 +30,7 @@
 #' @keywords internal 
 #'
 
-plmm_fit <- function(prep, 
+plmm_fit_fbm <- function(prep, 
                      penalty = "MCP",
                      gamma,
                      alpha = 1,
@@ -44,7 +44,7 @@ plmm_fit <- function(prep,
                      warn = TRUE,
                      init = NULL,
                      returnX = TRUE){
-  
+  browser()
   # set default gamma (will need this for cv.plmm)
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
@@ -70,14 +70,13 @@ plmm_fit <- function(prep,
   
   # rotate data
   w <- (eta * prep$S + (1 - eta))^(-1/2)
-  # TODO: how to implement the below if !exists(decomp) in plmm_prep_fbm()?
   SUX <- w %*% crossprod(A.row = prep$U,
                          X = X,
                          center = std_X$center,
                          scale = std_X$scale)
   # TODO: in the above, I need to add column of 1s for intercept!
   SUy <- w %*% crossprod(prep$U, prep$y)
-  
+  browser()
   # PICK UP HERE! 
   # re-standardize rotated SUX
   std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])

@@ -85,9 +85,29 @@ plmm <- function(X,
   if("character" %in% class(X)){
     dat <- get_data(path = X, returnX = TRUE, trace = trace)
     X <- dat$X
+    if("FBM.code256" %in% class(X) | "FBM" %in% class(X)){fbm_flag <- TRUE} else {fbm_flag <- FALSE}
   }
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
-  if("FBM.code256" %in% class(X)){fbm_flag <- TRUE} else {fbm_flag <- FALSE}
+  if("FBM.code256" %in% class(X) | "FBM" %in% class(X)){stop("To analyze data from a file-backed X matrix, meta-data must also be supplied. 
+                                       For the 'X' arg, you need to supply either (1) a character string representing the filepath to the .rds object or (2) a list as returned by get_data(). 
+                                       If you don't have an .rds object yet, see process_plink() for preparing your data.")}
+  if("list" %in% class(X)){
+    # check for X element 
+    if(!("X" %in% names(X))){stop("The list supplied for the X argument does not have a design matrix element named 'X'. Rename as needed and try again.")}
+    if("FBM.code256" %in% class(X$X) | "FBM" %in% class(X$X)){
+      dat <- X
+      X <- dat$X
+      fbm_flag <- TRUE
+    } else{
+      # TODO: add case to handle X passed as list where X is not an FBM
+      fbm_flag <- FALSE
+    }
+    
+  }
+  # if FBM flag is not 'on' by now, set it 'off'
+  if(!exists('fbm_flag')){fbm_flag <- FALSE}
+  
+  # finish type coersion & checks 
   if (!inherits(X, "matrix") & !fbm_flag) {
     tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
     if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
@@ -149,13 +169,14 @@ plmm <- function(X,
   if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
   if(fbm_flag){
     the_prep <- plmm_prep_fbm(X = X,
-                          y = y,
-                          K = K,
-                          k = k,
-                          diag_K = diag_K,
-                          eta_star = eta_star,
-                          penalty.factor = penalty.factor,
-                          trace = trace)
+                              meta = dat,
+                              y = y,
+                              K = K,
+                              k = k,
+                              diag_K = diag_K,
+                              eta_star = eta_star,
+                              penalty.factor = penalty.factor,
+                              trace = trace)
   } else {
     the_prep <- plmm_prep(X = X,
                           y = y,
@@ -170,6 +191,7 @@ plmm <- function(X,
   
   
   if(trace){cat("Beginning model fitting.\n")}
+
   if(fbm_flag){
     
   } else {

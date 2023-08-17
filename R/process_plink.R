@@ -95,9 +95,11 @@ process_plink <- function(data_dir,
   
   # identify monomorphic SNPs 
   constants_idx <- apply(X = counts[1:3,],
-                         MARGIN = 2,
-                         # see which ~called~ features have all same value
-                         FUN = function(c){sum(c == sum(c)) > 0})
+                                          MARGIN = 2,
+                                          # see which ~called~ features have all same value
+                                          FUN = function(c){sum(c == sum(c)) > 0})
+  
+  ns <- which(!constants_idx) # need this for analysis downstream
   
   cat("\nThere are ", sum(constants_idx), " constant features in the data",
       file = outfile, append = TRUE)
@@ -148,8 +150,12 @@ process_plink <- function(data_dir,
     #   
     # } else stop("Argument impute must be either simple or xgboost.")
     
+    # add centering & scaling info
+    scale_info <- bigstatsr::big_scale()(obj$genotypes)
     # now, save the new object -- this will have imputed values and constants_idx
-    obj$constants_idx <- constants_idx
+    obj$ns <- ns
+    obj$center <- scale_info$center
+    obj$scale <- scale_info$scale
     obj <- bigsnpr::snp_save(obj)
     
     cat("\nDone with imputation. File formatting in progress.",

@@ -1,6 +1,7 @@
 #' PLMM prep FBM: a function to run checks, SVD, and rotation prior to fitting a PLMM model when X is an FBM
 #'
 #' @param X Design matrix of type Filebacked Big Matrix (FBM). May include clinical covariates and other non-SNP data.
+#' @param meta A list with the appropriate meta-data to accompany X. This will include 'map' and 'fam' data frames, as well as an 'ns' vector. See `process_plink()` and `get_data()` for details.
 #' @param y Continuous outcome vector.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}, where X is standardized). This can also be a list, with components d and u (as returned by choose_k)
@@ -22,22 +23,28 @@
 #'
 #'@keywords internal
 plmm_prep_fbm <- function(X,
-                      y,
-                      k = NULL,
-                      K = NULL,
-                      diag_K = NULL,
-                      eta_star = NULL,
-                      penalty.factor = rep(1, ncol(X)),
-                      trace = FALSE, 
-                      ...){
-  
+                          meta,
+                          y,
+                          k = NULL,
+                          K = NULL,
+                          diag_K = NULL,
+                          eta_star = NULL,
+                          penalty.factor = rep(1, ncol(X)),
+                          trace = FALSE, 
+                          ...){
   
   ## coersion
   U <- S <- SUX <- SUy <- eta <- NULL
+  # TODO: Think about implementing standardization here with big_apply()
+  # std_X <- bigstatsr::big_apply(X = X,
+  #                               a.FUN = std_fbm,
+  #                               a.combine = cbind,
+  #                               ncores = bigstatsr::nb_cores())
+  # browser()
   
   # designate the dimensions of the design matrix 
-  p <- max(cols_along(X)) 
-  n <- max(rows_along(X))
+  p <- meta$X$nrow 
+  n <- meta$X$ncol
   
   # set default k 
   if(is.null(k)){
@@ -50,15 +57,9 @@ plmm_prep_fbm <- function(X,
     diag_K <- TRUE
   }
   
-  # identify nonsingular values in the standardized X matrix  
-  # TODO: how to make this work on FBM?
-  # ns <- attr(std_X, "nonsingular")
-  
   # keep only those penalty factors which penalize non-singular values 
-  # TODO: how to make this work on FBM?
-  # penalty.factor <- penalty.factor[ns]
-  
-  
+  penalty.factor <- penalty.factor[meta$ns]
+  # browser()
   # calculate SVD
   if(!(k %in% 1:min(n,p))){stop("k value is out of bounds. \nIf specified, k must be in the range from 1 to min(nrow(X), ncol(X))")}
   ## case 1: K is not specified (default to realized relatedness matrix)
@@ -78,12 +79,13 @@ plmm_prep_fbm <- function(X,
     # }
     # otherwise, if I want fewer singular values than min(n,p), use RSpectra decomposition method:
     if (k < min(n,p)){
-      decomp <- big_randomSVD(X,
+      decomp <- bigstatsr::big_randomSVD(X,
                               # standardization happens because of the line below
-                              fun.scaling = big_scale(center = TRUE, scale = TRUE),
+                              fun.scaling = bigstatsr::as_scaling_fun(center.col = meta$center, scale.col = meta$scale),
                               k = k,
+                              ind.col = meta$ns,
                               ...)
-    }
+
     
     D <- decomp$d
     U <- decomp$u
@@ -99,8 +101,8 @@ plmm_prep_fbm <- function(X,
     # } 
     # 
     if(k < min(n,p)){
-      decomp <- big_randomSVD(K,
-                              fun.scaling = big_scale(center = TRUE, scale = TRUE),
+      decomp <- bigstatsr::big_randomSVD(K,
+                              fun.scaling = bigstatsr::big_scale(center = TRUE, scale = TRUE),
                               k = k,
                               ...)
     }
@@ -121,10 +123,11 @@ plmm_prep_fbm <- function(X,
                         std_X = ifelse(exists(decomp),
                                        list(center = decomp$center,
                                             scale = decomp$scale),
-                                       NULL),
+                                       list(center = meta$center,
+                                            scale = meta$scale)),
                         S = S,
                         U = U,
-                        # ns = ns,
+                        ns = meta$ns,
                         eta = eta_star, # carry eta over to fit 
                         penalty.factor = penalty.factor,
                         trace = trace,

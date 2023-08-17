@@ -3,14 +3,16 @@
 #' 
 #' @param path The file path to the RDS object containing the processed data. Do not add the '.rds' extension to the path. 
 #' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL. 
-#' @param returnX Logical: Should the design matrix be returned as a numeric matrix that will be stored in memory. By default, this will be FALSE if the object sizes exceeds 100 Mb.
+#' @param fbm Logical: Should the design matrix be returned as an object of type Filebacked Big Matrix (FBM) as opposed to a numeric matrix that will be stored in memory. By default, this will be TRUE if the object sizes exceeds 100 Mb.
 #' @param trace Logical: Should trace messages be shown? Default is TRUE. 
 #' 
 #' @return A list with four components: 
 #'  * X, the design matrix as either (1) a numeric matrix or (2) a filebacked matrix (FBM). See `bigstatsr::FBM()` and `bigsnpr::bigSnp-class` documentation for details. 
 #'  * fam, a data frame containing the pedigree information (like a .fam file in PLINK)
 #'  * map, a data frame containing the feature information (like a .bim file in PLINK)
-#'  * constants_idx A vector indicating the which columns of X contain constant features (features with no variance). 
+#'  * ns: A vector indicating the which columns of X contain nonsingular features (i.e., features with variance != 0. 
+#'  * center: A vector of values for centering each column in X
+#'  * scale: A vector of values for scaling each column in X 
 #' @export
 #' 
 #' @examples
@@ -18,7 +20,11 @@
 #' pen <- get_data(path = "inst/extdata/penncath_lite")
 #' }
 #' 
-get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
+#' @details
+#' The .rds object should have an 'X' element - this is what will be used as the design matrix for analysis. This design matrix should *not* include an intercept column.
+#' 
+#' 
+get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
   
   rds <- paste0(path, ".rds")
   bk <- paste0(path, ".bk") # .bk will be present if RDS was created with bigsnpr methods 
@@ -30,17 +36,17 @@ get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
   }
   
   # return data in a tractable format 
-  if (missing(returnX)) {
+  if (missing(fbm)) {
     if (utils::object.size(obj$genotypes) > 1e8) {
       warning("\nDue to the large size of X (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).")
-      returnX <- FALSE
+      fbm <- TRUE
     } else {
       # if it fits, it ships 
-      returnX <- TRUE
+      fbm <- FALSE
     }
   }
   
-  if(returnX){
+  if(!fbm){
     X <- obj$genotypes[,]
     if(!is.null(row_id)){
       if(row_id == "iid"){row_names <- obj$fam$sample.ID}
@@ -54,15 +60,25 @@ get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
     
     return(list(X = X,
                 fam = obj$fam,
-                map = obj$map))
+                map = obj$map,
+                ns = obj$ns,
+                center = obj$center,
+                scale = obj$scale))
   } else {
-    cat("Note: X is being returned as a file-backed matrix (FBM) -- see bigstatsr::FBM() for details.
-        \n At this time, plmm() cannot analyze design matrix X in this FBM format. Allowing such an option will
-        \n require writing the 'meat and potatoes' of plmm() in C++, which is a work in progress. For now, 
-        \n functions from package bigsnpr may be used for analyzing FBM data.")
+    # cat("Note: X is being returned as a file-backed matrix (FBM) -- see bigstatsr::FBM() for details.
+    #     \n At this time, plmm() cannot analyze design matrix X in this FBM format. Allowing such an option will
+    #     \n require writing the 'meat and potatoes' of plmm() in C++, which is a work in progress. For now, 
+    #     \n functions from package bigsnpr may be used for analyzing FBM data.")
+    
+    X <- obj$genotypes
+    
+    
     return(list(X = obj$genotypes,
                 fam = obj$fam,
-                map = obj$map))
+                map = obj$map,
+                ns = obj$ns,
+                center = obj$center,
+                scale = obj$scale))
   }
   
 }

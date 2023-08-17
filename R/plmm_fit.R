@@ -60,7 +60,7 @@ plmm_fit <- function(prep,
   if (length(init)!=prep$ncol_X) stop("Dimensions of init and X do not match", call.=FALSE)
   
   if(prep$trace){cat("Beginning standardization + rotation.")}
-  
+
   # estimate eta if needed
   if (is.null(prep$eta)) {
     eta <- estimate_eta(S = prep$S, U = prep$U, y = prep$y) 
