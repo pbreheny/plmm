@@ -94,7 +94,11 @@ cv.plmm <- function(X,
   
   sde <- sqrt(.Machine$double.eps)
   
-  if(missing(fold)) {
+  if(missing(fold) | is.null(fold)) {
+    if(trace){
+      cat("'Fold' argument is either NULL or missing; assigning folds randomly (by default). 
+          \nTo specify folds for each observation, supply a vector with fold assignments.")
+    }
     fold <- sample(1:n %% nfolds)
     fold[fold==0] <- nfolds
   } else {
