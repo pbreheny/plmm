@@ -70,10 +70,9 @@ plmm_fit <- function(prep,
   }
   # rotate data
   w <- (eta * prep$S + (1 - eta))^(-1/2)
-  WU <- tcrossprod(diag(w, nrow = length(prep$S)), prep$U)
-  SUX <- WU %*% cbind(1, prep$std_X)
-  browser() # trying to figure out how to optimize the multiplications here
-  SUy <- diag(w) %*% crossprod(prep$U, prep$y)
+  wU <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
+  SUX <- wU %*% cbind(1, prep$std_X)
+  SUy <- wU %*% prep$y
   # re-standardize rotated SUX
   std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
   std_SUX_noInt <- std_SUX_temp$scaled_X
