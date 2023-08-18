@@ -13,7 +13,7 @@ cv.plmm(
   eta_star = NULL,
   penalty = c("MCP", "SCAD", "lasso"),
   penalty.factor = rep(1, ncol(X)),
-  type = "response",
+  type = "lp",
   ...,
   cluster,
   nfolds = 10,
@@ -41,7 +41,7 @@ cv.plmm(
 
 \item{penalty.factor}{Optional arg. to \code{plmm_prep}. Defaults to 1 for all predictors (except the intercept).}
 
-\item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.}
+\item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'lp'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the \emph{sum} of the linear predictor and the estimated random effect (BLUP). Defaults to 'lp'.}
 
 \item{...}{Additional arguments to \code{plmm_fit}}
 

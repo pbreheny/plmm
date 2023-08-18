@@ -9,7 +9,7 @@
 #' @param eta_star Optional arg. to \code{plmm_prep}. Defaults to NULL.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param penalty.factor Optional arg. to \code{plmm_prep}. Defaults to 1 for all predictors (except the intercept). 
-#' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
+#' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'lp'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the *sum* of the linear predictor and the estimated random effect (BLUP). Defaults to 'lp'.
 #' @param ... Additional arguments to \code{plmm_fit}
 #' @param cluster cv.plmm can be run in parallel across a cluster using the parallel package. The cluster must be set up in advance using the makeCluster function from that package. The cluster must then be passed to cv.plmm.
 #' @param nfolds The number of cross-validation folds. Default is 10.
@@ -38,7 +38,7 @@ cv.plmm <- function(X,
                     eta_star = NULL,
                     penalty = c("MCP", "SCAD", "lasso"),
                     penalty.factor = rep(1, ncol(X)),
-                    type = 'response',
+                    type = 'lp',
                     ...,
                     cluster,
                     nfolds=10,
@@ -49,8 +49,8 @@ cv.plmm <- function(X,
                     trace=FALSE) {
 
 
-  # default type is 'response'
-  if(missing(type)) {type == 'response'} 
+  # default type is 'lp'
+  if(missing(type)) {type == 'lp'} 
 
   # determine penalty 
   penalty <- match.arg(penalty)

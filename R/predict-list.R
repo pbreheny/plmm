@@ -2,7 +2,7 @@
 #'
 #' @param fit  A list with the components returned by `plmm_fit`
 #' @param newX A design matrix used for computing predicted values if requested.
-#' @param type A character argument indicating what type of prediction should be returned. Options are "response," "coefficients," "vars," "nvars," and "blup." See details. 
+#' @param type A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details. 
 #' @param lambda A numeric vector of regularization parameter \code{lambda} values at which predictions are requested.
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
 #' @param prep Optional argument. Result of the call to `plmm_prep` which corresponds to the `fit` argument. Required if \code{type == 'blup'} and object is too large to be returned in `fit` object.
@@ -13,7 +13,7 @@
 #' @keywords internal
 #'
 
-predict.list <- function(fit, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),
+predict.list <- function(fit, newX, type=c("lp", "coefficients", "vars", "nvars", "blup"),
                          lambda, idx=1:length(fit$lambda), prep = NULL, V11 = NULL, V21 = NULL, ...) {
   type <- match.arg(type)
   beta_vals <- coef.list(fit, lambda=lambda, which=idx, drop=FALSE) # includes intercept 
@@ -28,7 +28,7 @@ predict.list <- function(fit, newX, type=c("response", "coefficients", "vars", "
   
   Xbeta <- cbind(1, newX) %*% beta_vals
   
-  if (type=="response") return(drop(Xbeta))
+  if (type=="lp") return(drop(Xbeta))
   
   if (type == "blup"){
     # warning("The BLUP option is under development. Rely on these estimates at your own risk.")

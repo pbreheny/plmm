@@ -7,7 +7,7 @@
 \method{predict}{plmm}(
   object,
   newX,
-  type = c("response", "coefficients", "vars", "nvars", "blup"),
+  type = c("lp", "coefficients", "vars", "nvars", "blup"),
   lambda,
   idx = 1:length(object$lambda),
   X,
@@ -20,7 +20,7 @@
 
 \item{newX}{Design matrix used for computing predicted values if requested.}
 
-\item{type}{A character argument indicating what type of prediction should be returned. Options are "response," "coefficients," "vars," "nvars," and "blup." See details.}
+\item{type}{A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details.}
 
 \item{lambda}{A numeric vector of regularization parameter \code{lambda} values at which predictions are requested.}
 
@@ -45,10 +45,10 @@ newX <- sim_ps_x(n = nrow(admix$X), nJ = 4, p = ncol(admix$X),
  structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
  
  # make predictions for all lambda values 
- pred1 <- predict(object = fit, newX = newX, type = "response")
+ pred1 <- predict(object = fit, newX = newX, type = "lp")
  
  # make predictions for a select number of lambda values 
- pred2 <- predict(object = fit, newX = newX, type = "response", idx=98)
+ pred2 <- predict(object = fit, newX = newX, type = "lp", idx=98)
  }
  
  

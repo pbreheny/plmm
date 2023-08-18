@@ -96,7 +96,7 @@ The `predict()` methods for PLMMs are in development (we are working on a Best L
 # make predictions for select lambda value(s)
 admix_pred1 <- predict(object = admix_fit,
                        newX = admix$X,
-                       type = "response",
+                       type = "lp",
                        idx=98)
 ```
 

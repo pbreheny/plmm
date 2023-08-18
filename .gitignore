@@ -18,3 +18,4 @@ R/_*
 *.log
 vignettes/*.html
 inst/doc
+README.html
