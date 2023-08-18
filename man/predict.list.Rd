@@ -7,7 +7,7 @@
 \method{predict}{list}(
   fit,
   newX,
-  type = c("response", "coefficients", "vars", "nvars", "blup"),
+  type = c("lp", "coefficients", "vars", "nvars", "blup"),
   lambda,
   idx = 1:length(fit$lambda),
   prep = NULL,
@@ -21,7 +21,7 @@
 
 \item{newX}{A design matrix used for computing predicted values if requested.}
 
-\item{type}{A character argument indicating what type of prediction should be returned. Options are "response," "coefficients," "vars," "nvars," and "blup." See details.}
+\item{type}{A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details.}
 
 \item{lambda}{A numeric vector of regularization parameter \code{lambda} values at which predictions are requested.}
 

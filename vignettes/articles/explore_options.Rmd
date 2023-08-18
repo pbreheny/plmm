@@ -95,15 +95,19 @@ ggplot(K_dat,
        y = "SVD time in seconds")
 ```
 
-You can use [choose_k](docs/articles/choose_K.html) to implement truncated singular value decomposition (SVD). This is what is shown above via `RSpectra::svds()`.
+You can use `choose_k()` to implement truncated singular value decomposition (SVD). This is what is shown above via `RSpectra::svds()`.
 
-# Options for 'type' in CV
+# Options for 'type' in prediction
 
-There are two options for the `type` argument in the `cv.plmm()` function: 'response' and 'blup'. In PLMMs (as well as other contexts), a goal in model building is to predict outcomes in new data $X_2$ based on data and outcomes $X_1, y_1$. The linear predictor *(LP)* is $X_2 \hat \beta(\lambda)$, whereas the Best Linear Unbiased Predictor (*BLUP*) is $X_2 \hat \beta(\lambda) + V_{21} V_{11}^{\frac{-1}{2}}(\tilde y_1 - \tilde X_1 \hat \beta(\lambda))$. The 'response' option is simply an alias for LP.
+In PLMMs (as well as other contexts), a goal in model building is to predict outcomes in new data $X_2$ based on data and outcomes $X_1, y_1$. Our package offers two options for prediction, 'lp' and 'blup', which the user may specify via the `type` argument in `cv.plmm()` and related functions. LP is an acronym for "Linear Predictor" and BLUP is an acronym for Best Linear Unbiased Predictor. The linear predictor *(LP)* is $X_2 \hat \beta(\lambda)$, whereas the Best Linear Unbiased Predictor (*BLUP*) is $X_2 \hat \beta(\lambda) + V_{21} V_{11}^{\frac{-1}{2}}(\tilde y_1 - \tilde X_1 \hat \beta(\lambda))$, where:
 
-Note that the BLUP includes the LP as its first term, and adds a second term representing the predicted random effect. This means that the BLUP accounts for the covariance structure in the data, whereas the LP does not incorporate that structure. (CITATION NEEDED)
+-   $V_{n \times n} \equiv \eta \mathbf{K} + (1 - \eta)\mathbf{I}_n$ is the matrix describing the correlation among the $n$ observations of $X$. This matrix could be re-expressed as $V_{n \times n} \equiv \eta*(U \text{diag}(S)U^\top) + (1 - \eta)I_n$ via singular value decomposition.
 
-## Application to PLMM
+-   $\tilde X_1$ and $\tilde y_1$ are the standardized and rotated design matrix and outcomes.
+
+-   (*This bullet is a work in progress... need to think about this some more.*) The symbol $\eta$ represents the percentage of $\text{Var}(y)$ attributable to additive effects of the features (in the context of genetics, this is narrow-sense heritability). $\eta$ also captures the signal-to-noise ratio (SNR) of the data-generating mechanism (model). We estimate $\eta$ as $\hat \eta = \text{argmin} \ell (U, S, y)$, the value that minimizes the log-likelihood function (see `estimate_eta()` documentation and details).
+
+Note that the BLUP includes the LP as its first term, and adds a second term representing the predicted random effect. This means that the BLUP accounts for the covariance structure in the data, whereas the LP does not incorporate that structure.
 
 We can compare results from these options here:
 

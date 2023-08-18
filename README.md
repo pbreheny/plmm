@@ -32,7 +32,7 @@ The branches of this repo are organized in the following way:
 
   - `master` is the main branch with all the latest updates
 
-  - `check_size` is a development branch where I am re-thinking how data are saved/return, so that object size is manageable.
+  - `fbm` is a development branch where I am working to extend our current methods to analyze data from a design matrix stored as a file-backed object (a Filebacked Big Matrix, or FBM). See package [bigstatsr](https://privefl.github.io/bigstatsr/) for more info on these objects. 
 
   - `fam_lmm` is a development branch where I am thinking about how the framework `plmm()` uses for analyzing relationships can be used in contexts where penalization is not necessary. Example: family-based data which are not high-dimensional. 
   
