@@ -68,7 +68,7 @@ plmm_fit <- function(prep,
     # otherwise, use the user-supplied value (this is mainly for simulation)
     eta <- prep$eta
   }
-  
+
   # rotate data
   W <- diag((eta * prep$S + (1 - eta))^(-1/2), nrow = length(prep$S)) 
   SUX <- W %*% crossprod(prep$U, cbind(1, prep$std_X)) # add column of 1s for intercept
