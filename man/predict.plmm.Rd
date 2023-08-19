@@ -35,6 +35,18 @@
 \description{
 Predict method for plmm class
 }
+\details{
+Define beta-hat as the coefficients estimated at the value of lambda that minimizes cross-validation error (CVE). Then options for \code{type} are as follows:
+\itemize{
+\item 'response' (default): uses the product of newX and beta-hat to predict new values of the outcome. This does not incorporate the correlation structure of the data.
+For the stats folks out there, this is simply the linear predictor.
+\item 'blup' (acronym for Best Linear Unbiased Predictor): adds to the 'response' a value that represents the esetimated random effect. This addition is a way of incorporating
+the estimated correlation structure of data into our prediction of the outcome.
+\item 'coefficients': returns the estimated beta-hat
+\item 'vars': returns the \emph{indicies} of variables (e.g., SNPs) with nonzero coefficients at each value of lambda. EXCLUDES intercept.
+\item 'nvars': returns the \emph{number} of variables (e.g., SNPs) with nonzero coefficients at each value of lambda. EXCLUDES intercept.
+}
+}
 \examples{
 \dontrun{
 # fit a model 

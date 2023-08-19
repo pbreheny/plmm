@@ -40,7 +40,6 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   penalty.factor <- c(0, penalty.factor) # NB: I changed this on Nov. 2
   # TODO: verify this change in penalty factor adjustment 
   ind <- which(penalty.factor != 0)
-  
   # set up a fit from which to derive residuals 
   if (length(ind) != (p-1)) { # case 1: not all `p` columns are to be penalized
     fit <- stats::glm(y ~ -1 + X[, -ind, drop = FALSE], family='gaussian')
