@@ -9,15 +9,16 @@ cv.plmm(
   y,
   k = NULL,
   K = NULL,
+  diag_K = NULL,
   eta_star = NULL,
   penalty = c("MCP", "SCAD", "lasso"),
   penalty.factor = rep(1, ncol(X)),
-  type = "response",
+  type = "lp",
   ...,
   cluster,
   nfolds = 10,
   seed,
-  fold,
+  fold = NULL,
   returnY = FALSE,
   returnBiasDetails = FALSE,
   trace = FALSE
@@ -32,13 +33,15 @@ cv.plmm(
 
 \item{K}{Similarity matrix, in the form of (1) the relatedness matrix estimated from the data (default), (2) a user-supplied matrix, or (3) a user-supplied list with components 'd' and 'u' as created by choose_k().}
 
+\item{diag_K}{Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE.}
+
 \item{eta_star}{Optional arg. to \code{plmm_prep}. Defaults to NULL.}
 
 \item{penalty}{The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".}
 
 \item{penalty.factor}{Optional arg. to \code{plmm_prep}. Defaults to 1 for all predictors (except the intercept).}
 
-\item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.}
+\item{type}{A character argument indicating what should be returned from predict.plmm. If \code{type == 'lp'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the \emph{sum} of the linear predictor and the estimated random effect (BLUP). Defaults to 'lp'.}
 
 \item{...}{Additional arguments to \code{plmm_fit}}
 

@@ -2,7 +2,7 @@
 #'
 #' @param object An object of class \code{plmm}.
 #' @param newX Design matrix used for computing predicted values if requested.
-#' @param type A character argument indicating what type of prediction should be returned. Options are "response," "coefficients," "vars," "nvars," and "blup." See details. 
+#' @param type A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details. 
 #' @param lambda A numeric vector of regularization parameter \code{lambda} values at which predictions are requested.
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
 #' @param X Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'blup'} and object is too large to be returned in `plmm` object.
@@ -22,10 +22,10 @@
 #'  structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
 #'  
 #'  # make predictions for all lambda values 
-#'  pred1 <- predict(object = fit, newX = newX, type = "response")
+#'  pred1 <- predict(object = fit, newX = newX, type = "lp")
 #'  
 #'  # make predictions for a select number of lambda values 
-#'  pred2 <- predict(object = fit, newX = newX, type = "response", idx=98)
+#'  pred2 <- predict(object = fit, newX = newX, type = "lp", idx=98)
 #'  }
 #'  
 #'  
@@ -33,7 +33,7 @@
 
 predict.plmm <- function(object,
                          newX,
-                         type=c("response", "coefficients", "vars", "nvars", "blup"),
+                         type=c("lp", "coefficients", "vars", "nvars", "blup"),
                          lambda,
                          idx=1:length(object$lambda),
                          X,
@@ -55,7 +55,7 @@ predict.plmm <- function(object,
   
   Xbeta <- cbind(1, newX) %*% beta_vals
   
-  if (type=="response") return(drop(Xbeta))
+  if (type=="lp") return(drop(Xbeta))
   
   if (type == "blup"){ # assuming eta of X and newX are the same 
     
@@ -112,7 +112,7 @@ predict.plmm <- function(object,
 
 
 # fit <- plmm(X = admix$X, y = admix$y, lambda = c(0.05, 0.01))
-# head(predict(object = fit, newX = admix$X, type = 'response', lambda = 0.05))
+# head(predict(object = fit, newX = admix$X, type = 'lp', lambda = 0.05))
 # head(predict(object = fit, newX = admix$X, type = 'vars'))
 # predict(object = fit, newX = admix$X, type = 'nvars')
 # \dontrun{
@@ -172,7 +172,7 @@ predict.plmm <- function(object,
 # # linear predictor works well
 # linear_predictor <- predict.plmm(object$fit,
 # newX = X2,
-# type = 'response',
+# type = 'lp',
 # lambda = object$lambda.min)
 # drop(crossprod(linear_predictor - y2)/length(y2))
 #
@@ -212,7 +212,7 @@ predict.plmm <- function(object,
 # # ...the linear predictor is worse...
 # linear_predictor_null <- predict.plmm(object$fit,
 # newX = X2,
-# type = 'response',
+# type = 'lp',
 # lambda = object$lambda.min)
 # 
 # drop(crossprod(linear_predictor_null - y2)/length(y2))
@@ -298,7 +298,7 @@ predict.plmm <- function(object,
 # # linear predictor works well
 # linear_predictor <- predict.plmm(object$fit,
 # newX = X2,
-# type = 'response',
+# type = 'lp',
 # lambda = object$lambda.min)
 # drop(crossprod(linear_predictor - y2)/length(y2))
 
@@ -339,7 +339,7 @@ predict.plmm <- function(object,
 # # ...the linear predictor is worse...
 # linear_predictor_null <- predict.plmm(object$fit,
 # newX = X2,
-# type = 'response',
+# type = 'lp',
 # lambda = object$lambda.min)
 
 # drop(crossprod(linear_predictor_null - y2)/length(y2))

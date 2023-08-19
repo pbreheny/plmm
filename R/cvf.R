@@ -3,8 +3,8 @@
 #' Internal function for cv.plmm which calls plmm on a fold subset of the original data.
 #' @param i Fold number to be excluded from fit.
 #' @param fold n-length vector of fold-assignments.
-#' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP).
-#' @param estimated_V Estimated variance-covariance matrix using all observations when computing BLUP; NULL if type = "response" in cv.plmm. 
+#' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'lp'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'individual'} predictions are based on the linear predictor plus the estimated random effect (BLUP).
+#' @param estimated_V Estimated variance-covariance matrix using all observations when computing BLUP; NULL if type = "lp" in cv.plmm. 
 #' @param cv.args List of additional arguments to be passed to plmm.
 #' @param ... Optional arguments to `predict.list`
 #' @importFrom zeallot %<-%
@@ -31,7 +31,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   fit.i <- do.call("plmm_fit", cv.args)
   
   beta <- coef.list(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
-  Xbeta <- predict.list(fit = fit.i, newX = X_test, type = 'response', lambda = fit.i$lambda)
+  Xbeta <- predict.list(fit = fit.i, newX = X_test, type = 'lp', lambda = fit.i$lambda)
   yhat <- matrix(data = drop(Xbeta), nrow = length(y_test))
   
   if (type == 'blup'){

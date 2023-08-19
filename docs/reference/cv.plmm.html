@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,15 +56,16 @@
 <span>  <span class="va">y</span>,</span>
 <span>  k <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  K <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  diag_K <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  eta_star <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  penalty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCP"</span>, <span class="st">"SCAD"</span>, <span class="st">"lasso"</span><span class="op">)</span>,</span>
 <span>  penalty.factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"response"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"lp"</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  <span class="va">cluster</span>,</span>
 <span>  nfolds <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  <span class="va">seed</span>,</span>
-<span>  <span class="va">fold</span>,</span>
+<span>  fold <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  returnY <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returnBiasDetails <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -89,6 +90,10 @@
 <dd><p>Similarity matrix, in the form of (1) the relatedness matrix estimated from the data (default), (2) a user-supplied matrix, or (3) a user-supplied list with components 'd' and 'u' as created by choose_k().</p></dd>
 
 
+<dt>diag_K</dt>
+<dd><p>Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE.</p></dd>
+
+
 <dt>eta_star</dt>
 <dd><p>Optional arg. to <code>plmm_prep</code>. Defaults to NULL.</p></dd>
 
@@ -102,7 +107,7 @@
 
 
 <dt>type</dt>
-<dd><p>A character argument indicating what should be returned from predict.plmm. If <code>type == 'response'</code> predictions are based on the linear predictor, <code>$X beta$</code>. If <code>type == 'blup'</code> predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.</p></dd>
+<dd><p>A character argument indicating what should be returned from predict.plmm. If <code>type == 'lp'</code> predictions are based on the linear predictor, <code>$X beta$</code>. If <code>type == 'blup'</code> predictions are based on the <em>sum</em> of the linear predictor and the estimated random effect (BLUP). Defaults to 'lp'.</p></dd>
 
 
 <dt>...</dt>
@@ -155,7 +160,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter.</p>
+  <p></p><p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter, Yujiing Lu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

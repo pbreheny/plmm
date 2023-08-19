@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -189,11 +189,11 @@ error:</p>
 <span><span class="va">admix_cv_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">admix_cv</span>, lambda <span class="op">=</span> <span class="st">"min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">admix_cv_s</span><span class="op">)</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=197and p=100</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0908):</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0789):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 35</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.43</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.557</span></span></code></pre></div>
+<span><span class="co">#&gt;   Nonzero coefficients: 38</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 2.47</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.572</span></span></code></pre></div>
 <p>We can also plot the cross-validation error (CVE) versus <span class="math inline">\(\lambda\)</span> (on the log scale):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">admix_cv</span><span class="op">)</span></span></code></pre></div>
@@ -209,7 +209,7 @@ where we are for now:</p>
 <code class="sourceCode R"><span><span class="co"># make predictions for select lambda value(s)</span></span>
 <span><span class="va">admix_pred1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">admix_fit</span>,</span>
 <span>                       newX <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>,</span>
-<span>                       type <span class="op">=</span> <span class="st">"response"</span>,</span>
+<span>                       type <span class="op">=</span> <span class="st">"lp"</span>,</span>
 <span>                       idx<span class="op">=</span><span class="fl">98</span><span class="op">)</span></span></code></pre></div>
 <p>More to come….</p>
 </div>
@@ -221,7 +221,7 @@ where we are for now:</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter.</p>
+<p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter, Yujiing Lu.</p>
 </div>
 
 <div class="pkgdown-footer-right">
