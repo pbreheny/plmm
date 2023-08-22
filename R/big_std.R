@@ -1,4 +1,4 @@
-#' std_fbm
+#' big_std
 #'A function to standardize a matrix stored as an FBM object 
 #'
 #' @param X An file-backed design matrix 

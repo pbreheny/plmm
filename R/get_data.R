@@ -34,10 +34,10 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
   } else {
     obj <- readRDS(rds)
   }
-  
+
   # return data in a tractable format 
   if (missing(fbm)) {
-    if (utils::object.size(obj$genotypes) > 1e8) {
+    if (utils::object.size(obj$stdX) > 1e8) {
       warning("\nDue to the large size of X (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).")
       fbm <- TRUE
     } else {
@@ -47,7 +47,7 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
   }
   
   if(!fbm){
-    X <- obj$genotypes[,]
+    X <- obj$stdX[,]
     if(!is.null(row_id)){
       if(row_id == "iid"){row_names <- obj$fam$sample.ID}
       if(row_id == "fid"){row_names <- obj$fam$family.ID}
@@ -58,6 +58,8 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
     dimnames(X) <- list(row_names,
                         obj$map$marker.ID)
     
+    cat("Reminder: the X that is returned here is column-standardized.
+        A copy of the original data is available as an item in the .rds object")
     return(list(X = X,
                 fam = obj$fam,
                 map = obj$map,
@@ -65,15 +67,17 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
                 center = obj$center,
                 scale = obj$scale))
   } else {
-    # cat("Note: X is being returned as a file-backed matrix (FBM) -- see bigstatsr::FBM() for details.
+    cat("Note: X is being returned as a file-backed matrix (FBM) -- see bigstatsr::FBM() for details.")
     #     \n At this time, plmm() cannot analyze design matrix X in this FBM format. Allowing such an option will
     #     \n require writing the 'meat and potatoes' of plmm() in C++, which is a work in progress. For now, 
     #     \n functions from package bigsnpr may be used for analyzing FBM data.")
     
-    X <- obj$genotypes
+    X <- obj$stdX
     
+    cat("Reminder: the X that is returned here is column-standardized.
+        A copy of the original data is available as an item in the .rds object")
     
-    return(list(X = obj$genotypes,
+    return(list(X = obj$stdX,
                 fam = obj$fam,
                 map = obj$map,
                 ns = obj$ns,

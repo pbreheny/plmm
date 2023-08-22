@@ -40,11 +40,11 @@ process_plink <- function(data_dir,
     cat("\nPreprocessing", prefix, "data:")
   }
   
-  # read in PLINK files 
+  # read in PLINK files -------------------------------
   path <- paste0(data_dir, "/", prefix, ".rds")
   
   
-  # Create the RDS file first 
+  # Create the RDS file first ------------------------
   cat("\nCreating ", prefix, ".rds\n", file = outfile, append = TRUE)
   if(!quiet){
     cat("\nCreating ", prefix, ".rds\n")
@@ -59,8 +59,8 @@ process_plink <- function(data_dir,
     bigsnpr::snp_readBed(bedfile = paste0(data_dir, "/", prefix, ".bed"))
     obj <- bigsnpr::snp_attach(path)
   }
-  
-  # only consider SNPs on chromosomes 1-22
+  # check chromosomes --------------------------------
+  # only consider SNPs on chromosomes 1-22 
   chr_range <- range(obj$map$chromosome)
   if(chr_range[1] < 1 | chr_range[2] > 22){
     cat("PLMM only analyzes autosomes -- removing chromosomes outside 1-22")
@@ -93,21 +93,20 @@ process_plink <- function(data_dir,
   # save these counts (like 'col_summary' obj from snpStats package)
   counts <- bigstatsr::big_counts(X) # NB this is a matrix 
   
-  # identify monomorphic SNPs 
+  # identify constant features -----------------------------------
   constants_idx <- apply(X = counts[1:3,],
                                           MARGIN = 2,
                                           # see which ~called~ features have all same value
                                           FUN = function(c){sum(c == sum(c)) > 0})
   
   ns <- which(!constants_idx) # need this for analysis downstream
-  
   cat("\nThere are ", sum(constants_idx), " constant features in the data",
       file = outfile, append = TRUE)
   if(!quiet){
     cat("\nThere are ", sum(constants_idx), " constant features in the data")
   }
   
-  # notify about missing values
+  # notify about missing values --------------------------------
   na_idx <- counts[4,] > 0
   prop_na <- counts[4,]/nrow(X)
   
@@ -121,6 +120,7 @@ process_plink <- function(data_dir,
     cat("\nOf these, ", sum(prop_na > 0.5), " are missing in at least 50% of the samples")
   }
   
+  # imputation -------------------------------------------------
   if(!quiet & impute){
     cat("\nImputing the missing values using ", impute_method, " method\n")
   }
@@ -149,26 +149,28 @@ process_plink <- function(data_dir,
     # 
     #   
     # } else stop("Argument impute must be either simple or xgboost.")
-    
-    # add centering & scaling info
-    scale_info <- bigstatsr::big_scale()(obj$genotypes)
-    # now, save the new object -- this will have imputed values and constants_idx
-    obj$ns <- ns
-    obj$center <- scale_info$center
-    obj$scale <- scale_info$scale
-    cat("\nColumn-standardizing the design matrix...")
-    obj$stdX <- std_fbm(X = obj$genotypes,
-                        center = obj$center,
-                        scale = obj$scale,
-                        ns = obj$ns)
-    obj <- bigsnpr::snp_save(obj)
-    
-    cat("\nDone with imputation. File formatting in progress.",
-        file = outfile, append = TRUE)
-    
+  
   }
   
-  if(!quiet & impute){cat("\nDone with imputation. Processed files now saved as .rds object.")}
+  # standardization ------------------------------------------------
+  cat("\nDone with imputation. Now, column-standardizing the design matrix...")
+  # add centering & scaling info
+  scale_info <- bigstatsr::big_scale()(obj$genotypes)
+  # now, save the new object -- this will have imputed values and constants_idx
+  obj$ns <- ns
+  obj$center <- scale_info$center
+  obj$scale <- scale_info$scale
+  obj$stdX <- big_std(X = obj$genotypes,
+                           center = obj$center,
+                           scale = obj$scale,
+                           ns = obj$ns)
+  obj <- bigsnpr::snp_save(obj)
+  
+  cat("\nDone with standardization. File formatting in progress.",
+      file = outfile, append = TRUE)
+  
+  
+  if(!quiet & impute){cat("\nDone with standardization. Processed files now saved as .rds object.")}
   close(log_con)
 }
 

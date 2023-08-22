@@ -106,29 +106,38 @@ plmm <- function(X,
   }
   # if FBM flag is not 'on' by now, set it 'off'
   if(!exists('fbm_flag')){fbm_flag <- FALSE}
-  
-  # finish type coersion & checks 
-  if (!inherits(X, "matrix") & !fbm_flag) {
-    tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
-    if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
+
+  # finish type coersion & checks for matrix X ----------------
+  if(!fbm_flag){
+    if (!inherits(X, "matrix")) {
+      tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
+      if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
+    }
+    if (typeof(X)=="integer") storage.mode(X) <- "double"
+    if (typeof(X)=="character") stop("X must be a numeric matrix", call.=FALSE)
+    if (!is.double(y)) {
+      op <- options(warn=2)
+      on.exit(options(op))
+      y <- tryCatch(
+        error = function(cond) stop("y must be numeric or able to be coerced to numeric", call.=FALSE),
+        as.double(y))
+      options(op)
+    }
+    
+    # error checking 
+    if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
+    if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
+    if (length(penalty.factor)!=ncol(X)) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
+  } else {
+    # finish type coersion & checks for FBM X ----------------
+    # error checking 
+    if (length(y) != X$nrow) stop("X and y do not have the same number of observations", call.=FALSE)
+    if (any(is.na(y))) stop("Missing data (NA's) detected in the outcome.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
+    if (length(penalty.factor)!=X$ncol) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
+    
   }
-  if (typeof(X)=="integer") storage.mode(X) <- "double"
-  if (typeof(X)=="character") stop("X must be a numeric matrix", call.=FALSE)
-  if (!is.double(y)) {
-    op <- options(warn=2)
-    on.exit(options(op))
-    y <- tryCatch(
-      error = function(cond) stop("y must be numeric or able to be coerced to numeric", call.=FALSE),
-      as.double(y))
-    options(op)
-  }
-  
-  # error checking 
-  if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
-  if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
-  if (length(penalty.factor)!=ncol(X)) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
-  
-  # working with user-specified K
+
+  # working with user-specified K -----------------------------------------
   if(!is.null(diag_K)& !is.null(K)){
     stop("diag_K is true, but a K is also supplied. 
          If using diag_K, you cannot also pass a K argument.")
@@ -159,13 +168,15 @@ plmm <- function(X,
             \nIf the observations are unrelated, please set diag_K = TRUE. SVD is not needed in this case.
             \nOtherwise, consider using choose_k() first to get an approximation for your relatedness matrix.")
   }
+  
+  # set up defaults --------------------------------------------------
   # coercion for penalty
   penalty <- match.arg(penalty)
   
   # set default gamma
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
-  
+  # prep (SVD)-------------------------------------------------
   if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
   if(fbm_flag){
     the_prep <- plmm_prep_fbm(X = X,
@@ -188,8 +199,8 @@ plmm <- function(X,
                           trace = trace)
   }
   
-  
-  
+  browser()
+  # rotate & fit -------------------------------------------------------------
   if(trace){cat("Beginning model fitting.\n")}
 
   if(fbm_flag){
@@ -218,7 +229,7 @@ plmm <- function(X,
                         init = init)
   }
   
-  # browser()
+  # format results ---------------------------------------------------
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   if(fbm_flag){
     

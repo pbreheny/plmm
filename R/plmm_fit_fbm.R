@@ -73,7 +73,7 @@ plmm_fit_fbm <- function(prep,
   SUX <- wU %*% prep$X
   browser()
   # TODO: in the above, I need to add column of 1s for intercept!
-  SUy <- drop(W %*% crossprod(prep$U, prep$y))
+  SUy <- wU %*% prep$y
   
   
   # re-standardize rotated SUX

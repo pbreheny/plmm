@@ -37,8 +37,8 @@ plmm_prep_fbm <- function(X,
   U <- S <- SUX <- SUy <- eta <- NULL
   
   # designate the dimensions of the design matrix 
-  p <- meta$X$nrow 
-  n <- meta$X$ncol
+  p <- X$nrow 
+  n <- X$ncol
   
   # note what values are non-singular
   ns <- meta$ns
@@ -57,52 +57,56 @@ plmm_prep_fbm <- function(X,
   # keep only those penalty factors which penalize non-singular values 
   penalty.factor <- penalty.factor[ns]
 
-  # calculate SVD
-  if(!(k %in% 1:min(n,p))){stop("k value is out of bounds. \nIf specified, k must be in the range from 1 to min(nrow(X), ncol(X))")}
-  ## case 1: K is not specified (default to realized relatedness matrix)
-  # check: if K is diagonal, then no need for SVD! 
-  if(is.null(K) & diag_K){
-    if(trace){(cat("Using diagonal for K, so observations are treated as unrelated."))}
-    S <- rep(1, n)
-    U <- diag(n)
-  } else 
-    # TODO: double check, but I don't think the scenario below will apply when X is an FBM
-    # if (is.null(K) & !diag_K){
-    # if(trace){cat("No K specified - will use default definition of the \n realized relatedness matrix.\n")}
-    # 
-    # # if I want all the singular values (which is k = min(n,p)), use base::svd
-    # if(k == min(nrow(std_X),ncol(std_X))){
-    #   decomp <- svd(std_X, nv = 0)
-    # }
-    # otherwise, if I want fewer singular values than min(n,p), use RSpectra decomposition method:
-    if (k < min(n,p)){
-      decomp <- bigstatsr::big_randomSVD(X, k = k, ind.col = ns, ...)
 
-    
-    D <- decomp$d
-    U <- decomp$u
-    S <- (D^2)/p # singular values of K, the realized relationship matrix
-    
-  } else if (!is.null(K) & 'matrix' %in% class(K)){
-    ## case 2: K is a user-specified matrix
-    S <- U <- NULL
-    # 
-    # # again, decomposition depends on choice of k
-    # if(k == min(n,p)){
-    #   decomp <- svd(K, nv = 0)
-    # } 
-    # 
-    if(k < min(n,p)){
-      decomp <- bigstatsr::big_randomSVD(K, k = k, ...)
+  # calculate SVD ------------------------------------------------------------
+  if(!(k %in% 1:min(n,p))){stop("k value is out of bounds. \nIf specified, k must be in the range from 1 to min(nrow(X), ncol(X))")}
+  ## case 1: K is not specified ----------------------------------------------
+  if(is.null(K)){
+    # check: if K is the identity matrix, then no need for SVD! 
+    if(diag_K){
+      if(trace){(cat("Using identity matrix for K, so observations are treated as unrelated."))}
+      S <- rep(1, n)
+      U <- diag(n)
+    } else {
+      if(trace){cat("No K specified - will use default definition of the \n realized relatedness matrix.\n")}
+      
+      # if I want all the singular values (which is k = min(n,p)), use base::svd
+      if(k == min(n, p)){
+        decomp <- svd(X, nv = 0)
+      }
+      # otherwise, if I want fewer singular values than min(n,p), use RSpectra decomposition method:
+      if (k < min(n,p)){
+        decomp <- bigstatsr::big_randomSVD(X, k = k, ...)
+      }
+      
+      D <- decomp$d
+      U <- decomp$u
+      S <- (D^2)/p # singular values of K, the realized relationship matrix
+      
+    } 
+  } else if(!is.null(K)){
+    ## case 2: K is a user-specified matrix ---------------------------------
+    # if K is a matrix, work with it directly
+    if ('matrix' %in% class(K)){
+      S <- U <- NULL
+      # again, decomposition depends on choice of k
+      if(k == min(n,p)){
+        decomp <- svd(K, nv = 0)
+      }
+      
+      if(k < min(n,p)){
+        decomp <- bigstatsr::big_randomSVD(K, k = k, ...)
+      }
+      S <- decomp$d # if K matrix was user-specified, then no need to transform D here
+      U <- decomp$u
+    } else if(is.list(K)){
+      # if K is a list (as returned in choose_k()), no decomposition needed
+      S <- ((K$d)^2)/p
+      U <- K$u
+      
     }
-    S <- decomp$d # if K matrix was user-specified, then no need to transform D here
-    U <- decomp$u
-  } else if(!is.null(K) & is.list(K)){
-    # case 3: K is a user-supplied list, as returned from choose_k()
-    S <- ((K$d)^2)/p
-    U <- K$u
-    
   }
+    
   
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(ncol_X = n,
