@@ -44,7 +44,7 @@ plmm_fit_fbm <- function(prep,
                      warn = TRUE,
                      init = NULL,
                      returnX = TRUE){
-  browser()
+  
   # set default gamma (will need this for cv.plmm)
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
@@ -67,15 +67,11 @@ plmm_fit_fbm <- function(prep,
     # otherwise, use the user-supplied value (this is mainly for simulation)
     eta <- prep$eta
   }
+
+  w <- (eta * prep$S + (1 - eta))^(-1/2)
+  wU <- sweep(x = t(prep$U), MARGIN =  1, STATS = w, "*")
+  SUX <- wU %*% prep$X
   browser()
-  # rotate data
-  W <- diag((eta * prep$S + (1 - eta))^(-1/2), nrow = length(prep$S))
-  SUX <- W %*% bigstatsr::crossprod(x = prep$U,
-                                       y = prep$X,
-                                       ind.col = prep$ns,
-                                       center = prep$std_X$center,
-                                       scale = prep$std_X$scale,
-                                       ncores = nb_cores())
   # TODO: in the above, I need to add column of 1s for intercept!
   SUy <- drop(W %*% crossprod(prep$U, prep$y))
   

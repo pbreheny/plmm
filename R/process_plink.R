@@ -156,6 +156,11 @@ process_plink <- function(data_dir,
     obj$ns <- ns
     obj$center <- scale_info$center
     obj$scale <- scale_info$scale
+    cat("\nColumn-standardizing the design matrix...")
+    obj$stdX <- std_fbm(X = obj$genotypes,
+                        center = obj$center,
+                        scale = obj$scale,
+                        ns = obj$ns)
     obj <- bigsnpr::snp_save(obj)
     
     cat("\nDone with imputation. File formatting in progress.",

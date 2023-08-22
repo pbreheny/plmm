@@ -35,12 +35,6 @@ plmm_prep_fbm <- function(X,
   
   ## coersion
   U <- S <- SUX <- SUy <- eta <- NULL
-  # TODO: Think about implementing standardization here with big_apply()
-  # std_X <- bigstatsr::big_apply(X = X,
-  #                               a.FUN = std_fbm,
-  #                               a.combine = cbind,
-  #                               ncores = bigstatsr::nb_cores())
-  # browser()
   
   # designate the dimensions of the design matrix 
   p <- meta$X$nrow 
@@ -62,7 +56,7 @@ plmm_prep_fbm <- function(X,
   
   # keep only those penalty factors which penalize non-singular values 
   penalty.factor <- penalty.factor[ns]
-  # browser()
+
   # calculate SVD
   if(!(k %in% 1:min(n,p))){stop("k value is out of bounds. \nIf specified, k must be in the range from 1 to min(nrow(X), ncol(X))")}
   ## case 1: K is not specified (default to realized relatedness matrix)
@@ -82,12 +76,7 @@ plmm_prep_fbm <- function(X,
     # }
     # otherwise, if I want fewer singular values than min(n,p), use RSpectra decomposition method:
     if (k < min(n,p)){
-      decomp <- bigstatsr::big_randomSVD(X,
-                              # standardization happens because of the line below
-                              fun.scaling = bigstatsr::as_scaling_fun(center.col = meta$center, scale.col = meta$scale),
-                              k = k,
-                              ind.col = ns,
-                              ...)
+      decomp <- bigstatsr::big_randomSVD(X, k = k, ind.col = ns, ...)
 
     
     D <- decomp$d
@@ -104,10 +93,7 @@ plmm_prep_fbm <- function(X,
     # } 
     # 
     if(k < min(n,p)){
-      decomp <- bigstatsr::big_randomSVD(K,
-                              fun.scaling = bigstatsr::big_scale(center = TRUE, scale = TRUE),
-                              k = k,
-                              ...)
+      decomp <- bigstatsr::big_randomSVD(K, k = k, ...)
     }
     S <- decomp$d # if K matrix was user-specified, then no need to transform D here
     U <- decomp$u
@@ -124,11 +110,8 @@ plmm_prep_fbm <- function(X,
                         X = X,
                         y = y,
                         # NB: watch the line below; different from plmm_prep()
-                        std_X = ifelse(exists('decomp'),
-                                       list(center = decomp$center,
-                                            scale = decomp$scale),
-                                       list(center = meta$center,
-                                            scale = meta$scale)),
+                        center = ifelse(exists('decomp'), decomp$center, meta$center),
+                        scale = ifelse(exists('decomp'), decomp$scale, meta$scale),
                         S = S,
                         U = U,
                         ns = meta$ns,
