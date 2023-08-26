@@ -3,11 +3,16 @@
 #' @param data_dir The path to the bed/bim/fam data files 
 #' @param prefix The prefix (as a character string) of the bed/fam data files 
 #' @param impute Logical: should data be imputed? Default to TRUE.
-#' @param impute_method If 'impute' = TRUE, this argument will specify the kind of imputation desired. This is passed directly to `bigsnpr::snp_fastImputeSimple()`. Defaults to 'mode'. 
+#' @param impute_method If 'impute' = TRUE, this argument will specify the kind of imputation desired. Options are: 
+#'  * mode (default): Imputes the most frequent call. See `bigsnpr::snp_fastImputeSimple()` for details. 
+#'  * random: Imputes sampling according to allele frequencies.
+#'  * mean0: Imputes the rounded mean.
+#'  * mean2: Imputes the mean rounded to 2 decimal places.
+#'  * xgboost: Imputes using an algorithm based on local XGBoost models. See `bigsnpr::snp_fastImpute()` for details. 
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
 #' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
 #' @param outfile Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.
-#' #' Note: a more nuanced 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.
+#' @param ... Optional: additional arguments to `bigsnpr::snp_fastImpute()` (relevant only if impute_method = "xgboost")
 #' 
 #' @export
 #' 
@@ -19,12 +24,13 @@
 process_plink <- function(data_dir,
                           prefix,
                           impute = TRUE,
-                          impute_method = 'mode',
+                          impute_method = c('mode', 'random', 'mean0', 'mean2', 'xgboost'),
                           quiet = FALSE,
                           gz = FALSE,
-                          outfile){
+                          outfile,
+                          ...){
   
-  # start log 
+  # start log ------------------------------------------
   if(missing(outfile)){
     outfile = "process_plink.log"
     } else {
@@ -40,7 +46,7 @@ process_plink <- function(data_dir,
     cat("\nPreprocessing", prefix, "data:")
   }
   
-  # read in PLINK files 
+  # read in PLINK files --------------------------------
   path <- paste0(data_dir, "/", prefix, ".rds")
   
   
@@ -60,6 +66,7 @@ process_plink <- function(data_dir,
     obj <- bigsnpr::snp_attach(path)
   }
   
+  # chromosome check ---------------------------------
   # only consider SNPs on chromosomes 1-22
   chr_range <- range(obj$map$chromosome)
   if(chr_range[1] < 1 | chr_range[2] > 22){
@@ -93,7 +100,7 @@ process_plink <- function(data_dir,
   # save these counts (like 'col_summary' obj from snpStats package)
   counts <- bigstatsr::big_counts(X) # NB this is a matrix 
   
-  # identify monomorphic SNPs 
+  # identify monomorphic SNPs --------------------------------
   constants_idx <- apply(X = counts[1:3,],
                          MARGIN = 2,
                          # see which ~called~ features have all same value
@@ -105,7 +112,7 @@ process_plink <- function(data_dir,
     cat("\nThere are ", sum(constants_idx), " constant features in the data")
   }
   
-  # notify about missing values
+  # notify about missing values ----------------------------
   na_idx <- counts[4,] > 0
   prop_na <- counts[4,]/nrow(X)
   
@@ -119,7 +126,13 @@ process_plink <- function(data_dir,
     cat("\nOf these, ", sum(prop_na > 0.5), " are missing in at least 50% of the samples")
   }
   
+  # imputation ------------------------------------------
   if(!quiet & impute){
+    # catch for misspellings
+    if(!(impute_method %in% c('mode', 'random', 'mean0', 'mean2', 'xgboost'))){
+      stop("\nImpute method is misspecified or misspelled. Please use one of the 
+           \n5 options listed in the documentation.")
+    }
     cat("\nImputing the missing values using ", impute_method, " method\n")
   }
   
@@ -127,27 +140,22 @@ process_plink <- function(data_dir,
     cat("\nImputing the missing values using ", impute_method, " method",
         file = outfile, append = TRUE)
     
-    # NB: this will overwrite obj$genotypes
+    if(impute_method %in% c('mode', 'random', 'mean0', 'mean2')){ 
+       # NB: this will overwrite obj$genotypes
     obj$genotypes <- bigsnpr::snp_fastImputeSimple(Gna = X,
                                                    ncores = bigstatsr::nb_cores(),
                                                    method = impute_method) # dots can pass other args
-    
-    
-    # TODO: come back here and try to get the 'xgboost' method to work
-    # } else if (impute == "xgboost"){
-    #   imp <- bigsnpr::snp_fastImpute(Gna = X,
-    #                                  ncores = bigstatsr::nb_cores(),
-    #                                  infos.chr = chr,
-    #                                  seed = as.numeric(Sys.Date()),
-    #                                  ...) # dots can pass method
-    #   
-    #   # save imputed values (NB: will overwrite obj$genotypes)
-    #   obj$genotypes$code256 <- bigsnpr::CODE_IMPUTE_PRED
-    #   obj <- bigsnpr::snp_save(obj)
-    # 
-    #   
-    # } else stop("Argument impute must be either simple or xgboost.")
-    
+      } else if (impute_method == "xgboost"){
+      imp <- bigsnpr::snp_fastImpute(Gna = X,
+                                     ncores = bigstatsr::nb_cores(),
+                                     infos.chr = chr,
+                                     seed = as.numeric(Sys.Date()),
+                                     ...) # dots can pass method
+
+      # save imputed values (NB: will overwrite obj$genotypes)
+      obj$genotypes$code256 <- bigsnpr::CODE_IMPUTE_PRED
+    }
+    browser()
     # now, save the new object -- this will have imputed values and constants_idx
     obj$constants_idx <- constants_idx
     obj <- bigsnpr::snp_save(obj)
