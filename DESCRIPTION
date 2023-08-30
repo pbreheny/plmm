@@ -20,27 +20,26 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
-    snpStats, 
     ggmix, 
     graphics, 
     grDevices, 
     parallel, 
+    data.table,
     MASS, 
     knitr, 
     rmarkdown
 Imports: 
     bnpsd,
-    data.table,
     glmnet,
     Matrix,
     methods,
     ncvreg,
     popkin,
-    SNPRelate,
     stats,
     utils,
     zeallot,
     tinytest,
     RSpectra,
-    bigsnpr, 
-    bigstatsr
+    bigstatsr,
+    bigsnpr
+    
