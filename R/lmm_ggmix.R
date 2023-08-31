@@ -11,6 +11,7 @@
 
 
 lmm_ggmix <- function(X, y, p1, standardize = FALSE, K = NULL){
+  # TODO: make this function compatible with filebacked design matrix
   if (is.null(K)){ # case 1: use default (RRM) value for K 
     fit <- ggmix::ggmix(x=X, y=y, kinship=tcrossprod(ncvreg::std(X))/ncol(X), estimation="full", standardize = standardize)
   } else { # case 2: user-specified K 

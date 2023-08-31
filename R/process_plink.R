@@ -184,5 +184,3 @@ process_plink <- function(data_dir,
 
 
 
-
-

@@ -36,6 +36,10 @@ The branches of this repo are organized in the following way:
 
   - `fam_lmm` is a development branch where I am thinking about how the framework `plmm()` uses for analyzing relationships can be used in contexts where penalization is not necessary. Example: family-based data which are not high-dimensional. 
   
+  - `xgboost` is a development branch where I am working to implement an `xgboost` option for imputation in `process_plink()`.
+  
+  - `mfdr` is a development branch where I am working to create an `mfdr()` method for `plmm` objects. 
+  
   - `setup-lambda` is a development branch where we are resolving a bug in `setup_lambda`. Stay tuned for updates on this. 
   
   - `blup` is an **archived** branch previously focused on improving the implementation of the Best Linear Unbiased Predictor method 
