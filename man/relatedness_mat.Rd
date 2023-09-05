@@ -4,12 +4,10 @@
 \alias{relatedness_mat}
 \title{Calculate a relatedness matrix}
 \usage{
-relatedness_mat(X, ...)
+relatedness_mat(X)
 }
 \arguments{
-\item{X}{Either a numeric matrix of genotypes (subjects in rows, SNPs in columns), or a character prefix for PLINK bed/bim/fam files.}
-
-\item{...}{Optional arguments in the case that a character prefix is specified.}
+\item{X}{A numeric matrix of genotypes (from \emph{fully-imputed} data)}
 }
 \description{
 This function allows you to generate an n by n genetic relatedness matrix. If a numeric matrix is supplied, the RRM (Hayes, 2009) is used
