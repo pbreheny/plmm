@@ -26,7 +26,7 @@
 process_plink <- function(data_dir,
                           prefix,
                           impute = TRUE,
-                          impute_method = c('mode', 'random', 'mean0', 'mean2', 'xgboost'),
+                          impute_method = c('mode'),
                           quiet = FALSE,
                           gz = FALSE,
                           outfile,

@@ -16,6 +16,7 @@ library(penalizedLMM)
 library(ggplot2)
 library(dplyr)
 library(tibble)
+library(knitr)
 ```
 
 ## Background and motivation
@@ -26,9 +27,7 @@ While cross validation (as in `cv.plmm()`) serves as a method for assessing a mo
 
 -   "How accurate are the estimated $\hat \beta$ values?"
 
--   "Can we assess which of the features (e.g., which SNPs, or which predictors) are most likely to be false discoveries, and which features are most likely to be truly connected to the outcome I care about?"
-
-One way to address these important questions is through **marginal false discovery rates** (mFdr). In the mFdr framework, I can estimate an mFdr value for each feature in a penalized regression model. Using these mFdr values, I can then rank the selected features on a scale from 0 to 1. A feature with an mFdr value closer to zero has a high probability of being associated with the outcome of interest, whereas a feature with an mFdr value closer to 1 is probably a false discovery. In addition to ranking features, using mFdr also gives me another way to compare different models. Instead of just comparing the cross-validation error, I can also compare the features chosen and the number of probable false discoveries in each model.
+One way to address these important questions is through **marginal false discovery rates** (mFdr). In the mFdr framework, I can estimate an mFdr value for each value of $\lambda$ in a penalized regression model. This gives me another way to compare different models. Instead of just comparing the cross-validation error, I can also compare the number of probable false discoveries out of all the features chosen in each model.
 
 For those interested in the statistical theory behind this method, I recommend my advisor's [free online lecture notes](https://myweb.uiowa.edu/pbreheny/7240/s23/notes/3-30.pdf). In this article, I will use the `mfdr()` function to illustrate how marginal false discovery rates can be used to compare models fit with `plmm()` and `cv.plmm()`.
 
@@ -45,6 +44,7 @@ Let's begin with a simple example using our semi-simulated [admix data](man/admi
   
 For each fit, I will use cross validation to select the value of $\lambda$ that is best for prediction. 
 
+#### fit 1 
 ```{r fit1}
 # construct a cross-validated lasso model 
 cv_fit1 <- cv.plmm(X = admix$X,
@@ -62,7 +62,7 @@ mfdr1 <- mfdr(fit1)[cv_fit1$min,]
 
 ```
   
-
+#### fit 2 
 ```{r fit2}
 # choose k 
 admix$k <- choose_k(X = admix$X, returnKapprox = T)
@@ -82,11 +82,13 @@ summary(cv_fit2)
 mfdr2 <- mfdr(fit2)[cv_fit2$min,]
 ```
 
+
+#### fit 3 
 ```{r pca}
 # standardize design matrix and remove constant features 
 std_X <- ncvreg::std(admix$X)
 # calculate PCs from *standardized* data
-pca <- prcomp(std_X, center = TRUE, scale = TRUE)
+pca <- prcomp(std_X, center = F, scale = F)
 # plot the top 10 PCs in a scree plot 
 plot(x = 1:10,
      y = 100 * proportions(pca$sdev[1:10]^2),
@@ -151,25 +153,55 @@ kable(admix_comparison)
 
 ```
 
+Some observations based on the plots and output above: 
+
+  * The CV plot has the clearest pattern for fit 3
+  * Fits 2 and 3 have comparable marginal false discovery rates of about 4%, which is much lower (better) than the 16% mFdr for fit 1. 
+  * The number of selected variables is higher for the second fit. **Question**: could this mean that adding the PCs is decreasing power? I am still thinking about this... 
 
 Marginal false discovery rates also give us another way to select $\lambda$: instead of choosing the $\lambda$ value that minimizes cross validation error, I could choose the value that limits the mFdr at a certain level. We can examine this approach for the models we fit above: 
-```{r}
+```{r, eval=FALSE}
 # let's look at the smallest lambda for which mFdr is < 10% in each fit 
-
+# TODO: I am still working to 'iron this out' 
 # fit 1 
 bestlam1 <- fit1$lambda[mfdr1$mFDR < 0.1] |> min() |> round(5)
 mfdr1_res <- mfdr1[as.character(bestlam1),]
 
 # fit 2 
-
+bestlam2 <- fit2$lambda[mfdr2$mFDR < 0.2] |> min() |> round(5)
+mfdr2_res <- mfdr2[as.character(bestlam2),]
 
 # fit 3 
-
+bestlam3 <- fit3$lambda[mfdr3$mFDR < 0.3] |> min() |> round(5)
+mfdr3_res <- mfdr3[as.character(bestlam3),]
 
 ```
 
 
-### Maximal cranial width data (high dimensional)
+### Penncath data (high dimensional)
+
+```{r}
+# process PLINK files with penncath data
+penncath_lite <- process_plink(
+  data_dir = plink_example(parent = TRUE),
+  prefix = "penncath_lite",
+  gz = TRUE, # NB: PLINK data that ships with package comes gzipped
+  impute = TRUE, # mode imputation is default 
+  outfile = "process_penncath")
+
+# read in the processed penncath data 
+pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"),
+                returnX = TRUE)
+
+```
+
+
+Let's do a similar model comparison, this time using the `penncath_lite` data. These data represent 
+
+## Local false discovery rates 
+At the beginning of this vignette, we examined some important questions of inference. Let's consider an additional question that often arises in practice: "Can we assess which of the features (e.g., which SNPs, or which predictors) are most likely to be false discoveries, and which features are most likely to be truly connected to the outcome I care about?". This is a question about the individual features, rather than about a model. One way to address this question is with **local marginal false discovery rates** (lmfdr). The local mFdr framework takes mFdr to the feature level, so that an mFdr value is estimated for each $\hat \beta$ in a penalized regression model. Using these mFdr values, I can then rank the selected features on a scale from 0 to 1. A feature with an mFdr value closer to zero has a high probability of being associated with the outcome of interest, whereas a feature with an mFdr value closer to 1 is probably a false discovery. 
+
+Example to come here... in the future, I want to adapt `ncvreg:::local_mfdr()` to work with PLMMs.  
 
 ## References & acknowledgements
 
