@@ -70,7 +70,6 @@ predict.plmm <- function(object,
   if (type=="vars") return(drop(apply(beta_vals[-1, , drop=FALSE]!=0, 2, FUN=which))) # don't count intercept
   
   Xbeta <- cbind(1, newX) %*% beta_vals
-  
   if (type=="lp") return(drop(Xbeta))
   
   if (type == "blup"){ # assuming eta of X and newX are the same 

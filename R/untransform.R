@@ -14,7 +14,6 @@
 
 
 untransform <- function(res_b, ns, ncol_X, std_X, SUX, std_SUX){
-  
 ## Step 1: reverse the POST-ROTATION standardization ##  
   
   # create placeholder vector
@@ -22,8 +21,10 @@ untransform <- function(res_b, ns, ncol_X, std_X, SUX, std_SUX){
   
   # un-scale the non-intercept values & fill in the placeholder
   untransformed_b1[-1,] <- res_b[-1, , drop=FALSE]/attr(std_SUX, 'scale')
+
+## Step 2: 
   
-## Step 2: reverse the PRE-ROTATION standardization ## 
+## Step 3: reverse the PRE-ROTATION standardization ## 
   
   # partition the values from Step 1 into intercept and non-intercept parts
   a <- untransformed_b1[1, , drop = FALSE] # this is the intercept 
@@ -37,10 +38,13 @@ untransform <- function(res_b, ns, ncol_X, std_X, SUX, std_SUX){
   
   # unscale the beta values for non-singular, non-intercept columns
   untransformed_b2 <- b/attr(std_X, 'scale')[ns]
+  # # uncenter the beta values for the non-singular, non-intercept columns 
+  # untransformed_b2 <- sweep(untransformed_b2, 1, attr(std_X, 'center')[ns], "+")
   
   # fill in the un-transformed values
   untransformed_beta[ns+1,] <- untransformed_b2 # again, the + 1 is for the intercept
-  untransformed_beta[1,] <- a - crossprod(attr(std_X, 'center')[ns], untransformed_b2)
+  # untransformed_beta[1,] <- a - crossprod(attr(std_X, 'center')[ns], untransformed_b2)
+  untransformed_beta[1,] <- -crossprod(attr(std_X, 'center')[ns], untransformed_b2)
   
   # Final step: return un-transformed beta values 
   return(untransformed_beta)

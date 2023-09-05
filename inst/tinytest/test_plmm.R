@@ -121,3 +121,18 @@ fit2 <- plmm(X = admix$X, y = admix$y, K = K_admix$K_svd)
 tinytest::expect_equivalent(fit1$S, fit2$S)
 tinytest::expect_equivalent(fit1$beta_vals, fit2$beta_vals)
 
+# Test 6: make sure predict method is working -------------------
+plmm_fit <- plmm(admix$X, admix$y, penalty = 'lasso', lambda = c(0.1, 0.01))
+plmm_pred <- predict(object = plmm_fit, newX = admix$X, type = "lp")
+
+# use glmnet as gold standard
+glmnet_fit <- glmnet(admix$X, admix$y, lambda = c(0.1, 0.01))
+glmnet_pred <- predict(glmnet_fit, newx = admix$X, type = "response")
+
+cbind(admix$y, plmm_pred, glmnet_pred) -> test
+colnames(test) <- c('y',
+                 'y_hat_plmm0.1',
+                 'y_hat_plmm0.01',
+                 'y_hat_glmnet0.1',
+                 'y_hat_glmnet0.01')
+test[1:10,] # in plmm method, all rows of X have same predicted value! 

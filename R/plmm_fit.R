@@ -68,6 +68,7 @@ plmm_fit <- function(prep,
     # otherwise, use the user-supplied value (this is mainly for simulation)
     eta <- prep$eta
   }
+
   # rotate data
   w <- (eta * prep$S + (1 - eta))^(-1/2)
   wU <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
