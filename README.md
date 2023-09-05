@@ -22,10 +22,9 @@ For a description of the motivation of the functions in this package (along with
 
 The newest features of `penalizedLMM` are: 
 
-  - An `xgboost` method is now available in `process_plink()`. Check out the documentation for details. This option should be regarded as being in 'beta-testing' mode.
-  - The main model-fitting function `plmm` now has an argument `k` to approximate the decomposition of relationship matrix $\mathbf{K}$. Specifying `k` can **make model fitting faster by orders of magnitude**, with the caveat that choosing a 'best' value `k` is not trivial and will depend on the structure and size of the data. The approximate singular value decomposition is implemented with [RSpectra](https://github.com/yixuan/RSpectra); check out `RSpectra::svds()` for details.  
+  - version 2.1.0: A new function `mfdr()` for inference on model coefficients. 
 
-  - Processing data from [PLINK](https://www.cog-genomics.org/plink/1.9/) files is now done with `bigsnpr` functions (see `process_plink`). This is faster than the previous version. 
+  - version 2.0.3: An `xgboost` method is now available in `process_plink()`. Check out the documentation for details. This option should be regarded as being in 'beta-testing' mode.
   
 ## Note on branches 
 
