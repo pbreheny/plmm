@@ -31,6 +31,10 @@ reference:
     - coef.cv.plmm
     - coef.plmm
     
+  - title: Inference for PLMMs
+    contents:
+      - mfdr
+    
   - title: Other model fitting methods (and some helper functions)
     contents: 
     - convexMin
