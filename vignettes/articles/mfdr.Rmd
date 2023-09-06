@@ -13,9 +13,10 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(penalizedLMM)
+library(data.table) # for fread()
 library(ggplot2)
-library(dplyr)
-library(tibble)
+library(dplyr) # for mutate() and bind_rows()
+library(tibble) # for rownames_to_column() and other data cleaning funs.
 library(knitr)
 ```
 
@@ -135,6 +136,8 @@ summary(cv_fit3)
 mfdr3 <- mfdr(fit3)[cv_fit3$min,]
 ```
 
+
+### Comparisons
 Let's compare the results from these three models using the admix data: 
 
 ```{r}
@@ -180,6 +183,8 @@ mfdr3_res <- mfdr3[as.character(bestlam3),]
 
 ### Penncath data (high dimensional)
 
+Let's do a similar model comparison, this time using the `penncath_lite` data. 
+
 ```{r}
 # process PLINK files with penncath data
 penncath_lite <- process_plink(
@@ -192,11 +197,132 @@ penncath_lite <- process_plink(
 # read in the processed penncath data 
 pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"),
                 returnX = TRUE)
-
 ```
 
 
-Let's do a similar model comparison, this time using the `penncath_lite` data. These data represent 
+These data represent `r nrow(pen$X)` individuals and `r ncol(pen$X)` SNPs from a GWAS study. For the sake of example, let's use [hdl](https://www.cdc.gov/cholesterol/ldl_hdl.htm#:~:text=HDL%20(high%2Ddensity%20lipoprotein),for%20heart%20disease%20and%20stroke.) (high-density lipoprotein cholesterol) as our outcome. 
+
+```{r}
+# read in the clinical data
+pen_clinical <- fread(paste0(plink_example(parent = TRUE),
+                             "/penncath_clinical.csv")) |> 
+  rename(family.ID = FamID) |> 
+  mutate(sex = NULL)
+# several choices of outcome here;
+glimpse(pen_clinical)
+
+# choose hdl as outcome; impute missing values with the mean
+pen$fam <- full_join(pen$fam, pen_clinical, by = join_by("family.ID"))
+pen$y <- if_else(is.na(pen$fam$hdl), mean(pen$fam$hdl, na.rm = T), pen$fam$hdl)
+
+```
+
+#### fit 1 
+```{r fit1}
+# construct a cross-validated lasso model 
+cv_pen1 <- cv.plmm(X = pen$X,
+              y = pen$y,
+              penalty = "lasso",
+              # remember to set a seed for reproducibility 
+              seed = 26)
+
+# look at results 
+pen1 <- cv_pen1$fit
+summary(cv_pen1)
+# Calculate mFdr
+# head(mfdr(pen1))
+(pen_mfdr1 <- mfdr(pen1)[cv_pen1$min,])
+
+```
+
+Hmm -- we found an mFdr of 1 in fit 1, which is not great from an application standpoint. While this could be due to a true lack of association between any SNPs and the HDL outcome, this may also be an estimation issue. In our next model, we will use MCP instead of lasso in hopes of improving our estimation. 
+
+
+#### fit 2 
+
+```{r}
+pen$k <- choose_k(pen$X, returnKapprox = T)
+
+cv_pen2 <- cv.plmm(X = pen$X,
+        y = pen$y,
+        K = pen$k$K_svd,
+        seed = 26)
+
+pen2 <- cv_pen2$fit
+summary(cv_pen2)
+(pen_mfdr2 <- mfdr(pen2)[cv_pen2$min,])
+```
+
+#### fit 3 
+
+Finally, we will model the 'penncath' data one more time using sex, age, and the first few principal components 
+
+```{r}
+pen$std_X <- ncvreg::std(pen$X)
+pen_pca <- prcomp(pen$std_X, center = F, scale. = F)
+
+# scree plot 
+plot(x = 1:10,
+     y = 100 * proportions(pen_pca$sdev[1:10]^2),
+     type = 'b',
+     ylab = 'Proportion of variance explained',
+     xlab = 'PC',
+     main = 'Scree Plot')
+
+# will use 10 PCs as fixed effects 
+pen_PCs <- pen_pca$x
+```
+
+```{r}
+pen$X_plus_fixed_eff <- cbind(pen$fam[,c("age", "sex")], pen_PCs[,1:10], pen$X)
+
+pen$k_plus_pcs <- choose_k(X = pen$X_plus_fixed_eff, start = 1200, returnKapprox = T)
+
+cv_pen3 <- cv.plmm(X = pen$X_plus_fixed_eff,
+                   y = pen$y,
+                   K = pen$k_plus_pcs$K_svd,
+                   penalty.factor = c(rep(0, 12), rep(1, ncol(pen$X))),
+                   seed = 26)
+
+pen3 <- cv_pen3$fit
+summary(cv_pen3)
+
+(pen_mfdr3 <- mfdr(pen3)[cv_pen3$min,])
+```
+
+
+### Comparisons
+
+Comparing the three fits with the 'penncath' data, we can observe the following:
+
+```{r}
+par(mfrow = c(2,3))
+plot(cv_pen1); plot(cv_pen2); plot(cv_pen3)
+plot(pen1); plot(pen2); plot(pen3)
+
+pen_comparison <- dplyr::bind_rows(pen_mfdr1, pen_mfdr2, pen_mfdr3) |> 
+  rownames_to_column(var = "lambda") |> 
+  mutate(across(.cols = c(EF, mFDR),
+                .fns = ~round(.x, digits = 3)))
+kable(pen_comparison)
+```
+
+We can also look at how mFDR changes among the three models: 
+
+```{r}
+compare_mfdr <- bind_rows(mfdr(pen1), mfdr(pen2), mfdr(pen3)) |>
+  rownames_to_column(var = "lambda") |> 
+  mutate(model = c(rep("lasso", 100),
+         rep("MCP + trunc. SVD", 100),
+         rep('MCP + trunc. SVD + fixed eff', 100)),
+         log_lam = log(as.numeric(lambda)))
+ggplot(compare_mfdr, 
+       aes(x = log_lam, y = mFDR)) + 
+  geom_line(aes(colour = model)) + 
+  labs(x = expression(log(lambda)))
+```
+
+
 
 ## Local false discovery rates 
 At the beginning of this vignette, we examined some important questions of inference. Let's consider an additional question that often arises in practice: "Can we assess which of the features (e.g., which SNPs, or which predictors) are most likely to be false discoveries, and which features are most likely to be truly connected to the outcome I care about?". This is a question about the individual features, rather than about a model. One way to address this question is with **local marginal false discovery rates** (lmfdr). The local mFdr framework takes mFdr to the feature level, so that an mFdr value is estimated for each $\hat \beta$ in a penalized regression model. Using these mFdr values, I can then rank the selected features on a scale from 0 to 1. A feature with an mFdr value closer to zero has a high probability of being associated with the outcome of interest, whereas a feature with an mFdr value closer to 1 is probably a false discovery. 
@@ -206,3 +332,6 @@ Example to come here... in the future, I want to adapt `ncvreg:::local_mfdr()` t
 ## References & acknowledgements
 
 The `mfdr()` function I have incorporated here in our `penalizedLMM` package is based on Ryan Miller's joint work with Patrick Breheny in the `ncvreg::mfdr()` package. To read more about their work, see [Miller & Breheny (2023) in Stats in Medicine](https://doi.org/10.1002/sim.9678).
+
+Penncath data: These data describe coronary artery disease outcomes from the [PennCath study](https://pubmed.ncbi.nlm.nih.gov/21239051/)). This data set is a subset of a much larger data set (the original data has over 800K SNPs); I chose to create a 'lite' version for vignette purposes. For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
+

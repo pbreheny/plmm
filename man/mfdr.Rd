@@ -3,14 +3,29 @@
 \name{mfdr}
 \alias{mfdr}
 \title{mfdr: Marginal false discovery rates for PLMMs
-Based on ncvreg::mfdr()}
+Based on \code{\link[ncvreg:mfdr]{ncvreg::mfdr()}}}
 \usage{
 mfdr(fit)
 }
 \arguments{
 \item{fit}{A \code{plmm} object.}
 }
+\value{
+A data frame with a row for every value of lambda and 3 columns:
+\itemize{
+\item EF: The number of variables selected at the given value of lambda, averaged over the permutation fits.
+\item S: The actual number of selected variables for the non-permuted data.
+\item mFDR: The estimated marginal false discovery rate (EF/S).
+}
+}
 \description{
 mfdr: Marginal false discovery rates for PLMMs
-Based on ncvreg::mfdr()
+Based on \code{\link[ncvreg:mfdr]{ncvreg::mfdr()}}
+}
+\details{
+The function estimates the marginal false discovery rate (mFDR) for a penalized regression model. The estimate tends to be accurate in most settings, but will be slightly conservative if predictors are highly correlated
+}
+\examples{
+fit <- plmm(admix$X, admix$y)
+mfdr(fit) |> head()
 }
