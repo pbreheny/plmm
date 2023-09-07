@@ -1,5 +1,5 @@
 <!-- badges: start -->
-[![GitHub version](https://img.shields.io/static/v1?label=GitHub&message=1.0.1&color=blue&logo=github)](https://github.com/areisett/penalizedLMM)
+[![GitHub version](https://img.shields.io/static/v1?label=GitHub&message=2.1.1&color=blue&logo=github)](https://github.com/areisett/penalizedLMM)
 [![R-CMD-check](https://github.com/areisett/penalizedLMM/workflows/R-CMD-check/badge.svg)](https://github.com/areisett/penalizedLMM/actions)
 <!-- badges: end -->
 
