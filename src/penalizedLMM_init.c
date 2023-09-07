@@ -16,7 +16,7 @@ SEXP getListElement(SEXP list, const char *str) {
       elmt = VECTOR_ELT(list, i);
       break;
     }
-    return elmt;
+  return elmt;
 }
 
 
