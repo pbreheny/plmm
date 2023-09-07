@@ -22,9 +22,9 @@ For a description of the motivation of the functions in this package (along with
 
 The newest features of `penalizedLMM` are: 
 
-  - The main model-fitting function `plmm` now has an argument `k` to approximate the decomposition of relationship matrix $\mathbf{K}$. Specifying `k` can **make model fitting faster by orders of magnitude**, with the caveat that choosing a 'best' value `k` is not trivial and will depend on the structure and size of the data. The approximate singular value decomposition is implemented with [RSpectra](https://github.com/yixuan/RSpectra); check out `RSpectra::svds()` for details.  
+  - version 2.1.0: A new function `mfdr()` for inference on model coefficients. 
 
-  - Processing data from [PLINK](https://www.cog-genomics.org/plink/1.9/) files is now done with `bigsnpr` functions (see `process_plink`). This is faster than the previous version. 
+  - version 2.0.3: An `xgboost` method is now available in `process_plink()`. Check out the documentation for details. This option should be regarded as being in 'beta-testing' mode.
   
 ## Note on branches 
 
@@ -32,12 +32,12 @@ The branches of this repo are organized in the following way:
 
   - `master` is the main branch with all the latest updates
 
-  - `check_size` is a development branch where I am re-thinking how data are saved/return, so that object size is manageable.
+  - `fbm` is a development branch where I am working to extend our current methods to analyze data from a design matrix stored as a file-backed object (a Filebacked Big Matrix, or FBM). See package [bigstatsr](https://privefl.github.io/bigstatsr/) for more info on these objects. 
 
-  - `choose_k` is a development branch where I am thinking about how to choose the tuning parameter for truncated singular value decomposition. 
+  - `mfdr` is a development branch where I am working to create an `mfdr()` method for `plmm` objects. See `ncvreg::mfdr()` for inspiration. 
 
   - `fam_lmm` is a development branch where I am thinking about how the framework `plmm()` uses for analyzing relationships can be used in contexts where penalization is not necessary. Example: family-based data which are not high-dimensional. 
-  
+
   - `setup-lambda` is a development branch where we are resolving a bug in `setup_lambda`. Stay tuned for updates on this. 
   
   - `blup` is an **archived** branch previously focused on improving the implementation of the Best Linear Unbiased Predictor method 

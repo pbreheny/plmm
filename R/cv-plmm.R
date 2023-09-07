@@ -5,10 +5,11 @@
 #' @param y Continuous outcome vector for model fitting.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix, in the form of (1) the relatedness matrix estimated from the data (default), (2) a user-supplied matrix, or (3) a user-supplied list with components 'd' and 'u' as created by choose_k().
+#' @param diag_K Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE. 
 #' @param eta_star Optional arg. to \code{plmm_prep}. Defaults to NULL.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param penalty.factor Optional arg. to \code{plmm_prep}. Defaults to 1 for all predictors (except the intercept). 
-#' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'response'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the linear predictor plus the estimated random effect (BLUP). Defaults to 'response'.
+#' @param type A character argument indicating what should be returned from predict.plmm. If \code{type == 'lp'} predictions are based on the linear predictor, \code{$X beta$}. If \code{type == 'blup'} predictions are based on the *sum* of the linear predictor and the estimated random effect (BLUP). Defaults to 'lp'.
 #' @param ... Additional arguments to \code{plmm_fit}
 #' @param cluster cv.plmm can be run in parallel across a cluster using the parallel package. The cluster must be set up in advance using the makeCluster function from that package. The cluster must then be passed to cv.plmm.
 #' @param nfolds The number of cross-validation folds. Default is 10.
@@ -33,22 +34,24 @@ cv.plmm <- function(X,
                     y,
                     k = NULL,
                     K = NULL,
+                    diag_K = NULL,
                     eta_star = NULL,
                     penalty = c("MCP", "SCAD", "lasso"),
                     penalty.factor = rep(1, ncol(X)),
-                    type = 'response',
+                    type = 'lp',
                     ...,
                     cluster,
                     nfolds=10,
                     seed,
-                    fold,
+                    fold = NULL,
                     returnY=FALSE,
                     returnBiasDetails = FALSE,
                     trace=FALSE) {
 
-  # default type is 'response'
-  if(missing(type)) {type == 'response'} 
-  
+
+  # default type is 'lp'
+  if(missing(type)) {type == 'lp'} 
+
   # determine penalty 
   penalty <- match.arg(penalty)
   
@@ -57,6 +60,7 @@ cv.plmm <- function(X,
                       y = y,
                       k = k,
                       K = K,
+                      diag_K = diag_K,
                       eta_star = eta_star,
                       penalty.factor = penalty.factor,
                       trace,
@@ -77,9 +81,9 @@ cv.plmm <- function(X,
   
   estimated_V <- NULL 
   if (type == 'blup') {
-    estimated_V <- fit$estimated_V
+    estimated_V <- fit$eta * tcrossprod(fit$U %*% diag(fit$S), fit$U) + (1-fit$eta)*diag(nrow = nrow(fit$U)) 
   }
-  
+
   # initialize objects to hold CV results 
   n <- length(fit$y)
   E <- Y <- matrix(NA, nrow=nrow(X), ncol=length(fit$lambda))
@@ -94,7 +98,11 @@ cv.plmm <- function(X,
   
   sde <- sqrt(.Machine$double.eps)
   
-  if(missing(fold)) {
+  if(is.null(fold)) {
+    if(trace){
+      cat("'Fold' argument is either NULL or missing; assigning folds randomly (by default). 
+          \nTo specify folds for each observation, supply a vector with fold assignments.")
+    }
     fold <- sample(1:n %% nfolds)
     fold[fold==0] <- nfolds
   } else {
@@ -154,7 +162,8 @@ cv.plmm <- function(X,
   e <- sapply(1:nfolds, function(i) apply(E[fold==i, , drop=FALSE], 2, mean))
   Bias <- mean(e[min,] - apply(e, 2, min))
 
-  val <- list(cve=cve,
+  val <- list(type=type, 
+              cve=cve,
               cvse=cvse,
               fold=fold,
               lambda=lambda,

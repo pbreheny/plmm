@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,8 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
   </div>
@@ -64,7 +66,7 @@
 
 
 <dt>type</dt>
-<dd><p>A character argument indicating what should be returned from predict.plmm. If <code>type == 'response'</code> predictions are based on the linear predictor, <code>$X beta$</code>. If <code>type == 'individual'</code> predictions are based on the linear predictor plus the estimated random effect (BLUP).</p></dd>
+<dd><p>A character argument indicating what should be returned from predict.plmm. If <code>type == 'lp'</code> predictions are based on the linear predictor, <code>$X beta$</code>. If <code>type == 'individual'</code> predictions are based on the linear predictor plus the estimated random effect (BLUP).</p></dd>
 
 
 <dt>cv.args</dt>
@@ -72,7 +74,7 @@
 
 
 <dt>estimated_V</dt>
-<dd><p>Estimated variance-covariance matrix using all observations when computing BLUP; NULL if type = "response" in cv.plmm.</p></dd>
+<dd><p>Estimated variance-covariance matrix using all observations when computing BLUP; NULL if type = "lp" in cv.plmm.</p></dd>
 
 
 <dt>...</dt>
@@ -85,7 +87,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter.</p>
+  <p></p><p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter, Yujiing Lu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

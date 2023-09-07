@@ -47,13 +47,22 @@ choose_k <- function(X,
   if(trace){cat('\nCalcuating the relatedness matrix')}
   std_X <- ncvreg::std(X)
   K <- penalizedLMM::relatedness_mat(std_X)
-  
+
   # set up loop 
   k <- start
   it <- 1
   max_it <- (min(nrow(std_X), ncol(std_X)) - start)/step
+  max_it <- floor(max_it)
   k_vals <- rep(NA, max_it)
   inv_delt_vals <- rep(NA, max_it)
+  
+  # check 
+  if(!(k < min(nrow(std_X), ncol(std_X)) | it < max_it)){
+    stop("You are trying to choose k when the 'start' value is greater than the 
+         possible number of eigenvalues. Adjust start/step arguments so that 
+         k %in% 1:min(n, p)")
+  }
+  
 
   while(k < min(nrow(std_X), ncol(std_X)) | it < max_it){
     k_vals[it] <- k

@@ -1,6 +1,8 @@
 #' @keywords internal
 "_PACKAGE"
 
+#' @useDynLib penalizedLMM, .registration=TRUE
+
 ## usethis namespace: start
 #' @import methods
 #' @import stats

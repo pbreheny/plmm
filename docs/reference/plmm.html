@@ -12,7 +12,7 @@ NB: this function is simply a wrapper for plmm_prep -&amp;gt; plmm_fit -&amp;gt;
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,6 +27,8 @@ NB: this function is simply a wrapper for plmm_prep -&amp;gt; plmm_fit -&amp;gt;
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
   </div>
@@ -58,6 +60,7 @@ NB: this function is simply a wrapper for plmm_prep -&gt; plmm_fit -&gt; plmm_fo
 <span>  <span class="va">y</span>,</span>
 <span>  k <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  K <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  diag_K <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  eta_star <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  penalty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MCP"</span>, <span class="st">"SCAD"</span>, <span class="st">"lasso"</span><span class="op">)</span>,</span>
 <span>  <span class="va">gamma</span>,</span>
@@ -95,6 +98,10 @@ NB: this function is simply a wrapper for plmm_prep -&gt; plmm_fit -&gt; plmm_fo
 <dd><p>Similarity matrix used to rotate the data. This should either be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \(\frac{1}{p}(XX^T)\)), or (3) a list with components 'd' and 'u', as returned by choose_k().</p></dd>
 
 
+<dt>diag_K</dt>
+<dd><p>Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE.</p></dd>
+
+
 <dt>eta_star</dt>
 <dd><p>Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.</p></dd>
 
@@ -104,7 +111,7 @@ NB: this function is simply a wrapper for plmm_prep -&gt; plmm_fit -&gt; plmm_fo
 
 
 <dt>gamma</dt>
-<dd><p>The tuning parameter of the MCP/Spenncath penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.</p></dd>
+<dd><p>The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.</p></dd>
 
 
 <dt>alpha</dt>
@@ -168,22 +175,22 @@ NB: this function is simply a wrapper for plmm_prep -&gt; plmm_fit -&gt; plmm_fo
 <span class="r-in"><span><span class="va">fit_admix1</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_admix1</span>, idx <span class="op">=</span> <span class="fl">99</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.0235</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.0237</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  81 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  79 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># using admix data and k = 50 </span></span></span>
 <span class="r-in"><span><span class="va">fit_admix2</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, k <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_admix2</span>, idx <span class="op">=</span> <span class="fl">99</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.0286</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.0279</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  30 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  31 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># now use PLINK data files</span></span></span>
@@ -211,7 +218,7 @@ NB: this function is simply a wrapper for plmm_prep -&gt; plmm_fit -&gt; plmm_fo
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter.</p>
+  <p></p><p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter, Yujiing Lu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

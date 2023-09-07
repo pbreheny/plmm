@@ -2,7 +2,7 @@
 #'
 #' @param fit  A list with the components returned by `plmm_fit`
 #' @param newX A design matrix used for computing predicted values if requested.
-#' @param type A character argument indicating what type of prediction should be returned. Options are "response," "coefficients," "vars," "nvars," and "blup." See details. 
+#' @param type A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details. 
 #' @param lambda A numeric vector of regularization parameter \code{lambda} values at which predictions are requested.
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
 #' @param prep Optional argument. Result of the call to `plmm_prep` which corresponds to the `fit` argument. Required if \code{type == 'blup'} and object is too large to be returned in `fit` object.
@@ -10,10 +10,26 @@
 #' @param V11 Variance-covariance matrix of the training data. Extracted from `estimated_V` that is generated using all observations. 
 #' @param V21 Covariance matrix between the training and the testing data. Extracted from `estimated_V` that is generated using all observations. 
 #' @param ... Additional optional arguments
+#' 
+#' @details
+#' Define beta-hat as the coefficients estimated at the value of lambda that minimizes cross-validation error (CVE). Then options for `type` are as follows: 
+#'  * 'response' (default): uses the product of newX and beta-hat to predict new values of the outcome. This does not incorporate the correlation structure of the data. 
+#'  For the stats folks out there, this is simply the linear predictor. 
+#'  
+#'  * 'blup' (acronym for Best Linear Unbiased Predictor): adds to the 'response' a value that represents the esetimated random effect. This addition is a way of incorporating 
+#'  the estimated correlation structure of data into our prediction of the outcome. 
+#'  
+#'  * 'coefficients': returns the estimated beta-hat 
+#'  
+#'  * 'vars': returns the _indicies_ of variables (e.g., SNPs) with nonzero coefficients at each value of lambda. EXCLUDES intercept. 
+#'  
+#'  * 'nvars': returns the _number_ of variables (e.g., SNPs) with nonzero coefficients at each value of lambda. EXCLUDES intercept. 
+#' 
+#' 
 #' @keywords internal
 #'
 
-predict.list <- function(fit, newX, type=c("response", "coefficients", "vars", "nvars", "blup"),
+predict.list <- function(fit, newX, type=c("lp", "coefficients", "vars", "nvars", "blup"),
                          lambda, idx=1:length(fit$lambda), prep = NULL, V11 = NULL, V21 = NULL, ...) {
   type <- match.arg(type)
   beta_vals <- coef.list(fit, lambda=lambda, which=idx, drop=FALSE) # includes intercept 
@@ -28,7 +44,7 @@ predict.list <- function(fit, newX, type=c("response", "coefficients", "vars", "
   
   Xbeta <- cbind(1, newX) %*% beta_vals
   
-  if (type=="response") return(drop(Xbeta))
+  if (type=="lp") return(drop(Xbeta))
   
   if (type == "blup"){
     # warning("The BLUP option is under development. Rely on these estimates at your own risk.")

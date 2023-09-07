@@ -8,10 +8,11 @@ process_plink(
   data_dir,
   prefix,
   impute = TRUE,
-  impute_method = "mode",
+  impute_method = c("mode"),
   quiet = FALSE,
   gz = FALSE,
-  outfile
+  outfile,
+  ...
 )
 }
 \arguments{
@@ -21,21 +22,31 @@ process_plink(
 
 \item{impute}{Logical: should data be imputed? Default to TRUE.}
 
-\item{impute_method}{If 'impute' = TRUE, this argument will specify the kind of imputation desired. This is passed directly to \code{bigsnpr::snp_fastImputeSimple()}. Defaults to 'mode'.}
+\item{impute_method}{If 'impute' = TRUE, this argument will specify the kind of imputation desired. Options are:
+\itemize{
+\item mode (default): Imputes the most frequent call. See \code{bigsnpr::snp_fastImputeSimple()} for details.
+\item random: Imputes sampling according to allele frequencies.
+\item mean0: Imputes the rounded mean.
+\item mean2: Imputes the mean rounded to 2 decimal places.
+\item xgboost: Imputes using an algorithm based on local XGBoost models. See \code{bigsnpr::snp_fastImpute()} for details. Note: this can take several minutes, even for a relatively small data set.
+}}
 
 \item{quiet}{Logical: should messages be printed to the console? Defaults to TRUE}
 
 \item{gz}{Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.}
 
-\item{outfile}{Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.
-#' Note: a more nuanced 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.}
+\item{outfile}{Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.}
+
+\item{...}{Optional: additional arguments to \code{bigsnpr::snp_fastImpute()} (relevant only if impute_method = "xgboost")}
 }
 \description{
 Preprocess PLINK files using the \code{bigsnpr} package
 }
 \examples{
 \dontrun{
-lite <- process_plink(data_dir = plink_example(path = "penncath_lite.bed.gz", parent = T), prefix = "penncath_lite", gz = TRUE)
-mid <- process_plink(data_dir = "/Users/tabithapeter/Desktop/penalizedLMM/data-raw", prefix = "penncath_mid", gz = F, method = "mean2")
+process_plink(data_dir = "../temp_files",
+ prefix = "penncath_lite",
+  impute_method = "xgboost",
+   quiet = F)
 }
 }

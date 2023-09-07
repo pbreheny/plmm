@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,8 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
   </div>
@@ -133,7 +135,7 @@ formats.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">admix_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">admix_fit</span>, lambda <span class="op">=</span> <span class="va">admix_fit</span><span class="op">$</span><span class="va">lambda</span><span class="op">[</span><span class="fl">95</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized regression model with n=197, p=101 at lambda=0.0265</span></span>
+<span><span class="co">#&gt; MCP-penalized regression model with n=197, p=101 at lambda=0.0268</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
 <span><span class="co">#&gt; The model converged </span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
@@ -146,17 +148,17 @@ fits 100 values of <span class="math inline">\(\lambda\)</span> (see the
 <code>setup_lambda</code> function for details).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">admix_fit</span><span class="op">$</span><span class="va">beta_vals</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">97</span><span class="op">:</span><span class="fl">100</span><span class="op">]</span></span>
-<span><span class="co">#&gt;                    0.0249        0.0242        0.0235        0.0228</span></span>
-<span><span class="co">#&gt; (Intercept)  4.286017e+12  4.655421e+12  5.109077e+12  5.544097e+12</span></span>
-<span><span class="co">#&gt; Snp1         6.010341e-01  6.015657e-01  6.020665e-01  6.025509e-01</span></span>
-<span><span class="co">#&gt; Snp2         2.450574e-01  2.449875e-01  2.449468e-01  2.449049e-01</span></span>
-<span><span class="co">#&gt; Snp3        -8.513772e-01 -8.685401e-01 -8.856239e-01 -9.021693e-01</span></span>
-<span><span class="co">#&gt; Snp4         2.334758e-01  2.333570e-01  2.332333e-01  2.331121e-01</span></span>
-<span><span class="co">#&gt; Snp5        -9.166925e-01 -9.172980e-01 -9.179115e-01 -9.185036e-01</span></span>
-<span><span class="co">#&gt; Snp6        -1.458947e-01 -1.457543e-01 -1.456309e-01 -1.455105e-01</span></span>
-<span><span class="co">#&gt; Snp7        -7.524049e-02 -7.735698e-02 -7.936147e-02 -8.130992e-02</span></span>
+<span><span class="co">#&gt;                    0.0252        0.0245        0.0237        0.0230</span></span>
+<span><span class="co">#&gt; (Intercept)  1.210033e+13  1.348560e+13  1.486105e+13  1.619097e+13</span></span>
+<span><span class="co">#&gt; Snp1         5.894063e-01  5.886052e-01  5.877958e-01  5.869656e-01</span></span>
+<span><span class="co">#&gt; Snp2         2.225748e-01  2.199392e-01  2.173264e-01  2.148342e-01</span></span>
+<span><span class="co">#&gt; Snp3        -8.891979e-01 -9.110011e-01 -9.324280e-01 -9.538902e-01</span></span>
+<span><span class="co">#&gt; Snp4         2.225295e-01  2.211453e-01  2.197641e-01  2.184046e-01</span></span>
+<span><span class="co">#&gt; Snp5        -9.192049e-01 -9.202741e-01 -9.213671e-01 -9.224166e-01</span></span>
+<span><span class="co">#&gt; Snp6        -1.545110e-01 -1.553968e-01 -1.562862e-01 -1.571417e-01</span></span>
+<span><span class="co">#&gt; Snp7        -9.059670e-02 -9.433440e-02 -9.800309e-02 -1.016045e-01</span></span>
 <span><span class="co">#&gt; Snp8         0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00</span></span>
-<span><span class="co">#&gt; Snp9         2.622510e-01  2.626832e-01  2.631287e-01  2.635587e-01</span></span></code></pre></div>
+<span><span class="co">#&gt; Snp9         2.569231e-01  2.568234e-01  2.567295e-01  2.566464e-01</span></span></code></pre></div>
 <p>Note that for all values of <span class="math inline">\(\lambda\)</span>, SNP 8 has <span class="math inline">\(\hat \beta = 0\)</span>. This is because SNP 8 is
 a constant feature, a feature (column) whose values do not vary among
 the members of this population.</p>
@@ -164,7 +166,7 @@ the members of this population.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># for n = 25 </span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">admix_fit</span>, lambda <span class="op">=</span> <span class="va">admix_fit</span><span class="op">$</span><span class="va">lambda</span><span class="op">[</span><span class="fl">25</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized regression model with n=197, p=101 at lambda=0.2201</span></span>
+<span><span class="co">#&gt; MCP-penalized regression model with n=197, p=101 at lambda=0.2228</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
 <span><span class="co">#&gt; The model converged </span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
@@ -188,11 +190,11 @@ error:</p>
 <span><span class="va">admix_cv_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">admix_cv</span>, lambda <span class="op">=</span> <span class="st">"min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">admix_cv_s</span><span class="op">)</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=197and p=100</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0908):</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0846):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 35</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.52</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.588</span></span></code></pre></div>
+<span><span class="co">#&gt;   Nonzero coefficients: 36</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 2.44</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.561</span></span></code></pre></div>
 <p>We can also plot the cross-validation error (CVE) versus <span class="math inline">\(\lambda\)</span> (on the log scale):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">admix_cv</span><span class="op">)</span></span></code></pre></div>
@@ -208,7 +210,7 @@ where we are for now:</p>
 <code class="sourceCode R"><span><span class="co"># make predictions for select lambda value(s)</span></span>
 <span><span class="va">admix_pred1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">admix_fit</span>,</span>
 <span>                       newX <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>,</span>
-<span>                       type <span class="op">=</span> <span class="st">"response"</span>,</span>
+<span>                       type <span class="op">=</span> <span class="st">"lp"</span>,</span>
 <span>                       idx<span class="op">=</span><span class="fl">98</span><span class="op">)</span></span></code></pre></div>
 <p>More to come….</p>
 </div>
@@ -220,7 +222,7 @@ where we are for now:</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter.</p>
+<p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter, Yujiing Lu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

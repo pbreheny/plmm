@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,8 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
   </div>
@@ -54,7 +56,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>,</span>
 <span>  <span class="va">newX</span>,</span>
-<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"response"</span>, <span class="st">"coefficients"</span>, <span class="st">"vars"</span>, <span class="st">"nvars"</span>, <span class="st">"blup"</span><span class="op">)</span>,</span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lp"</span>, <span class="st">"coefficients"</span>, <span class="st">"vars"</span>, <span class="st">"nvars"</span>, <span class="st">"blup"</span><span class="op">)</span>,</span>
 <span>  <span class="va">lambda</span>,</span>
 <span>  idx <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">lambda</span><span class="op">)</span>,</span>
 <span>  prep <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -75,7 +77,7 @@
 
 
 <dt>type</dt>
-<dd><p>A character argument indicating what type of prediction should be returned. Options are "response," "coefficients," "vars," "nvars," and "blup." See details.</p></dd>
+<dd><p>A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details.</p></dd>
 
 
 <dt>lambda</dt>
@@ -106,13 +108,23 @@
 <dd><p>Optional argument. $q times n$ covariance matrix between new and old observations. Required if <code>type == 'blup'</code>.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Define beta-hat as the coefficients estimated at the value of lambda that minimizes cross-validation error (CVE). Then options for <code>type</code> are as follows:</p><ul><li><p>'response' (default): uses the product of newX and beta-hat to predict new values of the outcome. This does not incorporate the correlation structure of the data.
+For the stats folks out there, this is simply the linear predictor.</p></li>
+<li><p>'blup' (acronym for Best Linear Unbiased Predictor): adds to the 'response' a value that represents the esetimated random effect. This addition is a way of incorporating
+the estimated correlation structure of data into our prediction of the outcome.</p></li>
+<li><p>'coefficients': returns the estimated beta-hat</p></li>
+<li><p>'vars': returns the <em>indicies</em> of variables (e.g., SNPs) with nonzero coefficients at each value of lambda. EXCLUDES intercept.</p></li>
+<li><p>'nvars': returns the <em>number</em> of variables (e.g., SNPs) with nonzero coefficients at each value of lambda. EXCLUDES intercept.</p></li>
+</ul></div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter.</p>
+  <p></p><p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter, Yujiing Lu.</p>
 </div>
 
 <div class="pkgdown-footer-right">

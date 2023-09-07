@@ -68,18 +68,16 @@ plmm_fit <- function(prep,
     # otherwise, use the user-supplied value (this is mainly for simulation)
     eta <- prep$eta
   }
-  
   # rotate data
-  W <- diag((eta * prep$S + (1 - eta))^(-1/2), nrow = length(prep$S)) 
-  SUX <- W %*% crossprod(prep$U, cbind(1, prep$std_X)) # add column of 1s for intercept
-  SUy <- drop(W %*% crossprod(prep$U, prep$y))
-  
+  w <- (eta * prep$S + (1 - eta))^(-1/2)
+  wU <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
+  SUX <- wU %*% cbind(1, prep$std_X)
+  SUy <- wU %*% prep$y
   # re-standardize rotated SUX
   std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
   std_SUX_noInt <- std_SUX_temp$scaled_X
   std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
   attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
-  
   # calculate population var without mean 0; will need this for call to ncvfit()
   xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
   
@@ -87,7 +85,7 @@ plmm_fit <- function(prep,
   
   # remove initial values for coefficients representing columns with singular values
   init <- init[prep$ns] 
-  
+
   # set up lambda
   if (missing(lambda)) {
     lambda <- setup_lambda(X = std_SUX,
@@ -131,11 +129,6 @@ plmm_fit <- function(prep,
     resid <- res$resid
     if(prep$trace){setTxtProgressBar(pb, ll)}
   }
-  
-  # reconstruct K to calculate V 
-  # this is on the standardized X scale 
-  estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S), prep$U) + (1-eta)*diag(nrow = nrow(prep$U)) 
-  
   ret <- structure(list(
     y = prep$y,
     S = prep$S,
@@ -163,9 +156,7 @@ plmm_fit <- function(prep,
     max.iter = max.iter,
     warn = warn,
     init = init,
-    trace = prep$trace, 
-    estimated_V = estimated_V
-  )) 
+    trace = prep$trace)) 
   
   return(ret)
   

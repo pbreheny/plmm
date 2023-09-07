@@ -7,6 +7,9 @@
     <loc>/articles/choose_k.html</loc>
   </url>
   <url>
+    <loc>/articles/explore_options.html</loc>
+  </url>
+  <url>
     <loc>/articles/getting-started.html</loc>
   </url>
   <url>
@@ -14,6 +17,9 @@
   </url>
   <url>
     <loc>/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>/articles/mfdr.html</loc>
   </url>
   <url>
     <loc>/articles/plink-files.html</loc>
@@ -104,6 +110,9 @@
   </url>
   <url>
     <loc>/reference/loss.plmm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mfdr.html</loc>
   </url>
   <url>
     <loc>/reference/penalizedLMM-package.html</loc>
@@ -206,6 +215,9 @@
   </url>
   <url>
     <loc>/reference/untransform.html</loc>
+  </url>
+  <url>
+    <loc>/reference/v_hat.html</loc>
   </url>
   <url>
     <loc>/reference/varp.html</loc>
