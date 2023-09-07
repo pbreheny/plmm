@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,6 +26,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
     <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
   </div>
@@ -55,10 +56,11 @@
 <span>  <span class="va">data_dir</span>,</span>
 <span>  <span class="va">prefix</span>,</span>
 <span>  impute <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  impute_method <span class="op">=</span> <span class="st">"mode"</span>,</span>
+<span>  impute_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mode"</span><span class="op">)</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  gz <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">outfile</span></span>
+<span>  <span class="va">outfile</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -77,7 +79,12 @@
 
 
 <dt>impute_method</dt>
-<dd><p>If 'impute' = TRUE, this argument will specify the kind of imputation desired. This is passed directly to <code><a href="https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html" class="external-link">bigsnpr::snp_fastImputeSimple()</a></code>. Defaults to 'mode'.</p></dd>
+<dd><p>If 'impute' = TRUE, this argument will specify the kind of imputation desired. Options are:</p><ul><li><p>mode (default): Imputes the most frequent call. See <code><a href="https://privefl.github.io/bigsnpr/reference/snp_fastImputeSimple.html" class="external-link">bigsnpr::snp_fastImputeSimple()</a></code> for details.</p></li>
+<li><p>random: Imputes sampling according to allele frequencies.</p></li>
+<li><p>mean0: Imputes the rounded mean.</p></li>
+<li><p>mean2: Imputes the mean rounded to 2 decimal places.</p></li>
+<li><p>xgboost: Imputes using an algorithm based on local XGBoost models. See <code><a href="https://privefl.github.io/bigsnpr/reference/snp_fastImpute.html" class="external-link">bigsnpr::snp_fastImpute()</a></code> for details. Note: this can take several minutes, even for a relatively small data set.</p></li>
+</ul></dd>
 
 
 <dt>quiet</dt>
@@ -89,16 +96,21 @@
 
 
 <dt>outfile</dt>
-<dd><p>Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.
-#' Note: a more nuanced 'impute' argument is still under construction. Only "simple" method is available at this time, but we hope to add "xgboost" as an option in the future.</p></dd>
+<dd><p>Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Optional: additional arguments to <code><a href="https://privefl.github.io/bigsnpr/reference/snp_fastImpute.html" class="external-link">bigsnpr::snp_fastImpute()</a></code> (relevant only if impute_method = "xgboost")</p></dd>
 
 </dl></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="va">lite</span> <span class="op">&lt;-</span> <span class="fu">process_plink</span><span class="op">(</span>data_dir <span class="op">=</span> <span class="fu"><a href="plink_example.html">plink_example</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"penncath_lite.bed.gz"</span>, parent <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>, prefix <span class="op">=</span> <span class="st">"penncath_lite"</span>, gz <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">mid</span> <span class="op">&lt;-</span> <span class="fu">process_plink</span><span class="op">(</span>data_dir <span class="op">=</span> <span class="st">"/Users/tabithapeter/Desktop/penalizedLMM/data-raw"</span>, prefix <span class="op">=</span> <span class="st">"penncath_mid"</span>, gz <span class="op">=</span> <span class="cn">F</span>, method <span class="op">=</span> <span class="st">"mean2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">process_plink</span><span class="op">(</span>data_dir <span class="op">=</span> <span class="st">"../temp_files"</span>,</span></span>
+<span class="r-in"><span> prefix <span class="op">=</span> <span class="st">"penncath_lite"</span>,</span></span>
+<span class="r-in"><span>  impute_method <span class="op">=</span> <span class="st">"xgboost"</span>,</span></span>
+<span class="r-in"><span>   quiet <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

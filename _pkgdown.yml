@@ -18,6 +18,10 @@ reference:
     - choose_k
     - plmm
     
+  - title: Inference for PLMMs
+    contents: 
+    - mfdr
+    
   - title: Loss, information, and cross-validation for PLMMs
     contents:
     - cv.plmm

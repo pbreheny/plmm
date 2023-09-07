@@ -140,7 +140,7 @@ mfdr3 <- mfdr(fit3)[cv_fit3$min,]
 ### Comparisons
 Let's compare the results from these three models using the admix data: 
 
-```{r}
+```{r admix_comparison}
 # columns are ordered by models 1-3
 # rows are CV plots & coefficient path plots
 par(mfrow = c(2,3))
@@ -163,7 +163,7 @@ Some observations based on the plots and output above:
   * The number of selected variables is higher for the second fit. **Question**: could this mean that adding the PCs is decreasing power? I am still thinking about this... 
 
 Marginal false discovery rates also give us another way to select $\lambda$: instead of choosing the $\lambda$ value that minimizes cross validation error, I could choose the value that limits the mFdr at a certain level. We can examine this approach for the models we fit above: 
-```{r, eval=FALSE}
+```{r bestlam, eval=FALSE}
 # let's look at the smallest lambda for which mFdr is < 10% in each fit 
 # TODO: I am still working to 'iron this out' 
 # fit 1 
@@ -185,24 +185,27 @@ mfdr3_res <- mfdr3[as.character(bestlam3),]
 
 Let's do a similar model comparison, this time using the `penncath_lite` data. 
 
-```{r}
+```{r, eval=FALSE}
 # process PLINK files with penncath data
+# NB: you only need to do this step the first time you process the raw data.
 penncath_lite <- process_plink(
   data_dir = plink_example(parent = TRUE),
   prefix = "penncath_lite",
   gz = TRUE, # NB: PLINK data that ships with package comes gzipped
   impute = TRUE, # mode imputation is default 
   outfile = "process_penncath")
+```
 
+
+```{r get_pen, eval=FALSE}
 # read in the processed penncath data 
 pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"),
                 returnX = TRUE)
 ```
 
+These data represent 1,401 individuals and 4,367 SNPs from a GWAS study. For the sake of example, let's use [hdl](https://www.cdc.gov/cholesterol/ldl_hdl.htm#:~:text=HDL%20(high%2Ddensity%20lipoprotein),for%20heart%20disease%20and%20stroke.) (high-density lipoprotein cholesterol) as our outcome. 
 
-These data represent `r nrow(pen$X)` individuals and `r ncol(pen$X)` SNPs from a GWAS study. For the sake of example, let's use [hdl](https://www.cdc.gov/cholesterol/ldl_hdl.htm#:~:text=HDL%20(high%2Ddensity%20lipoprotein),for%20heart%20disease%20and%20stroke.) (high-density lipoprotein cholesterol) as our outcome. 
-
-```{r}
+```{r clinical, eval=FALSE}
 # read in the clinical data
 pen_clinical <- fread(paste0(plink_example(parent = TRUE),
                              "/penncath_clinical.csv")) |> 
@@ -213,12 +216,12 @@ glimpse(pen_clinical)
 
 # choose hdl as outcome; impute missing values with the mean
 pen$fam <- full_join(pen$fam, pen_clinical, by = join_by("family.ID"))
-pen$y <- if_else(is.na(pen$fam$hdl), mean(pen$fam$hdl, na.rm = T), pen$fam$hdl)
+pen$y <- ifelse(is.na(pen$fam$hdl), mean(pen$fam$hdl, na.rm = T), pen$fam$hdl)
 
 ```
 
 #### fit 1 
-```{r fit1}
+```{r pen1, eval=FALSE}
 # construct a cross-validated lasso model 
 cv_pen1 <- cv.plmm(X = pen$X,
               y = pen$y,
@@ -240,7 +243,7 @@ Hmm -- we found an mFdr of 1 in fit 1, which is not great from an application st
 
 #### fit 2 
 
-```{r}
+```{r pen2, eval=FALSE}
 pen$k <- choose_k(pen$X, returnKapprox = T)
 
 cv_pen2 <- cv.plmm(X = pen$X,
@@ -257,7 +260,7 @@ summary(cv_pen2)
 
 Finally, we will model the 'penncath' data one more time using sex, age, and the first few principal components 
 
-```{r}
+```{r pen_pca, eval=FALSE}
 pen$std_X <- ncvreg::std(pen$X)
 pen_pca <- prcomp(pen$std_X, center = F, scale. = F)
 
@@ -273,15 +276,20 @@ plot(x = 1:10,
 pen_PCs <- pen_pca$x
 ```
 
-```{r}
+```{r pen3, eval=FALSE}
 pen$X_plus_fixed_eff <- cbind(pen$fam[,c("age", "sex")], pen_PCs[,1:10], pen$X)
 
-pen$k_plus_pcs <- choose_k(X = pen$X_plus_fixed_eff, start = 1200, returnKapprox = T)
+# TODO: the following line needs troubleshooting
+# pen$k_plus_pcs <- choose_k(X = pen$X_plus_fixed_eff,
+#                            # start at 1200 based on result from the previous fit
+#                            start = 1200,
+#                            returnKapprox = T)
 
 cv_pen3 <- cv.plmm(X = pen$X_plus_fixed_eff,
                    y = pen$y,
-                   K = pen$k_plus_pcs$K_svd,
-                   penalty.factor = c(rep(0, 12), rep(1, ncol(pen$X))),
+                    # start at 1200 based on result from the previous fit
+                   k = 1200,
+                   penalty.factor = c(rep(0,12), rep(1,ncol(pen$X))),
                    seed = 26)
 
 pen3 <- cv_pen3$fit
@@ -295,7 +303,7 @@ summary(cv_pen3)
 
 Comparing the three fits with the 'penncath' data, we can observe the following:
 
-```{r}
+```{r pen_compare, eval=FALSE}
 par(mfrow = c(2,3))
 plot(cv_pen1); plot(cv_pen2); plot(cv_pen3)
 plot(pen1); plot(pen2); plot(pen3)
@@ -309,7 +317,7 @@ kable(pen_comparison)
 
 We can also look at how mFDR changes among the three models: 
 
-```{r}
+```{r pen_mfdr_graph, eval=FALSE}
 compare_mfdr <- bind_rows(mfdr(pen1), mfdr(pen2), mfdr(pen3)) |>
   rownames_to_column(var = "lambda") |> 
   mutate(model = c(rep("lasso", 100),
