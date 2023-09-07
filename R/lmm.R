@@ -19,7 +19,8 @@
 #' @export
 #' 
 #' @examples 
-#' fit <- lmm(X = oav$X, y = oav$y, K = oav$K)
+#' fit <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
+#' fit$beta_vals
 lmm <- function(X,
                  y,
                  k = NULL, 

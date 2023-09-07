@@ -56,7 +56,7 @@ names(B1) <- NULL
 B1 <- ifelse(is.na(B1), 0, B1)
 
 # test 1: implementation 
-expect_equivalent(A1, B1, tolerance = 0.02)
+expect_equivalent(A1, B1, tolerance = 0.01)
 
 # check  
 # head(data.frame(A1, B1))
