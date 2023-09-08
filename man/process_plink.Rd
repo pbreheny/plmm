@@ -8,7 +8,7 @@ process_plink(
   data_dir,
   prefix,
   impute = TRUE,
-  impute_method = c("mode"),
+  impute_method = "mode",
   quiet = FALSE,
   gz = FALSE,
   outfile,
@@ -46,7 +46,7 @@ Preprocess PLINK files using the \code{bigsnpr} package
 \dontrun{
 process_plink(data_dir = "../temp_files",
  prefix = "penncath_lite",
-  impute_method = "xgboost",
+  impute = T,
    quiet = F)
 }
 }
