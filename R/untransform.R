@@ -22,9 +22,7 @@ untransform <- function(res_b, ns, ncol_X, std_X, SUX, std_SUX){
   # un-scale the non-intercept values & fill in the placeholder
   untransformed_b1[-1,] <- res_b[-1, , drop=FALSE]/attr(std_SUX, 'scale')
 
-## Step 2: 
-  
-## Step 3: reverse the PRE-ROTATION standardization ## 
+## Step 2: reverse the PRE-ROTATION standardization ## 
   
   # partition the values from Step 1 into intercept and non-intercept parts
   a <- untransformed_b1[1, , drop = FALSE] # this is the intercept 
