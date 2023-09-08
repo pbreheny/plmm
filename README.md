@@ -31,13 +31,15 @@ The newest features of `penalizedLMM` are:
 The branches of this repo are organized in the following way: 
 
   - `master` is the main branch with all the latest updates
+  
+  - `fix_lp` is a development branch where we are fixing what I think is a bug in `untransform()`. We noticed that our mean squared prediction error (MSPE) was really large for PLMMs where predictions were made based on the linear predictor. I am still troubleshooting what's going on here... 
 
   - `fbm` is a development branch where I am working to extend our current methods to analyze data from a design matrix stored as a file-backed object (a Filebacked Big Matrix, or FBM). See package [bigstatsr](https://privefl.github.io/bigstatsr/) for more info on these objects. 
 
   - `mfdr` is a development branch where I am working to create an `mfdr()` method for `plmm` objects. See `ncvreg::mfdr()` for inspiration. 
 
   - `fam_lmm` is a development branch where I am thinking about how the framework `plmm()` uses for analyzing relationships can be used in contexts where penalization is not necessary. Example: family-based data which are not high-dimensional. 
-
+  
   - `setup-lambda` is a development branch where we are resolving a bug in `setup_lambda`. Stay tuned for updates on this. 
   
   - `blup` is an **archived** branch previously focused on improving the implementation of the Best Linear Unbiased Predictor method 
