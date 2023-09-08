@@ -18,6 +18,10 @@ reference:
     - choose_k
     - plmm
     
+  - title: Inference for PLMMs
+    contents: 
+    - mfdr
+    
   - title: Loss, information, and cross-validation for PLMMs
     contents:
     - cv.plmm
@@ -30,6 +34,10 @@ reference:
     contents:
     - coef.cv.plmm
     - coef.plmm
+    
+  - title: Inference for PLMMs
+    contents:
+      - mfdr
     
   - title: Other model fitting methods (and some helper functions)
     contents: 
