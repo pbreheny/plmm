@@ -41,8 +41,9 @@ untransform <- function(res_b, ns, ncol_X, std_X, SUX, std_SUX){
   
   # fill in the un-transformed values
   untransformed_beta[ns+1,] <- untransformed_b2 # again, the + 1 is for the intercept
-  # untransformed_beta[1,] <- a - crossprod(attr(std_X, 'center')[ns], untransformed_b2)
-  untransformed_beta[1,] <- -crossprod(attr(std_X, 'center')[ns], untransformed_b2)
+  untransformed_beta[1,] <- a - crossprod(attr(std_X, 'center')[ns], untransformed_b2)
+  # idea:
+  # untransformed_beta[1,] <- -crossprod(attr(std_X, 'center')[ns], untransformed_b2)
   
   # Final step: return un-transformed beta values 
   return(untransformed_beta)

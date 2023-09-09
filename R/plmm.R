@@ -155,8 +155,7 @@ plmm <- function(X,
                         eta_star = eta_star,
                         penalty.factor = penalty.factor,
                         trace = trace)
-  
-  
+
   if(trace){cat("Beginning model fitting.\n")}
   the_fit <- plmm_fit(prep = the_prep,
                       penalty = penalty,

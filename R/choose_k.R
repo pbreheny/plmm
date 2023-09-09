@@ -66,10 +66,9 @@ choose_k <- function(X,
   while(k < min(nrow(std_X), ncol(std_X)) | it < max_it){
     k_vals[it] <- k
     # truncated SVD 
-    trunc <- RSpectra::svds(A = std_X, k = k, nv = 0)
+    trunc <- RSpectra::svds(A = K, k = k, nv = 0)
     # calculate approximation
-    S <- ((trunc$d)^2)/ncol(X)
-    A_k <- trunc$u %*% tcrossprod(diag(S), trunc$u)
+    A_k <- trunc$u %*% tcrossprod(diag(trunc$d), trunc$u)
     
     # calculate difference 
     d <- abs(delta(K, A_k, type = type))
