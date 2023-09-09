@@ -37,6 +37,7 @@ K_diagonal <- diag(x = (rnorm(n = nrow(admix$X))^2),
 plmm1 <- plmm(X = admix$X,
               y = admix$y,
               K = K_diagonal,
+              diag_K = TRUE,
               # FIXME: Need to fix plmm so that lambda can be a single value
               lambda = c(0.001, 0),
               penalty = "lasso")

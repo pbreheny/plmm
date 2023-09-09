@@ -18,22 +18,24 @@
 #' (1) K is not user-specified, (2) K is a matrix, and (3) K is a list. 
 #' 
 #' In case 1: 
-#'  * (a) if K is not specified but diag_K = TRUE: observations will be treated as unrelated, 
-#'    where S = sort(diag(K), decreasing = T) and columns of U are the columns of an 
-#'    identity matrix sorted on the values of S.  
+#'  * (a) if K is not specified but diag_K = TRUE: K is treated as the identity matrix. 
+#'     All S = rep(1, n), and U = diag(n)
 #'  * (b) if K is not specified, diag_K = FALSE, and k = min(n,p): 
 #'    use base::svd(K), where K = relatedness_mat(std_X)
 #'  * (c) if K is not specified, diag_K = FALSE, and k < min(n,p): 
 #'    use RSpectra::svds(K, k = k), where K = relatedness_mat(std_X)
 #'  
 #' In case 2: 
-#'  * (a): if K is a matrix and k = min(n,p): use base::svd(K)
-#'  * (b): if K is a matrix and k < min(n,p): use RSpectra::svds(K, k)
+#'  * (a): if K is a matrix and diag_K = TRUE: observations will be treated as unrelated, 
+#'    where S = sort(diag(K), decreasing = T) and columns of U are the columns of an 
+#'    identity matrix sorted on the values of S.  
+#'  * (b): if K is a matrix and k = min(n,p): use base::svd(K)
+#'  * (c): if K is a matrix and k < min(n,p): use RSpectra::svds(K, k)
 #'  
 #' In case 3: 
 #' if K is a list, D and U are simply passed from \code{choose_k()} & D is transformed to S. 
 #' 
-#' Any scenarios outside of these 3 will error out. 
+#' Any scenarios outside of those outlined will error out. 
 #' 
 #' @keywords internal
 
@@ -46,14 +48,16 @@ plmm_svd <- function(std_X, n, p, diag_K, K, k, trace){
 
   # case 1: K is not specified (default to realized relatedness matrix)
   if(is.null(K) & diag_K){
-    ## case 1 (a): if K is diagonal, then no need for SVD! 
-    if(trace){(cat("Using diagonal for K, so observations are treated as unrelated."))}
-    S <- sort(diag(K), decreasing = T)
-    U <- diag(nrow = n)[,order(diag(K), decreasing = T)]
+    ## case 1 (a): if K is the identity matrix, then no need for SVD! 
+    if(trace){(cat("Using identity matrix for K."))}
+    S <- rep(1, n)
+    U <- diag(nrow = n)
   } else if (is.null(K) & !diag_K){
-    ## case 1 (b): K is not specified, not diagonal, and k = min(n,p)
+    ## case 1 (b): K is not specified, diag_K = FALSE, and k = min(n,p)
     if(trace){cat("No K specified - will use default definition of the \n realized relatedness matrix.\n")}
-    K <- relatedness_mat(std_X) # TODO: write this function in C 
+    K <- relatedness_mat(std_X) 
+    # TODO: thinking aobut how to write this function in C
+    
     # remember: if I want all the singular values (which is k = min(n,p)), use base::svd
     if(k == min(n_stdX,p_stdX)){
       decomp <- svd(K, nv = 0)
@@ -71,11 +75,18 @@ plmm_svd <- function(std_X, n, p, diag_K, K, k, trace){
     # case 2: K is a user-specified matrix
     S <- U <- NULL
     
-    # case 2 (a): K is a matrix and k = min(n,p)
+    # case 2 (a): K is a diagonal matrix and diag_K = TRUE
+    if(!is.null(diag_K)& !is.null(K)){
+      if(trace){(cat("Using diagonal matrix for K, equivalent to a lm() with weights."))}
+      S <- sort(diag(K), decreasing = T)
+      U <- diag(nrow = n)[,order(diag(K), decreasing = T)]
+    }
+    
+    # case 2 (b): K is a matrix and k = min(n,p)
     if(k == min(n_stdX, p_stdX)){
       decomp <- svd(K, nv = 0)
     } 
-    # case 2 (b): K is a matrix and k < min(n,p)
+    # case 2 (c): K is a matrix and k < min(n,p)
     if(k < min(n_stdX,p_stdX)){
       decomp <- RSpectra::svds(A = K, nv = 0, k = k)
     }

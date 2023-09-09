@@ -12,7 +12,7 @@ NB: this function is simply a wrapper for plmm_prep -&amp;gt; plmm_fit -&amp;gt;
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -175,22 +175,22 @@ NB: this function is simply a wrapper for plmm_prep -&gt; plmm_fit -&gt; plmm_fo
 <span class="r-in"><span><span class="va">fit_admix1</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_admix1</span>, idx <span class="op">=</span> <span class="fl">99</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.0237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.00036</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  79 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  98 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># using admix data and k = 50 </span></span></span>
 <span class="r-in"><span><span class="va">fit_admix2</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, k <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_admix2</span>, idx <span class="op">=</span> <span class="fl">99</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.0279</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.0307</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  31 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  28 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># now use PLINK data files</span></span></span>
