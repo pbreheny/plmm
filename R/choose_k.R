@@ -52,6 +52,7 @@ choose_k <- function(X,
   k <- start
   it <- 1
   max_it <- (min(nrow(std_X), ncol(std_X)) - start)/step
+  max_it <- floor(max_it)
   k_vals <- rep(NA, max_it)
   inv_delt_vals <- rep(NA, max_it)
   

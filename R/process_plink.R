@@ -20,13 +20,13 @@
 #' \dontrun{
 #' process_plink(data_dir = "../temp_files",
 #'  prefix = "penncath_lite",
-#'   impute_method = "xgboost",
+#'   impute = T,
 #'    quiet = F)
 #' }
 process_plink <- function(data_dir,
                           prefix,
                           impute = TRUE,
-                          impute_method = c('mode', 'random', 'mean0', 'mean2', 'xgboost'),
+                          impute_method = 'mode',
                           quiet = FALSE,
                           gz = FALSE,
                           outfile,

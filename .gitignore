@@ -21,3 +21,5 @@ R/_*
 vignettes/*.html
 inst/doc
 README.html
+*.o
+*.so
