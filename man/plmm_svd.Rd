@@ -36,9 +36,8 @@ Broadly speaking, there are three cases:
 
 In case 1:
 \itemize{
-\item (a) if K is not specified but diag_K = TRUE: observations will be treated as unrelated,
-where S = sort(diag(K), decreasing = T) and columns of U are the columns of an
-identity matrix sorted on the values of S.
+\item (a) if K is not specified but diag_K = TRUE: K is treated as the identity matrix.
+All S = rep(1, n), and U = diag(n)
 \item (b) if K is not specified, diag_K = FALSE, and k = min(n,p):
 use base::svd(K), where K = relatedness_mat(std_X)
 \item (c) if K is not specified, diag_K = FALSE, and k < min(n,p):
@@ -47,13 +46,16 @@ use RSpectra::svds(K, k = k), where K = relatedness_mat(std_X)
 
 In case 2:
 \itemize{
-\item (a): if K is a matrix and k = min(n,p): use base::svd(K)
-\item (b): if K is a matrix and k < min(n,p): use RSpectra::svds(K, k)
+\item (a): if K is a matrix and diag_K = TRUE: observations will be treated as unrelated,
+where S = sort(diag(K), decreasing = T) and columns of U are the columns of an
+identity matrix sorted on the values of S.
+\item (b): if K is a matrix and k = min(n,p): use base::svd(K)
+\item (c): if K is a matrix and k < min(n,p): use RSpectra::svds(K, k)
 }
 
 In case 3:
 if K is a list, D and U are simply passed from \code{choose_k()} & D is transformed to S.
 
-Any scenarios outside of these 3 will error out.
+Any scenarios outside of those outlined will error out.
 }
 \keyword{internal}
