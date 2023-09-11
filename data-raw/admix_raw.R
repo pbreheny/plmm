@@ -7,8 +7,8 @@ admix_raw <- read.delim("https://s3.amazonaws.com/pbreheny-data-sets/admixture.t
 # str(admix_raw) # includes 197 obs., 100 SNPs, and racial category 
 
 
-# Simulate Y, a numeric outcome representing a phenotypic trait 
-# Y will depend on race as well as some SNP information, in order to illustrate
+# Simulate Y, an outcome representing a continuous phenotype
+# Note: Y will depend on race as well as some SNP information, in order to illustrate
 #   population structure (as is common in GWAS studies)
 
 # make the ancestry variable into a numeric value 
@@ -31,8 +31,8 @@ set.seed(522)
 noise <- rnorm(n = nrow(admix_raw))
 
 # create an outcome variable 
-X <- as.matrix(admix_raw)
-y <- X%*%true_beta + noise
+true_X <- as.matrix(admix_raw)
+y <- true_X%*%true_beta + noise
 
 # test this data with a couple of the penalizedLMM functions
 fit <- cv.plmm(X = admix_raw, y = y, penalty = "lasso") 
@@ -44,12 +44,15 @@ summary(fit2); fit2$fit$beta_vals[,fit2$min]
 mfdr(fit$fit)
 mfdr(fit2$fit)
 
+# create objects to export to user level 
+X <- admix_raw |> 
+  dplyr::select(-c(Race)) |> 
+  as.matrix()
+
 # create a list with the data needed for analyses 
-admix <- list(X = admix %>%
-                dplyr::select(-c(y, Race)) %>%
-                as.matrix(),
-              y = admix$y,
-              race = admix$Race
+admix <- list(X = X,
+              y = y,
+              race = admix_raw$Race
 )
 
-usethis::use_data(admix_raw, overwrite = TRUE)
+usethis::use_data(admix, overwrite = TRUE)
