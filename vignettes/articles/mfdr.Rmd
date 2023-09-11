@@ -74,7 +74,6 @@ admix$k <- choose_k(X = admix$X, returnKapprox = T)
 cv_fit2 <- cv.plmm(X = admix$X,
                    y = admix$y,
                    K = admix$k$K_svd,
-                   penalty = "lasso",
                    seed = 26)
 
 # look at results 
@@ -124,7 +123,6 @@ admix$k_plus_PCs <- choose_k(X = admix$X_plus_PCs, returnKapprox = T)
 cv_fit3 <- cv.plmm(X = admix$X_plus_PCs,
                    y = admix$y,
                    K = admix$k_plus_PCs$K_svd,
-                   penalty = "lasso",
                    # make sure not to penalize fixed effects - we want to keep 
                    #  these in the model!
                    penalty.factor = c(rep(0, 4), rep(1, ncol(admix$X))),
@@ -154,7 +152,9 @@ admix_comparison <- dplyr::bind_rows(mfdr1, mfdr2, mfdr3) |>
                 .fns = ~round(.x, digits = 3)),
          model = paste0("Model ", 1:3)) |> 
   dplyr::select(model, EF, S, mFDR)
-kable(admix_comparison)
+rownames(admix_comparison) <- NULL
+kable(admix_comparison,
+      caption = "Comparing 3 models at their respective lambda.min values")
 
 
 ```
