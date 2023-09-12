@@ -2,8 +2,7 @@
 % Please edit documentation in R/mfdr.R
 \name{mfdr}
 \alias{mfdr}
-\title{mfdr: Marginal false discovery rates for PLMMs
-Based on \code{\link[ncvreg:mfdr]{ncvreg::mfdr()}}}
+\title{mfdr: Marginal false discovery rates for PLMMs}
 \usage{
 mfdr(fit)
 }
@@ -19,11 +18,11 @@ A data frame with a row for every value of lambda and 3 columns:
 }
 }
 \description{
-mfdr: Marginal false discovery rates for PLMMs
 Based on \code{\link[ncvreg:mfdr]{ncvreg::mfdr()}}
 }
 \details{
 The function estimates the marginal false discovery rate (mFDR) for a penalized regression model. The estimate tends to be accurate in most settings, but will be slightly conservative if predictors are highly correlated
+We have not implemented something like mFDR for LMMs yet
 }
 \examples{
 fit <- plmm(admix$X, admix$y)

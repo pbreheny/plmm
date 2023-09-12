@@ -22,13 +22,14 @@
 #' @export
 #'
 #' @examples 
+#' \dontrun{
 #' # fit a model 
 #' fit <- lmm(X = pedigree$X, y = pedigree$clinical$y)
 #' predict.lmm(fit, type = "coefficients")
 #' predict.lmm(fit, type = "lp", newX = pedigree$X)
 #' predict.lmm(fit, type = "blup", X = pedigree$X, newX = pedigree$X, y = pedigree$clinical$y)
-#'  
-#'  
+#' }
+#' 
 predict.lmm <- function(object,
                          newX,
                          type=c("lp", "coefficients", "blup"),
