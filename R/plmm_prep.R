@@ -74,56 +74,16 @@ plmm_prep <- function(X,
   
   # calculate SVD
   if(!(k %in% 1:min(n,p))){stop("k value is out of bounds. \nIf specified, k must be in the range from 1 to min(nrow(X), ncol(X))")}
-  ## case 1: K is not specified (default to realized relatedness matrix)
-  # check: if K is diagonal, then no need for SVD! 
-  if(is.null(K) & diag_K){
-    if(trace){(cat("Using diagonal for K, so observations are treated as unrelated."))}
-    S <- rep(1, n)
-    U <- diag(n)
-  } else if (is.null(K) & !diag_K){
-    if(trace){cat("No K specified - will use default definition of the \n realized relatedness matrix.\n")}
-    
-    # if I want all the singular values (which is k = min(n,p)), use base::svd
-    if(k == min(nrow(std_X),ncol(std_X))){
-      decomp <- svd(std_X, nv = 0)
-    }
-    # otherwise, if I want fewer singular values than min(n,p), use RSpectra decomposition method:
-    if (k < min(nrow(std_X),ncol(std_X))){
-      decomp <- RSpectra::svds(A = std_X, nv = 0, k = k)
-    }
-    
-    D <- decomp$d
-    U <- decomp$u
-    S <- (D^2)/p # singular values of K, the realized relationship matrix
-    
-  } else if (!is.null(K) & 'matrix' %in% class(K)){
-    ## case 2: K is a user-specified matrix
-    S <- U <- NULL
-    
-    # again, decomposition depends on choice of k
-    if(k == min(nrow(std_X),ncol(std_X))){
-      decomp <- svd(K, nv = 0)
-    } 
-    
-    if(k < min(nrow(std_X),ncol(std_X))){
-      decomp <- RSpectra::svds(A = K, nv = 0, k = k)
-    }
-    S <- decomp$d # if K matrix was user-specified, then no need to transform D here
-    U <- decomp$u
-  } else if(!is.null(K) & is.list(K)){
-    # case 3: K is a user-supplied list, as returned from choose_k()
-      S <- ((K$d)^2)/p
-      U <- K$u
 
-  }
+  svd_res <- plmm_svd(std_X, n, p, diag_K, K, k, trace)
 
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(ncol_X = ncol(X),
                         nrow_X = nrow(X), 
                         y = y,
                         std_X = std_X,
-                        S = S,
-                        U = U,
+                        S = svd_res$S,
+                        U = svd_res$U,
                         ns = ns,
                         eta = eta_star, # carry eta over to fit 
                         penalty.factor = penalty.factor,

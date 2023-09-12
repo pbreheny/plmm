@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -111,7 +111,7 @@ option <code>diag_K = T</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># add this plot </span></span>
 <span><span class="va">fit_admix1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
-<span><span class="va">fit_admix2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, diag_K <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="va">fit_admix2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, diag_K <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_admix1</span><span class="op">)</span>;<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_admix2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="explore_options_files/figure-html/diag_K-1.png" width="700"></p>
@@ -212,17 +212,17 @@ LP does not incorporate that structure.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_admix1</span><span class="op">)</span>;<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_admix1_blup</span><span class="op">)</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=197and p=100</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1078):</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0842):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 41</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.42</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.556</span></span>
+<span><span class="co">#&gt;   Nonzero coefficients: 36</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 2.41</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.552</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=197and p=100</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1254):</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.3171):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 31</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.55</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.596</span></span></code></pre></div>
+<span><span class="co">#&gt;   Nonzero coefficients: 2</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 1.85</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.359</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="options-for-looking-at-bias-and-variance">Options for looking at bias and variance<a class="anchor" aria-label="anchor" href="#options-for-looking-at-bias-and-variance"></a>

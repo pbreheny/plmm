@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,6 +92,8 @@
 <span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span> <span class="co"># for rownames_to_column() and other data cleaning funs.</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/" class="external-link">knitr</a></span><span class="op">)</span></span></code></pre></div>
+<p><strong>Note</strong>: once again, this is a work in progress. I do
+not recommend blindly follow this like a tutorial!</p>
 <div class="section level2">
 <h2 id="background-and-motivation">Background and motivation<a class="anchor" aria-label="anchor" href="#background-and-motivation"></a>
 </h2>
@@ -285,13 +287,15 @@ data:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">admix_comparison</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">mfdr1</span>, <span class="va">mfdr2</span>, <span class="va">mfdr3</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"lambda"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span>.cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">EF</span>, <span class="va">mFDR</span><span class="op">)</span>,</span>
-<span>                .fns <span class="op">=</span> <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">.x</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>                .fns <span class="op">=</span> <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">.x</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>         model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Model "</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">EF</span>, <span class="va">S</span>, <span class="va">mFDR</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">admix_comparison</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
-<th align="left">lambda</th>
+<th align="left"></th>
+<th align="left">model</th>
 <th align="right">EF</th>
 <th align="right">S</th>
 <th align="right">mFDR</th>
@@ -299,18 +303,21 @@ data:</p>
 <tbody>
 <tr class="odd">
 <td align="left">0.0302</td>
+<td align="left">Model 1</td>
 <td align="right">12.128</td>
 <td align="right">76</td>
 <td align="right">0.160</td>
 </tr>
 <tr class="even">
 <td align="left">0.0215</td>
+<td align="left">Model 2</td>
 <td align="right">2.512</td>
 <td align="right">63</td>
 <td align="right">0.040</td>
 </tr>
 <tr class="odd">
 <td align="left">0.0989</td>
+<td align="left">Model 3</td>
 <td align="right">0.055</td>
 <td align="right">24</td>
 <td align="right">0.002</td>
@@ -320,11 +327,8 @@ data:</p>
 <p>Some observations based on the plots and output above:</p>
 <ul>
 <li>The CV plot has the clearest pattern for fit 3</li>
-<li>Fits 2 and 3 have comparable marginal false discovery rates of about
-4%, which is much lower (better) than the 16% mFdr for fit 1.</li>
-<li>The number of selected variables is higher for the second fit.
-<strong>Question</strong>: could this mean that adding the PCs is
-decreasing power? I am still thinking about this…</li>
+<li>… <will add more here></will>
+</li>
 </ul>
 <p>Marginal false discovery rates also give us another way to select
 <span class="math inline">\(\lambda\)</span>: instead of choosing the

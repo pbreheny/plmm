@@ -78,6 +78,7 @@ reference:
     - lamNames
     - plmm_format
     - plmm_prep
+    - plmm_svd
     - predict.list
     - scale_varp
     - setup_lambda

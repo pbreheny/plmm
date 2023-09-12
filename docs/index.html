@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,11 +77,9 @@
 <div class="section level2">
 <h2 id="latest-changes">Latest changes<a class="anchor" aria-label="anchor" href="#latest-changes"></a>
 </h2>
-<p>The newest features of <code>penalizedLMM</code> are:</p>
+<p>The newest features of <code>penalizedLMM</code> are: - version 2.1.0: A new function <code><a href="reference/mfdr.html">mfdr()</a></code> for inference on model coefficients.</p>
 <ul>
-<li><p>An <code>xgboost</code> method is now available in <code><a href="reference/process_plink.html">process_plink()</a></code>. Check out the documentation for details. This option should be regarded as being in ‘beta-testing’ mode.</p></li>
-<li><p>The main model-fitting function <code>plmm</code> now has an argument <code>k</code> to approximate the decomposition of relationship matrix <span class="math inline"><strong>K</strong></span>. Specifying <code>k</code> can <strong>make model fitting faster by orders of magnitude</strong>, with the caveat that choosing a ‘best’ value <code>k</code> is not trivial and will depend on the structure and size of the data. The approximate singular value decomposition is implemented with <a href="https://github.com/yixuan/RSpectra" class="external-link">RSpectra</a>; check out <code><a href="https://rdrr.io/pkg/RSpectra/man/svds.html" class="external-link">RSpectra::svds()</a></code> for details.</p></li>
-<li><p>Processing data from <a href="https://www.cog-genomics.org/plink/1.9/" class="external-link">PLINK</a> files is now done with <code>bigsnpr</code> functions (see <code>process_plink</code>). This is faster than the previous version.</p></li>
+<li>version 2.0.3: An <code>xgboost</code> method is now available in <code><a href="reference/process_plink.html">process_plink()</a></code>. Check out the documentation for details. This option should be regarded as being in ‘beta-testing’ mode.</li>
 </ul>
 </div>
 <div class="section level2">
@@ -90,6 +88,7 @@
 <p>The branches of this repo are organized in the following way:</p>
 <ul>
 <li><p><code>master</code> is the main branch with all the latest updates</p></li>
+<li><p><code>fix_lp</code> is a development branch where we are fixing what I think is a bug in <code><a href="reference/untransform.html">untransform()</a></code>. We noticed that our mean squared prediction error (MSPE) was really large for PLMMs where predictions were made based on the linear predictor. I am still troubleshooting what’s going on here…</p></li>
 <li><p><code>fbm</code> is a development branch where I am working to extend our current methods to analyze data from a design matrix stored as a file-backed object (a Filebacked Big Matrix, or FBM). See package <a href="https://privefl.github.io/bigstatsr/" class="external-link">bigstatsr</a> for more info on these objects.</p></li>
 <li><p><code>mfdr</code> is a development branch where I am working to create an <code><a href="reference/mfdr.html">mfdr()</a></code> method for <code>plmm</code> objects. See <code><a href="https://rdrr.io/pkg/ncvreg/man/mfdr.html" class="external-link">ncvreg::mfdr()</a></code> for inspiration.</p></li>
 <li><p><code>fam_lmm</code> is a development branch where I am thinking about how the framework <code><a href="reference/plmm.html">plmm()</a></code> uses for analyzing relationships can be used in contexts where penalization is not necessary. Example: family-based data which are not high-dimensional.</p></li>
@@ -127,7 +126,7 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/areisett/penalizedLMM" class="external-link"><img src="https://img.shields.io/static/v1?label=GitHub&amp;message=1.0.1&amp;color=blue&amp;logo=github" alt="GitHub version"></a></li>
+<li><a href="https://github.com/areisett/penalizedLMM" class="external-link"><img src="https://img.shields.io/static/v1?label=GitHub&amp;message=2.1.1&amp;color=blue&amp;logo=github" alt="GitHub version"></a></li>
 <li><a href="https://github.com/areisett/penalizedLMM/actions" class="external-link"><img src="https://github.com/areisett/penalizedLMM/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>

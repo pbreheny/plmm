@@ -30,7 +30,7 @@ We can visualize the impact of two approaches for choosing $\mathbf{K}$: on the 
 ```{r diag_K}
 # add this plot 
 fit_admix1 <- plmm(X = admix$X, y = admix$y)
-fit_admix2 <- plmm(X = admix$X, y = admix$y, diag_K = T)
+fit_admix2 <- plmm(X = admix$X, y = admix$y, diag_K = TRUE)
 par(mfrow=c(1,2))
 plot(fit_admix1);plot(fit_admix2)
 ```

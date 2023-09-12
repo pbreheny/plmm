@@ -16,7 +16,10 @@ R/_*
 *.bim
 *.fam
 *.log
+*.o
+*.so
 vignettes/*.html
 inst/doc
 README.html
-
+*.o
+*.so

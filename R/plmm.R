@@ -108,11 +108,6 @@ plmm <- function(X,
   if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
   if (length(penalty.factor)!=ncol(X)) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
   
-  # working with user-specified K
-  if(!is.null(diag_K)& !is.null(K)){
-    stop("diag_K is true, but a K is also supplied. 
-         If using diag_K, you cannot also pass a K argument.")
-  }
   if (!is.null(K)){
     # first, check type/class:
     if (!inherits(K, "matrix") & !is.list(K)) {
@@ -155,8 +150,7 @@ plmm <- function(X,
                         eta_star = eta_star,
                         penalty.factor = penalty.factor,
                         trace = trace)
-  
-  
+
   if(trace){cat("Beginning model fitting.\n")}
   the_fit <- plmm_fit(prep = the_prep,
                       penalty = penalty,
