@@ -160,25 +160,20 @@ kable(admix_comparison,
 ```
 
 Some observations based on the plots and output above: 
-
-  * The CV plot has the clearest pattern for fit 3
-  * ... <will add more here> 
+  * In the simulated outcome, only 2 $\beta$ values are truly nonzero (i.e., only 2 SNPs (SNPs 17 and 85) are actually associated with this outcome - see `data-raw/admix.R` for details). With this in mind, these results leave a lot to be desired... still thinking about this/wondering how to explain this phenomena. 
 
 Marginal false discovery rates also give us another way to select $\lambda$: instead of choosing the $\lambda$ value that minimizes cross validation error, I could choose the value that limits the mFdr at a certain level. We can examine this approach for the models we fit above: 
 ```{r bestlam, eval=FALSE}
-# let's look at the smallest lambda for which mFdr is < 10% in each fit 
-# TODO: I am still working to 'iron this out' 
+# let's look at lambda where mFDR is smallest, instead of mFDR where lambda = lambda.min (minimum CVE)
+
 # fit 1 
-bestlam1 <- fit1$lambda[mfdr1$mFDR < 0.1] |> min() |> round(5)
-mfdr1_res <- mfdr1[as.character(bestlam1),]
+(mfdr1[which.min(mfdr1$mFDR),])
 
 # fit 2 
-bestlam2 <- fit2$lambda[mfdr2$mFDR < 0.2] |> min() |> round(5)
-mfdr2_res <- mfdr2[as.character(bestlam2),]
+(mfdr2[which.min(mfdr2$mFDR),])
 
 # fit 3 
-bestlam3 <- fit3$lambda[mfdr3$mFDR < 0.3] |> min() |> round(5)
-mfdr3_res <- mfdr3[as.character(bestlam3),]
+(mfdr3[which.min(mfdr3$mFDR),])
 
 ```
 

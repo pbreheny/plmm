@@ -1,0 +1,51 @@
+---
+title: "deconfounding"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(penalizedLMM)
+```
+
+
+## Context 
+
+I want to explore how different types of confounding impact PLMMs --- the questions on my mind include: 
+
+  * When does PLMM perform well? When does it perform poorly? 
+  * How does PLMM compare to PCA in different data contexts? 
+  * Could a PLMM that uses PCs as fixed effects -- in a sense, a 'hybrid' approach -- be a way to approach deconfounding when data have a complex structure? 
+  
+## Starting with the admix data 
+
+Recall from the article on mfdr our results for analyzing the admix data: 
+
+```{r}
+# using lasso penalty 
+fit <- cv.plmm(X = admix$X, y = admix$y, penalty = "lasso") 
+summary(fit); plot(fit)
+
+# using MCP penalty 
+fit2 <- cv.plmm(X = admix$X, y = admix$y)
+summary(fit2); plot(fit2)
+
+res1 <- mfdr(fit$fit); res2 <- mfdr(fit2$fit)
+par(mfrow=c(1,2))
+mfdr_plot(res1, type = "l"); mfdr_plot(res2, type = "l")
+```
+
+
+Now consider what happens when... 
+
+
+## Simulating other data sets 
+
+
+
+
