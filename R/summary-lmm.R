@@ -9,10 +9,12 @@
 #' @export
 #' 
 #' @examples 
+#' \dontrun{
 #' fit <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
 #' coef.lmm(fit)
+#' }
 #' 
-#' 
+
 
 coef.lmm <- function(object, which = 1:length(object$beta_vals), ...){
   beta_vals <- object$beta_vals[which]

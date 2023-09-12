@@ -2,7 +2,7 @@
 % Please edit documentation in R/plmm_svd.R
 \name{plmm_svd}
 \alias{plmm_svd}
-\title{A function to implement singular value decomposition for a PLMM
+\title{A function to implement singular value decomposition for a PLMM or LMM
 This is an internal function to \code{plmm_prep()}}
 \usage{
 plmm_svd(std_X, n, p, diag_K, K, k, trace)
@@ -23,7 +23,7 @@ plmm_svd(std_X, n, p, diag_K, K, k, trace)
 \item{trace}{Logical: should messages be printed to console?}
 }
 \description{
-A function to implement singular value decomposition for a PLMM
+A function to implement singular value decomposition for a PLMM or LMM
 This is an internal function to \code{plmm_prep()}
 }
 \details{

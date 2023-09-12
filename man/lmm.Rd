@@ -9,6 +9,7 @@ lmm(
   y,
   k = NULL,
   K = NULL,
+  diag_K = NULL,
   eta_star = NULL,
   eps = 1e-04,
   max.iter = 10000,
@@ -27,6 +28,8 @@ lmm(
 \item{k}{An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to \code{RSpectra::svds()}. Defaults to \code{min(n, p) - 1}, where n and p are the dimensions of the \emph{standardized} design matrix.}
 
 \item{K}{Similarity matrix used to rotate the data. This should be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list as created by choose_k.}
+
+\item{diag_K}{Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE.}
 
 \item{eta_star}{Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.}
 
@@ -51,6 +54,8 @@ A list including the estimated coefficients on the original scale, as well as ot
 NB: this function is simply a wrapper for lmm_prep -> lmm_fit -> lmm_format
 }
 \examples{
-fit <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
-fit$beta_vals
+# compare basic LM with LMM (latter accounts for family relationships)
+fit1 <- lmm(X = pedigree$X, y = pedigree$clinical$y, diag_K = TRUE)
+fit2 <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
+fit1$beta_vals; fit2$beta_vals
 }

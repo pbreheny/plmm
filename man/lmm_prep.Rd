@@ -9,6 +9,7 @@ lmm_prep(
   y,
   k = NULL,
   K = NULL,
+  diag_K = NULL,
   eta_star = NULL,
   returnX = TRUE,
   trace = FALSE,
@@ -23,6 +24,8 @@ lmm_prep(
 \item{k}{An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to \code{RSpectra::svds()}. Defaults to \code{min(n, p) - 1}, where n and p are the dimensions of the \emph{standardized} design matrix.}
 
 \item{K}{Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}, where X is standardized).}
+
+\item{diag_K}{Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Passed from \code{lmm()}.}
 
 \item{eta_star}{Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.}
 

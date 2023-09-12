@@ -5,17 +5,22 @@
 \alias{pedigree}
 \title{Pedigree: mock genotype data from a family-based design.}
 \format{
-A list with 3 components
-\describe{
+\subsection{\code{pedigree}}{
+
+A list with 3 components:
 \itemize{
-\item X: Design matrix representing 23 family members and 5 genes}
+\item X: Design matrix representing 23 family members and 5 genes
 \item K: Matrix representing the family members' relationships as expected proportions of genetic overlap.
-\item note: values of 0.5 represent parent-child and sibling relationships; see data-raw/pedigree.R for details.
-\item note: This is NOT a correlation matrix. Use \code{cov2cor()} or a similar function to obtain correlations.}
-\item clinical: a data frame with clinical information:
-\item sample.id: integer indicating sample.id (same as IID in PLINK .fam file)
-\item sex: the biological sex of each participant (just like PLINK, 2 = female & 1 = male)
-\item y: numeric value corresponding to phenotype severity}
+\itemize{
+\item Values of 0.5 represent parent-child and sibling relationships; see data-raw/pedigree.R for details.
+\item Note: This is NOT a correlation matrix. Use \code{cov2cor()} or a similar function to obtain correlations.
+}
+\item clinical: a data frame with 23 observations and 3 variables:
+\describe{
+\item{sample.id}{integer indicating sample.id (same as IID in PLINK .fam file)}
+\item{sex}{the biological sex of each participant (just like PLINK, 2 = female & 1 = male)}
+\item{y}{numeric value corresponding to phenotype severity}
+}
 }
 }
 }

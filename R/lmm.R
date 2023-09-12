@@ -21,9 +21,9 @@
 #' 
 #' @examples 
 #' # compare basic LM with LMM (latter accounts for family relationships)
-#' fit1 <- lmm(X = pedigree$X, y = pedigree$clinical$y, diag_K = T)
+#' fit1 <- lmm(X = pedigree$X, y = pedigree$clinical$y, diag_K = TRUE)
 #' fit2 <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
-#' coef.lmm(fit1); coef.lmm(fit2)
+#' fit1$beta_vals; fit2$beta_vals
 
 lmm <- function(X,
                  y,

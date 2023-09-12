@@ -17,16 +17,17 @@
 #' This dataset was inspired by one of T. Peter's collaborative projects involving
 #' an analysis of congenital disorders in family-based data. The outcome indicated 
 #' the severity of the phenotype, with higher values -> more severe. 
-#' @format A list with 3 components
+#' @format ## `pedigree`
+#' A list with 3 components:
+#'  * X: Design matrix representing 23 family members and 5 genes
+#'  * K: Matrix representing the family members' relationships as expected proportions of genetic overlap. 
+#'    * Values of 0.5 represent parent-child and sibling relationships; see data-raw/pedigree.R for details. 
+#'    * Note: This is NOT a correlation matrix. Use `cov2cor()` or a similar function to obtain correlations.
+#'  * clinical: a data frame with 23 observations and 3 variables:
 #' \describe{
-#'   * X: Design matrix representing 23 family members and 5 genes
-#'   * K: Matrix representing the family members' relationships as expected proportions of genetic overlap. 
-#'    * note: values of 0.5 represent parent-child and sibling relationships; see data-raw/pedigree.R for details.
-#'    * note: This is NOT a correlation matrix. Use `cov2cor()` or a similar function to obtain correlations.
-#'   * clinical: a data frame with clinical information: 
-#'    * sample.id: integer indicating sample.id (same as IID in PLINK .fam file)
-#'    * sex: the biological sex of each participant (just like PLINK, 2 = female & 1 = male)
-#'    * y: numeric value corresponding to phenotype severity
+#'   \item{sample.id}{integer indicating sample.id (same as IID in PLINK .fam file)}
+#'    \item{sex}{the biological sex of each participant (just like PLINK, 2 = female & 1 = male)}
+#'    \item{y}{numeric value corresponding to phenotype severity}
 #' }
 #' 
 "pedigree"
