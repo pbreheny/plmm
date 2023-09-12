@@ -3,7 +3,7 @@
 \docType{data}
 \name{admix}
 \alias{admix}
-\title{Semi-simulated SNP data}
+\title{Admix: Semi-simulated SNP data}
 \format{
 A list with 3 components
 \describe{

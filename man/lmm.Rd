@@ -51,5 +51,6 @@ A list including the estimated coefficients on the original scale, as well as ot
 NB: this function is simply a wrapper for lmm_prep -> lmm_fit -> lmm_format
 }
 \examples{
-fit <- lmm(X = oav$X, y = oav$y, K = oav$K)
+fit <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
+fit$beta_vals
 }

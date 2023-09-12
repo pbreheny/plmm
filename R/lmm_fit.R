@@ -43,7 +43,7 @@ lmm_fit <- function(prep,
   if (length(init)!=prep$ncol_X) stop("Dimensions of init and X do not match", call.=FALSE)
   
   if(prep$trace){cat("Beginning standardization + rotation.")}
-  
+
   # estimate eta if needed
   if (is.null(prep$eta)) {
     eta <- estimate_eta(S = prep$S, U = prep$U, y = prep$y) 
@@ -53,10 +53,11 @@ lmm_fit <- function(prep,
   }
   
   # rotate data
-  W <- diag((eta * prep$S + (1 - eta))^(-1/2), nrow = length(prep$S)) 
-  SUX <- W %*% crossprod(prep$U, cbind(1, prep$std_X)) # add column of 1s for intercept
-  SUy <- drop(W %*% crossprod(prep$U, prep$y))
-  
+  # rotate data
+  w <- (eta * prep$S + (1 - eta))^(-1/2)
+  wU <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
+  SUX <- wU %*% cbind(1, prep$std_X)
+  SUy <- wU %*% prep$y
   # re-standardize rotated SUX
   std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
   std_SUX_noInt <- std_SUX_temp$scaled_X

@@ -52,3 +52,8 @@ coef.plmm <- function(object, lambda, which = 1:length(object$lambda), drop = TR
     return(beta_vals)
   }
 }
+
+
+
+
+

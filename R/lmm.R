@@ -5,6 +5,7 @@
 #' @param y Continuous outcome vector.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list as created by choose_k.
+#' @param diag_K Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE. 
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param eps Convergence threshold. The algorithm iterates until the RMSD for the change in linear predictors for each coefficient is less than eps. Default is \code{1e-4}.
 #' @param max.iter Maximum number of iterations (total across entire path). Default is 10000.
@@ -19,12 +20,16 @@
 #' @export
 #' 
 #' @examples 
-#' fit <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
-#' fit$beta_vals
+#' # compare basic LM with LMM (latter accounts for family relationships)
+#' fit1 <- lmm(X = pedigree$X, y = pedigree$clinical$y, diag_K = T)
+#' fit2 <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
+#' coef.lmm(fit1); coef.lmm(fit2)
+
 lmm <- function(X,
                  y,
                  k = NULL, 
                  K = NULL,
+                 diag_K = NULL,
                  eta_star = NULL,
                  eps = 1e-04,
                  max.iter = 10000,
@@ -83,6 +88,7 @@ lmm <- function(X,
                         y = y,
                         K = K,
                         k = k,
+                        diag_K = diag_K,
                         eta_star = eta_star,
                         returnX = returnX,
                         trace = trace)
