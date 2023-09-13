@@ -1,6 +1,6 @@
 #' a function to create the estimated variance matrix from a PLMM fit 
 #' @param fit An object returned by `plmm()`
-#' @param K An optional list or matrix as returned by `choose_K()`
+#' @param K An optional matrix as list returned by `choose_K()`
 #' @return Vhat, a matrix representing the estimated variance 
 #' 
 #' @export

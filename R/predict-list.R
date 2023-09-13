@@ -55,7 +55,6 @@ predict.list <- function(fit, newX, type=c("lp", "coefficients", "vars", "nvars"
       
     # test1 <- V21 %*% chol2inv(chol(V11)) # true 
     # TODO: to find the inverse of V11 using svd results of K, i.e., the inverse of a submatrix, might need to use Woodbury's formula 
-    
     ranef <- V21 %*% chol2inv(chol(V11)) %*% (fit$y - cbind(1, prep$std_X) %*% beta_vals)
       
     blup <- Xbeta + ranef
