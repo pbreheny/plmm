@@ -100,7 +100,7 @@ plot(x = 1:10,
      main = 'Scree Plot')
 # first 4 PCs explain most of the variance, so we will use these as fixed effects; this makes sense given the ancestry of the participants 
 pca_dat <- data.frame(race = admix$race, PC1 = pca$x[,1], PC2 = pca$x[, 2])
-pca_plot <- ggplot(pca_dat, aes(x = PC1, y = PC2, col = race)) +
+pca_plot <- ggplot(pca_dat, aes(x = PC1, y = PC2, col = as.factor(race))) +
   geom_point() +
   coord_fixed()
 plot(pca_plot)
@@ -116,13 +116,10 @@ admix$X_plus_PCs <- cbind(PCs[,1:4], admix$X)
 With the principal components calculated, we can now fit our third model: 
 
 ```{r fit3}
-# choose k using new design matrix
-admix$k_plus_PCs <- choose_k(X = admix$X_plus_PCs, returnKapprox = T)
-
 # construct the model 
 cv_fit3 <- cv.plmm(X = admix$X_plus_PCs,
                    y = admix$y,
-                   K = admix$k_plus_PCs$K_svd,
+                   K = admix$k$K_svd,
                    # make sure not to penalize fixed effects - we want to keep 
                    #  these in the model!
                    penalty.factor = c(rep(0, 4), rep(1, ncol(admix$X))),
@@ -182,43 +179,37 @@ Marginal false discovery rates also give us another way to select $\lambda$: ins
 
 Let's do a similar model comparison, this time using the `penncath_lite` data. 
 
-```{r, eval=FALSE}
-# process PLINK files with penncath data
-# NB: you only need to do this step the first time you process the raw data.
+```{r penncath_lite_process}
+# preprocess PLINK files
 penncath_lite <- process_plink(
   data_dir = plink_example(parent = TRUE),
   prefix = "penncath_lite",
   gz = TRUE, # NB: PLINK data that ships with package comes gzipped
   impute = TRUE, # mode imputation is default 
   outfile = "process_penncath")
-```
 
 
-```{r get_pen, eval=FALSE}
-# read in the processed penncath data 
-pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"),
-                returnX = TRUE)
+# read in the data to global environment
+pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"))
+
+str(pen) # Three objects here
 ```
+
 
 These data represent 1,401 individuals and 4,367 SNPs from a GWAS study. For the sake of example, let's use [hdl](https://www.cdc.gov/cholesterol/ldl_hdl.htm#:~:text=HDL%20(high%2Ddensity%20lipoprotein),for%20heart%20disease%20and%20stroke.) (high-density lipoprotein cholesterol) as our outcome. 
 
-```{r clinical, eval=FALSE}
-# read in the clinical data
-pen_clinical <- fread(paste0(plink_example(parent = TRUE),
-                             "/penncath_clinical.csv")) |> 
-  rename(family.ID = FamID) |> 
-  mutate(sex = NULL)
-# several choices of outcome here;
-glimpse(pen_clinical)
+```{r}
+# NB: the 'quiet' option in process_plink()  will silence the printed messages
+pen_cl <- read.csv(plink_example(path = 'penncath_clinical.csv'))
 
-# choose hdl as outcome; impute missing values with the mean
-pen$fam <- full_join(pen$fam, pen_clinical, by = join_by("family.ID"))
-pen$y <- ifelse(is.na(pen$fam$hdl), mean(pen$fam$hdl, na.rm = T), pen$fam$hdl)
-
+# for the sake of illustration, I use a simple mean imputation for the outcome 
+pen$y <- ifelse(is.na(pen_cl$hdl),
+                mean(pen_cl$hdl, na.rm = T), pen_cl$hdl)
 ```
 
+
 #### fit 1 
-```{r pen1, eval=FALSE}
+```{r pen1}
 # construct a cross-validated lasso model 
 cv_pen1 <- cv.plmm(X = pen$X,
               y = pen$y,
@@ -235,8 +226,10 @@ summary(cv_pen1)
 
 ```
 
-Hmm -- we found an mFdr of 1 in fit 1, which is not great from an application standpoint. While this could be due to a true lack of association between any SNPs and the HDL outcome, this may also be an estimation issue. In our next model, we will use MCP instead of lasso in hopes of improving our estimation. 
+Hmm -- we found an mFdr of 1 in fit 1, which is not great from an application standpoint. While this could be due to a true lack of association between any SNPs and the HDL outcome, this may also be an estimation issue. Remember, these articles are a work in progress... 
 
+
+In our next model, we will use MCP instead of lasso. 
 
 #### fit 2 
 
@@ -255,7 +248,7 @@ summary(cv_pen2)
 
 #### fit 3 
 
-Finally, we will model the 'penncath' data one more time using sex, age, and the first few principal components 
+Finally, we will model the 'penncath' data one more time using sex and the first few principal components 
 
 ```{r pen_pca, eval=FALSE}
 pen$std_X <- ncvreg::std(pen$X)
@@ -274,13 +267,7 @@ pen_PCs <- pen_pca$x
 ```
 
 ```{r pen3, eval=FALSE}
-pen$X_plus_fixed_eff <- cbind(pen$fam[,c("age", "sex")], pen_PCs[,1:10], pen$X)
-
-# TODO: the following line needs troubleshooting
-# pen$k_plus_pcs <- choose_k(X = pen$X_plus_fixed_eff,
-#                            # start at 1200 based on result from the previous fit
-#                            start = 1200,
-#                            returnKapprox = T)
+pen$X_plus_fixed_eff <- cbind(pen$fam[,c("sex")], pen_PCs[,1:10], pen$X)
 
 cv_pen3 <- cv.plmm(X = pen$X_plus_fixed_eff,
                    y = pen$y,
