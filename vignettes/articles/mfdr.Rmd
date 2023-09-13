@@ -233,7 +233,7 @@ In our next model, we will use MCP instead of lasso.
 
 #### fit 2 
 
-```{r pen2, eval=FALSE}
+```{r pen2}
 pen$k <- choose_k(pen$X, returnKapprox = T)
 
 cv_pen2 <- cv.plmm(X = pen$X,
@@ -250,7 +250,7 @@ summary(cv_pen2)
 
 Finally, we will model the 'penncath' data one more time using sex and the first few principal components 
 
-```{r pen_pca, eval=FALSE}
+```{r pen_pca}
 pen$std_X <- ncvreg::std(pen$X)
 pen_pca <- prcomp(pen$std_X, center = F, scale. = F)
 
@@ -266,7 +266,7 @@ plot(x = 1:10,
 pen_PCs <- pen_pca$x
 ```
 
-```{r pen3, eval=FALSE}
+```{r pen3}
 pen$X_plus_fixed_eff <- cbind(pen$fam[,c("sex")], pen_PCs[,1:10], pen$X)
 
 cv_pen3 <- cv.plmm(X = pen$X_plus_fixed_eff,
@@ -287,11 +287,13 @@ summary(cv_pen3)
 
 Comparing the three fits with the 'penncath' data, we can observe the following:
 
-```{r pen_compare, eval=FALSE}
+```{r pen_compare}
 par(mfrow = c(2,3))
 plot(cv_pen1); plot(cv_pen2); plot(cv_pen3)
 plot(pen1); plot(pen2); plot(pen3)
+```
 
+```{r}
 pen_comparison <- dplyr::bind_rows(pen_mfdr1, pen_mfdr2, pen_mfdr3) |> 
   rownames_to_column(var = "lambda") |> 
   mutate(across(.cols = c(EF, mFDR),
@@ -299,9 +301,10 @@ pen_comparison <- dplyr::bind_rows(pen_mfdr1, pen_mfdr2, pen_mfdr3) |>
 kable(pen_comparison)
 ```
 
+
 We can also look at how mFDR changes among the three models: 
 
-```{r pen_mfdr_graph, eval=FALSE}
+```{r pen_mfdr_graph}
 compare_mfdr <- bind_rows(mfdr(pen1), mfdr(pen2), mfdr(pen3)) |>
   rownames_to_column(var = "lambda") |> 
   mutate(model = c(rep("lasso", 100),

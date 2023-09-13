@@ -62,14 +62,17 @@ reference:
     - print.summary.cv.plmm
     - plot.cv.plmm
     - plot.plmm
+    - mfdr_plot
     
   - title: Prediction
     contents: 
     - predict.plmm
+    - predict.lmm
     
   - title: Data sets
     contents:
     - admix
+    - pedigree
     
   - title: internal
     contents: 

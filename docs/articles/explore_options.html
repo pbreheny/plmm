@@ -42,6 +42,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
     <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
     <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
@@ -212,17 +213,17 @@ LP does not incorporate that structure.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_admix1</span><span class="op">)</span>;<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_admix1_blup</span><span class="op">)</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=197and p=100</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0842):</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0981):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 36</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.41</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.552</span></span>
+<span><span class="co">#&gt;   Nonzero coefficients: 27</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 2.02</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.423</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=197and p=100</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.3171):</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1128):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 2</span></span>
+<span><span class="co">#&gt;   Nonzero coefficients: 25</span></span>
 <span><span class="co">#&gt;   Cross-validation error (deviance): 1.85</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.359</span></span></code></pre></div>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.360</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="options-for-looking-at-bias-and-variance">Options for looking at bias and variance<a class="anchor" aria-label="anchor" href="#options-for-looking-at-bias-and-variance"></a>
