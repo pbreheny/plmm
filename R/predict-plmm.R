@@ -74,7 +74,7 @@ predict.plmm <- function(object,
   
   if (type == "blup"){ # assuming eta of X and newX are the same 
     
-    warning("The BLUP option is under development. Rely on these estimates at your own risk.") 
+    message("The BLUP option is under development. Rely on these estimates with caution.") 
     
     if (missing(X)) stop("The design matrix is required for BLUP calculation. Please supply the no-intercept design matrix to the X argument.") 
     if (missing(y) & is.null(object$y)) stop("The vector of outcomes is required for BLUP calculation. Please either supply it to the y argument, or set returnX=TRUE in the plmm function.")

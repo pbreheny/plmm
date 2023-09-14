@@ -81,7 +81,7 @@ cv.plmm <- function(X,
   
   estimated_V <- NULL 
   if (type == 'blup') {
-    estimated_V <- fit$eta * tcrossprod(fit$U %*% diag(fit$S), fit$U) + (1-fit$eta)*diag(nrow = nrow(fit$U)) 
+    estimated_V <- v_hat(fit, K)
   }
 
   # initialize objects to hold CV results 

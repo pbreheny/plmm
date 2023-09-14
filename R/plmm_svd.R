@@ -56,7 +56,7 @@ plmm_svd <- function(std_X, n, p, diag_K, K, k, trace){
     ## case 1 (b): K is not specified, diag_K = FALSE, and k = min(n,p)
     if(trace){cat("No K specified - will use default definition of the \n realized relatedness matrix.\n")}
     K <- relatedness_mat(std_X) 
-    # TODO: thinking aobut how to write this function in C
+    # TODO: thinking about how to write relatedness_mat() in C...
     
     # remember: if I want all the singular values (which is k = min(n,p)), use base::svd
     if(k == min(n_stdX,p_stdX)){
@@ -68,8 +68,8 @@ plmm_svd <- function(std_X, n, p, diag_K, K, k, trace){
       decomp <- RSpectra::svds(A = K, nv = 0, k = k)
     }
     
-    S <- decomp$d
-    U <- decomp$u # NB: we need this -1 multiplier!! 
+    S <- decomp$d # relatedness_mat() internally scales by 1/p, so no need for that here
+    U <- decomp$u 
     
   } else if (!is.null(K) & 'matrix' %in% class(K)){
     # case 2: K is a user-specified matrix
@@ -90,11 +90,11 @@ plmm_svd <- function(std_X, n, p, diag_K, K, k, trace){
     if(k < min(n_stdX,p_stdX)){
       decomp <- RSpectra::svds(A = K, nv = 0, k = k)
     }
-    S <- decomp$d # if K matrix was user-specified, then no need to transform D here
+    S <- decomp$d/p # need to scale singular values by 1/p here!
     U <- decomp$u
   } else if(!is.null(K) & is.list(K)){
     # case 3: K is a user-supplied list, as returned from choose_k()
-    S <- K$d
+    S <- K$d # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
     U <- K$u
     
   }

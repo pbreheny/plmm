@@ -24,15 +24,18 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   
   # extract test set (comes from cv prep on full data)
   X_test <- full_cv_prep$std_X[fold==i, , drop=FALSE] 
-  y_test <- full_cv_prep$y[fold==i]
+  # standardize y, so that X, y, and yhat (see below) are all on same scale! 
+  y_test <- full_cv_prep$y[fold==i] |> ncvreg::std() 
 
   # fit a plmm within each fold 
   # lambda stays the same for each fold; comes from the overall fit in cv_plmm.R line 63 
   fit.i <- do.call("plmm_fit", cv.args)
   
-  beta <- coef.list(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
-  Xbeta <- predict.list(fit = fit.i, newX = X_test, type = 'lp', lambda = fit.i$lambda)
-  yhat <- matrix(data = drop(Xbeta), nrow = length(y_test))
+  if(type == "lp"){
+    beta <- coef.list(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
+    Xbeta <- predict.list(fit = fit.i, newX = X_test, type = 'lp', lambda = fit.i$lambda)
+    yhat <- matrix(data = drop(Xbeta), nrow = length(y_test)) 
+  }
   
   if (type == 'blup'){
     # estimated_V here comes from the overall fit in cv_plmm.R, an n*n matrix 
