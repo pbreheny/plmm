@@ -12,6 +12,7 @@
   idx = 1:length(object$lambda),
   X,
   y,
+  K = NULL,
   ...
 )
 }
@@ -29,6 +30,8 @@
 \item{X}{Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'blup'} and object is too large to be returned in \code{plmm} object.}
 
 \item{y}{Optional argument. Original continuous outcome vector from object. Required if \code{type == 'blup'}.}
+
+\item{K}{An optional list or matrix as returned by \code{choose_K()}.}
 
 \item{...}{Additional optional arguments}
 }

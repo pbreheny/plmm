@@ -7,6 +7,7 @@
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
 #' @param X Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'blup'} and object is too large to be returned in `plmm` object.
 #' @param y Optional argument. Original continuous outcome vector from object. Required if \code{type == 'blup'}.
+#' @param K An optional list or matrix as returned by `choose_K()`. 
 #' @param ... Additional optional arguments
 #' 
 #' @details
@@ -54,6 +55,7 @@ predict.plmm <- function(object,
                          idx=1:length(object$lambda),
                          X,
                          y,
+                         K = NULL,
                          ...) {
   
   type <- match.arg(type)
@@ -78,7 +80,6 @@ predict.plmm <- function(object,
     
     if (missing(X)) stop("The design matrix is required for BLUP calculation. Please supply the no-intercept design matrix to the X argument.") 
     if (missing(y) & is.null(object$y)) stop("The vector of outcomes is required for BLUP calculation. Please either supply it to the y argument, or set returnX=TRUE in the plmm function.")
-    # if (!(c("S", "U") %in% names(object))) stop("SVD results are required for BLUP calculation. Use 'svd_details = TRUE' in the 'plmm' function.")
     
     if (!is.null(object$y)) y <- object$y
     
@@ -86,7 +87,7 @@ predict.plmm <- function(object,
     # used to compute #
     ################### 
     
-    V11 <- object$Vhat # same as V11_check 
+    V11 <- v_hat(object, K)
     
     # cannot use U, S when computing V21, because nv=0. V is needed to restore X 
     V21 <- object$eta * (1/p) * tcrossprod(newX, X) # same as V21_check 

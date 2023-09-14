@@ -50,6 +50,7 @@ predict.list <- function(fit, newX, type=c("lp", "blup"),
     
     std_y <- ncvreg::std(fit$y) # get y on same scale as X!
     ranef <- V21 %*% chol2inv(chol(V11)) %*% (std_y - cbind(1, prep$std_X) %*% beta_vals)
+
       
     blup <- Xbeta + ranef
     

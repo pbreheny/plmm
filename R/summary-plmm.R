@@ -22,9 +22,9 @@
 #' @export
 #'
 #' @examples
-#' fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' s1 <- summary(fit, idx = 97)
-#' s2 <- summary(fit, lambda = 0.0005957590)
+#' fit <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+#' summary(fit$fit, idx = 97)
+#' summary(fit, lambda = fit$lambda.min)
 
 summary.plmm <- function(object, lambda, idx, eps = 1e-5, ...){
 

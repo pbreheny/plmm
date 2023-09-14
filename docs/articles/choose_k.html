@@ -42,6 +42,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
     <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
     <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
@@ -207,18 +208,18 @@ to see the results:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=197and p=100</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0896):</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0832):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 29</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.81</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.677</span></span>
+<span><span class="co">#&gt;   Nonzero coefficients: 31</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 2.37</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.539</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=197and p=100</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0409):</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1278):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 53</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.60</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.614</span></span></code></pre></div>
+<span><span class="co">#&gt;   Nonzero coefficients: 35</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 3.26</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.806</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

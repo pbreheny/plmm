@@ -1,4 +1,4 @@
-#' A function to implement singular value decomposition for a PLMM 
+#' A function to implement singular value decomposition for a PLMM or LMM 
 #' This is an internal function to \code{plmm_prep()}
 #' 
 #' @param std_X The standardized X matrix
