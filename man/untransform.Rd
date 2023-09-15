@@ -4,7 +4,7 @@
 \alias{untransform}
 \title{Untransform coefficient values back to the original scale}
 \usage{
-untransform(res_b, ns, ncol_X, std_X, SUX, std_SUX)
+untransform(res_b, ns, ncol_X, std_X, SUX, std_SUX, partial = FALSE)
 }
 \arguments{
 \item{res_b}{The values returned in the 'beta' argument of the ncvfit() object}
@@ -18,9 +18,13 @@ untransform(res_b, ns, ncol_X, std_X, SUX, std_SUX)
 \item{SUX}{The rotated design matrix (has the intercept)}
 
 \item{std_SUX}{The standardized design matrix AFTER rotation; this should have attribute 'scale'}
+
+\item{partial}{Logical: Should beta values be untransformed from just the post-rotation standardization?
+This option exists because I need partial= TRUE inside the internal function \code{predict.list()}.
+Users should leave this option false unless they know exactly what they're doing.}
 }
 \description{
 This function unwinds both steps of the standardization process to obtain
-coefficient values on their original scale. It is called by plmm().
+coefficient values on their original scale. It is called by plmm_format().
 }
 \keyword{internal}

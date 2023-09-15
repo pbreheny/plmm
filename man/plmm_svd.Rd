@@ -34,23 +34,23 @@ let svd(std_X) be defined as t(U)DU, and write S = (D^2)/p (a good derivation ex
 Broadly speaking, there are three cases:
 (1) K is not user-specified, (2) K is a matrix, and (3) K is a list.
 
-In case 1:
+In case 1 (K is NULL):
 \itemize{
-\item (a) if K is not specified but diag_K = TRUE: K is treated as the identity matrix.
+\item (a) if diag_K = TRUE: K is treated as the identity matrix.
 All S = rep(1, n), and U = diag(n)
-\item (b) if K is not specified, diag_K = FALSE, and k = min(n,p):
+\item (b) diag_K = FALSE and k = min(n,p):
 use base::svd(K), where K = relatedness_mat(std_X)
-\item (c) if K is not specified, diag_K = FALSE, and k < min(n,p):
+\item (c) diag_K = FALSE and k < min(n,p):
 use RSpectra::svds(K, k = k), where K = relatedness_mat(std_X)
 }
 
-In case 2:
+In case 2 (K is a matrix):
 \itemize{
-\item (a): if K is a matrix and diag_K = TRUE: observations will be treated as unrelated,
+\item (a): if diag_K = TRUE: observations will be treated as unrelated,
 where S = sort(diag(K), decreasing = T) and columns of U are the columns of an
 identity matrix sorted on the values of S.
-\item (b): if K is a matrix and k = min(n,p): use base::svd(K)
-\item (c): if K is a matrix and k < min(n,p): use RSpectra::svds(K, k)
+\item (b): if k = min(n,p): use base::svd(K)
+\item (c): if k < min(n,p): use RSpectra::svds(K, k)
 }
 
 In case 3:

@@ -10,13 +10,16 @@
 #' @importFrom zeallot %<-%
 #' @keywords internal
 cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
-  
+
   # save the 'prep' object from the plmm_prep() in cv.plmm
   full_cv_prep <- cv.args$prep
   
   # subset std_X, and y to match fold indices 
   #   (and in so doing, leave out the ith fold)
   cv.args$prep$std_X <- full_cv_prep$std_X[fold!=i, ,drop=FALSE]
+  # NB: need center & scale values here! Will pass this to untransform() via coef.list
+  attr(cv.args$prep$std_X, "center") <- attr(full_cv_prep$std_X, "center")
+  attr(cv.args$prep$std_X, "scale") <- attr(full_cv_prep$std_X, "scale")
   cv.args$prep$U <- full_cv_prep$U[fold!=i, , drop=FALSE]
   cv.args$prep$y <- full_cv_prep$y[fold!=i] 
   
@@ -24,16 +27,20 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   
   # extract test set (comes from cv prep on full data)
   X_test <- full_cv_prep$std_X[fold==i, , drop=FALSE] 
-  # standardize y, so that X, y, and yhat (see below) are all on same scale! 
-  y_test <- full_cv_prep$y[fold==i] |> ncvreg::std() 
+  y_test <- full_cv_prep$y[fold==i]
 
   # fit a plmm within each fold 
   # lambda stays the same for each fold; comes from the overall fit in cv_plmm.R line 63 
   fit.i <- do.call("plmm_fit", cv.args)
   
   if(type == "lp"){
-    beta <- coef.list(fit.i, fit.i$lambda, drop=FALSE) # includes intercept
-    Xbeta <- predict.list(fit = fit.i, newX = X_test, type = 'lp', lambda = fit.i$lambda)
+    # beta <- coef.list(fit.i, fit.i$lambda,
+    #                   std_X = cv.args$prep$std_X,
+    #                   drop=FALSE) # includes intercept
+    Xbeta <- predict.list(fit = fit.i,
+                          std_X = cv.args$prep$std_X,
+                          newX = X_test,
+                          type = 'lp')
     yhat <- matrix(data = drop(Xbeta), nrow = length(y_test)) 
   }
   
@@ -42,9 +49,13 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
     V21 <- estimated_V[fold==i, fold!=i, drop = FALSE] 
     V11 <- estimated_V[fold!=i, fold!=i, drop = FALSE] 
     
-    yhat <- predict.list(fit = fit.i, newX = X_test, type = 'blup',
-                         lambda = fit.i$lambda, prep = cv.args$prep, 
-                         V11 = V11, V21 = V21, ...)
+    yhat <- predict.list(fit = fit.i,
+                         std_X = cv.args$prep$std_X,
+                         newX = X_test,
+                         type = 'blup',
+                         prep = cv.args$prep, 
+                         V11 = V11,
+                         V21 = V21, ...)
     
   }
   

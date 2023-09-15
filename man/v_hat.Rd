@@ -9,7 +9,7 @@ v_hat(fit, K = NULL)
 \arguments{
 \item{fit}{An object returned by \code{plmm()}}
 
-\item{K}{An optional matrix as list returned by \code{choose_K()}}
+\item{K}{An optional matrix or list as returned by \code{choose_K()}}
 }
 \value{
 Vhat, a matrix representing the estimated variance

@@ -1,9 +1,9 @@
-#' Predict method for a list used in cross-validation (e.g. the \code{fit.i} within \code{cvf})
+#' Predict method for a list used in cross-validation (within \code{cvf})
 #'
-#' @param fit  A list with the components returned by `plmm_fit`
+#' @param fit  A list with the components returned by `plmm_fit`. 
+#' @param std_X The standardized design matrix of training data, *pre-rotation*. 
 #' @param newX A design matrix used for computing predicted values (i.e, the test data).
 #' @param type A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details. 
-#' @param lambda A numeric vector of regularization parameter \code{lambda} values at which predictions are requested.
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
 #' @param prep Optional argument. Result of the call to `plmm_prep` which corresponds to the `fit` argument. Required if \code{type == 'blup'}. 
 #' @param V11 Variance-covariance matrix of the training data. Extracted from `estimated_V` that is generated using all observations. Required if \code{type == 'blup'}. 
@@ -21,23 +21,44 @@
 #' @keywords internal
 #'
 
-predict.list <- function(fit, newX, type=c("lp", "blup"),
-                         lambda, idx=1:length(fit$lambda), prep = NULL, V11 = NULL, V21 = NULL, ...) {
+predict.list <- function(fit,
+                         std_X,
+                         newX,
+                         type=c("lp", "blup"),
+                         idx=1:length(fit$lambda),
+                         prep = NULL,
+                         V11 = NULL,
+                         V21 = NULL, ...) {
+  
   type <- match.arg(type)
-  beta_vals <- coef.list(fit, lambda=lambda, which=idx, drop=FALSE) # includes intercept 
+  # get beta values from fit -- these coefficients are on the transformed scale
+  raw_beta_vals <- fit$b[, idx, drop = FALSE]
   
-  # addressing each type: 
+  # reverse the transformations of the beta values 
+  beta_vals <- untransform(res_b = raw_beta_vals,
+                           ns = fit$ns,
+                           ncol_X = fit$ncol_X,
+                           std_X = std_X,
+                           SUX = fit$SUX,
+                           std_SUX = fit$std_SUX,
+                           partial = TRUE)
   
-  if (type=="coefficients") return(beta_vals)
-  
-  if (type=="nvars") return(apply(beta_vals[-1, , drop=FALSE]!=0, 2, sum)) # don't count intercept
-  
-  if (type=="vars") return(drop(apply(beta_vals[-1, , drop=FALSE]!=0, 2, FUN=which))) # don't count intercept
-  
+  # format dim. names
+  if(is.null(dim(beta_vals))) {
+    # case 1: beta_vals is a vector 
+    names(beta_vals) <- lamNames(fit$lambda)
+  } else {
+    # case 2: beta_vals is a matrix
+    colnames(beta_vals) <- lamNames(fit$lambda)
+  }
+
+  # calculate the estimated mean values for test data 
   Xbeta <- cbind(1, newX) %*% beta_vals
   
+  # for linear predictor, return mean values 
   if (type=="lp") return(drop(Xbeta))
   
+  # for blup, will incorporate the estimated variance 
   if (type == "blup"){
     # warning("The BLUP option is under development. Rely on these estimates at your own risk.")
     
@@ -47,11 +68,9 @@ predict.list <- function(fit, newX, type=c("lp", "blup"),
       
     # test1 <- V21 %*% chol2inv(chol(V11)) # true 
     # TODO: to find the inverse of V11 using svd results of K, i.e., the inverse of a submatrix, might need to use Woodbury's formula 
-    
-    std_y <- ncvreg::std(fit$y) # get y on same scale as X!
-    ranef <- V21 %*% chol2inv(chol(V11)) %*% (std_y - cbind(1, prep$std_X) %*% beta_vals)
 
-      
+    ranef <- V21 %*% chol2inv(chol(V11)) %*% (fit$y - cbind(1, prep$std_X) %*% beta_vals)
+
     blup <- Xbeta + ranef
     
     return(blup)

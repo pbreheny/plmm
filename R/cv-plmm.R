@@ -135,6 +135,7 @@ cv.plmm <- function(X,
                  cv.args = cv.args,
                  estimated_V = estimated_V)
       if (trace) {setTxtProgressBar(pb, i)}
+
     }
     # update E and Y
     E[fold==i, 1:res$nl] <- res$loss

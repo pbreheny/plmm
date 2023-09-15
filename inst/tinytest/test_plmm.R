@@ -4,14 +4,14 @@
 # Test 0: Case where K = identity -------------------------------------------
 
 # set up 
-K_identity <- diag(nrow = nrow(admix$X))
 lambda0 <- c(1, 0.1, 0.01, 0.001)
 
 plmm0 <- plmm(X = admix$X,
               y = admix$y,
-              K = K_identity,
+              diag_K = TRUE,
               lambda = lambda0,
-              penalty = "lasso")
+              penalty = "lasso",
+              trace = T)
 
 lasso0 <- glmnet::glmnet(x = admix$X,
                  y = admix$y,
@@ -142,3 +142,4 @@ colnames(test) <- c('y',
                  'y_hat_glmnet0.01')
 # test[1:10,] # in plmm method, all rows of X have same predicted value! 
 if(mean(test[,2] - test[,4]) > 5) stop("PLMM and GLMNET predictions are far off for the test model.")
+
