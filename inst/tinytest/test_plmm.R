@@ -68,6 +68,7 @@ lambda2 <- c(1, 0.1, 0.01)
 
 plmm2 <- plmm(X = admix$X,
               y = admix$y,
+              diag_K = TRUE,
               K = K_diagonal,
               lambda = lambda2,
               penalty = "lasso")
