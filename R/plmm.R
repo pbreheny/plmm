@@ -169,8 +169,7 @@ plmm <- function(X,
   the_final_product <- plmm_format(fit = the_fit, 
                                    convex = convex,
                                    dfmax = dfmax, 
-                                   X = X,
-                                   K = K)
+                                   X = X)
   
   return(the_final_product)
   

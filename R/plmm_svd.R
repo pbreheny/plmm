@@ -2,7 +2,6 @@
 #' This is an internal function to \code{plmm_prep()}
 #' 
 #' @param K The relatedness matrix
-#' @param p The number of columns in original X matrix
 #' @param k Optional integer argument indicating the number of singular values to use in a truncated SVD. See details. 
 #' @param trunc Logical: should truncated SVD be used? 
 #' @param trace Logical: should messages be printed to console? 
@@ -16,7 +15,7 @@
 #' 
 #' @keywords internal
 
-plmm_svd <- function(K, k, p, trunc, trace){
+plmm_svd <- function(K, k, trunc, trace){
   # case 1: full SVD -----------------------------------  
   if(!trunc){
     if(trace){cat("\nUsing full SVD")}

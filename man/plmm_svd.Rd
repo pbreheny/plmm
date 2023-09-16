@@ -5,20 +5,14 @@
 \title{A function to implement singular value decomposition for a PLMM or LMM
 This is an internal function to \code{plmm_prep()}}
 \usage{
-plmm_svd(std_X, n, p, diag_K, K, k, trace)
+plmm_svd(K, k, trunc, trace)
 }
 \arguments{
-\item{std_X}{The standardized X matrix}
-
-\item{n}{The number of rows in X}
-
-\item{p}{The number of columns in X}
-
-\item{diag_K}{Logical: is K a diagonal matrix? Defaults to FALSE.}
-
-\item{K}{Optional argument indicating the relatedness matrix to be used. See details.}
+\item{K}{The relatedness matrix}
 
 \item{k}{Optional integer argument indicating the number of singular values to use in a truncated SVD. See details.}
+
+\item{trunc}{Logical: should truncated SVD be used?}
 
 \item{trace}{Logical: should messages be printed to console?}
 }
@@ -28,34 +22,9 @@ This is an internal function to \code{plmm_prep()}
 }
 \details{
 The kind of SVD implemented here will depend on the combination of arguments supplied.
-Let svd(K) be defined as t(U)SU, since K is symmetric in a PLMM context. We can
-let svd(std_X) be defined as t(U)DU, and write S = (D^2)/p (a good derivation exercise, for those who are interested).
-
-Broadly speaking, there are three cases:
-(1) K is not user-specified, (2) K is a matrix, and (3) K is a list.
-
-In case 1 (K is NULL):
-\itemize{
-\item (a) if diag_K = TRUE: K is treated as the identity matrix.
-All S = rep(1, n), and U = diag(n)
-\item (b) diag_K = FALSE and k = min(n,p):
-use base::svd(K), where K = relatedness_mat(std_X)
-\item (c) diag_K = FALSE and k < min(n,p):
-use RSpectra::svds(K, k = k), where K = relatedness_mat(std_X)
-}
-
-In case 2 (K is a matrix):
-\itemize{
-\item (a): if diag_K = TRUE: observations will be treated as unrelated,
-where S = sort(diag(K), decreasing = T) and columns of U are the columns of an
-identity matrix sorted on the values of S.
-\item (b): if k = min(n,p): use base::svd(K)
-\item (c): if k < min(n,p): use RSpectra::svds(K, k)
-}
-
-In case 3:
-if K is a list, D and U are simply passed from \code{choose_k()} & D is transformed to S.
-
-Any scenarios outside of those outlined will error out.
+(1) if trunc = FALSE
+use base::svd(K)
+(2) if trunc = TRUE
+use RSpectra::svds(K, k = k)
 }
 \keyword{internal}

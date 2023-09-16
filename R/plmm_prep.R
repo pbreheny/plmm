@@ -116,7 +116,7 @@ plmm_prep <- function(X,
       K <- relatedness_mat(X)
     }
     
-    svd_res <- plmm_svd(K = K, k = k, p = p, trunc = trunc, trace = trace)
+    svd_res <- plmm_svd(K = K, k = k, trunc = trunc, trace = trace)
     S <- svd_res$S
     U <- svd_res$U
   }
@@ -132,17 +132,19 @@ plmm_prep <- function(X,
   
   
   # return values to be passed into plmm_fit(): 
-  ret <- structure(list(ncol_X = ncol(X),
-                        nrow_X = nrow(X), 
-                        y = y,
-                        std_X = std_X,
-                        S = S,
-                        U = U,
-                        ns = ns,
-                        eta = eta_star, # carry eta over to fit 
-                        penalty.factor = penalty.factor,
-                        trace = trace,
-                        snp_names = if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)))
+  ret <- structure(list(
+    K = K,
+    ncol_X = ncol(X),
+    nrow_X = nrow(X), 
+    y = y,
+    std_X = std_X,
+    S = S,
+    U = U,
+    ns = ns,
+    eta = eta_star, # carry eta over to fit 
+    penalty.factor = penalty.factor,
+    trace = trace,
+    snp_names = if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)))
   
   return(ret)
   

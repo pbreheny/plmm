@@ -103,13 +103,13 @@ tinytest::expect_equivalent(matrix(0,
           fit3$beta_vals[monomorphic_snps,])
 # Test 4: case where K is simulated to have no population structure ----------
 
-K_independent <- sim_ps_x(n = nrow(admix$X),
-                          p = ncol(admix$X),
-                          # supposing all individuals are independent 
-                          nJ = nrow(admix$X),
-                          structureX = "independent"
-) |> 
-  relatedness_mat()
+# K_independent <- sim_ps_x(n = nrow(admix$X),
+#                           p = ncol(admix$X),
+#                           # supposing all individuals are independent 
+#                           nJ = nrow(admix$X),
+#                           structureX = "independent"
+# ) |> 
+#   relatedness_mat()
 
 # TODO come back here
 
@@ -143,4 +143,4 @@ colnames(test) <- c('y',
                  'y_hat_glmnet0.01')
 # test[1:10,] # in plmm method, all rows of X have same predicted value! 
 if(mean(test[,2] - test[,4]) > 5) stop("PLMM and GLMNET predictions are far off for the test model.")
-
+# NB: the 5 above is chosen arbitrarily, based on my experience with the admix data 

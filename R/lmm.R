@@ -105,8 +105,7 @@ lmm <- function(X,
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   the_final_product <- lmm_format(fit = the_fit, 
                                    dfmax = dfmax, 
-                                   X = X,
-                                   K = K)
+                                   X = X)
   
   return(the_final_product)
   

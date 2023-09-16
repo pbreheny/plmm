@@ -13,7 +13,7 @@ plmm_prep(
   diag_K = NULL,
   eta_star = NULL,
   penalty.factor = rep(1, ncol(X)),
-  trace = FALSE,
+  trace = NULL,
   ...
 )
 }

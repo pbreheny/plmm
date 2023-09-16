@@ -4,18 +4,14 @@
 \alias{lmm_format}
 \title{LMM format: a function to format the output of a model constructed with \code{lmm_fit}}
 \usage{
-lmm_format(fit, convex = TRUE, dfmax = fit$ncol_X + 1, X, K)
+lmm_format(fit, dfmax = fit$ncol_X + 1, X)
 }
 \arguments{
 \item{fit}{A list of parameters describing the output of a model constructed with \code{lmm_fit}}
 
-\item{convex}{convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.}
-
 \item{dfmax}{dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.}
 
 \item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
-
-\item{K}{Similarity matrix used to rotate the data. This will be passed from plmm() as (1) NULL, in which case relatedness_mat(std(X)) is used, (2) a matrix or (3) a list with components d and u (eigenvalues and eigenvectors, respectively).}
 }
 \value{
 A list with the components:

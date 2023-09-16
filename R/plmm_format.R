@@ -4,7 +4,6 @@
 #' @param convex convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
 #' @param dfmax dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
 #' @param X Design matrix. May include clinical covariates and other non-SNP data. 
-#' @param K Similarity matrix used to rotate the data. This will be passed from plmm() as (1) NULL, in which case relatedness_mat(std(X)) is used, (2) a matrix or (3) a list with components d and u (eigenvalues and eigenvectors, respectively).
 #' 
 #' @return A list with the components: 
 #' * beta_vals: The estimated beta values at each value of lambda
@@ -32,8 +31,7 @@
 plmm_format <- function(fit,
                         convex = TRUE,
                         dfmax = fit$ncol_X + 1, 
-                        X,
-                        K){
+                        X){
   # eliminate saturated lambda values, if any
   ind <- !is.na(fit$iter)
   iter <- fit$iter[ind]

@@ -77,9 +77,6 @@ lmm_fit <- function(prep,
          Check your design matrix to address this issue.")
   }
   
-  # reconstruct K to calculate V 
-  # this is on the standardized X scale 
-  estimated_V <- eta * tcrossprod(prep$U %*% diag(prep$S), prep$U) + (1-eta)*diag(nrow = nrow(prep$U)) 
   
   ret <- structure(list(
     res = res,
@@ -97,8 +94,7 @@ lmm_fit <- function(prep,
     snp_names = prep$snp_names,
     eps = eps,
     returnX = prep$returnX,
-    trace = prep$trace, 
-    estimated_V = estimated_V
+    trace = prep$trace
   )) 
   
   return(ret)
