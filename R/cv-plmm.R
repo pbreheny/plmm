@@ -48,13 +48,12 @@ cv.plmm <- function(X,
                     returnBiasDetails = FALSE,
                     trace=FALSE) {
 
-
   # default type is 'lp'
   if(missing(type)) {type == 'lp'} 
 
   # determine penalty 
   penalty <- match.arg(penalty)
-  
+
   # implement preparation steps for model fitting 
   prep.args <- c(list(X = X,
                       y = y,
@@ -63,9 +62,9 @@ cv.plmm <- function(X,
                       diag_K = diag_K,
                       eta_star = eta_star,
                       penalty.factor = penalty.factor,
-                      trace,
+                      trace = trace,
                       ...)) # ... additional arguments to plmm_prep()
-  
+
   prep <- do.call('plmm_prep', prep.args)
   
   

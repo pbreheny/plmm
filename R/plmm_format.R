@@ -40,7 +40,7 @@ plmm_format <- function(fit,
   converged <- fit$converged[ind]
   lambda <- fit$lambda[ind]
   loss <- fit$loss[ind]
-  if (fit$warn & sum(iter) == fit$max.iter) warning("Maximum number of iterations reached")
+  if (fit$warn & sum(iter) == fit$max.iter) warning("\nMaximum number of iterations reached")
   convex.min <- if (convex) convexMin(b = fit$b,
                                       X = fit$std_SUX,
                                       penalty = fit$penalty,
@@ -57,7 +57,7 @@ plmm_format <- function(fit,
                            SUX = fit$SUX,
                            std_SUX = fit$std_SUX)
   
-  if(fit$trace){cat("\nBeta values are estimated -- almost done!\n")}
+  if(fit$trace){cat("\nBeta values are estimated -- almost done!")}
   
   # give the matrix of beta_values readable names 
   # SNPs (or covariates) on the rows, lambda values on the columns

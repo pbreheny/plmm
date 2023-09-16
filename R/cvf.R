@@ -17,31 +17,29 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   # subset std_X, and y to match fold indices 
   #   (and in so doing, leave out the ith fold)
   cv.args$prep$std_X <- full_cv_prep$std_X[fold!=i, ,drop=FALSE]
-  # NB: need center & scale values here! Will pass this to untransform() via coef.list
+  # NB: need center & scale values here! Will pass this to untransform() via predict.list
   attr(cv.args$prep$std_X, "center") <- attr(full_cv_prep$std_X, "center")
   attr(cv.args$prep$std_X, "scale") <- attr(full_cv_prep$std_X, "scale")
   cv.args$prep$U <- full_cv_prep$U[fold!=i, , drop=FALSE]
   cv.args$prep$y <- full_cv_prep$y[fold!=i] 
   
-  # eta used in each fold comes from the overall fit.args. If user-supplied, then use that in all fold; if not, estimate eta in each fold 
-  
   # extract test set (comes from cv prep on full data)
   X_test <- full_cv_prep$std_X[fold==i, , drop=FALSE] 
   y_test <- full_cv_prep$y[fold==i]
+  
+  # NB: eta used in each fold comes from the overall fit.args. If user-supplied, then 
+  # use that in all fold; if not, estimate eta in each fold 
 
   # fit a plmm within each fold 
-  # lambda stays the same for each fold; comes from the overall fit in cv_plmm.R line 63 
+  # lambda stays the same for each fold; comes from the overall fit in cv_plmm()
   fit.i <- do.call("plmm_fit", cv.args)
   
   if(type == "lp"){
-    # beta <- coef.list(fit.i, fit.i$lambda,
-    #                   std_X = cv.args$prep$std_X,
-    #                   drop=FALSE) # includes intercept
-    Xbeta <- predict.list(fit = fit.i,
+    yhat <- predict.list(fit = fit.i,
                           std_X = cv.args$prep$std_X,
                           newX = X_test,
                           type = 'lp')
-    yhat <- matrix(data = drop(Xbeta), nrow = length(y_test)) 
+    # yhat <- matrix(data = drop(Xbeta), nrow = length(y_test)) 
   }
   
   if (type == 'blup'){

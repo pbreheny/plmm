@@ -34,7 +34,7 @@ predict.list <- function(fit,
   # get beta values from fit -- these coefficients are on the transformed scale
   raw_beta_vals <- fit$b[, idx, drop = FALSE]
   
-  # reverse the transformations of the beta values 
+  # reverse the post-rotation standardization of the beta values 
   beta_vals <- untransform(res_b = raw_beta_vals,
                            ns = fit$ns,
                            ncol_X = fit$ncol_X,
@@ -60,9 +60,6 @@ predict.list <- function(fit,
   
   # for blup, will incorporate the estimated variance 
   if (type == "blup"){
-    # warning("The BLUP option is under development. Rely on these estimates at your own risk.")
-    
-    if(is.null(prep)) stop("The 'prep' argument is required for BLUP calculation.")
       
     # covariance comes from selected rows and columns from estimated_V that is generated in the overall fit (V11, V21)
       

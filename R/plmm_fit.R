@@ -59,7 +59,7 @@ plmm_fit <- function(prep,
   if (alpha <= 0) stop("alpha must be greater than 0; choose a small positive number instead", call.=FALSE)
   if (length(init)!=prep$ncol_X) stop("Dimensions of init and X do not match", call.=FALSE)
   
-  if(prep$trace){cat("Beginning standardization + rotation.")}
+  if(prep$trace){cat("\nBeginning standardization + rotation.")}
   
   # estimate eta if needed
   if (is.null(prep$eta)) {
@@ -82,7 +82,7 @@ plmm_fit <- function(prep,
   # calculate population var without mean 0; will need this for call to ncvfit()
   xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
   
-  if(prep$trace){cat("Setup complete. Beginning model fitting.\n")}
+  if(prep$trace){cat("\nSetup complete. Beginning model fitting.")}
   
   # remove initial values for coefficients representing columns with singular values
   init <- init[prep$ns] 
@@ -99,7 +99,7 @@ plmm_fit <- function(prep,
   } else {
     # make sure (if user-supplied sequence) is in DESCENDING order
     if(length(lambda) > 1){
-      if (max(diff(lambda)) > 0) stop("User-supplied lambda sequence must be in descending (largest -> smallest) order")
+      if (max(diff(lambda)) > 0) stop("\nUser-supplied lambda sequence must be in descending (largest -> smallest) order")
     }
     nlambda <- length(lambda)
     user.lambda <- TRUE
