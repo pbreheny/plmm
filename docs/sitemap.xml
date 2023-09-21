@@ -7,6 +7,9 @@
     <loc>/articles/choose_k.html</loc>
   </url>
   <url>
+    <loc>/articles/deconfounding.html</loc>
+  </url>
+  <url>
     <loc>/articles/explore_options.html</loc>
   </url>
   <url>
@@ -41,6 +44,9 @@
   </url>
   <url>
     <loc>/reference/coef.list.html</loc>
+  </url>
+  <url>
+    <loc>/reference/coef.lmm.html</loc>
   </url>
   <url>
     <loc>/reference/coef.plmm.html</loc>
@@ -94,10 +100,25 @@
     <loc>/reference/lasso_pca10.html</loc>
   </url>
   <url>
+    <loc>/reference/lmm.html</loc>
+  </url>
+  <url>
+    <loc>/reference/lmm_fit.html</loc>
+  </url>
+  <url>
+    <loc>/reference/lmm_format.html</loc>
+  </url>
+  <url>
     <loc>/reference/lmm_ggmix.html</loc>
   </url>
   <url>
     <loc>/reference/lmm_lasso.html</loc>
+  </url>
+  <url>
+    <loc>/reference/lmm_prep.html</loc>
+  </url>
+  <url>
+    <loc>/reference/lmm_untransform.html</loc>
   </url>
   <url>
     <loc>/reference/logLik.html</loc>
@@ -113,6 +134,12 @@
   </url>
   <url>
     <loc>/reference/mfdr.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mfdr_plot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/pedigree.html</loc>
   </url>
   <url>
     <loc>/reference/penalizedLMM-package.html</loc>
@@ -151,6 +178,9 @@
     <loc>/reference/plmm_scad.html</loc>
   </url>
   <url>
+    <loc>/reference/plmm_svd.html</loc>
+  </url>
+  <url>
     <loc>/reference/plot.cv.plmm.html</loc>
   </url>
   <url>
@@ -158,6 +188,9 @@
   </url>
   <url>
     <loc>/reference/predict.list.html</loc>
+  </url>
+  <url>
+    <loc>/reference/predict.lmm.html</loc>
   </url>
   <url>
     <loc>/reference/predict.plmm.html</loc>

@@ -1,4 +1,5 @@
 #' mfdr: Marginal false discovery rates for PLMMs
+#' 
 #' Based on [ncvreg::mfdr()]
 #' 
 #' @param fit A \code{plmm} object.
@@ -10,7 +11,7 @@
 #' 
 #' @details
 #' The function estimates the marginal false discovery rate (mFDR) for a penalized regression model. The estimate tends to be accurate in most settings, but will be slightly conservative if predictors are highly correlated
-#' 
+#' We have not implemented something like mFDR for LMMs yet
 #' 
 #' @export
 #' 
@@ -19,7 +20,7 @@
 #' mfdr(fit) |> head()
 mfdr <- function(fit) {
   # Setup
-  if (!inherits(fit, 'plmm')) stop('"fit" must be a plmm object', call.=FALSE)
+  if (!(inherits(fit, 'plmm'))) stop('"fit" must be a plmm object', call.=FALSE)
   S0 <- sum(fit$penalty.factor==0)
   S <- predict(fit, type="nvars") - S0
   

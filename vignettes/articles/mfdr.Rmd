@@ -20,6 +20,8 @@ library(tibble) # for rownames_to_column() and other data cleaning funs.
 library(knitr)
 ```
 
+**Note**: once again, this is a work in progress. I do not recommend blindly follow this like a tutorial! 
+
 ## Background and motivation
 
 While cross validation (as in `cv.plmm()`) serves as a method for assessing a model's ability to predict outcomes in new data, cross validation is not geared towards making *inferences* about the $\hat \beta$ values (coefficients) estimated by a model. When we use a PLMM, we often want to answer questions like:
@@ -72,7 +74,6 @@ admix$k <- choose_k(X = admix$X, returnKapprox = T)
 cv_fit2 <- cv.plmm(X = admix$X,
                    y = admix$y,
                    K = admix$k$K_svd,
-                   penalty = "lasso",
                    seed = 26)
 
 # look at results 
@@ -99,7 +100,7 @@ plot(x = 1:10,
      main = 'Scree Plot')
 # first 4 PCs explain most of the variance, so we will use these as fixed effects; this makes sense given the ancestry of the participants 
 pca_dat <- data.frame(race = admix$race, PC1 = pca$x[,1], PC2 = pca$x[, 2])
-pca_plot <- ggplot(pca_dat, aes(x = PC1, y = PC2, col = race)) +
+pca_plot <- ggplot(pca_dat, aes(x = PC1, y = PC2, col = as.factor(race))) +
   geom_point() +
   coord_fixed()
 plot(pca_plot)
@@ -115,14 +116,10 @@ admix$X_plus_PCs <- cbind(PCs[,1:4], admix$X)
 With the principal components calculated, we can now fit our third model: 
 
 ```{r fit3}
-# choose k using new design matrix
-admix$k_plus_PCs <- choose_k(X = admix$X_plus_PCs, returnKapprox = T)
-
 # construct the model 
 cv_fit3 <- cv.plmm(X = admix$X_plus_PCs,
                    y = admix$y,
-                   K = admix$k_plus_PCs$K_svd,
-                   penalty = "lasso",
+                   K = admix$k$K_svd,
                    # make sure not to penalize fixed effects - we want to keep 
                    #  these in the model!
                    penalty.factor = c(rep(0, 4), rep(1, ncol(admix$X))),
@@ -148,35 +145,32 @@ plot(cv_fit1); plot(cv_fit2); plot(cv_fit3)
 plot(fit1); plot(fit2); plot(fit3)
 
 admix_comparison <- dplyr::bind_rows(mfdr1, mfdr2, mfdr3) |> 
-  rownames_to_column(var = "lambda") |> 
   mutate(across(.cols = c(EF, mFDR),
-                .fns = ~round(.x, digits = 3)))
-kable(admix_comparison)
+                .fns = ~round(.x, digits = 3)),
+         model = paste0("Model ", 1:3)) |> 
+  dplyr::select(model, EF, S, mFDR)
+rownames(admix_comparison) <- NULL
+kable(admix_comparison,
+      caption = "Comparing 3 models at their respective lambda.min values")
 
 
 ```
 
 Some observations based on the plots and output above: 
-
-  * The CV plot has the clearest pattern for fit 3
-  * Fits 2 and 3 have comparable marginal false discovery rates of about 4%, which is much lower (better) than the 16% mFdr for fit 1. 
-  * The number of selected variables is higher for the second fit. **Question**: could this mean that adding the PCs is decreasing power? I am still thinking about this... 
+  * In the simulated outcome, only 2 $\beta$ values are truly nonzero (i.e., only 2 SNPs (SNPs 17 and 85) are actually associated with this outcome - see `data-raw/admix.R` for details). With this in mind, these results leave a lot to be desired... still thinking about this/wondering how to explain this phenomena. 
 
 Marginal false discovery rates also give us another way to select $\lambda$: instead of choosing the $\lambda$ value that minimizes cross validation error, I could choose the value that limits the mFdr at a certain level. We can examine this approach for the models we fit above: 
 ```{r bestlam, eval=FALSE}
-# let's look at the smallest lambda for which mFdr is < 10% in each fit 
-# TODO: I am still working to 'iron this out' 
+# let's look at lambda where mFDR is smallest, instead of mFDR where lambda = lambda.min (minimum CVE)
+
 # fit 1 
-bestlam1 <- fit1$lambda[mfdr1$mFDR < 0.1] |> min() |> round(5)
-mfdr1_res <- mfdr1[as.character(bestlam1),]
+(mfdr1[which.min(mfdr1$mFDR),])
 
 # fit 2 
-bestlam2 <- fit2$lambda[mfdr2$mFDR < 0.2] |> min() |> round(5)
-mfdr2_res <- mfdr2[as.character(bestlam2),]
+(mfdr2[which.min(mfdr2$mFDR),])
 
 # fit 3 
-bestlam3 <- fit3$lambda[mfdr3$mFDR < 0.3] |> min() |> round(5)
-mfdr3_res <- mfdr3[as.character(bestlam3),]
+(mfdr3[which.min(mfdr3$mFDR),])
 
 ```
 
@@ -185,43 +179,37 @@ mfdr3_res <- mfdr3[as.character(bestlam3),]
 
 Let's do a similar model comparison, this time using the `penncath_lite` data. 
 
-```{r, eval=FALSE}
-# process PLINK files with penncath data
-# NB: you only need to do this step the first time you process the raw data.
+```{r penncath_lite_process}
+# preprocess PLINK files
 penncath_lite <- process_plink(
   data_dir = plink_example(parent = TRUE),
   prefix = "penncath_lite",
   gz = TRUE, # NB: PLINK data that ships with package comes gzipped
   impute = TRUE, # mode imputation is default 
   outfile = "process_penncath")
-```
 
 
-```{r get_pen, eval=FALSE}
-# read in the processed penncath data 
-pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"),
-                returnX = TRUE)
+# read in the data to global environment
+pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"))
+
+str(pen) # Three objects here
 ```
+
 
 These data represent 1,401 individuals and 4,367 SNPs from a GWAS study. For the sake of example, let's use [hdl](https://www.cdc.gov/cholesterol/ldl_hdl.htm#:~:text=HDL%20(high%2Ddensity%20lipoprotein),for%20heart%20disease%20and%20stroke.) (high-density lipoprotein cholesterol) as our outcome. 
 
-```{r clinical, eval=FALSE}
-# read in the clinical data
-pen_clinical <- fread(paste0(plink_example(parent = TRUE),
-                             "/penncath_clinical.csv")) |> 
-  rename(family.ID = FamID) |> 
-  mutate(sex = NULL)
-# several choices of outcome here;
-glimpse(pen_clinical)
+```{r}
+# NB: the 'quiet' option in process_plink()  will silence the printed messages
+pen_cl <- read.csv(plink_example(path = 'penncath_clinical.csv'))
 
-# choose hdl as outcome; impute missing values with the mean
-pen$fam <- full_join(pen$fam, pen_clinical, by = join_by("family.ID"))
-pen$y <- ifelse(is.na(pen$fam$hdl), mean(pen$fam$hdl, na.rm = T), pen$fam$hdl)
-
+# for the sake of illustration, I use a simple mean imputation for the outcome 
+pen$y <- ifelse(is.na(pen_cl$hdl),
+                mean(pen_cl$hdl, na.rm = T), pen_cl$hdl)
 ```
 
+
 #### fit 1 
-```{r pen1, eval=FALSE}
+```{r pen1}
 # construct a cross-validated lasso model 
 cv_pen1 <- cv.plmm(X = pen$X,
               y = pen$y,
@@ -238,12 +226,14 @@ summary(cv_pen1)
 
 ```
 
-Hmm -- we found an mFdr of 1 in fit 1, which is not great from an application standpoint. While this could be due to a true lack of association between any SNPs and the HDL outcome, this may also be an estimation issue. In our next model, we will use MCP instead of lasso in hopes of improving our estimation. 
+Hmm -- we found an mFdr of 1 in fit 1, which is not great from an application standpoint. While this could be due to a true lack of association between any SNPs and the HDL outcome, this may also be an estimation issue. Remember, these articles are a work in progress... 
 
+
+In our next model, we will use MCP instead of lasso. 
 
 #### fit 2 
 
-```{r pen2, eval=FALSE}
+```{r pen2}
 pen$k <- choose_k(pen$X, returnKapprox = T)
 
 cv_pen2 <- cv.plmm(X = pen$X,
@@ -258,9 +248,9 @@ summary(cv_pen2)
 
 #### fit 3 
 
-Finally, we will model the 'penncath' data one more time using sex, age, and the first few principal components 
+Finally, we will model the 'penncath' data one more time using sex and the first few principal components 
 
-```{r pen_pca, eval=FALSE}
+```{r pen_pca}
 pen$std_X <- ncvreg::std(pen$X)
 pen_pca <- prcomp(pen$std_X, center = F, scale. = F)
 
@@ -276,14 +266,8 @@ plot(x = 1:10,
 pen_PCs <- pen_pca$x
 ```
 
-```{r pen3, eval=FALSE}
-pen$X_plus_fixed_eff <- cbind(pen$fam[,c("age", "sex")], pen_PCs[,1:10], pen$X)
-
-# TODO: the following line needs troubleshooting
-# pen$k_plus_pcs <- choose_k(X = pen$X_plus_fixed_eff,
-#                            # start at 1200 based on result from the previous fit
-#                            start = 1200,
-#                            returnKapprox = T)
+```{r pen3}
+pen$X_plus_fixed_eff <- cbind(pen$fam[,c("sex")], pen_PCs[,1:10], pen$X)
 
 cv_pen3 <- cv.plmm(X = pen$X_plus_fixed_eff,
                    y = pen$y,
@@ -303,11 +287,13 @@ summary(cv_pen3)
 
 Comparing the three fits with the 'penncath' data, we can observe the following:
 
-```{r pen_compare, eval=FALSE}
+```{r pen_compare}
 par(mfrow = c(2,3))
 plot(cv_pen1); plot(cv_pen2); plot(cv_pen3)
 plot(pen1); plot(pen2); plot(pen3)
+```
 
+```{r}
 pen_comparison <- dplyr::bind_rows(pen_mfdr1, pen_mfdr2, pen_mfdr3) |> 
   rownames_to_column(var = "lambda") |> 
   mutate(across(.cols = c(EF, mFDR),
@@ -315,9 +301,10 @@ pen_comparison <- dplyr::bind_rows(pen_mfdr1, pen_mfdr2, pen_mfdr3) |>
 kable(pen_comparison)
 ```
 
+
 We can also look at how mFDR changes among the three models: 
 
-```{r pen_mfdr_graph, eval=FALSE}
+```{r pen_mfdr_graph}
 compare_mfdr <- bind_rows(mfdr(pen1), mfdr(pen2), mfdr(pen3)) |>
   rownames_to_column(var = "lambda") |> 
   mutate(model = c(rep("lasso", 100),

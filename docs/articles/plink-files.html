@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
     <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
     <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
@@ -96,22 +97,9 @@ your choice of directory in the following function calls.</p>
 <span>  prefix <span class="op">=</span> <span class="st">"penncath_lite"</span>,</span>
 <span>  gz <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># NB: PLINK data that ships with package comes gzipped</span></span>
 <span>  impute <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># mode imputation is default </span></span>
-<span>  outfile <span class="op">=</span> <span class="st">"process_penncath"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Logging to process_penncath.log</span></span>
-<span><span class="co">#&gt; Preprocessing penncath_lite data:</span></span>
-<span><span class="co">#&gt; Creating  penncath_lite .rds</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Unzipping .gz files - this could take a second</span></span>
-<span><span class="co">#&gt; There are  124  constant features in the data</span></span>
-<span><span class="co">#&gt; There are a total of  3514 SNPs with missing values</span></span>
-<span><span class="co">#&gt; Of these,  13  are missing in at least 50% of the samples</span></span>
-<span><span class="co">#&gt; Imputing the missing values using  mode  method</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Done with imputation. Processed files now saved as .rds object.</span></span>
-<span></span>
-<span></span>
-<span><span class="co"># read in the data to global environment</span></span>
+<span>  outfile <span class="op">=</span> <span class="st">"process_penncath"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># read in the data to global environment</span></span>
 <span><span class="va">pen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span>path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="../reference/plink_example.html">plink_example</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="st">"/penncath_lite"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pen</span><span class="op">)</span> <span class="co"># Three objects here</span></span>
@@ -136,7 +124,7 @@ your choice of directory in the following function calls.</p>
 <span><span class="co">#&gt;   ..$ allele2     : chr [1:4367] "T" "C" "C" "A" ...</span></span></code></pre></div>
 <p>In addition to the genotype data, I want to analyze a continuous
 phenotype stored in an external data file. I will load that here:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># NB: the 'quiet' option in process_plink()  will silence the printed messages</span></span>
 <span><span class="va">pen_cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="../reference/plink_example.html">plink_example</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">'penncath_clinical.csv'</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -145,7 +133,7 @@ phenotype stored in an external data file. I will load that here:</p>
 <span>                                       <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">pen_cl</span><span class="op">$</span><span class="va">hdl</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>,</span>
 <span>                                       <span class="va">pen_cl</span><span class="op">$</span><span class="va">hdl</span><span class="op">)</span></span></code></pre></div>
 <p>Now that we have the data processed, we can fit a model.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pen_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">pen</span><span class="op">$</span><span class="va">X</span>,</span>
 <span>                     y <span class="op">=</span> <span class="va">pen_cl</span><span class="op">$</span><span class="va">hdl_impute</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in plmm(X = pen$X, y = pen_cl$hdl_impute): The number of observations is large, and k is not specified.</span></span>
@@ -162,9 +150,9 @@ phenotype stored in an external data file. I will load that here:</p>
 <span><span class="co">#&gt;  [9] "convex.min"     "loss"           "penalty.factor" "ns_idx"        </span></span>
 <span><span class="co">#&gt; [13] "ncol_X"         "nrow_X"         "iter"           "converged"</span></span></code></pre></div>
 <p>We can summarize this fit at the 25th <span class="math inline">\(\lambda\)</span> value:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pen_fit</span>, lambda <span class="op">=</span> <span class="va">pen_fit</span><span class="op">$</span><span class="va">lambda</span><span class="op">[</span><span class="fl">25</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized regression model with n=1401, p=4368 at lambda=0.8758</span></span>
+<span><span class="co">#&gt; MCP-penalized regression model with n=1401, p=4368 at lambda=0.8756</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
 <span><span class="co">#&gt; The model converged </span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
@@ -173,12 +161,12 @@ phenotype stored in an external data file. I will load that here:</p>
 <p>And we can plot the coefficient paths; note that in these graphs,
 regions shaded in grey corresponds to values of <span class="math inline">\(\lambda\)</span> for which the model fit is
 nonconvex. See <code><a href="https://rdrr.io/pkg/ncvreg/man/plot.ncvreg.html" class="external-link">ncvreg::plot.ncvreg()</a></code> for details.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pen_fit</span><span class="op">)</span></span></code></pre></div>
 <p><img src="plink-files_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <p>We can implement cross-validation for this model using the code
 below:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pen_cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.plmm.html">cv.plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">pen</span><span class="op">$</span><span class="va">X</span>,</span>
 <span>                       y <span class="op">=</span> <span class="va">pen_cl</span><span class="op">$</span><span class="va">hdl_impute</span><span class="op">)</span></span>
 <span><span class="co"># to see progress bar, run the above with the trace = TRUE argument; this will</span></span>
@@ -186,11 +174,11 @@ below:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pen_cv</span>, lambda <span class="op">=</span> <span class="st">"min"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=1401and p=4367</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=1.0824):</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.9589):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 6</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 156.43</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 12.507</span></span>
+<span><span class="co">#&gt;   Nonzero coefficients: 16</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 156.03</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 12.491</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pen_cv</span><span class="op">)</span></span></code></pre></div>
 <p><img src="plink-files_files/figure-html/penncath_cv-1.png" width="700"></p>

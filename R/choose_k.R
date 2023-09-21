@@ -46,7 +46,8 @@ choose_k <- function(X,
   # calculate true K 
   if(trace){cat('\nCalcuating the relatedness matrix')}
   std_X <- ncvreg::std(X)
-  K <- penalizedLMM::relatedness_mat(std_X)
+  K <- penalizedLMM::relatedness_mat(X)
+  # note: relatedness_mat() standardizes X and scales the singular values of K by 1/p
 
   # set up loop 
   k <- start
@@ -67,10 +68,9 @@ choose_k <- function(X,
   while(k < min(nrow(std_X), ncol(std_X)) | it < max_it){
     k_vals[it] <- k
     # truncated SVD 
-    trunc <- RSpectra::svds(A = std_X, k = k, nv = 0)
+    trunc <- RSpectra::svds(A = K, k = k, nv = 0)
     # calculate approximation
-    S <- ((trunc$d)^2)/ncol(X)
-    A_k <- trunc$u %*% tcrossprod(diag(S), trunc$u)
+    A_k <- trunc$u %*% tcrossprod(diag(trunc$d), trunc$u)
     
     # calculate difference 
     d <- abs(delta(K, A_k, type = type))

@@ -48,13 +48,12 @@ cv.plmm <- function(X,
                     returnBiasDetails = FALSE,
                     trace=FALSE) {
 
-
   # default type is 'lp'
   if(missing(type)) {type == 'lp'} 
 
   # determine penalty 
   penalty <- match.arg(penalty)
-  
+
   # implement preparation steps for model fitting 
   prep.args <- c(list(X = X,
                       y = y,
@@ -63,16 +62,16 @@ cv.plmm <- function(X,
                       diag_K = diag_K,
                       eta_star = eta_star,
                       penalty.factor = penalty.factor,
-                      trace,
+                      trace = trace,
                       ...)) # ... additional arguments to plmm_prep()
-  
+
   prep <- do.call('plmm_prep', prep.args)
   
   
   # implement full model fit 
   fit.args <- c(list(prep = prep, penalty = penalty), list(...))
   fit <- do.call('plmm_fit', fit.args)
-  fit_to_return <- plmm_format(fit, X = X, K = K)
+  fit_to_return <- plmm_format(fit, X = X)
   
   # set up arguments for cv 
   cv.args <- fit.args
@@ -81,7 +80,7 @@ cv.plmm <- function(X,
   
   estimated_V <- NULL 
   if (type == 'blup') {
-    estimated_V <- fit$eta * tcrossprod(fit$U %*% diag(fit$S), fit$U) + (1-fit$eta)*diag(nrow = nrow(fit$U)) 
+    estimated_V <- v_hat(fit, K)
   }
 
   # initialize objects to hold CV results 
@@ -135,6 +134,7 @@ cv.plmm <- function(X,
                  cv.args = cv.args,
                  estimated_V = estimated_V)
       if (trace) {setTxtProgressBar(pb, i)}
+
     }
     # update E and Y
     E[fold==i, 1:res$nl] <- res$loss

@@ -1,0 +1,94 @@
+---
+title: "deconfounding"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(penalizedLMM)
+```
+
+
+## Context 
+
+I want to explore how different types of confounding impact PLMMs --- the questions on my mind include: 
+
+  * When does PLMM perform well? When does it perform poorly? 
+  * How does PLMM compare to PCA in different data contexts? 
+  * Could a PLMM that uses PCs as fixed effects -- in a sense, a 'hybrid' approach -- be a way to approach deconfounding when data have a complex structure? 
+  
+## Starting with some test data 
+
+Let's compare three lasso models: `glmnet`, `plmm` with the linear predictor (default), and `plmm` with the BLUP option. 
+
+```{r}
+library(glmnet)
+gb <- function(n=100, p=256, s=4, gamma=6, beta=2, B=20) {
+  mu <- matrix(rnorm(B*p), B, p)
+  z <- rep(1:B, each=n/B)
+  X <- matrix(rnorm(n*p), n, p) + mu[z,] |>
+    ncvreg::std()
+  b <- rep(c(beta, 0), c(s, p-s))
+  g <- seq(-gamma, gamma, length=B)
+  y <- X %*% b + g[z]
+  Z <- model.matrix(~0+factor(z))
+  list(y=y, X=X, beta=b, Z=Z, gamma=g, mu=mu, id=z)
+}
+l <- gb()
+cvg <- cv.glmnet(l$X, l$y)
+cvp <- cv.plmm(l$X, l$y, penalty='lasso')
+cvp_blup <- cv.plmm(l$X, l$y, penalty='lasso',
+                    type = 'blup',
+                    returnBiasDetails = TRUE)
+
+# look at K -- note that this data scenario has a 'finer' population structure
+library(corrplot)
+corrplot(relatedness_mat(l$X), is.corr = F, tl.pos = "n")
+
+```
+
+### MSPE
+
+The mean squared prediction error is about the same between `glmnet` and `plmm`, but adding the `blup` option makes an improvement: 
+
+```{r}
+min(cvg$cvm)
+min(cvp$cve)
+min(cvp_blup$cve)
+```
+
+### MSE
+
+For mean squared error, we see that $\hat \beta$ is better in `plmm`, and better still in `plmm` + BLUP. 
+
+```{r}
+crossprod(l$beta - coef(cvg)[-1]) |> drop()
+crossprod(l$beta - coef(cvp)[-1]) |> drop()
+crossprod(l$beta - coef(cvp_blup)[-1]) |> drop()
+```
+
+
+
+```{r, include=FALSE, eval=FALSE}
+Recall from the article on mfdr our results for analyzing the admix data: 
+# using lasso penalty 
+fit <- cv.plmm(X = admix$X, y = admix$y, penalty = "lasso") 
+summary(fit); plot(fit)
+
+# using MCP penalty 
+fit2 <- cv.plmm(X = admix$X, y = admix$y)
+summary(fit2); plot(fit2)
+
+res1 <- mfdr(fit$fit); res2 <- mfdr(fit2$fit)
+par(mfrow=c(1,2))
+mfdr_plot(res1, type = "l"); mfdr_plot(res2, type = "l")
+```
+
+
+
+

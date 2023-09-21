@@ -8,6 +8,7 @@
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list with components 'd' and 'u', as returned by choose_k().
 #' @param diag_K Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE. 
+#'  Note: plmm() does not check to see if a matrix is diagonal. If you want to use a diagonal K matrix, you must set diag_K = TRUE.
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for Spenncath.
@@ -126,23 +127,19 @@ plmm <- function(X,
     
     # error checking 
     if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
-    if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
+    if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  
+                                            \nTake actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to plmm", call.=FALSE)
     if (length(penalty.factor)!=ncol(X)) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
   } else {
     # finish type coersion & checks for FBM X ----------------
     # error checking 
     if (length(y) != X$nrow) stop("X and y do not have the same number of observations", call.=FALSE)
-    if (any(is.na(y))) stop("Missing data (NA's) detected in the outcome.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to ncvreg", call.=FALSE)
+    if (any(is.na(y))) stop("Missing data (NA's) detected in the outcome.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to plmm", call.=FALSE)
     if (length(penalty.factor)!=X$ncol) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
     
   }
-
-  # working with user-specified K -----------------------------------------
-  if(!is.null(diag_K)& !is.null(K)){
-    stop("diag_K is true, but a K is also supplied. 
-         If using diag_K, you cannot also pass a K argument.")
-  }
-  if (!is.null(K)){
+  
+  if (!is.null(K)){-
     # first, check type/class:
     if (!inherits(K, "matrix") & !is.list(K)) {
       tmp <- try(K <- stats::model.matrix(~0+., data=K), silent=TRUE)
@@ -199,7 +196,7 @@ plmm <- function(X,
                           trace = trace)
   }
   
-  browser()
+
   # rotate & fit -------------------------------------------------------------
   if(trace){cat("Beginning model fitting.\n")}
 
@@ -237,8 +234,7 @@ plmm <- function(X,
     the_final_product <- plmm_format(fit = the_fit, 
                                      convex = convex,
                                      dfmax = dfmax, 
-                                     X = X,
-                                     K = K)
+                                     X = X)
     
   }
   

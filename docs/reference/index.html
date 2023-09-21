@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,6 +25,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
     <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
     <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
@@ -88,6 +89,11 @@
         <dd>a function to choose k, the number of eigenvalues to use in truncated SVD</dd>
       </dl><dl><dt>
           
+          <code><a href="lmm.html">lmm()</a></code> 
+        </dt>
+        <dd>a function to implement a mixed model for structured data <em>without</em> penalization</dd>
+      </dl><dl><dt>
+          
           <code><a href="plmm.html">plmm()</a></code> 
         </dt>
         <dd>Fit a linear mixed model with non-convex regularization</dd>
@@ -106,8 +112,7 @@
           
           <code><a href="mfdr.html">mfdr()</a></code> 
         </dt>
-        <dd>mfdr: Marginal false discovery rates for PLMMs
-Based on <code><a href="https://rdrr.io/pkg/ncvreg/man/mfdr.html" class="external-link">ncvreg::mfdr()</a></code></dd>
+        <dd>mfdr: Marginal false discovery rates for PLMMs</dd>
       </dl></div><div class="section level2">
       <h2 id="loss-information-and-cross-validation-for-plmms">Loss, information, and cross-validation for PLMMs<a class="anchor" aria-label="anchor" href="#loss-information-and-cross-validation-for-plmms"></a></h2>
       
@@ -145,7 +150,7 @@ Based on <code><a href="https://rdrr.io/pkg/ncvreg/man/mfdr.html" class="externa
         </dt>
         <dd>Evaluate the negative log-likelihood of a non-null Gaussian plmm model</dd>
       </dl></div><div class="section level2">
-      <h2 id="coefficient-methods-for-plmms">Coefficient methods for PLMMs<a class="anchor" aria-label="anchor" href="#coefficient-methods-for-plmms"></a></h2>
+      <h2 id="coefficient-methods-for-lmms-and-plmms">Coefficient methods for LMMs and PLMMs<a class="anchor" aria-label="anchor" href="#coefficient-methods-for-lmms-and-plmms"></a></h2>
       
       
 
@@ -157,6 +162,11 @@ Based on <code><a href="https://rdrr.io/pkg/ncvreg/man/mfdr.html" class="externa
 
       <dl><dt>
           
+          <code><a href="coef.lmm.html">coef(<i>&lt;lmm&gt;</i>)</a></code> 
+        </dt>
+        <dd>Coef method for "lmm" class</dd>
+      </dl><dl><dt>
+          
           <code><a href="coef.cv.plmm.html">coef(<i>&lt;cv.plmm&gt;</i>)</a></code> 
         </dt>
         <dd>Coef method for "cv.plmm" class</dd>
@@ -165,6 +175,22 @@ Based on <code><a href="https://rdrr.io/pkg/ncvreg/man/mfdr.html" class="externa
           <code><a href="coef.plmm.html">coef(<i>&lt;plmm&gt;</i>)</a></code> 
         </dt>
         <dd>Coef method for "plmm" class</dd>
+      </dl></div><div class="section level2">
+      <h2 id="inference-for-plmms-1">Inference for PLMMs<a class="anchor" aria-label="anchor" href="#inference-for-plmms-1"></a></h2>
+      
+      
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="mfdr.html">mfdr()</a></code> 
+        </dt>
+        <dd>mfdr: Marginal false discovery rates for PLMMs</dd>
       </dl></div><div class="section level2">
       <h2 id="other-model-fitting-methods-and-some-helper-functions-">Other model fitting methods (and some helper functions)<a class="anchor" aria-label="anchor" href="#other-model-fitting-methods-and-some-helper-functions-"></a></h2>
       
@@ -259,6 +285,11 @@ This function is intended to be called after <code><a href="../reference/process
           <code><a href="plot.plmm.html">plot(<i>&lt;plmm&gt;</i>)</a></code> 
         </dt>
         <dd>Plot method for plmm class</dd>
+      </dl><dl><dt>
+          
+          <code><a href="mfdr_plot.html">mfdr_plot()</a></code> 
+        </dt>
+        <dd>Plot method for mFDR</dd>
       </dl></div><div class="section level2">
       <h2 id="prediction">Prediction<a class="anchor" aria-label="anchor" href="#prediction"></a></h2>
       
@@ -275,6 +306,11 @@ This function is intended to be called after <code><a href="../reference/process
           <code><a href="predict.plmm.html">predict(<i>&lt;plmm&gt;</i>)</a></code> 
         </dt>
         <dd>Predict method for plmm class</dd>
+      </dl><dl><dt>
+          
+          <code><a href="predict.lmm.html">predict(<i>&lt;lmm&gt;</i>)</a></code> 
+        </dt>
+        <dd>Predict method for lmm class</dd>
       </dl></div><div class="section level2">
       <h2 id="data-sets">Data sets<a class="anchor" aria-label="anchor" href="#data-sets"></a></h2>
       
@@ -290,7 +326,12 @@ This function is intended to be called after <code><a href="../reference/process
           
           <code><a href="admix.html">admix</a></code> 
         </dt>
-        <dd>Semi-simulated SNP data</dd>
+        <dd>Admix: Semi-simulated SNP data</dd>
+      </dl><dl><dt>
+          
+          <code><a href="pedigree.html">pedigree</a></code> 
+        </dt>
+        <dd>Pedigree: mock genotype data from a family-based design.</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

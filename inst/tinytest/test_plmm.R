@@ -4,14 +4,14 @@
 # Test 0: Case where K = identity -------------------------------------------
 
 # set up 
-K_identity <- diag(nrow = nrow(admix$X))
 lambda0 <- c(1, 0.1, 0.01, 0.001)
 
 plmm0 <- plmm(X = admix$X,
               y = admix$y,
-              K = K_identity,
+              diag_K = TRUE,
               lambda = lambda0,
-              penalty = "lasso")
+              penalty = "lasso",
+              trace = T)
 
 lasso0 <- glmnet::glmnet(x = admix$X,
                  y = admix$y,
@@ -37,6 +37,7 @@ K_diagonal <- diag(x = (rnorm(n = nrow(admix$X))^2),
 plmm1 <- plmm(X = admix$X,
               y = admix$y,
               K = K_diagonal,
+              diag_K = TRUE,
               # FIXME: Need to fix plmm so that lambda can be a single value
               lambda = c(0.001, 0),
               penalty = "lasso")
@@ -56,7 +57,7 @@ names(B1) <- NULL
 B1 <- ifelse(is.na(B1), 0, B1)
 
 # test 1: implementation 
-expect_equivalent(A1, B1, tolerance = 0.02)
+expect_equivalent(A1, B1, tolerance = 0.01)
 
 # check  
 # head(data.frame(A1, B1))
@@ -67,6 +68,7 @@ lambda2 <- c(1, 0.1, 0.01)
 
 plmm2 <- plmm(X = admix$X,
               y = admix$y,
+              diag_K = TRUE,
               K = K_diagonal,
               lambda = lambda2,
               penalty = "lasso")
@@ -101,13 +103,13 @@ tinytest::expect_equivalent(matrix(0,
           fit3$beta_vals[monomorphic_snps,])
 # Test 4: case where K is simulated to have no population structure ----------
 
-K_independent <- sim_ps_x(n = nrow(admix$X),
-                          p = ncol(admix$X),
-                          # supposing all individuals are independent 
-                          nJ = nrow(admix$X),
-                          structureX = "independent"
-) |> 
-  relatedness_mat()
+# K_independent <- sim_ps_x(n = nrow(admix$X),
+#                           p = ncol(admix$X),
+#                           # supposing all individuals are independent 
+#                           nJ = nrow(admix$X),
+#                           structureX = "independent"
+# ) |> 
+#   relatedness_mat()
 
 # TODO come back here
 
@@ -121,3 +123,24 @@ fit2 <- plmm(X = admix$X, y = admix$y, K = K_admix$K_svd)
 tinytest::expect_equivalent(fit1$S, fit2$S)
 tinytest::expect_equivalent(fit1$beta_vals, fit2$beta_vals)
 
+# Test 6: make sure predict method is working -------------------
+plmm_fit <- plmm(admix$X,
+                 admix$y,
+                 # K = relatedness_mat(admix$X),
+                 penalty = 'lasso',
+                 lambda = c(0.1, 0.01))
+plmm_pred <- predict(object = plmm_fit, newX = admix$X, type = "lp")
+
+# use glmnet as gold standard
+glmnet_fit <- glmnet::glmnet(admix$X, admix$y, lambda = c(0.1, 0.01))
+glmnet_pred <- predict(glmnet_fit, newx = admix$X, type = "response")
+
+cbind(admix$y, plmm_pred, glmnet_pred) -> test
+colnames(test) <- c('y',
+                 'y_hat_plmm0.1',
+                 'y_hat_plmm0.01',
+                 'y_hat_glmnet0.1',
+                 'y_hat_glmnet0.01')
+# test[1:10,] # in plmm method, all rows of X have same predicted value! 
+if(mean(test[,2] - test[,4]) > 5) stop("PLMM and GLMNET predictions are far off for the test model.")
+# NB: the 5 above is chosen arbitrarily, based on my experience with the admix data 

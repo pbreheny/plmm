@@ -4,7 +4,6 @@
 #' @param convex convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
 #' @param dfmax dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
 #' @param X Design matrix. May include clinical covariates and other non-SNP data. 
-#' @param K Similarity matrix used to rotate the data. This will be passed from plmm() as (1) NULL, in which case relatedness_mat(std(X)) is used, (2) a matrix or (3) a list with components d and u (eigenvalues and eigenvectors, respectively).
 #' 
 #' @return A list with the components: 
 #' * beta_vals: The estimated beta values at each value of lambda
@@ -32,16 +31,14 @@
 plmm_format <- function(fit,
                         convex = TRUE,
                         dfmax = fit$ncol_X + 1, 
-                        X,
-                        K){
-  
+                        X){
   # eliminate saturated lambda values, if any
   ind <- !is.na(fit$iter)
   iter <- fit$iter[ind]
   converged <- fit$converged[ind]
   lambda <- fit$lambda[ind]
   loss <- fit$loss[ind]
-  if (fit$warn & sum(iter) == fit$max.iter) warning("Maximum number of iterations reached")
+  if (fit$warn & sum(iter) == fit$max.iter) warning("\nMaximum number of iterations reached")
   convex.min <- if (convex) convexMin(b = fit$b,
                                       X = fit$std_SUX,
                                       penalty = fit$penalty,
@@ -49,7 +46,7 @@ plmm_format <- function(fit,
                                       l2 = fit$lambda*(1-fit$alpha),
                                       family = 'gaussian',
                                       penalty.factor = fit$penalty.factor) else NULL
-  # browser()
+  
   # reverse the transformations of the beta values 
   beta_vals <- untransform(res_b = fit$b,
                            ns = fit$ns,
@@ -58,7 +55,7 @@ plmm_format <- function(fit,
                            SUX = fit$SUX,
                            std_SUX = fit$std_SUX)
   
-  if(fit$trace){cat("\nBeta values are estimated -- almost done!\n")}
+  if(fit$trace){cat("\nBeta values are estimated -- almost done!")}
   
   # give the matrix of beta_values readable names 
   # SNPs (or covariates) on the rows, lambda values on the columns
