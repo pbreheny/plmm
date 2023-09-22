@@ -12,9 +12,17 @@ estimate_eta <- function(S, U, y, eta_star){
   eta <- NULL
   
   # estimate eta 
-  Uy <- crossprod(U, y)
-  opt <- stats::optimize(f=log_lik, c(0.01, 0.99), Uy=Uy, S=S)
-  eta <- opt$minimum 
+  if("FBM" %in% class(U)){
+    Uy <- bigstatsr::big_cprodVec(U, y)
+    opt <- stats::optimize(f=log_lik, c(0.01, 0.99), Uy=Uy, S=S)
+    eta <- opt$minimum 
+    
+  } else {
+    Uy <- crossprod(U, y)
+    opt <- stats::optimize(f=log_lik, c(0.01, 0.99), Uy=Uy, S=S)
+    eta <- opt$minimum 
+    
+  }
   
   
   return(eta)

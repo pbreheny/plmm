@@ -57,6 +57,7 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
     
     dimnames(X) <- list(row_names,
                         obj$map$marker.ID)
+    # TODO fix this error: Error in dimnames(X) <- list(row_names, o
     
     cat("Reminder: the X that is returned here is column-standardized.
         A copy of the original data is available as an item in the .rds object")

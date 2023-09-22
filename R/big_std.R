@@ -11,31 +11,34 @@
 #' @return A standardized matrix of class FBM
 #' @keywords internal
 big_std <- function(X, center, scale, ns, fbm = TRUE){
-  centeredX <- bigstatsr::big_apply(X = X,
-                                    a.FUN = function(X, ind, center){
-                                      sweep(x = X[,ind],
+  # allocate space 
+  centeredX <- bigstatsr::FBM(X$nrow, X$ncol)
+  bigstatsr::big_apply(X = X,
+                       a.FUN = function(X, ind, center, res){
+                         res[,ind] <- sweep(x = X[,ind],
                                             MARGIN = 2,
                                             STATS = center[ind],
                                             FUN = "-")},
-                                    a.combine = cbind,
-                                    ncores = bigstatsr::nb_cores(),
-                                    center = center)
-  centeredXfbm <- bigstatsr::as_FBM(centeredX)
+                       a.combine = cbind,
+                       ncores = bigstatsr::nb_cores(),
+                       center = center,
+                       res = centeredX)
+  
+  scaledX <- bigstatsr::FBM(centeredX$nrow, centeredX$ncol)
+  bigstatsr::big_apply(X = centeredX, 
+                       a.FUN = function(X, ind, scale, res){
+                         res[,ind] <- sweep(x = X[,ind],
+                               MARGIN = 2,
+                               STATS = scale[ind],
+                               FUN = "/")},
+                       a.combine = cbind,
+                       # NB: only scale the nonsingular columns
+                       ind = ns, 
+                       ncores = bigstatsr::nb_cores(),
+                       scale = scale,
+                       res = scaledX)
+  
 
-  scaledX <- bigstatsr::big_apply(X = centeredXfbm, 
-                                  a.FUN = function(X, ind, scale){
-                                    sweep(x = X[,ind],
-                                          MARGIN = 2,
-                                          STATS = scale[ind],
-                                          FUN = "/")},
-                                  a.combine = cbind,
-                                  # NB: only scale the nonsingular columns
-                                  ind = ns, 
-                                  ncores = bigstatsr::nb_cores(),
-                                  scale = scale)
-  if(fbm){
-    return(bigstatsr::as_FBM(scaledX))
-  } else {
-    return(scaledX)
-}
+  return(scaledX)
+  
 }

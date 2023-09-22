@@ -57,56 +57,74 @@ plmm_prep_fbm <- function(X,
   # keep only those penalty factors which penalize non-singular values 
   penalty.factor <- penalty.factor[ns]
 
-
-  # calculate SVD ------------------------------------------------------------
-  if(!(k %in% 1:min(n,p))){stop("k value is out of bounds. \nIf specified, k must be in the range from 1 to min(nrow(X), ncol(X))")}
-  ## case 1: K is not specified ----------------------------------------------
-  if(is.null(K)){
-    # check: if K is the identity matrix, then no need for SVD! 
-    if(diag_K){
-      if(trace){(cat("Using identity matrix for K, so observations are treated as unrelated."))}
-      S <- rep(1, n)
-      U <- diag(n)
-    } else {
-      if(trace){cat("No K specified - will use default definition of the \n realized relatedness matrix.\n")}
-      
-      # if I want all the singular values (which is k = min(n,p)), use base::svd
-      if(k == min(n, p)){
-        decomp <- svd(X, nv = 0)
-      }
-      # otherwise, if I want fewer singular values than min(n,p), use RSpectra decomposition method:
-      if (k < min(n,p)){
-        decomp <- bigstatsr::big_randomSVD(X, k = k, ...)
-      }
-      
-      D <- decomp$d
-      U <- decomp$u
-      S <- (D^2)/p # singular values of K, the realized relationship matrix
-      
-    } 
-  } else if(!is.null(K)){
-    ## case 2: K is a user-specified matrix ---------------------------------
-    # if K is a matrix, work with it directly
-    if ('matrix' %in% class(K)){
-      S <- U <- NULL
-      # again, decomposition depends on choice of k
-      if(k == min(n,p)){
-        decomp <- svd(K, nv = 0)
-      }
-      
-      if(k < min(n,p)){
-        decomp <- bigstatsr::big_randomSVD(K, k = k, ...)
-      }
-      S <- decomp$d # if K matrix was user-specified, then no need to transform D here
-      U <- decomp$u
-    } else if(is.list(K)){
-      # if K is a list (as returned in choose_k()), no decomposition needed
-      S <- ((K$d)^2)/p
-      U <- K$u
-      
-    }
+  # designate the dimensions of the standardized design matrix, with only ns columns
+  n_stdX <- X$nrow
+  p_stdX <- length(ns)
+  
+  # set default k and create indicator 'trunc' to pass to plmm_svd
+  if(is.null(k)){
+    k <- min(n_stdX, p_stdX)
+    trunc <- FALSE
+  } else if(!is.null(k) & (k < min(n_stdX, p_stdX))){
+    trunc <- TRUE
+  } else if(!(k %in% 1:min(n_stdX,p_stdX))){
+    stop("\nk value is out of bounds. 
+         \nIf specified, k must be an integer in the range from 1 to min(nrow(X), ncol(X)). 
+         \nwhere X does not include singular columns. For help detecting singularity,
+         \nsee ncvreg::std()")
   }
+  
+  # set default: if diag_K not specified, set to false
+  if(is.null(diag_K)){diag_K <- FALSE}
+  
+  # handle the cases where no SVD is needed: 
+  # case 1: K is the identity matrix 
+  flag1 <- diag_K & is.null(K)
+  if(flag1){
+    if(trace){(cat("\nUsing identity matrix for K."))}
+    S <- rep(1, n)
+    U <- diag(nrow = n)
+  }
+  # case 2: K is user-supplied diagonal matrix (like a weighted lm())
+  flag2 <- diag_K & !is.null(K) & ('matrix' %in% class(K))
+  if(flag2){
+    if(trace){(cat("\nUsing supplied diagonal matrix for K, similar to a lm() with weights."))}
+    S <- sort(diag(K), decreasing = T)
+    U <- diag(nrow = n)[,order(diag(K), decreasing = T)]
+  }
+  # case 3: K is a user-supplied list, as passed from choose_k()
+  flag3 <- !is.null(K) & ('list' %in% class(K))
+  if(flag3){
+    if(trace){cat("\nK is a list; will pass SVD components from list to model fitting.")}
+    # case 3: K is a user-supplied list, as returned from choose_k()
+    S <- K$d # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
+    U <- K$u
+  }
+  
+  # otherwise, need to do SVD:
+  if(trace){cat("\nStarting singular value decomposition.")}
+  if(sum(c(flag1, flag2, flag3)) == 0){
+    # set default K: if not specified and not diagonal, use realized relatedness matrix
+    # NB: relatedness_mat(X) standardizes X! 
+    if(is.null(K) & is.null(S)){
+      # NB: the is.null(S) keeps you from overwriting the 3 preceding cases 
+      if(trace){cat("\nUsing the default definition of the realized relatedness matrix.")}
+      K <- relatedness_mat_fbm(X, ns)
+    }
     
+    svd_res <- bigstatsr::big_randomSVD(X = K,
+                                        k = k,
+                                        ...)
+    S <- svd_res$d
+    U <- svd_res$u |> as_FBM()
+  }
+  
+  # error check: what if the combination of args. supplied was none of the SVD cases above?
+  if(is.null(S) | is.null(U)){
+    stop("\nSomething is wrong in the SVD. The combination of supplied arguments does not match any cases handled in 
+         \n plmm_svd(), the internal function called by plmm() via plmm_prep().
+         \n Re-examine the supplied arguments.")
+  }
   
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(ncol_X = n,

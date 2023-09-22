@@ -19,7 +19,6 @@ plmm_svd <- function(K, k, trunc, trace){
   # case 1: full SVD -----------------------------------  
   if(!trunc){
     if(trace){cat("\nUsing full SVD")}
-    # NB: the is.null(S) keeps you from overwriting case 2 (a)
     decomp <- svd(K, nv = 0)
     S <- decomp$d
     U <- decomp$u

@@ -24,6 +24,7 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
+#' 
 #' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
 #' 
 #' @importFrom zeallot %<-%
@@ -57,6 +58,13 @@
 #' fit_plink2 <- plmm(X = penncath_mid$X, y = penncath_clinical$hdl_impute, k = 5, trace = TRUE)
 #' # Runs in ~44 seconds on my 2015 MacBook Pro
 #' summary(fit_plink2, idx = 5);summary(fit_plink2, idx = 95)
+#' 
+#' 
+#' # case where X is an FBM
+#' lite <- get_data("../temp_files/penncath_lite", fbm = TRUE)
+#' clinical <- read.csv("../temp_files/penncath_clinical.csv")
+#' hdl <- ifelse(is.na(clinical$hdl), mean(clinical$hdl, na.rm = TRUE), clinical$hdl)
+#' fit_fbm <- plmm(X = lite, y = hdl, k = 1200)
 #' }
 
 
@@ -199,7 +207,7 @@ plmm <- function(X,
 
   # rotate & fit -------------------------------------------------------------
   if(trace){cat("Beginning model fitting.\n")}
-
+browser()
   if(fbm_flag){
     the_fit <- plmm_fit_fbm(prep = the_prep,
                             penalty = penalty,

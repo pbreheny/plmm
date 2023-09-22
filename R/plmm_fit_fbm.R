@@ -68,14 +68,32 @@ plmm_fit_fbm <- function(prep,
     eta <- prep$eta
   }
 
+  # rotate data 
   w <- (eta * prep$S + (1 - eta))^(-1/2)
-  wU <- sweep(x = t(prep$U), MARGIN =  1, STATS = w, "*")
-  SUX <- wU %*% prep$X
-  browser()
-  # TODO: in the above, I need to add column of 1s for intercept!
-  SUy <- wU %*% prep$y
+  tU <- bigstatsr::big_transpose(U)
+  wU <- bigstatsr::FBM(tU$nrow, tU$ncol)
+  bigstatsr::big_apply(tU,
+                       a.FUN = function(X, ind, w, res){
+                         res[,ind] <- sweep(x = X[,ind],
+                                            MARGIN = 1,
+                                            STATS = w,
+                                            "*")},
+                       a.combine = cbind,
+                       w = w,
+                       res = wU)
+  
+  # TODO: add column of 1s for intercept!
+  X_with_intcpt <- matrix(nrow = X$nrow, ncol = length(prep$ns) + 1) 
+  X_with_intcpt[,1] <- rep(1, X$nrow)
+  X_with_intcpt <- X_with_intcpt |> bigstatsr::as_FBM()
+  # bigstatsr::big_apply(...)
   
   
+  # TODO: SUX <- wU %*% prep$X
+  
+  # TODO: SUy <- wU %*% prep$y
+  
+  # PICK UP HERE -------------------------------------------------
   # re-standardize rotated SUX
   std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
   std_SUX_noInt <- std_SUX_temp$scaled_X
