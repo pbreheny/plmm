@@ -113,12 +113,16 @@ plmm_prep <- function(X,
     if(is.null(K) & is.null(S)){
       # NB: the is.null(S) keeps you from overwriting the 3 preceding cases 
       if(trace){cat("\nUsing the default definition of the realized relatedness matrix.")}
-      K <- relatedness_mat(X)
+      svd_res <- plmm_svd(X = X, k = k, trunc = trunc, trace = trace)
+      S <- (svd_res$D^2)*(1/p)
+      U <- svd_res$U
+    } else {
+      # last case: K is a user-supplied matrix
+      svd_res <- plmm_svd(X = K, k = k, trunc = trunc, trace = trace)
+      S <- svd_res$D
+      U <- svd_res$U
     }
     
-    svd_res <- plmm_svd(K = K, k = k, trunc = trunc, trace = trace)
-    S <- svd_res$S
-    U <- svd_res$U
   }
   
   # error check: what if the combination of args. supplied was none of the SVD cases above?
@@ -133,7 +137,6 @@ plmm_prep <- function(X,
   
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
-    K = K,
     ncol_X = ncol(X),
     nrow_X = nrow(X), 
     y = y,

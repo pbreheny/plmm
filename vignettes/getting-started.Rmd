@@ -77,7 +77,7 @@ plot(admix_fit)
 To select a $\lambda$ value, we often use cross validation. Below is an example of using `cv.plmm` to select a $\lambda$ that minimizes cross-validation error: 
 
 ```{r admix_cv}
-admix_cv <- cv.plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+admix_cv <- cv.plmm(X = admix$X, y = admix$y)
 admix_cv_s <- summary(admix_cv, lambda = "min")
 print(admix_cv_s)
 ```

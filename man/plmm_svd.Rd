@@ -5,10 +5,10 @@
 \title{A function to implement singular value decomposition for a PLMM or LMM
 This is an internal function to \code{plmm_prep()}}
 \usage{
-plmm_svd(K, k, trunc, trace)
+plmm_svd(X, k, trunc, trace)
 }
 \arguments{
-\item{K}{The relatedness matrix}
+\item{X}{The standardized design matrix}
 
 \item{k}{Optional integer argument indicating the number of singular values to use in a truncated SVD. See details.}
 
