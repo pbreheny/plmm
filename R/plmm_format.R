@@ -62,6 +62,7 @@ plmm_format <- function(fit,
   varnames <- c("(Intercept)", fit$snp_names)
   dimnames(beta_vals) <- list(varnames, lamNames(fit$lambda))
   
+  colnames(fit$linear.predictors) <- lamNames(fit$lambda)
 
   ## output
   val <- structure(list(beta_vals = beta_vals,
@@ -69,6 +70,8 @@ plmm_format <- function(fit,
                         eta = fit$eta,
                         S = fit$S,
                         U = fit$U,
+                        Wy = fit$SUy,
+                        linear.predictors = fit$linear.predictors,
                         penalty = fit$penalty,
                         gamma = fit$gamma,
                         alpha = fit$alpha,

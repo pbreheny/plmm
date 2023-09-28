@@ -111,6 +111,7 @@ plmm_fit <- function(prep,
   # placeholders for results
   init <- c(0, init) # add initial value for intercept
   resid <- drop(SUy - std_SUX %*% init)
+  linear.predictors <- matrix(NA, nrow = nrow(std_SUX), ncol=nlambda)
   b <- matrix(NA, nrow=ncol(std_SUX), ncol=nlambda) 
   iter <- integer(nlambda)
   converged <- logical(nlambda)
@@ -124,6 +125,7 @@ plmm_fit <- function(prep,
     lam <- lambda[ll]
     res <- ncvreg::ncvfit(std_SUX, SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
     b[, ll] <- init <- res$beta
+    linear.predictors[,ll] <- std_SUX%*%(res$beta)
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
     loss[ll] <- res$loss
@@ -141,6 +143,7 @@ plmm_fit <- function(prep,
     nrow_X = prep$nrow_X, 
     lambda = lambda,
     b = b,
+    linear.predictors = linear.predictors,
     eta = eta,
     iter = iter,
     converged = converged, 
