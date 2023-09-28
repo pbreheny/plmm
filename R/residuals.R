@@ -9,6 +9,8 @@
 #' @param unrotate Logical: should residuals be 'unrotated', i.e. transformed back to the original scale? 
 #' @param ...      Not used.
 #' 
+#' @rdname residuals.plmm
+#' 
 #' @examples
 #' \dontrun{
 #' fit <- plmm(admix$X, admix$y)
