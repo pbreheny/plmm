@@ -21,16 +21,16 @@ plmm_svd <- function(X, k, trunc, trace){
     if(trace){cat("\nUsing full SVD")}
     # NB: the is.null(S) keeps you from overwriting case 2 (a)
     decomp <- svd(X, nv = 0)
-    D <- decomp$d
+    d <- decomp$d
     U <- decomp$u
   } else {
     # case 2: truncated SVD -----------------------------
     if(trace){cat("\nUsing truncated SVD with k singular values")}
     decomp <- RSpectra::svds(A = X, nv = 0, k = k)
-    D <- decomp$d
+    d <- decomp$d
     U <- decomp$u
   }
   
-  res <- list(D = D, U = U)
+  res <- list(d = d, U = U)
   return(res)
 }

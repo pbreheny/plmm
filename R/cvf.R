@@ -24,8 +24,8 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   cv.args$prep$y <- full_cv_prep$y[fold!=i] 
   
   # extract test set (comes from cv prep on full data)
-  X_test <- full_cv_prep$std_X[fold==i, , drop=FALSE] 
-  y_test <- full_cv_prep$y[fold==i]
+  test_X <- full_cv_prep$std_X[fold==i, , drop=FALSE] 
+  test_y <- full_cv_prep$y[fold==i]
   
   # NB: eta used in each fold comes from the overall fit.args. If user-supplied, then 
   # use that in all fold; if not, estimate eta in each fold 
@@ -37,7 +37,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   if(type == "lp"){
     yhat <- predict.list(fit = fit.i,
                           std_X = cv.args$prep$std_X,
-                          newX = X_test,
+                          newX = test_X,
                           type = 'lp')
     # yhat <- matrix(data = drop(Xbeta), nrow = length(y_test)) 
   }

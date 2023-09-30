@@ -85,8 +85,8 @@ lmm_prep <- function(X,
   if(flag3){
     if(trace){cat("\nK is a list; will pass SVD components from list to model fitting.")}
     # case 3: K is a user-supplied list, as returned from choose_k()
-    S <- K$d # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
-    U <- K$u
+    S <- K$s # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
+    U <- K$U
   }
   
   # otherwise, need to do SVD:
@@ -98,19 +98,19 @@ lmm_prep <- function(X,
       # NB: the is.null(S) keeps you from overwriting the 3 preceding cases 
       if(trace){cat("\nUsing the default definition of the realized relatedness matrix.")}
       svd_res <- plmm_svd(X = X, k = k, trunc = trunc, trace = trace)
-      S <- (svd_res$D^2)*(1/p)
+      s <- (svd_res$d^2)*(1/p)
       U <- svd_res$U
     } else {
       # last case: K is a user-supplied matrix
       svd_res <- plmm_svd(X = K, k = k, trunc = trunc, trace = trace)
-      S <- svd_res$D
+      s <- svd_res$d
       U <- svd_res$U
     }
     
   }
   
   # error check: what if the combination of args. supplied was none of the SVD cases above?
-  if(is.null(S) | is.null(U)){
+  if(is.null(s) | is.null(U)){
     stop("\nSomething is wrong in the SVD. The combination of supplied arguments does not match any cases handled in 
          \n plmm_svd(), the internal function called by plmm() via plmm_prep().
          \n Re-examine the supplied arguments -- should you have set diag_K = TRUE?
@@ -120,8 +120,8 @@ lmm_prep <- function(X,
   
   
   # return values to be passed into plmm_fit(): 
-  ret <- structure(list(ncol_X = ncol(X),
-                        nrow_X = nrow(X), 
+  ret <- structure(list(p= p,
+                        n = n, 
                         y = y,
                         std_X = std_X,
                         S = S,

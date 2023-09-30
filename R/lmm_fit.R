@@ -16,15 +16,15 @@
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
 #' @return A list with these components: 
 #' * std_X: The standardized design matrix 
-#' * SUX: first partial result of data rotation 
-#' * SUy: second partial result of data rotation 
+#' * rot_X: first partial result of data rotation 
+#' * rot_y: second partial result of data rotation 
 #' * eta: numeric value representing the ratio of variances. 
-#' * std_SUX: re-standardized rotated design matrix. This is 'fed' into \code{lmm_fit()}. 
+#' * stdrot_X: re-standardized rotated design matrix. This is 'fed' into \code{lmm_fit()}. 
 #' * b: The values returned in the 'beta' argument of the lmm() object
 #' * iter: The number of iterations at each given lambda value 
 #' * converged: The convergence status at each given lambda value 
 #' * ns: The indices of the non-singular columns of the ORIGINAL design matrix
-#' * ncol_X: The number of columns in the ORIGINAL design matrix 
+#' * p: The number of columns in the ORIGINAL design matrix 
 #' 
 #' @keywords internal 
 #'
@@ -37,16 +37,16 @@ lmm_fit <- function(prep,
                      returnX = TRUE){
   
   # set default init
-  if(is.null(init)) init <- rep(0, prep$ncol_X)
+  if(is.null(init)) init <- rep(0, prep$p)
   
   # error checking
-  if (length(init)!=prep$ncol_X) stop("Dimensions of init and X do not match", call.=FALSE)
+  if (length(init)!=prep$p) stop("Dimensions of init and X do not match", call.=FALSE)
   
   if(prep$trace){cat("Beginning standardization + rotation.")}
 
   # estimate eta if needed
   if (is.null(prep$eta)) {
-    eta <- estimate_eta(S = prep$S, U = prep$U, y = prep$y) 
+    eta <- estimate_eta(s = prep$s, U = prep$U, y = prep$y) 
   } else {
     # otherwise, use the user-supplied value (this is mainly for simulation)
     eta <- prep$eta
@@ -54,23 +54,23 @@ lmm_fit <- function(prep,
   
   # rotate data
   # rotate data
-  w <- (eta * prep$S + (1 - eta))^(-1/2)
-  wU <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
-  SUX <- wU %*% cbind(1, prep$std_X)
-  SUy <- wU %*% prep$y
-  # re-standardize rotated SUX
-  std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
-  std_SUX_noInt <- std_SUX_temp$scaled_X
-  std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
-  attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
+  w <- (eta * prep$s + (1 - eta))^(-1/2)
+  wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
+  rot_X <- wUt %*% cbind(1, prep$std_X)
+  rot_y <- wUt %*% prep$y
+  # re-standardize rotated rot_X
+  stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
+  stdrot_X_noInt <- stdrot_X_temp$scaled_X
+  stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
+  attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
   
   # calculate population var without mean 0; will need this for call to lmm()
-  # xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
+  # xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
   
   if(prep$trace){cat("Setup complete. Beginning model fitting.\n")}
   
   # main attraction
-  res <- lm.fit(x = std_SUX, y = SUy) 
+  res <- lm.fit(x = stdrot_X, y = rot_y) 
   if(any(is.na(res$coefficients))){
     stop("One or more coefficients is NA. This is usually due to one predictor 
          (one column of the X matrix) being a linear combination of the others.
@@ -82,13 +82,13 @@ lmm_fit <- function(prep,
     res = res,
     std_X = prep$std_X,
     y = prep$y,
-    S = prep$S,
+    s = prep$s,
     U = prep$U,
-    std_SUX = std_SUX,
-    SUX = SUX,
-    SUy = SUy,
-    ncol_X = prep$ncol_X, 
-    nrow_X = prep$nrow_X, 
+    stdrot_X = stdrot_X,
+    rot_X = rot_X,
+    rot_y = rot_y,
+    p = prep$p, 
+    n = prep$n, 
     eta = eta,
     ns = prep$ns,
     snp_names = prep$snp_names,

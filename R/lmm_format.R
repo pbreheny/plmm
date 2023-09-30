@@ -23,10 +23,10 @@ lmm_format <- function(fit,
   # reverse the transformations of the beta values 
   beta_vals <- lmm_untransform(res_b = fit$res$coefficients,
                            ns = fit$ns,
-                           ncol_X = fit$ncol_X,
+                           ncol_X = fit$p,
                            std_X = fit$std_X,
-                           SUX = fit$SUX,
-                           std_SUX = fit$std_SUX)
+                           SUX = fit$rot_X,
+                           std_SUX = fit$stdrot_X)
   
   if(fit$trace){cat("\nBeta values are estimated -- almost done!\n")}
   
@@ -38,11 +38,11 @@ lmm_format <- function(fit,
   val <- structure(list(beta_vals = beta_vals,
                         lm.fit = fit$res,
                         eta = fit$eta,
-                        S = fit$S,
+                        s = fit$s,
                         U = fit$U,
                         ns_idx = c(1, 1 + fit$ns), # PAY ATTENTION HERE! 
-                        ncol_X = fit$ncol_X,
-                        nrow_X = fit$nrow_X,
+                        p = fit$p,
+                        n = fit$n,
                    class = "lmm"))
   
   return(val)

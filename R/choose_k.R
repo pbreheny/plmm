@@ -12,7 +12,7 @@
 #' @param returnK Logical: should the true K (as in relatedness_mat(X)) be returned? Defaults to FALSE.  
 #' 
 #' @return A list with at least 3 items:
-#'  * K_svd: a list with the SVD components (d and u) for the approximated relatedness matrix K that can be passed to `plmm()`
+#'  * svd_K: a list with the SVD components (s and U) for the approximated relatedness matrix K that can be passed to `plmm()`
 #'  * k, the chosen number of eigenvalues 
 #'  * delt, the distance between the true and approximated K matrices at chosen k
 #'  * k_vals, a vector of all k values evaluated 
@@ -89,7 +89,7 @@ choose_k <- function(X,
   # return list with approximated K 
   
   ret <- list(
-    K_svd = trunc,
+    svd_K = list(U = trunc$u, s = trunc$d),
     k = k,
     delt = d,
     k_vals = k_vals,

@@ -46,15 +46,15 @@ lmm_fit(
 A list with these components:
 \itemize{
 \item std_X: The standardized design matrix
-\item SUX: first partial result of data rotation
-\item SUy: second partial result of data rotation
+\item rot_X: first partial result of data rotation
+\item rot_y: second partial result of data rotation
 \item eta: numeric value representing the ratio of variances.
-\item std_SUX: re-standardized rotated design matrix. This is 'fed' into \code{lmm_fit()}.
+\item stdrot_X: re-standardized rotated design matrix. This is 'fed' into \code{lmm_fit()}.
 \item b: The values returned in the 'beta' argument of the lmm() object
 \item iter: The number of iterations at each given lambda value
 \item converged: The convergence status at each given lambda value
 \item ns: The indices of the non-singular columns of the ORIGINAL design matrix
-\item ncol_X: The number of columns in the ORIGINAL design matrix
+\item p: The number of columns in the ORIGINAL design matrix
 }
 }
 \description{

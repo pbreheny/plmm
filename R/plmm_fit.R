@@ -15,10 +15,10 @@
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
 #' @return A list with these components: 
 #' * std_X: The standardized design matrix 
-#' * SUX: first partial result of data rotation 
-#' * SUy: second partial result of data rotation 
+#' * rot_X: first partial result of data rotation 
+#' * rot_y: second partial result of data rotation 
 #' * eta: numeric value representing the ratio of variances. 
-#' * std_SUX: re-standardized rotated design matrix. This is 'fed' into \code{plmm_fit()}. 
+#' * std_rot_X: re-standardized rotated design matrix. This is 'fed' into \code{plmm_fit()}. 
 #' * b: The values returned in the 'beta' argument of the ncvfit() object
 #' * lambda: The sequence of lambda values used in model fitting 
 #' * iter: The number of iterations at each given lambda value 
@@ -57,30 +57,30 @@ plmm_fit <- function(prep,
   if (gamma <= 2 & penalty=="SCAD") stop("gamma must be greater than 2 for the SCAD penalty", call.=FALSE)
   if (nlambda < 2) stop("nlambda must be at least 2", call.=FALSE)
   if (alpha <= 0) stop("alpha must be greater than 0; choose a small positive number instead", call.=FALSE)
-  if (length(init)!=prep$ncol_X) stop("Dimensions of init and X do not match", call.=FALSE)
+  if (length(init)!=prep$p) stop("Dimensions of init and X do not match", call.=FALSE)
   
   if(prep$trace){cat("\nBeginning standardization + rotation.")}
   
   # estimate eta if needed
   if (is.null(prep$eta)) {
-    eta <- estimate_eta(S = prep$S, U = prep$U, y = prep$y) 
+    eta <- estimate_eta(s = prep$s, U = prep$U, y = prep$y) 
   } else {
     # otherwise, use the user-supplied value (this is mainly for simulation)
     eta <- prep$eta
   }
 
   # rotate data
-  w <- (eta * prep$S + (1 - eta))^(-1/2)
-  wU <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
-  SUX <- wU %*% cbind(1, prep$std_X)
-  SUy <- wU %*% prep$y
-  # re-standardize rotated SUX
-  std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
-  std_SUX_noInt <- std_SUX_temp$scaled_X
-  std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
-  attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
+  w <- (eta * prep$s + (1 - eta))^(-1/2)
+  wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
+  rot_X <- wUt %*% cbind(1, prep$std_X)
+  rot_y <- wUt %*% prep$y
+  # re-standardize rotated rot_X
+  stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
+  stdrot_X_noInt <- stdrot_X_temp$scaled_X
+  stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
+  attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
   # calculate population var without mean 0; will need this for call to ncvfit()
-  xtx <- apply(std_SUX, 2, function(x) mean(x^2, na.rm = TRUE)) 
+  xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
   
   if(prep$trace){cat("\nSetup complete. Beginning model fitting.")}
   
@@ -89,8 +89,8 @@ plmm_fit <- function(prep,
 
   # set up lambda
   if (missing(lambda)) {
-    lambda <- setup_lambda(X = std_SUX,
-                           y = SUy,
+    lambda <- setup_lambda(X = stdrot_X,
+                           y = rot_y,
                            alpha = alpha,
                            nlambda = nlambda,
                            lambda.min = lambda.min,
@@ -110,9 +110,9 @@ plmm_fit <- function(prep,
   
   # placeholders for results
   init <- c(0, init) # add initial value for intercept
-  resid <- drop(SUy - std_SUX %*% init)
-  linear.predictors <- matrix(NA, nrow = nrow(std_SUX), ncol=nlambda)
-  b <- matrix(NA, nrow=ncol(std_SUX), ncol=nlambda) 
+  resid <- drop(rot_y - stdrot_X %*% init)
+  linear.predictors <- matrix(NA, nrow = nrow(stdrot_X), ncol=nlambda)
+  b <- matrix(NA, nrow=ncol(stdrot_X), ncol=nlambda) 
   iter <- integer(nlambda)
   converged <- logical(nlambda)
   loss <- numeric(nlambda)
@@ -123,9 +123,9 @@ plmm_fit <- function(prep,
   ## TODO: think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
-    res <- ncvreg::ncvfit(std_SUX, SUy, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
+    res <- ncvreg::ncvfit(stdrot_X, rot_y, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
     b[, ll] <- init <- res$beta
-    linear.predictors[,ll] <- std_SUX%*%(res$beta)
+    linear.predictors[,ll] <- stdrot_X%*%(res$beta)
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
     loss[ll] <- res$loss
@@ -134,13 +134,13 @@ plmm_fit <- function(prep,
   }
   ret <- structure(list(
     y = prep$y,
-    S = prep$S,
+    p = prep$p, 
+    n = prep$n, 
+    s = prep$s,
     U = prep$U,
-    std_SUX = std_SUX,
-    SUX = SUX,
-    SUy = SUy,
-    ncol_X = prep$ncol_X, 
-    nrow_X = prep$nrow_X, 
+    rot_X = rot_X,
+    rot_y = rot_y,
+    stdrot_X = stdrot_X,
     lambda = lambda,
     b = b,
     linear.predictors = linear.predictors,
