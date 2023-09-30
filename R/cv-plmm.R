@@ -70,7 +70,6 @@ cv.plmm <- function(X,
   
   # implement full model fit 
   fit.args <- c(list(prep = prep, penalty = penalty), list(...))
-  browser()
   fit <- do.call('plmm_fit', fit.args)
   fit_to_return <- plmm_format(fit, X = X)
   

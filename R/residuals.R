@@ -27,18 +27,18 @@ residuals.plmm <- function(object,
                            ...) {
   
   # Calculate matrix of residuals
-  WR <- matrix(nrow = nrow(object$linear.predictors), ncol = ncol(object$linear.predictors))
-  for(j in 1:ncol(WR)){
-    WR[,j] <- object$Wy - object$linear.predictors[j]
+  R <- matrix(nrow = nrow(object$linear.predictors), ncol = ncol(object$linear.predictors))
+  for(j in 1:ncol(R)){
+    R[,j] <- object$rot_y - object$linear.predictors[j]
   }
   if(unrotate){
     stop("\nThis option is still underdevelopment. Don't try to unrotate residuals yet.")
-    w <- (object$eta * object$S + (1 - object$eta))^(-1/2)
+    w <- (object$eta * object$s + (1 - object$eta))^(-1/2)
     W_inv <- sweep(object$U, 2, 1/(w), "*")
-    R <- W_inv%*%WR
-  } else {
-    R <- WR
-  }
+    WR <- W_inv%*%R
+    # TODO: if this were worth pursuing, I need to finish working this thru
+
+  } 
   
   # Interpolate and return
   if (!missing(lambda)) {

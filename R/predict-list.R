@@ -56,7 +56,7 @@ predict.list <- function(fit,
   Xb <- cbind(1, newX) %*% beta_vals
   
   # for linear predictor, return mean values 
-  if (type=="lp") return(drop(Xbeta))
+  if (type=="lp") return(drop(Xb))
   
   # for blup, will incorporate the estimated variance 
   if (type == "blup"){

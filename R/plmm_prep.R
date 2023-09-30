@@ -113,7 +113,7 @@ plmm_prep <- function(X,
     if(is.null(K) & is.null(s)){
       # NB: the is.null(S) keeps you from overwriting the 3 preceding cases 
       if(trace){cat("\nUsing the default definition of the realized relatedness matrix.")}
-      svd_res <- plmm_svd(X = X, k = k, trunc = trunc, trace = trace)
+      svd_res <- plmm_svd(X = std_X, k = k, trunc = trunc, trace = trace)
       s <- (svd_res$d^2)*(1/p)
       U <- svd_res$U
     } else {

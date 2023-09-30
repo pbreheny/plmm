@@ -49,7 +49,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
     
     yhat <- predict.list(fit = fit.i,
                          std_X = cv.args$prep$std_X,
-                         newX = X_test,
+                         newX = test_X,
                          type = 'blup',
                          prep = cv.args$prep, 
                          V11 = V11,
@@ -57,6 +57,6 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
     
   }
   
-  loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(y_test, yhat[,ll]))
+  loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(test_y, yhat[,ll]))
   list(loss=loss, nl=length(fit.i$lambda), yhat=yhat)
 }

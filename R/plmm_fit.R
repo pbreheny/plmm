@@ -50,7 +50,7 @@ plmm_fit <- function(prep,
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
   # set default init
-  if(is.null(init)) init <- rep(0, prep$ncol_X)
+  if(is.null(init)) init <- rep(0, prep$p)
   
   # error checking
   if (gamma <= 1 & penalty=="MCP") stop("gamma must be greater than 1 for the MC penalty", call.=FALSE)
