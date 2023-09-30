@@ -13,7 +13,7 @@
 #' * ncol_X: The number of columns in the original design matrix 
 #' * std_X: standardized design matrix 
 #' * y: The vector of outcomes 
-#' * S: The singular values of K 
+#' * s: The singular values of K 
 #' * U: the left singular values of K (same as left singular values of X). 
 #' * ns: the indices for the nonsingular values of std_X
 #' * snp_names: Formatted column names of the design matrix 
@@ -31,7 +31,7 @@ lmm_prep <- function(X,
   
   
   ## coersion
-  U <- S <- SUX <- SUy <- eta <- NULL
+  U <- s <- eta <- NULL
   
   # designate the dimensions of the original design matrix 
   n <- nrow(X)
@@ -70,14 +70,14 @@ lmm_prep <- function(X,
   flag1 <- diag_K & is.null(K)
   if(flag1){
     if(trace){(cat("\nUsing identity matrix for K."))}
-    S <- rep(1, n)
+    s <- rep(1, n)
     U <- diag(nrow = n)
   }
   # case 2: K is user-supplied diagonal matrix (like a weighted lm())
   flag2 <- diag_K & !is.null(K) & ('matrix' %in% class(K))
   if(flag2){
     if(trace){(cat("\nUsing supplied diagonal matrix for K, similar to a lm() with weights."))}
-    S <- sort(diag(K), decreasing = T)
+    s <- sort(diag(K), decreasing = T)
     U <- diag(nrow = n)[,order(diag(K), decreasing = T)]
   }
   # case 3: K is a user-supplied list, as passed from choose_k()
@@ -85,7 +85,7 @@ lmm_prep <- function(X,
   if(flag3){
     if(trace){cat("\nK is a list; will pass SVD components from list to model fitting.")}
     # case 3: K is a user-supplied list, as returned from choose_k()
-    S <- K$s # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
+    s <- K$s # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
     U <- K$U
   }
   
@@ -94,7 +94,7 @@ lmm_prep <- function(X,
   if(sum(c(flag1, flag2, flag3)) == 0){
     # set default K: if not specified and not diagonal, use realized relatedness matrix
     # NB: relatedness_mat(X) standardizes X! 
-    if(is.null(K) & is.null(S)){
+    if(is.null(K) & is.null(s)){
       # NB: the is.null(S) keeps you from overwriting the 3 preceding cases 
       if(trace){cat("\nUsing the default definition of the realized relatedness matrix.")}
       svd_res <- plmm_svd(X = X, k = k, trunc = trunc, trace = trace)
@@ -124,12 +124,12 @@ lmm_prep <- function(X,
                         n = n, 
                         y = y,
                         std_X = std_X,
-                        S = S,
+                        s = s,
                         U = U,
                         ns = ns,
                         eta = eta_star, # carry eta over to fit 
                         trace = trace,
-                        snp_names = if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)))
+                        snp_names = if (is.null(colnames(X))) paste("K", 1:p, sep="") else colnames(X)))
   
   return(ret)
   

@@ -12,7 +12,7 @@ double pnorm(double x, double mu, double sigma, int lower_tail, int give_log);
 SEXP mfdr_gaussian(SEXP fit) {
   
   // Declarations
-  int n = INTEGER(getListElement(fit, "nrow_X"))[0];
+  int n = INTEGER(getListElement(fit, "n"))[0];
   int L = ncols(getListElement(fit, "beta_vals"));
   int p = nrows(getListElement(fit, "beta_vals"));
   double *b = REAL(getListElement(fit, "beta_vals"));
