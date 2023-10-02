@@ -6,23 +6,23 @@
 #' @param res_b The values returned in the 'beta' argument of the ncvfit() object
 #' @param ns The indices of the non-singular columns of the ORIGINAL design matrix
 #' @param p The number of columns in the original design matrix (without the intercept)
-#' @param std_X The standardized design matrix BEFORE rotation; this should have attributes 'scale', 'center', and 'nonsingular'
-#' @param rot_X The rotated design matrix (has the intercept)
-#' @param stdrot_X The standardized design matrix AFTER rotation; this should have attribute 'scale'
+#' @param std_X_scale The 'scale' attribute from the standardized design matrix BEFORE rotation
+#' @param std_X_center The 'center' attribute from the standardized design matrix BEFORE rotation
+#' @param stdrot_X_scale The 'scale' attribute from the standardized design matrix AFTER rotation
 #' @param partial Logical: Should beta values be untransformed from just the post-rotation standardization? 
 #' This option exists because I need partial= TRUE inside the internal function `predict.list()`. 
 #' Users should leave this option false unless they know exactly what they're doing. 
 #' @keywords internal
 
 
-untransform <- function(res_b, ns, p, std_X, rot_X, stdrot_X, partial = FALSE){
+untransform <- function(res_b, ns, p, std_X_scale, std_X_center, stdrot_X_scale, partial = FALSE){
   ## Step 1: reverse the POST-ROTATION standardization ##  
   
   # create placeholder vector
   untransformed_b1 <- res_b
   
   # un-scale the non-intercept values & fill in the placeholder
-  untransformed_b1[-1,] <- res_b[-1, , drop=FALSE]/attr(stdrot_X, 'scale')
+  untransformed_b1[-1,] <- res_b[-1, , drop=FALSE]/stdrot_X_scale
   
   if (partial){
     return(untransformed_b1)
@@ -40,15 +40,11 @@ untransform <- function(res_b, ns, p, std_X, rot_X, stdrot_X, partial = FALSE){
                                  ncol = ncol(untransformed_b1))
     
     # unscale the beta values for non-singular, non-intercept columns
-    untransformed_b2 <- b/attr(std_X, 'scale')[ns]
-    # # uncenter the beta values for the non-singular, non-intercept columns 
-    # untransformed_b2 <- sweep(untransformed_b2, 1, attr(std_X, 'center')[ns], "+")
+    untransformed_b2 <- b/std_X_scale[ns]
     
     # fill in the un-transformed values
     untransformed_beta[ns+1,] <- untransformed_b2 # again, the + 1 is for the intercept
-    untransformed_beta[1,] <- a - crossprod(attr(std_X, 'center')[ns], untransformed_b2)
-    # idea:
-    # untransformed_beta[1,] <- -crossprod(attr(std_X, 'center')[ns], untransformed_b2)
+    untransformed_beta[1,] <- a - crossprod(std_X_center[ns], untransformed_b2)
     
     # Final step: return un-transformed beta values 
     return(untransformed_beta)

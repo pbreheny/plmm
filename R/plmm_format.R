@@ -51,9 +51,9 @@ plmm_format <- function(fit,
   beta_vals <- untransform(res_b = fit$b,
                            ns = fit$ns,
                            p = fit$p,
-                           std_X = ncvreg::std(X),
-                           rot_X = fit$rot_X,
-                           stdrot_X = fit$stdrot_X)
+                           std_X_scale = attr(std_X, 'scale'),
+                           std_X_center = attr(std_X, 'center'),
+                           stdrot_X_scale = attr(stdrot_X, 'scale'))
   
   if(fit$trace){cat("\nBeta values are estimated -- almost done!")}
   

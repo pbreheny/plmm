@@ -173,10 +173,19 @@ process_plink <- function(data_dir,
     obj$constants_idx <- constants_idx
     obj <- bigsnpr::snp_save(obj)
     
-    cat("\nDone with imputation. File formatting in progress.",
-        file = outfile, append = TRUE)
-    
   }
+  
+  # cat("\nDone with imputation. Now, column-standardizing the design matrix...")
+  # # add centering & scaling info
+  # scale_info <- bigstatsr::big_scale()(obj$genotypes)
+  # # now, save the new object -- this will have imputed values and constants_idx
+  # obj$ns <- ns
+  # obj$std_X <- nsvreg::std(X = obj$genotypes[,])
+  # obj <- bigsnpr::snp_save(obj)
+  
+  cat("\nDone with standardization. File formatting in progress.",
+      file = outfile, append = TRUE)
+  
   
   if(!quiet & impute){cat("\nDone with imputation. Processed files now saved as .rds object.")}
   close(log_con)
