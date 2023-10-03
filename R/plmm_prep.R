@@ -133,18 +133,41 @@ plmm_prep <- function(X,
          \n Or did you set diag_K = TRUE and specifiy a k value at the same time?")
   }
   
+  if(trace){cat("\nBeginning standardization + rotation.")}
   
+  # estimate eta if needed
+  if (is.null(eta_star)) {
+    eta <- estimate_eta(s = s, U = U, y = y) 
+  } else {
+    # otherwise, use the user-supplied value (this is mainly for simulation)
+    eta <- eta_star
+  }
+  
+  # rotate data
+  w <- (eta * s + (1 - eta))^(-1/2)
+  wUt <- sweep(x = t(U), MARGIN = 1, STATS = w, FUN = "*")
+  rot_X <- wUt %*% cbind(1, std_X)
+  rot_y <- wUt %*% y
+  # re-standardize rotated rot_X
+  stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
+  stdrot_X_noInt <- stdrot_X_temp$scaled_X
+  stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
+  attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
   
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
+    X = X,
     p = p,
     n = n, 
     y = y,
     std_X = std_X,
     s = s,
     U = U,
+    rot_X = rot_X,
+    rot_y = rot_y,
+    stdrot_X = stdrot_X,
     ns = ns,
-    eta = eta_star, # carry eta over to fit 
+    eta = eta, # carry eta over to fit 
     penalty.factor = penalty.factor,
     trace = trace,
     snp_names = if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)))

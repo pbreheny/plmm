@@ -59,29 +59,7 @@ plmm_fit <- function(prep,
   if (alpha <= 0) stop("alpha must be greater than 0; choose a small positive number instead", call.=FALSE)
   if (length(init)!=prep$p) stop("Dimensions of init and X do not match", call.=FALSE)
   
-  if(prep$trace){cat("\nBeginning standardization + rotation.")}
-  
-  # estimate eta if needed
-  if (is.null(prep$eta)) {
-    eta <- estimate_eta(s = prep$s, U = prep$U, y = prep$y) 
-  } else {
-    # otherwise, use the user-supplied value (this is mainly for simulation)
-    eta <- prep$eta
-  }
 
-  # rotate data
-  w <- (eta * prep$s + (1 - eta))^(-1/2)
-  wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
-  rot_X <- wUt %*% cbind(1, prep$std_X)
-  rot_y <- wUt %*% prep$y
-  # re-standardize rotated rot_X
-  stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
-  stdrot_X_noInt <- stdrot_X_temp$scaled_X
-  stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
-  attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
-  # calculate population var without mean 0; will need this for call to ncvfit()
-  xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
-  
   if(prep$trace){cat("\nSetup complete. Beginning model fitting.")}
   
   # remove initial values for coefficients representing columns with singular values
@@ -89,8 +67,8 @@ plmm_fit <- function(prep,
 
   # set up lambda
   if (missing(lambda)) {
-    lambda <- setup_lambda(X = stdrot_X,
-                           y = rot_y,
+    lambda <- setup_lambda(X = prep$stdrot_X,
+                           y = prep$rot_y,
                            alpha = alpha,
                            nlambda = nlambda,
                            lambda.min = lambda.min,
@@ -108,11 +86,14 @@ plmm_fit <- function(prep,
   # make sure to *not* penalize the intercept term 
   new.penalty.factor <- c(0, prep$penalty.factor)
   
+  # calculate population var without mean 0; will need this for call to ncvfit()
+  xtx <- apply(prep$stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
+  
   # placeholders for results
   init <- c(0, init) # add initial value for intercept
-  resid <- drop(rot_y - stdrot_X %*% init)
-  linear.predictors <- matrix(NA, nrow = nrow(stdrot_X), ncol=nlambda)
-  b <- matrix(NA, nrow=ncol(stdrot_X), ncol=nlambda) 
+  resid <- drop(prep$rot_y - prep$stdrot_X %*% init)
+  linear.predictors <- matrix(NA, nrow = nrow(prep$stdrot_X), ncol=nlambda)
+  b <- matrix(NA, nrow=ncol(prep$stdrot_X), ncol=nlambda) 
   iter <- integer(nlambda)
   converged <- logical(nlambda)
   loss <- numeric(nlambda)
@@ -123,9 +104,9 @@ plmm_fit <- function(prep,
   ## TODO: think about putting this loop in C
   for (ll in 1:nlambda){
     lam <- lambda[ll]
-    res <- ncvreg::ncvfit(stdrot_X, rot_y, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
+    res <- ncvreg::ncvfit(prep$stdrot_X, prep$rot_y, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
     b[, ll] <- init <- res$beta
-    linear.predictors[,ll] <- stdrot_X%*%(res$beta)
+    linear.predictors[,ll] <- prep$stdrot_X%*%(res$beta)
     iter[ll] <- res$iter
     converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
     loss[ll] <- res$loss
@@ -138,13 +119,14 @@ plmm_fit <- function(prep,
     n = prep$n, 
     s = prep$s,
     U = prep$U,
-    rot_X = rot_X,
-    rot_y = rot_y,
-    stdrot_X = stdrot_X,
+    std_X = prep$std_X,
+    rot_X = prep$rot_X,
+    rot_y = prep$rot_y,
+    stdrot_X = prep$stdrot_X,
     lambda = lambda,
     b = b,
     linear.predictors = linear.predictors,
-    eta = eta,
+    eta = prep$eta,
     iter = iter,
     converged = converged, 
     loss = loss, 
