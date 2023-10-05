@@ -77,16 +77,11 @@ cv.plmm <- function(X,
   cv.args <- fit.args
   cv.args$warn <- FALSE
   cv.args$lambda <- fit$lambda 
-  
-  estimated_V <- NULL 
-  if (type == 'blup') {
-    estimated_V <- v_hat(fit, K)
-  }
 
   # initialize objects to hold CV results 
   n <- length(fit$y)
-  E <- Y <- matrix(NA, nrow=nrow(X), ncol=length(fit$lambda))
-
+  cve_mat <- cvse_mat <- matrix(NA, nrow=nfolds, ncol=length(fit$lambda))
+  E <- Y <- array(dim = c(length(fit$y), length(fit$lambda), nfolds))
   
   # set up folds for cross validation 
   if (!missing(seed)) {
@@ -100,9 +95,9 @@ cv.plmm <- function(X,
   if(is.null(fold)) {
     if(trace){
       cat("'Fold' argument is either NULL or missing; assigning folds randomly (by default). 
-          \nTo specify folds for each observation, supply a vector with fold assignments.")
+          ")
     }
-    fold <- sample(1:n %% nfolds)
+    fold <- sample(1:nrow(prep$stdrot_X) %% nfolds)
     fold[fold==0] <- nfolds
   } else {
     nfolds <- max(fold)
@@ -121,6 +116,7 @@ cv.plmm <- function(X,
   if (trace) cat("\nStarting cross validation\n")  
   # set up progress bar -- this can take a while
   if(trace){pb <- txtProgressBar(min = 0, max = nfolds, style = 3)}
+  # NB: I am splitting the rows of stdrot_X into folds, so I am indexing 'k', not 'n'
   for (i in 1:nfolds) {
     # case 1: user-specified cluster
     if (!missing(cluster)) {
@@ -132,39 +128,52 @@ cv.plmm <- function(X,
                  fold = fold,
                  type = type,
                  cv.args = cv.args,
-                 estimated_V = estimated_V)
+                 K = K)
       if (trace) {setTxtProgressBar(pb, i)}
 
     }
-    # update E and Y
-    E[fold==i, 1:res$nl] <- res$loss
-    Y[fold==i, 1:res$nl] <- res$yhat
+    
+    # fill in array with loss and yhat values 
+    E[,,i] <- res$loss
+    Y[,,i] <- res$yhat
+    
+    
+    # eliminate saturated lambda values, if any
+    ind <- which(apply(is.finite(res$loss), 2, all)) # index for lambda values to keep
+    res$loss <- res$loss[, ind, drop=FALSE]
+    res$yhat <- res$yhat[, ind]
+    lambda <- fit$lambda[ind]
+    
+    # assess loss 
+    cve <- apply(res$loss, 2, mean)
+    cvse <- apply(res$loss, 2, stats::sd) / sqrt(length(fit$y))
+    
+    cve_mat[i, 1:res$nl] <- cve
+    cvse_mat[i, 1:res$nl] <- cvse
   }
 
-  # eliminate saturated lambda values, if any
-  ind <- which(apply(is.finite(E), 2, all)) # index for lambda values to keep
-  E <- E[, ind, drop=FALSE]
-  Y <- Y[, ind]
-  lambda <- fit$lambda[ind]
-
   # return min lambda idx
-  cve <- apply(E, 2, mean)
-  cvse <- apply(E, 2, stats::sd) / sqrt(n)
-  min <- which.min(cve)
+  avg_cve_over_folds <- colSums(cve_mat)/nrow(cve_mat)
+  min <- which.min(avg_cve_over_folds)
 
   # return lambda 1se idx
-  l.se <- cve[min] - cvse[min]
-  u.se <- cve[min] + cvse[min]
-  within1se <- which(cve >= l.se & cve <= u.se)
+  avg_cvse_over_folds <- colSums(cvse_mat)/nrow(cvse_mat)
+  l.se <- avg_cve_over_folds[min] - avg_cvse_over_folds[min]
+  u.se <- avg_cve_over_folds[min] + avg_cvse_over_folds[min]
+  within1se <- which(avg_cve_over_folds >= l.se & avg_cve_over_folds <= u.se)
   min1se <- which.max(lambda %in% lambda[within1se])
 
   # bias correction
-  e <- sapply(1:nfolds, function(i) apply(E[fold==i, , drop=FALSE], 2, mean))
-  Bias <- mean(e[min,] - apply(e, 2, min))
+  if(returnBiasDetails){
+    Bias <- mean(cve_mat[min,] - apply(cve_mat, 2, min))
+  }
+  
 
   val <- list(type=type, 
-              cve=cve,
-              cvse=cvse,
+              avg_cve_over_folds=avg_cve_over_folds,
+              avg_cvse_over_folds=avg_cvse_over_folds,
+              cve_mat = cve_mat,
+              cvse_mat = cvse_mat,
               fold=fold,
               lambda=lambda,
               fit=fit_to_return,

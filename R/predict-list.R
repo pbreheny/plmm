@@ -5,6 +5,7 @@
 #' @param newX A design matrix used for computing predicted values (i.e, the test data).
 #' @param type A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details. 
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
+#' @param stdrot_X_scale A vector of scale values from the rotated + standardized data. These values should be from the whole dataset, not what is subset to a fold!
 #' @param prep Optional argument. Result of the call to `plmm_prep` which corresponds to the `fit` argument. Required if \code{type == 'blup'}. 
 #' @param V11 Variance-covariance matrix of the training data. Extracted from `estimated_V` that is generated using all observations. Required if \code{type == 'blup'}. 
 #' @param V21 Covariance matrix between the training and the testing data. Extracted from `estimated_V` that is generated using all observations. Required if \code{type == 'blup'}. 
@@ -26,9 +27,13 @@ predict.list <- function(fit,
                          newX,
                          type=c("lp", "blup"),
                          idx=1:length(fit$lambda),
+                         stdrot_X_scale,
                          prep = NULL,
                          V11 = NULL,
-                         V21 = NULL, ...) {
+                         V21 = NULL, 
+                         # std_X_scale = ,
+                         # std_X_center = ,
+                         ...) {
   
   type <- match.arg(type)
   # get beta values from fit -- these coefficients are on the transformed scale
@@ -38,11 +43,12 @@ predict.list <- function(fit,
   beta_vals <- untransform(res_b = raw_beta_vals,
                            ns = fit$ns,
                            p = fit$p,
-                           std_X = std_X,
-                           rot_X = fit$rot_X,
-                           stdrot_X = fit$stdrot_X,
+                           stdrot_X_scale = stdrot_X_scale,
+                           # because this is partial, we don't need std_X attr
+                           std_X_center = NULL,
+                           std_X_scale = NULL,
                            partial = TRUE)
-  
+
   # format dim. names
   if(is.null(dim(beta_vals))) {
     # case 1: beta_vals is a vector 
@@ -62,11 +68,11 @@ predict.list <- function(fit,
   if (type == "blup"){
       
     # covariance comes from selected rows and columns from estimated_V that is generated in the overall fit (V11, V21)
-      
+
     # test1 <- V21 %*% chol2inv(chol(V11)) # true 
     # TODO: to find the inverse of V11 using svd results of K, i.e., the inverse of a submatrix, might need to use Woodbury's formula 
 
-    ranef <- V21 %*% chol2inv(chol(V11)) %*% (fit$y - cbind(1, prep$std_X) %*% beta_vals)
+    ranef <- V21 %*% chol2inv(chol(V11)) %*% (drop(fit$y) - (cbind(1, prep$std_X) %*% beta_vals))
 
     blup <- Xb + ranef
     

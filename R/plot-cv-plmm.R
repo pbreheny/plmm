@@ -26,10 +26,10 @@ plot.cv.plmm <- function(x, log.l=TRUE, type=c("cve", "rsq", "scale", "snr", "al
   } else xlab <- expression(lambda)
 
   ## Calculate y
-  L.cve <- x$cve - x$cvse
-  U.cve <- x$cve + x$cvse
+  L.cve <- x$avg_cve_over_folds - x$avg_cvse_over_folds
+  U.cve <- x$avg_cve_over_folds + x$avg_cvse_over_folds
   if (type=="cve") {
-    y <- x$cve
+    y <- x$avg_cve_over_folds
     L <- L.cve
     U <- U.cve
     ylab <- "Cross-validation error"
@@ -41,7 +41,7 @@ plot.cv.plmm <- function(x, log.l=TRUE, type=c("cve", "rsq", "scale", "snr", "al
       y <- rsq
       L <- rsql
       U <- rsqu
-      ylab <- ~R^2
+      ylab <- ~R^2 #TODO: not sure exactly what this ~ is doing ...
     } else if(type=="snr") {
       y <- rsq/(1-rsq)
       L <- rsql/(1-rsql)
@@ -49,14 +49,14 @@ plot.cv.plmm <- function(x, log.l=TRUE, type=c("cve", "rsq", "scale", "snr", "al
       ylab <- "Signal-to-noise ratio"
     }
   } else if (type=="scale") {
-    y <- sqrt(x$cve)
+    y <- sqrt(x$avg_cve_over_folds)
     L <- sqrt(L.cve)
     U <- sqrt(U.cve)
     ylab <- ~hat(sigma)
   }
 
-  ind <- which(is.finite(l[1:length(x$cve)]))
-  ylim <- if (is.null(x$cvse)) range(y[ind]) else range(c(L[ind], U[ind]))
+  ind <- which(is.finite(l[1:length(x$avg_cve_over_folds)]))
+  ylim <- if (is.null(x$avg_cvse_over_folds)) range(y[ind]) else range(c(L[ind], U[ind]))
   aind <- intersect(ind, which((U-L)/diff(ylim) > 1e-3))
   plot.args = list(x=l[ind], y=y[ind], ylim=ylim, xlab=xlab, ylab=ylab, type="n", xlim=rev(range(l[ind])), las=1)
   new.args = list(...)

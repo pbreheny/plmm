@@ -114,11 +114,12 @@ plmm_prep <- function(X,
       # NB: the is.null(S) keeps you from overwriting the 3 preceding cases 
       if(trace){cat("\nUsing the default definition of the realized relatedness matrix.")}
       svd_res <- plmm_svd(X = std_X, k = k, trunc = trunc, trace = trace)
+      Vt <- svd_res$Vt 
       s <- (svd_res$d^2)*(1/p)
       U <- svd_res$U
     } else {
       # last case: K is a user-supplied matrix
-      svd_res <- plmm_svd(X = K, k = k, trunc = trunc, trace = trace)
+      svd_res <- plmm_svd(X = K, k = k, trunc = trunc, trace = trace, ...)
       s <- svd_res$d
       U <- svd_res$U
     }
@@ -171,6 +172,10 @@ plmm_prep <- function(X,
     penalty.factor = penalty.factor,
     trace = trace,
     snp_names = if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)))
+  
+  if(!is.null(Vt)){
+    ret$Vt <- Vt
+  }
   
   return(ret)
   

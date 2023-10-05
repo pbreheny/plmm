@@ -113,6 +113,7 @@ plmm_fit <- function(prep,
     resid <- res$resid
     if(prep$trace){setTxtProgressBar(pb, ll)}
   }
+  
   ret <- structure(list(
     y = prep$y,
     p = prep$p, 
