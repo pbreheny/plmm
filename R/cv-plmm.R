@@ -165,7 +165,7 @@ cv.plmm <- function(X,
 
   # bias correction
   if(returnBiasDetails){
-    Bias <- mean(cve_mat[min,] - apply(cve_mat, 2, min))
+    Bias <- mean(cve_mat[,min] - apply(cve_mat, 2, min))
   }
   
 
