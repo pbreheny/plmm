@@ -14,13 +14,15 @@ cvf <- function(i, fold, type, cv.args, K, ...) {
   
   # subset std_X, and y to match fold indices 
   #   (and in so doing, leave out the ith fold)
+  cv.args$prep$rot_y <- full_cv_prep$rot_y[fold!=i] 
   cv.args$prep$stdrot_X <- full_cv_prep$stdrot_X[fold!=i, ,drop=FALSE]
   # attr(cv.args$prep$stdrot_X, 'scale') <- attr(full_cv_prep$stdrot_X, 'scale')[fold!=i]
   # TODO: do I need center & scale values above? What to pass to untransform() via predict.list()?
-  cv.args$prep$U <- full_cv_prep$U[,fold!=i,drop=FALSE] # TODO: generalize this to accommodate p >> n case 
+  
+  # for estimating V (v_hat()) in BLUP case, I will need to get U and s for the ith fold:
+  cv.args$prep$U <- full_cv_prep$U[,fold!=i,drop=FALSE] # TODO: generalize this to accommodate p > n case 
   cv.args$prep$s <- full_cv_prep$s[fold!=i]
-  cv.args$prep$rot_y <- full_cv_prep$rot_y[fold!=i] 
-
+  
   # extract test set (comes from cv prep on full data)
   # NB: test data is on *standardized* scale 
   # test_U <- full_cv_prep$U[,fold==i,drop=FALSE]
