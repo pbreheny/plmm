@@ -4,6 +4,7 @@
 #' NB: this function is simply a wrapper for plmm_prep -> plmm_fit -> plmm_format
 #' @param X Design matrix object or a string with the file path to a design matrix. If a string, string will be passed to `get_data()`. 
 #' * Note: X may include clinical covariates and other non-SNP data, but no missing values are allowed.
+#' @param std_needed Logical: does the supplied X need to be standardized? Defaults to FALSE, since `process_plink()` standardizes the design matrix by default. 
 #' @param y Continuous outcome vector. Logistic regression modeling is still in development.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list with components 'd' and 'u', as returned by choose_k().
@@ -69,6 +70,7 @@
 
 
 plmm <- function(X,
+                 std_needed = FALSE,
                  y,
                  k = NULL, 
                  K = NULL,
@@ -93,7 +95,7 @@ plmm <- function(X,
   ## check types 
   if("character" %in% class(X)){
     dat <- get_data(path = X, returnX = TRUE, trace = trace)
-    X <- dat$X
+    X <- dat$std_X
     if("FBM.code256" %in% class(X) | "FBM" %in% class(X)){fbm_flag <- TRUE} else {fbm_flag <- FALSE}
   }
   if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
@@ -102,10 +104,10 @@ plmm <- function(X,
                                        If you don't have an .rds object yet, see process_plink() for preparing your data.")}
   if("list" %in% class(X)){
     # check for X element 
-    if(!("X" %in% names(X))){stop("The list supplied for the X argument does not have a design matrix element named 'X'. Rename as needed and try again.")}
-    if("FBM.code256" %in% class(X$X) | "FBM" %in% class(X$X)){
+    if(!("std_X" %in% names(X))){stop("The list supplied for the X argument does not have a design matrix element named 'std_X'. Rename as needed and try again.")}
+    if("FBM.code256" %in% class(X$std_X) | "FBM" %in% class(X$std_X)){
       dat <- X
-      X <- dat$X
+      std_X <- dat$std_X
       fbm_flag <- TRUE
     } else{
       # TODO: add case to handle X passed as list where X is not an FBM
@@ -147,7 +149,7 @@ plmm <- function(X,
     
   }
   
-  if (!is.null(K)){-
+  if (!is.null(K)){
     # first, check type/class:
     if (!inherits(K, "matrix") & !is.list(K)) {
       tmp <- try(K <- stats::model.matrix(~0+., data=K), silent=TRUE)
@@ -184,7 +186,7 @@ plmm <- function(X,
   # prep (SVD)-------------------------------------------------
   if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
   if(fbm_flag){
-    the_prep <- plmm_prep_fbm(X = X,
+    the_prep <- plmm_prep_fbm(X = std_X,
                               meta = dat,
                               y = y,
                               K = K,
@@ -195,6 +197,8 @@ plmm <- function(X,
                               trace = trace)
   } else {
     the_prep <- plmm_prep(X = X,
+                          # TODO: work out the line below 
+                          # std_needed = std_needed,
                           y = y,
                           K = K,
                           k = k,

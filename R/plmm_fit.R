@@ -70,18 +70,6 @@ plmm_fit <- function(prep,
   }
   
   # rotate data
-<<<<<<< HEAD
-  w <- (eta * prep$S + (1 - eta))^(-1/2)
-  wU <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
-  SUX <- wU %*% cbind(1, prep$std_X)
-  SUy <- wU %*% prep$y
-  
-  # re-standardize rotated SUX
-  std_SUX_temp <- scale_varp(SUX[,-1, drop = FALSE])
-  std_SUX_noInt <- std_SUX_temp$scaled_X
-  std_SUX <- cbind(SUX[,1, drop = FALSE], std_SUX_noInt) # re-attach intercept
-  attr(std_SUX,'scale') <- std_SUX_temp$scale_vals
-=======
   w <- (eta * prep$s + (1 - eta))^(-1/2)
   wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
   rot_X <- wUt %*% cbind(1, prep$std_X)
@@ -91,7 +79,7 @@ plmm_fit <- function(prep,
   stdrot_X_noInt <- stdrot_X_temp$scaled_X
   stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
   attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
->>>>>>> master
+  
   # calculate population var without mean 0; will need this for call to ncvfit()
   xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
   

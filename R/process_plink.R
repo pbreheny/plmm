@@ -191,7 +191,7 @@ process_plink <- function(data_dir,
   obj$ns <- ns
   obj$center <- scale_info$center
   obj$scale <- scale_info$scale
-  obj$stdX <- big_std(X = obj$genotypes,
+  obj$std_X <- big_std(X = obj$genotypes,
                            center = obj$center,
                            scale = obj$scale,
                            ns = obj$ns)

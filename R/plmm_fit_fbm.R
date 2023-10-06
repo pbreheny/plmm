@@ -70,9 +70,9 @@ plmm_fit_fbm <- function(prep,
 
   # rotate data 
   w <- (eta * prep$S + (1 - eta))^(-1/2)
-  tU <- bigstatsr::big_transpose(U)
-  wU <- bigstatsr::FBM(tU$nrow, tU$ncol)
-  bigstatsr::big_apply(tU,
+  Ut <- bigstatsr::big_transpose(U)
+  wUt <- bigstatsr::FBM(Ut$nrow, Ut$ncol)
+  bigstatsr::big_apply(Ut,
                        a.FUN = function(X, ind, w, res){
                          res[,ind] <- sweep(x = X[,ind],
                                             MARGIN = 1,
@@ -80,13 +80,20 @@ plmm_fit_fbm <- function(prep,
                                             "*")},
                        a.combine = cbind,
                        w = w,
-                       res = wU)
+                       res = wUt)
   
-  # TODO: add column of 1s for intercept!
-  X_with_intcpt <- matrix(nrow = X$nrow, ncol = length(prep$ns) + 1) 
-  X_with_intcpt[,1] <- rep(1, X$nrow)
-  X_with_intcpt <- X_with_intcpt |> bigstatsr::as_FBM()
-  # bigstatsr::big_apply(...)
+  # add column of 1s for intercept
+  std_X_with_intcpt <- matrix(data = 0, nrow = std_X$nrow, ncol = length(prep$ns) + 1) 
+  std_X_with_intcpt[,1] <- rep(1, std_X$nrow)
+  std_X_with_intcpt <- std_X_with_intcpt |> bigstatsr::as_FBM()
+  # fill in other columns with values of std_X
+  bigstatsr::big_apply(std_X,
+                       a.FUN = function(X, ind, res){
+                         res[,ind] <- res[,ind] + X[,ind]
+                       },
+                       a.combine = cbind,
+                       ind = 2:ncol(std_X),
+                       res = std_X_with_intcpt)
   
   
   # TODO: SUX <- wU %*% prep$X

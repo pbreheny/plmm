@@ -21,7 +21,7 @@
 #' }
 #' 
 #' @details
-#' The .rds object should have an 'X' element - this is what will be used as the design matrix for analysis. This design matrix should *not* include an intercept column.
+#' The .rds object should have an 'std_X' element - this is what will be used as the design matrix for analysis. This design matrix should *not* include an intercept column.
 #' 
 #' 
 get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
@@ -37,8 +37,9 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
 
   # return data in a tractable format 
   if (missing(fbm)) {
-    if (utils::object.size(obj$stdX) > 1e8) {
-      warning("\nDue to the large size of X (>100 Mb), returnX has been turned off.\nTo turn this message off, explicitly specify returnX=TRUE or returnX=FALSE).")
+    if (utils::object.size(obj$std_X) > 1e8) {
+      warning("\nDue to the large size of X (>100 Mb), X has been returned as a file-backed matrix (FBM).
+              \nTo turn this message off, explicitly specify fbm=TRUE or fbm=FALSE).")
       fbm <- TRUE
     } else {
       # if it fits, it ships 
@@ -47,7 +48,7 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
   }
   
   if(!fbm){
-    X <- obj$stdX[,]
+    std_X <- obj$std_X[,]
     if(!is.null(row_id)){
       if(row_id == "iid"){row_names <- obj$fam$sample.ID}
       if(row_id == "fid"){row_names <- obj$fam$family.ID}
@@ -55,30 +56,30 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
       row_names <- 1:length(obj$fam$sample.ID)
     }
     
-    dimnames(X) <- list(row_names,
+    dimnames(std_X) <- list(row_names,
                         obj$map$marker.ID)
     # TODO fix this error: Error in dimnames(X) <- list(row_names, o
     
     cat("Reminder: the X that is returned here is column-standardized.
-        A copy of the original data is available as an item in the .rds object")
-    return(list(X = X,
+        A copy of the original data is available via the 'genotypes' matrix in the .rds object")
+    return(list(std_X = std_X,
                 fam = obj$fam,
                 map = obj$map,
                 ns = obj$ns,
                 center = obj$center,
                 scale = obj$scale))
   } else {
-    cat("Note: X is being returned as a file-backed matrix (FBM) -- see bigstatsr::FBM() for details.")
+    cat("Note: The design matrix is being returned as a file-backed matrix (FBM) -- see bigstatsr::FBM() for details.")
     #     \n At this time, plmm() cannot analyze design matrix X in this FBM format. Allowing such an option will
     #     \n require writing the 'meat and potatoes' of plmm() in C++, which is a work in progress. For now, 
     #     \n functions from package bigsnpr may be used for analyzing FBM data.")
     
-    X <- obj$stdX
+    std_X <- obj$std_X
     
     cat("Reminder: the X that is returned here is column-standardized.
-        A copy of the original data is available as an item in the .rds object")
+        A copy of the original data is available via the 'genotypes' matrix in the .rds object")
     
-    return(list(X = obj$stdX,
+    return(list(std_X = obj$std_X,
                 fam = obj$fam,
                 map = obj$map,
                 ns = obj$ns,
