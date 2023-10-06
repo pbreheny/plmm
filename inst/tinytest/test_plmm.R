@@ -144,3 +144,16 @@ colnames(test) <- c('y',
 # test[1:10,] # in plmm method, all rows of X have same predicted value! 
 if(mean(test[,2] - test[,4]) > 5) stop("PLMM and GLMNET predictions are far off for the test model.")
 # NB: the 5 above is chosen arbitrarily, based on my experience with the admix data 
+
+
+# Test: is resid. method working ----------------------------------------------
+R <- residuals(object = plmm(admix$X, admix$y, penalty = "lasso",
+                                  diag_K = TRUE, lambda = lambda0))
+
+ncv_fit <- ncvreg::ncvreg(X = admix$X, y = admix$y, penalty = "lasso", lambda = lambda0)
+ncv_R <- matrix(nrow = nrow(ncv_fit$linear.predictors), ncol = ncol(ncv_fit$linear.predictors))
+for(j in 1:ncol(ncv_R)){
+  ncv_R[,j] <- ncv_fit$y - ncv_fit$linear.predictors[j]
+}
+
+tinytest::expect_equivalent(R, ncv_R)

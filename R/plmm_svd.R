@@ -1,7 +1,7 @@
 #' A function to implement singular value decomposition for a PLMM or LMM 
 #' This is an internal function to \code{plmm_prep()}
 #' 
-#' @param K The relatedness matrix
+#' @param X The standardized design matrix
 #' @param k Optional integer argument indicating the number of singular values to use in a truncated SVD. See details. 
 #' @param trunc Logical: should truncated SVD be used? 
 #' @param trace Logical: should messages be printed to console? 
@@ -15,21 +15,21 @@
 #' 
 #' @keywords internal
 
-plmm_svd <- function(K, k, trunc, trace){
+plmm_svd <- function(X, k, trunc, trace){
   # case 1: full SVD -----------------------------------  
   if(!trunc){
     if(trace){cat("\nUsing full SVD")}
-    decomp <- svd(K, nv = 0)
-    S <- decomp$d
+    decomp <- svd(X, nv = 0)
+    d <- decomp$d
     U <- decomp$u
   } else {
     # case 2: truncated SVD -----------------------------
     if(trace){cat("\nUsing truncated SVD with k singular values")}
-    decomp <- RSpectra::svds(A = K, nv = 0, k = k)
-    S <- decomp$d
+    decomp <- RSpectra::svds(A = X, nv = 0, k = k)
+    d <- decomp$d
     U <- decomp$u
   }
   
-  res <- list(S = S, U = U)
+  res <- list(d = d, U = U)
   return(res)
 }

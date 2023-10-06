@@ -4,7 +4,7 @@
 \alias{plmm_format}
 \title{PLMM format: a function to format the output of a model constructed with \code{plmm_fit}}
 \usage{
-plmm_format(fit, convex = TRUE, dfmax = fit$ncol_X + 1, X)
+plmm_format(fit, convex = TRUE, dfmax = fit$p + 1, X)
 }
 \arguments{
 \item{fit}{A list of parameters describing the output of a model constructed with \code{plmm_fit}}

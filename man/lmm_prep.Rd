@@ -41,7 +41,7 @@ List with these components:
 \item ncol_X: The number of columns in the original design matrix
 \item std_X: standardized design matrix
 \item y: The vector of outcomes
-\item S: The singular values of K
+\item s: The singular values of K
 \item U: the left singular values of K (same as left singular values of X).
 \item ns: the indices for the nonsingular values of std_X
 \item snp_names: Formatted column names of the design matrix

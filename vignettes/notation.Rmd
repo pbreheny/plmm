@@ -1,0 +1,77 @@
+---
+title: "Notes on notation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Notes on notation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include=FALSE}
+library(penalizedLMM)
+library(rmarkdown)
+```
+
+The purpose of this short vignette is to document the notation conventions for the math and programming related to PLMM. We begin with the math, and then translate our math notation into naming objects in our source code. 
+
+
+## Math notation 
+
+Here are the concepts we need to denote, in order of their usage in our derivations: 
+
+  - $n$ and $p$ are the dimensions of our data, where $n$ is the number of *observations* (e.g., number of patients, number of samples, etc.) and $p$ is the number of *features* (e.g., number of SNPs, number of variables, number of covariates, etc.). 
+  
+  - For indices: 
+    - $i \in 1,..., n$ indexes observations
+    - $j \in 1,..., p$ indexes features
+    - $k \in 1,...,v$ indexes singular values. Note that $\text{max}(k) = \text{min}(n, p)$.
+    - $ll \in 1,...,l$ indexes values of lasso tuning parameter $\lambda$
+  
+  - $X$ and $\mathbf{y}$ are the $n \times p$ design matrix of our data and the $n \times 1$ vector of outcomes, respectively. 
+  
+  - $\mathbf{X}$ is the column-standardized $X$, in which each of the $p$ columns has mean 0 and standard deviation 1. 
+  
+  - $\mathbf{U}$ and $\mathbf{d}$ are the right singular vectors and singular values of $\mathbf{X}$, as one would obtain from the singular value decomposition (SVD). The diagonal matrix which has the $d$ values along the diagonal is denoted $\mathbf{D}$. 
+  
+  - $\mathbf{K} \equiv \frac{1}{p}\mathbf{X}\mathbf{X}^{\top}$, which is often referred to in the literature as the realized relatedness matrix (RRM). $\mathbf{K}$ has dimension $n \times n$. Note that $\mathbf{K}$ can be obtained from the SVD of $\mathbf{X}$, i.e., $\mathbf{K} \equiv \frac{1}{p}\mathbf{X}\mathbf{X}^{\top} = \mathbf{U}\frac{1}{p}\mathbf{D}^2\mathbf{U}^{\top} = \mathbf{U}\mathbf{S}\mathbf{U}^{\top}$, where $\mathbf{S}$ is the diagonal matrix whose diagonal values are $\frac{d_k^2}{p}$. 
+  
+  - $\mathbf{V}$ is ...
+  
+  - $\eta$ is ... 
+  
+  - $\mathbf{w}$ is the vector of weights defined as ...
+  
+  - $\tilde{\mathbf{X}}$ is the matrix .... 
+  
+  - $\tilde{\mathbb{X}}$ is the matrix .... 
+  
+  
+  
+Looking over this list, you will notice some conventions: 
+
+  - Matrices are denoted with uppercase letters
+  - Vectors are denoted with boldface lowercase letters
+  - Scalar values are denoted with lowercase letters
+
+## Object names in source code 
+
+In the code, we denote the objects above in this way: 
+
+  - $X$ and $y$ are `X` and `y`
+  
+  - $\mathbf{X}$ is `std_X`
+  
+  - $\tilde{\mathbf{X}}$ is `rot_X`
+  
+  - $\tilde{\mathbb{X}}$ is `stdrot_X`
+  
+  - $\mathbf{X}\boldsymbol{\beta}$ is `Xb`
+
+

@@ -39,7 +39,7 @@ choose_k(
 \value{
 A list with at least 3 items:
 \itemize{
-\item K_svd: a list with the SVD components (d and u) for the approximated relatedness matrix K that can be passed to \code{plmm()}
+\item svd_K: a list with the SVD components (s and U) for the approximated relatedness matrix K that can be passed to \code{plmm()}
 \item k, the chosen number of eigenvalues
 \item delt, the distance between the true and approximated K matrices at chosen k
 \item k_vals, a vector of all k values evaluated

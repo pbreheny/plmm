@@ -4,14 +4,14 @@
 \alias{log_lik}
 \title{Evaluate the negative log-likelihood of a null Gaussian penalizedLMM model}
 \usage{
-log_lik(eta, Uy, S)
+log_lik(eta, rot_y, s)
 }
 \arguments{
 \item{eta}{The proportion of variance in the outcome that is attributable to causal SNP effects. In other words, SNR. Sometimes referred to as the narrow-sense heritability.}
 
-\item{Uy}{The the continuous outcome, y, rotated by the eigenvectors of the similarity matrix, K.}
+\item{rot_y}{The the continuous outcome, y, rotated by the eigenvectors of the similarity matrix, K.}
 
-\item{S}{The eigenvalues of the similarity matrix, K.}
+\item{s}{The eigenvalues of the similarity matrix, K.}
 }
 \description{
 This function allows you to evaluate the negtive log-likelihood of a linear mixed model under the assumption of a null model in order to estimate the variance parameter, eta.
@@ -22,7 +22,7 @@ admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix
 ev <- eigen(admix$K)
 U <- ev$vectors
 fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
-(log_lik(eta = fit$eta, Uy = U\%*\%admix$y, S = ev$values ))
+(log_lik(eta = fit$eta, rot_y = U\%*\%admix$y, s = ev$values ))
 }
 }
 \keyword{internal}

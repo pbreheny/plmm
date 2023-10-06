@@ -4,18 +4,18 @@
 \alias{gic}
 \title{General information criterion method of selecting lambda for "plmm" class}
 \usage{
-gic(fit, ic = c("bic", "hdbic"), SUX, SUy, S)
+gic(fit, ic = c("bic", "hdbic"), rot_X, rot_y, s)
 }
 \arguments{
 \item{fit}{An object of class "plmm" where svd_detail has been set to TRUE (the default)}
 
 \item{ic}{Information criterion that should be used to select lambda. Currently supports BIC or HDBIC. Defaults to BIC.}
 
-\item{SUX}{Optional: Rotated design matrix including rotated intercept and unpenalized columns, if present. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
+\item{rot_X}{Optional: Rotated design matrix including rotated intercept and unpenalized columns, if present. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
 
-\item{SUy}{Optional: Rotated outcome vector. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
+\item{rot_y}{Optional: Rotated outcome vector. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
 
-\item{S}{Optional: Eigenvalues from similarity matrix used for model fitting. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
+\item{s}{Optional: Eigenvalues from similarity matrix used for model fitting. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
 }
 \description{
 General information criterion method of selecting lambda for "plmm" class
@@ -23,8 +23,8 @@ General information criterion method of selecting lambda for "plmm" class
 \examples{
 fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
 std_X <- ncvreg::std(admix$X)
-SU <- diag(fit$S)\%*\%fit$U
-gic_res <- gic(fit = fit, ic = "bic", SUX = SU\%*\%std_X, SUy = SU\%*\%admix$y, S = fit$S)
+wUt <- diag(fit$s)\%*\%fit$U
+gic_res <- gic(fit = fit, ic = "bic", rot_X = wUt\%*\%std_X, rot_y = wUt\%*\%admix$y, s = fit$s)
 names(gic_res)
 range(gic_res$gic, na.rm = TRUE) # NAs will result from monomorphic SNPs
 }

@@ -60,8 +60,8 @@ predict.plmm <- function(object,
   
   type <- match.arg(type)
   beta_vals <- coef.plmm(object, lambda, which=idx, drop=FALSE) # includes intercept 
-  p <- object$ncol_X 
-  n <- object$nrow_X 
+  p <- object$p 
+  n <- object$n 
   
   # addressing each type: 
   
@@ -71,8 +71,8 @@ predict.plmm <- function(object,
   
   if (type=="vars") return(drop(apply(beta_vals[-1, , drop=FALSE]!=0, 2, FUN=which))) # don't count intercept
   
-  Xbeta <- cbind(1, newX) %*% beta_vals
-  if (type=="lp") return(drop(Xbeta))
+  Xb <- cbind(1, newX) %*% beta_vals
+  if (type=="lp") return(drop(Xb))
   
   if (type == "blup"){ # assuming eta of X and newX are the same 
     
@@ -93,7 +93,7 @@ predict.plmm <- function(object,
     V21 <- object$eta * (1/p) * tcrossprod(newX, X) # same as V21_check 
 
     ranef <- V21 %*% chol2inv(chol(V11)) %*% (drop(y) - cbind(1, X) %*% beta_vals)
-    blup <- drop(Xbeta + ranef)
+    blup <- drop(Xb + ranef)
     
     # #################
     # # used to check #

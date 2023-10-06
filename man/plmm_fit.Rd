@@ -52,10 +52,10 @@ plmm_fit(
 A list with these components:
 \itemize{
 \item std_X: The standardized design matrix
-\item SUX: first partial result of data rotation
-\item SUy: second partial result of data rotation
+\item rot_X: first partial result of data rotation
+\item rot_y: second partial result of data rotation
 \item eta: numeric value representing the ratio of variances.
-\item std_SUX: re-standardized rotated design matrix. This is 'fed' into \code{plmm_fit()}.
+\item std_rot_X: re-standardized rotated design matrix. This is 'fed' into \code{plmm_fit()}.
 \item b: The values returned in the 'beta' argument of the ncvfit() object
 \item lambda: The sequence of lambda values used in model fitting
 \item iter: The number of iterations at each given lambda value

@@ -30,7 +30,7 @@
 
 plmm_format <- function(fit,
                         convex = TRUE,
-                        dfmax = fit$ncol_X + 1, 
+                        dfmax = fit$p + 1, 
                         X){
   # eliminate saturated lambda values, if any
   ind <- !is.na(fit$iter)
@@ -40,7 +40,7 @@ plmm_format <- function(fit,
   loss <- fit$loss[ind]
   if (fit$warn & sum(iter) == fit$max.iter) warning("\nMaximum number of iterations reached")
   convex.min <- if (convex) convexMin(b = fit$b,
-                                      X = fit$std_SUX,
+                                      X = fit$stdrot_X,
                                       penalty = fit$penalty,
                                       gamma = fit$gamma, 
                                       l2 = fit$lambda*(1-fit$alpha),
@@ -50,10 +50,10 @@ plmm_format <- function(fit,
   # reverse the transformations of the beta values 
   beta_vals <- untransform(res_b = fit$b,
                            ns = fit$ns,
-                           ncol_X = fit$ncol_X,
+                           p = fit$p,
                            std_X = ncvreg::std(X),
-                           SUX = fit$SUX,
-                           std_SUX = fit$std_SUX)
+                           rot_X = fit$rot_X,
+                           stdrot_X = fit$stdrot_X)
   
   if(fit$trace){cat("\nBeta values are estimated -- almost done!")}
   
@@ -62,13 +62,16 @@ plmm_format <- function(fit,
   varnames <- c("(Intercept)", fit$snp_names)
   dimnames(beta_vals) <- list(varnames, lamNames(fit$lambda))
   
+  colnames(fit$linear.predictors) <- lamNames(fit$lambda)
 
   ## output
   val <- structure(list(beta_vals = beta_vals,
                         lambda = lambda,
                         eta = fit$eta,
-                        S = fit$S,
+                        s = fit$s,
                         U = fit$U,
+                        rot_y = fit$rot_y,
+                        linear.predictors = fit$linear.predictors,
                         penalty = fit$penalty,
                         gamma = fit$gamma,
                         alpha = fit$alpha,
@@ -76,8 +79,8 @@ plmm_format <- function(fit,
                         loss = loss,
                         penalty.factor = fit$penalty.factor,
                         ns_idx = c(1, 1 + fit$ns), # PAY ATTENTION HERE! 
-                        ncol_X = fit$ncol_X,
-                        nrow_X = fit$nrow_X, 
+                        p = fit$p,
+                        n = fit$n, 
                         iter = iter,
                         converged = converged),
                    class = "plmm")

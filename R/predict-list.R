@@ -37,10 +37,10 @@ predict.list <- function(fit,
   # reverse the post-rotation standardization of the beta values 
   beta_vals <- untransform(res_b = raw_beta_vals,
                            ns = fit$ns,
-                           ncol_X = fit$ncol_X,
+                           p = fit$p,
                            std_X = std_X,
-                           SUX = fit$SUX,
-                           std_SUX = fit$std_SUX,
+                           rot_X = fit$rot_X,
+                           stdrot_X = fit$stdrot_X,
                            partial = TRUE)
   
   # format dim. names
@@ -53,10 +53,10 @@ predict.list <- function(fit,
   }
 
   # calculate the estimated mean values for test data 
-  Xbeta <- cbind(1, newX) %*% beta_vals
+  Xb <- cbind(1, newX) %*% beta_vals
   
   # for linear predictor, return mean values 
-  if (type=="lp") return(drop(Xbeta))
+  if (type=="lp") return(drop(Xb))
   
   # for blup, will incorporate the estimated variance 
   if (type == "blup"){
@@ -68,7 +68,7 @@ predict.list <- function(fit,
 
     ranef <- V21 %*% chol2inv(chol(V11)) %*% (fit$y - cbind(1, prep$std_X) %*% beta_vals)
 
-    blup <- Xbeta + ranef
+    blup <- Xb + ranef
     
     return(blup)
   }

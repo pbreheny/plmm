@@ -2,8 +2,8 @@
 #'
 #' This function allows you to evaluate the negtive log-likelihood of a linear mixed model under the assumption of a null model in order to estimate the variance parameter, eta.
 #' @param eta The proportion of variance in the outcome that is attributable to causal SNP effects. In other words, SNR. Sometimes referred to as the narrow-sense heritability.
-#' @param Uy The the continuous outcome, y, rotated by the eigenvectors of the similarity matrix, K.
-#' @param S The eigenvalues of the similarity matrix, K.
+#' @param rot_y The the continuous outcome, y, rotated by the eigenvectors of the similarity matrix, K.
+#' @param s The eigenvalues of the similarity matrix, K.
 #' @keywords internal
 #' 
 #' @examples 
@@ -12,21 +12,21 @@
 #' ev <- eigen(admix$K)
 #' U <- ev$vectors
 #' fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
-#' (log_lik(eta = fit$eta, Uy = U%*%admix$y, S = ev$values ))
+#' (log_lik(eta = fit$eta, rot_y = U%*%admix$y, s = ev$values ))
 #' }
 
-log_lik <- function(eta, Uy, S){
+log_lik <- function(eta, rot_y, s){
 
-  n <- dim(Uy)[1]
+  n <- dim(rot_y)[1]
 
   # evaluate log determinant
-  Sd <- eta * S + (1 - eta)
-  ldet <- sum(log(Sd))  # log of product = sum of the logs
+  sd <- eta * s + (1 - eta)
+  ldet <- sum(log(sd))  # log of product = sum of the logs
 
   # evaluate the variance
-  Sdi <- 1/Sd 
-  Uy <- as.vector(Uy)
-  ss <- (1/n) * sum(Uy*Uy*Sdi)
+  sdi <- 1/sd 
+  rot_y <- as.vector(rot_y)
+  ss <- (1/n) * sum(rot_y*rot_y*sdi)
 
   # evaluate the negative log likelihood
   # NB: keep constant here to be consistent with log_lik.lm() method

@@ -4,20 +4,20 @@
 \alias{untransform}
 \title{Untransform coefficient values back to the original scale}
 \usage{
-untransform(res_b, ns, ncol_X, std_X, SUX, std_SUX, partial = FALSE)
+untransform(res_b, ns, p, std_X, rot_X, stdrot_X, partial = FALSE)
 }
 \arguments{
 \item{res_b}{The values returned in the 'beta' argument of the ncvfit() object}
 
 \item{ns}{The indices of the non-singular columns of the ORIGINAL design matrix}
 
-\item{ncol_X}{The number of columns in the original design matrix (without the intercept)}
+\item{p}{The number of columns in the original design matrix (without the intercept)}
 
 \item{std_X}{The standardized design matrix BEFORE rotation; this should have attributes 'scale', 'center', and 'nonsingular'}
 
-\item{SUX}{The rotated design matrix (has the intercept)}
+\item{rot_X}{The rotated design matrix (has the intercept)}
 
-\item{std_SUX}{The standardized design matrix AFTER rotation; this should have attribute 'scale'}
+\item{stdrot_X}{The standardized design matrix AFTER rotation; this should have attribute 'scale'}
 
 \item{partial}{Logical: Should beta values be untransformed from just the post-rotation standardization?
 This option exists because I need partial= TRUE inside the internal function \code{predict.list()}.

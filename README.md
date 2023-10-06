@@ -31,11 +31,9 @@ The branches of this repo are organized in the following way:
 
   - `master` is the main branch with all the latest updates
   
-  - `fix_lp` is a development branch where we are fixing what I think is a bug in `untransform()`. We noticed that our mean squared prediction error (MSPE) was really large for PLMMs where predictions were made based on the linear predictor. I am still troubleshooting what's going on here... 
-
   - `fbm` is a development branch where I am working to extend our current methods to analyze data from a design matrix stored as a file-backed object (a Filebacked Big Matrix, or FBM). See package [bigstatsr](https://privefl.github.io/bigstatsr/) for more info on these objects. 
   
-  - `setup-lambda` is a development branch where we are resolving a bug in `setup_lambda`. Stay tuned for updates on this. 
+  - `refine_workflow` is an **archived** branch in which I explored changing the workflow to make cross validation more efficient. This change involved moving the rotation step into `plmm_prep()`, instead of having that step as part of model fitting in `plmm_fit()`. I found that this change was not compatible with cross validation, for reasons that I am currently writing up as part of a paper. Once that paper is done, I will delete this branch. 
   
   - `blup` is an **archived** branch previously focused on improving the implementation of the Best Linear Unbiased Predictor method 
   
