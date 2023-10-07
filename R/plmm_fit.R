@@ -1,6 +1,8 @@
 #' PLMM fit: a function that fits a PLMM using the values returned by plmm_prep()
 #' This is an internal function for \code{cv.plmm}
 #' @param prep A list as returned from \code{plmm_prep}
+#' @param eta_star The ratio of variances (passed from plmm())
+#' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
 #' @param penalty The penalty to be applied to the model. Either "MCP" (the default), "SCAD", or "lasso".
 #' @param gamma The tuning parameter of the MCP/SCAD penalty (see details). Default is 3 for MCP and 3.7 for SCAD.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
@@ -9,7 +11,6 @@
 #' @param lambda A user-specified sequence of lambda values. By default, a sequence of values of length nlambda is computed, equally spaced on the log scale.
 #' @param eps Convergence threshold. The algorithm iterates until the RMSD for the change in linear predictors for each coefficient is less than eps. Default is \code{1e-4}.
 #' @param max.iter Maximum number of iterations (total across entire path). Default is 10000.
-#' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
@@ -32,6 +33,8 @@
 #'
 
 plmm_fit <- function(prep, 
+                     eta_star,
+                     penalty.factor,
                      penalty = "MCP",
                      gamma,
                      alpha = 1,
@@ -45,41 +48,77 @@ plmm_fit <- function(prep,
                      warn = TRUE,
                      init = NULL,
                      returnX = TRUE){
-  
-  # set default gamma (will need this for cv.plmm)
-  if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
-  
-  # set default init
-  if(is.null(init)) init <- rep(0, prep$p)
-  
-  # error checking
+
+  # error checking ------------------------------------------------------------
   if (gamma <= 1 & penalty=="MCP") stop("gamma must be greater than 1 for the MC penalty", call.=FALSE)
   if (gamma <= 2 & penalty=="SCAD") stop("gamma must be greater than 2 for the SCAD penalty", call.=FALSE)
   if (nlambda < 2) stop("nlambda must be at least 2", call.=FALSE)
   if (alpha <= 0) stop("alpha must be greater than 0; choose a small positive number instead", call.=FALSE)
-  if (length(init)!=prep$p) stop("Dimensions of init and X do not match", call.=FALSE)
+  if (length(init)!=prep$std_X$ncol) stop("Dimensions of init and X do not match", call.=FALSE)
   
   if(prep$trace){cat("Beginning standardization + rotation.")}
 
-  # estimate eta if needed
-  if (is.null(prep$eta)) {
+  # estimate eta if needed -----------------------------------------------------
+  if (is.null(eta_star)) {
     eta <- estimate_eta(s = prep$s, U = prep$U, y = prep$y) 
   } else {
     # otherwise, use the user-supplied value (this is mainly for simulation)
-    eta <- prep$eta
+    eta <- eta_star
+  }
+  browser()
+  # rotate data ----------------------------------------------------------------
+  if('matrix' %in% class(prep$std_X)) {
+    w <- (eta * prep$s + (1 - eta))^(-1/2)
+    wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
+    rot_X <- wUt %*% cbind(1, prep$std_X)
+    rot_y <- wUt %*% prep$y
+    # re-standardize rotated rot_X
+    stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
+    stdrot_X_noInt <- stdrot_X_temp$scaled_X
+    stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
+    attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
+  } else if ('FBM' %in% class(prep$std_X)){
+    w <- (eta * prep$s + (1 - eta))^(-1/2)
+    Ut <- bigstatsr::big_transpose(prep$U)
+    wUt <- bigstatsr::FBM(Ut$nrow, Ut$ncol)
+    bigstatsr::big_apply(Ut,
+                         a.FUN = function(X, ind, w, res){
+                           res[,ind] <- sweep(x = X[,ind],
+                                              MARGIN = 1,
+                                              STATS = w,
+                                              "*")},
+                         a.combine = cbind,
+                         w = w,
+                         res = wUt)
+    
+    # add column of 1s for intercept
+    std_X_with_intcpt <- matrix(data = 0,
+                                nrow = prep$std_X$nrow,
+                                ncol = prep$std_X$ncol + 1) 
+    std_X_with_intcpt[,1] <- rep(1, prep$std_X$nrow)
+    std_X_with_intcpt <- std_X_with_intcpt |> bigstatsr::as_FBM()
+    # fill in other columns with values of std_X
+    bigstatsr::big_apply(prep$std_X,
+                         a.FUN = function(X, ind, res){
+                           res[,ind] <- res[,ind] + X[,ind]
+                         },
+                         a.combine = cbind,
+                         ind = 2:prep$std_X$ncol,
+                         res = std_X_with_intcpt)
+    # rotate X and y
+    rot_X <- bigstatsr::FBM(nrow = wUt$nrow, ncol = std_X_with_intcpt$ncol)
+    bigstatsr::big_apply(wUt,
+                         a.FUN = function(X, ind, B, res){
+                           res[ind,] <- X[ind,]%*%B[,ind]
+                         },
+                         a.combine = rbind,
+                         ind = bigstatsr::rows_along(X),
+                         B = std_X_with_intcpt,
+                         res = rot_X)
+    
   }
   
-  # rotate data
-  w <- (eta * prep$s + (1 - eta))^(-1/2)
-  wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
-  rot_X <- wUt %*% cbind(1, prep$std_X)
-  rot_y <- wUt %*% prep$y
-  # re-standardize rotated rot_X
-  stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
-  stdrot_X_noInt <- stdrot_X_temp$scaled_X
-  stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
-  attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
-  
+  # settings for model fitting -------------------------------------------
   # calculate population var without mean 0; will need this for call to ncvfit()
   xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
   
@@ -88,7 +127,7 @@ plmm_fit <- function(prep,
   # remove initial values for coefficients representing columns with singular values
   init <- init[prep$ns] 
 
-  # set up lambda
+  # set up lambda -------------------------------------------------------
   if (missing(lambda)) {
     lambda <- setup_lambda(X = stdrot_X,
                            y = rot_y,
@@ -118,7 +157,7 @@ plmm_fit <- function(prep,
   converged <- logical(nlambda)
   loss <- numeric(nlambda)
   
-  # main attraction 
+  # main attraction -----------------------------------------------------------
   ## set up progress bar -- this can take a while
   if(prep$trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
   ## TODO: think about putting this loop in C

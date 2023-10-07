@@ -5,21 +5,29 @@
 #' @param y Continuous outcome vector.
 #' @export
 #' @keywords internal
-estimate_eta <- function(s, U, y, eta_star){
-  # TODO: could also pass 'R' (the residuals... instead of y.)
+estimate_eta <- function(s, U, y){
   
   # coercion
   eta <- NULL
-  
   # estimate eta 
   if("FBM" %in% class(U)){
+    n <- U$nrow
     rot_y <- bigstatsr::big_cprodVec(U, y)
-    opt <- stats::optimize(f=log_lik, c(0.01, 0.99), Uy=rot_y, s=s)
+    opt <- stats::optimize(f=log_lik,
+                           interval = c(0.01, 0.99),
+                           rot_y=rot_y,
+                           s=s,
+                           n=n)
     eta <- opt$minimum 
     
   } else {
+    n <- nrow(U)
     rot_y <- crossprod(U, y)
-    opt <- stats::optimize(f=log_lik, c(0.01, 0.99), rot_y=rot_y, s=s)
+    opt <- stats::optimize(f=log_lik,
+                           interval = c(0.01, 0.99),
+                           rot_y=rot_y,
+                           s=s,
+                           n=n)
     eta <- opt$minimum 
     
   }

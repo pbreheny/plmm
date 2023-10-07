@@ -7,7 +7,7 @@
 #' @param trace Logical: Should trace messages be shown? Default is TRUE. 
 #' 
 #' @return A list with four components: 
-#'  * X, the design matrix as either (1) a numeric matrix or (2) a filebacked matrix (FBM). See `bigstatsr::FBM()` and `bigsnpr::bigSnp-class` documentation for details. 
+#'  * std_X, the column-standardized design matrix as either (1) a numeric matrix or (2) a filebacked matrix (FBM). See `bigstatsr::FBM()` and `bigsnpr::bigSnp-class` documentation for details. 
 #'  * fam, a data frame containing the pedigree information (like a .fam file in PLINK)
 #'  * map, a data frame containing the feature information (like a .bim file in PLINK)
 #'  * ns: A vector indicating the which columns of X contain nonsingular features (i.e., features with variance != 0. 
@@ -21,7 +21,7 @@
 #' }
 #' 
 #' @details
-#' The .rds object should have an 'std_X' element - this is what will be used as the design matrix for analysis. This design matrix should *not* include an intercept column.
+#' The .rds object should have an 'std_X' element - this is what will be used as the design matrix for analysis. This design matrix should *not* include an intercept column (this will be added later in `plmm_fit`()).
 #' 
 #' 
 get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
@@ -34,7 +34,7 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
   } else {
     obj <- readRDS(rds)
   }
-
+  
   # return data in a tractable format 
   if (missing(fbm)) {
     if (utils::object.size(obj$std_X) > 1e8) {
@@ -48,6 +48,7 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
   }
   
   if(!fbm){
+    # get std_X as a matrix 
     std_X <- obj$std_X[,]
     if(!is.null(row_id)){
       if(row_id == "iid"){row_names <- obj$fam$sample.ID}
@@ -60,14 +61,16 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
                         obj$map$marker.ID)
     # TODO fix this error: Error in dimnames(X) <- list(row_names, o
     
-    cat("Reminder: the X that is returned here is column-standardized.
-        A copy of the original data is available via the 'genotypes' matrix in the .rds object")
-    return(list(std_X = std_X,
+    cat("\nReminder: the X that is returned here is column-standardized.
+        \nA copy of the original data is available via the 'genotypes' matrix in the .rds object")
+    return(list(n = obj$n,
+                p = obj$p,
+                std_X = std_X,
+                std_X_center = obj$std_X_center,
+                std_X_scale = obj$std_X_scale,
                 fam = obj$fam,
                 map = obj$map,
-                ns = obj$ns,
-                center = obj$center,
-                scale = obj$scale))
+                ns = obj$ns))
   } else {
     cat("Note: The design matrix is being returned as a file-backed matrix (FBM) -- see bigstatsr::FBM() for details.")
     #     \n At this time, plmm() cannot analyze design matrix X in this FBM format. Allowing such an option will
@@ -76,15 +79,17 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
     
     std_X <- obj$std_X
     
-    cat("Reminder: the X that is returned here is column-standardized.
-        A copy of the original data is available via the 'genotypes' matrix in the .rds object")
+    cat("\nReminder: the X that is returned here is column-standardized.
+        \nA copy of the original data is available via the 'genotypes' matrix in the .rds object")
     
-    return(list(std_X = obj$std_X,
+    return(list(n = obj$n,
+                p = obj$p,
+                std_X = obj$std_X,
+                std_X_center = obj$std_X_center,
+                std_X_scale = obj$std_X_scale,
                 fam = obj$fam,
                 map = obj$map,
-                ns = obj$ns,
-                center = obj$center,
-                scale = obj$scale))
+                ns = obj$ns))
   }
   
 }

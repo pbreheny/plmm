@@ -5,7 +5,7 @@
 #' @param k Optional integer argument indicating the number of singular values to use in a truncated SVD. See details. 
 #' @param trunc Logical: should truncated SVD be used? 
 #' @param trace Logical: should messages be printed to console? 
-#' 
+#' @param ... Additional arguments to bigstatsr::big_randomSVD()
 #' @details
 #' The kind of SVD implemented here will depend on the combination of arguments supplied. 
 #' (1) if trunc = FALSE
@@ -15,20 +15,31 @@
 #' 
 #' @keywords internal
 
-plmm_svd <- function(X, k, trunc, trace){
-  # case 1: full SVD -----------------------------------  
-  if(!trunc){
-    if(trace){cat("\nUsing full SVD")}
-    decomp <- svd(X, nv = 0)
-    d <- decomp$d
-    U <- decomp$u
-  } else {
-    # case 2: truncated SVD -----------------------------
-    if(trace){cat("\nUsing truncated SVD with k singular values")}
-    decomp <- RSpectra::svds(A = X, nv = 0, k = k)
-    d <- decomp$d
-    U <- decomp$u
+plmm_svd <- function(X, k, trunc, trace, ...){
+  
+  if('FBM' %in% class(X)){
+    # case 1: full SVD -----------------------------------  
+    if(!trunc){
+      if(trace){cat("\nUsing full SVD")}
+      decomp <- svd(X, nv = 0)
+      d <- decomp$d
+      U <- decomp$u
+    } else {
+      # case 2: truncated SVD -----------------------------
+      if(trace){cat("\nUsing truncated SVD with k singular values")}
+      if('FBM' %in% class(X)){
+        decomp <- bigstatsr::big_randomSVD(X = X, k = k, ...)
+        d <- decomp$d
+        U <- decomp$u |> bigstatsr::as_FBM()
+      } else {
+        decomp <- RSpectra::svds(A = X, nv = 0, k = k)
+        d <- decomp$d
+        U <- decomp$u
+      }
+      
+    }
   }
+  
   
   res <- list(d = d, U = U)
   return(res)

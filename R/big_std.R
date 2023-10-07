@@ -38,7 +38,10 @@ big_std <- function(X, center, scale, ns, fbm = TRUE){
                        scale = scale,
                        res = scaledX)
   
-
-  return(scaledX)
+  # subset the features so that constant features (monomorphic SNPs) are not 
+  # included in analysis
+  std_X <- bigstatsr::big_copy(scaledX, ind.col = ns)
+  
+  return(std_X)
   
 }

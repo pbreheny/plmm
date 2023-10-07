@@ -5,7 +5,7 @@
 #' @param X Design matrix object or a string with the file path to a design matrix. If a string, string will be passed to `get_data()`. 
 #' * Note: X may include clinical covariates and other non-SNP data, but no missing values are allowed.
 #' @param std_needed Logical: does the supplied X need to be standardized? Defaults to FALSE, since `process_plink()` standardizes the design matrix by default. 
-#' @param y Continuous outcome vector. Logistic regression modeling is still in development.
+#' @param y Continuous outcome vector. Defaults to NULL, assuming that the outcome is the 6th column in the .fam PLINK file data. Can also be a user-supplied numeric vector. 
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list with components 'd' and 'u', as returned by choose_k().
 #' @param diag_K Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE. 
@@ -33,12 +33,12 @@
 #' 
 #' @examples 
 #' # using admix data 
-#' fit_admix1 <- plmm(X = admix$X, y = admix$y)
+#' fit_admix1 <- plmm(X = admix$X, y = admix$y, std_needed = TRUE)
 #' s1 <- summary(fit_admix1, idx = 99)
 #' print(s1)
 #' 
 #' # using admix data and k = 50 
-#' fit_admix2 <- plmm(X = admix$X, y = admix$y, k = 50)
+#' fit_admix2 <- plmm(X = admix$X, y = admix$y, k = 50, std_needed = TRUE)
 #' s2 <- summary(fit_admix2, idx = 99)
 #' print(s2)
 #' 
@@ -71,7 +71,7 @@
 
 plmm <- function(X,
                  std_needed = FALSE,
-                 y,
+                 y = NULL,
                  k = NULL, 
                  K = NULL,
                  diag_K = NULL,
@@ -86,30 +86,38 @@ plmm <- function(X,
                  eps = 1e-04,
                  max.iter = 10000,
                  convex = TRUE,
-                 dfmax = ncol(X) + 1,
+                 dfmax = NULL,
                  warn = TRUE,
-                 penalty.factor = rep(1, ncol(X)),
-                 init = rep(0, ncol(X)),
+                 penalty.factor = NULL,
+                 init = NULL,
                  trace = FALSE) {
-
-  ## check types 
+  
+# check X types -------------------------------------------------
+  ## string with a filepath -----------------------------
   if("character" %in% class(X)){
     dat <- get_data(path = X, returnX = TRUE, trace = trace)
-    X <- dat$std_X
+    std_X <- dat$std_X
     if("FBM.code256" %in% class(X) | "FBM" %in% class(X)){fbm_flag <- TRUE} else {fbm_flag <- FALSE}
   }
-  if ("SnpMatrix" %in% class(X)) X <- methods::as(X, 'numeric')
+  ## FBM object ----------------
   if("FBM.code256" %in% class(X) | "FBM" %in% class(X)){stop("To analyze data from a file-backed X matrix, meta-data must also be supplied. 
                                        For the 'X' arg, you need to supply either (1) a character string representing the filepath to the .rds object or (2) a list as returned by get_data(). 
                                        If you don't have an .rds object yet, see process_plink() for preparing your data.")}
+  ## list -----------------------
   if("list" %in% class(X)){
     # check for X element 
     if(!("std_X" %in% names(X))){stop("The list supplied for the X argument does not have a design matrix element named 'std_X'. Rename as needed and try again.")}
     if("FBM.code256" %in% class(X$std_X) | "FBM" %in% class(X$std_X)){
       dat <- X
       std_X <- dat$std_X
+      # designate the dimensions of the standardized design matrix, with only ns columns
+      std_X_n <- std_X$nrow
+      std_X_p <- std_X$ncol
       fbm_flag <- TRUE
     } else{
+      std_X <- obj$std_X
+      std_X_n <- std_X$nrow
+      std_X_p <- std_X$ncol
       # TODO: add case to handle X passed as list where X is not an FBM
       fbm_flag <- FALSE
     }
@@ -118,125 +126,129 @@ plmm <- function(X,
   # if FBM flag is not 'on' by now, set it 'off'
   if(!exists('fbm_flag')){fbm_flag <- FALSE}
 
-  # finish type coersion & checks for matrix X ----------------
+  ## matrix -------------------------------
   if(!fbm_flag){
     if (!inherits(X, "matrix")) {
       tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
       if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
     }
     if (typeof(X)=="integer") storage.mode(X) <- "double"
-    if (typeof(X)=="character") stop("X must be a numeric matrix", call.=FALSE)
-    if (!is.double(y)) {
-      op <- options(warn=2)
-      on.exit(options(op))
-      y <- tryCatch(
-        error = function(cond) stop("y must be numeric or able to be coerced to numeric", call.=FALSE),
-        as.double(y))
-      options(op)
-    }
+    if (typeof(X)=="character") stop("if X is a matrix, it must be a numeric matrix", call.=FALSE)
     
-    # error checking 
-    if (length(y) != nrow(X)) stop("X and y do not have the same number of observations", call.=FALSE)
-    if (any(is.na(y)) | any(is.na(X))) stop("Missing data (NA's) detected.  
-                                            \nTake actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to plmm", call.=FALSE)
-    if (length(penalty.factor)!=ncol(X)) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
-  } else {
-    # finish type coersion & checks for FBM X ----------------
-    # error checking 
-    if (length(y) != X$nrow) stop("X and y do not have the same number of observations", call.=FALSE)
-    if (any(is.na(y))) stop("Missing data (NA's) detected in the outcome.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to plmm", call.=FALSE)
-    if (length(penalty.factor)!=X$ncol) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
+    if(std_needed){
+      # designate the dimensions of the original design matrix 
+      n <- nrow(X)
+      p <- ncol(X) 
+      std_X <- ncvreg::std(X)
+      std_X_center <- attr(std_X, 'center')
+      std_X_scale <- attr(std_X, 'scale')
+      ns <- attr(std_X, 'nonsingular')
+      # designate the dimensions of the standardized design matrix, with only ns columns
+      std_X_n <- nrow(std_X)
+      std_X_p <- ncol(std_X)
+    }
     
   }
   
-  if (!is.null(K)){
-    # first, check type/class:
-    if (!inherits(K, "matrix") & !is.list(K)) {
-      tmp <- try(K <- stats::model.matrix(~0+., data=K), silent=TRUE)
-      if (inherits(tmp, "try-error")) stop("K must be either (1) able to be coerced to a matrix or (2) be a list.", call.=FALSE)
-    }
-    if (typeof(K)=="integer") storage.mode(X) <- "double" # change K to X 
-    if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
-    if (is.list(K)) {
-      if(!('d' %in% names(K) & 'U' %in% names(K))){stop('Components d and U not both found in list supplied for K.')}
-    }
-    # last thing: check dimensions
-    if (is.matrix(K)){
-      if (dim(K)[1] != nrow(X) || dim(K)[2] != nrow(X)) stop("Dimensions of K and X do not match", call.=FALSE)
-    } else if (is.list(K)) {
-      if (nrow(X) != nrow(K$U)) stop("Dimensions of K and X do not match.")
-    }
+  #  check y types -------------------------------
+  # if y is null, use .fam file 
+  if(is.null(y)){
+    # default: uses bigSNP naming convention as would be returned in get_data()
+    y <- dat$fam$affection 
+  }
   
-  }
-  # warn about computational time for large K 
-  if(is.null(k) & is.null(diag_K) & (nrow(X) > 1000)){
-    warning("The number of observations is large, and k is not specified.
-    \nThis can dramatically increase computational time -- the SVD calculation is expensive.
-            \nIf the observations are unrelated, please set diag_K = TRUE. SVD is not needed in this case.
-            \nOtherwise, consider using choose_k() first to get an approximation for your relatedness matrix.")
-  }
+  if (!is.double(y)) {
+    op <- options(warn=2)
+    on.exit(options(op))
+    y <- tryCatch(
+      error = function(cond) stop("y must be numeric or able to be coerced to numeric", call.=FALSE),
+      as.double(y))
+    options(op)
+  }  
   
   # set up defaults --------------------------------------------------
+  if(is.null(dfmax)){dfmax <- std_X_p + 1}
+  if(is.null(penalty.factor)){penalty.factor <- rep(1, std_X_p)}
+  
+  # TODO: work out the lines below
+  # keep only those penalty factors which penalize non-singular values 
+  # penalty.factor <- penalty.factor[ns]
+  
+  # set default init
+  if(is.null(init)){init <- rep(0, std_X_p)}
+  
   # coercion for penalty
   penalty <- match.arg(penalty)
   
   # set default gamma
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
+  # error checking ------------------------------------------------------------
+  if(!fbm_flag){
+    # error check for matrix X
+    if (length(y) != std_X_n) stop("X and y do not have the same number of observations", call.=FALSE)
+    if (any(is.na(y)) | any(is.na(std_X))) stop("Missing data (NA's) detected.  
+                                            \nTake actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to plmm", call.=FALSE)
+    if (length(penalty.factor)!=std_X_p) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
+  } else {
+    #  error checking for FBM X 
+    if (length(y) != std_X_n) stop("X and y do not have the same number of observations", call.=FALSE)
+    if (any(is.na(y))) stop("Missing data (NA's) detected in the outcome.  Take actions (e.g., removing cases, removing features, imputation) to eliminate missing data before passing X and y to plmm", call.=FALSE)
+    if (length(penalty.factor)!=std_X_p) stop("Dimensions of penalty.factor and X do not match", call.=FALSE)
+  }
+  
+  # check K types -------------------------------------------------------
+  if (!is.null(K)){
+    # first, check type/class:
+    if (!inherits(K, "matrix") & !is.list(K)) {
+      tmp <- try(K <- stats::model.matrix(~0+., data=K), silent=TRUE)
+      if (inherits(tmp, "try-error")) stop("K must be either (1) able to be coerced to a matrix or (2) be a list.", call.=FALSE)
+    }
+    if (typeof(K)=="integer") storage.mode(std_X) <- "double" # change K to X 
+    if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
+    if (is.list(K)) {
+      if(!('d' %in% names(K) & 'U' %in% names(K))){stop('Components d and U not both found in list supplied for K.')}
+    }
+    # last thing: check dimensions
+    if (is.matrix(K)){
+      if (dim(K)[1] != std_X_n || dim(K)[2] != std_X_n) stop("Dimensions of K and X do not match", call.=FALSE)
+    } else if (is.list(K)) {
+      if (std_X_n != nrow(K$U)) stop("Dimensions of K and X do not match.")
+    }
+  
+  }
+
+
   # prep (SVD)-------------------------------------------------
   if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
-  if(fbm_flag){
-    the_prep <- plmm_prep_fbm(X = std_X,
-                              meta = dat,
-                              y = y,
-                              K = K,
-                              k = k,
-                              diag_K = diag_K,
-                              eta_star = eta_star,
-                              penalty.factor = penalty.factor,
-                              trace = trace)
-  } else {
-    the_prep <- plmm_prep(X = X,
-                          # TODO: work out the line below 
-                          # std_needed = std_needed,
-                          y = y,
-                          K = K,
-                          k = k,
-                          diag_K = diag_K,
-                          eta_star = eta_star,
-                          penalty.factor = penalty.factor,
-                          trace = trace)
-  }
+  the_prep <- plmm_prep(std_X = std_X,
+                        std_X_n = std_X_n,
+                        std_X_p = std_X_p,
+                        p = dat$p,
+                        y = y,
+                        K = K,
+                        k = k,
+                        diag_K = diag_K,
+                        trace = trace)
+
   
 
   # rotate & fit -------------------------------------------------------------
   if(trace){cat("Beginning model fitting.\n")}
-browser()
-  if(fbm_flag){
-    the_fit <- plmm_fit_fbm(prep = the_prep,
-                            penalty = penalty,
-                            gamma = gamma,
-                            alpha = alpha,
-                            lambda.min = lambda.min,
-                            nlambda = nlambda,
-                            lambda = lambda,
-                            eps = eps,
-                            max.iter = max.iter,
-                            warn = warn,
-                            init = init)
-  } else {
-    the_fit <- plmm_fit(prep = the_prep,
-                        penalty = penalty,
-                        gamma = gamma,
-                        alpha = alpha,
-                        lambda.min = lambda.min,
-                        nlambda = nlambda,
-                        lambda = lambda,
-                        eps = eps,
-                        max.iter = max.iter,
-                        warn = warn,
-                        init = init)
-  }
+  the_fit <- plmm_fit(prep = the_prep,
+                      eta_star = eta_star,
+                      penalty.factor = penalty.factor,
+                      penalty = penalty,
+                      gamma = gamma,
+                      alpha = alpha,
+                      lambda.min = lambda.min,
+                      nlambda = nlambda,
+                      lambda = lambda,
+                      eps = eps,
+                      max.iter = max.iter,
+                      warn = warn,
+                      init = init)
+
   
   # format results ---------------------------------------------------
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}

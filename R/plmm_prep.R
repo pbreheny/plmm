@@ -1,24 +1,21 @@
 #' PLMM prep: a function to run checks, SVD, and rotation prior to fitting a PLMM model
 #' This is an internal function for \code{cv.plmm}
 #'
-#' @param X Design matrix. May include clinical covariates and other non-SNP data.
+#' @param std_X Column standardized design matrix. May include clinical covariates and other non-SNP data.
+#' @param std_X_n The number of observations in std_X (integer)
+#' @param std_X_p The number of features in std_X (integer)
+#' @param p The number of features in the *original* design matrix X, including constant features
 #' @param y Continuous outcome vector.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}, where X is standardized). This can also be a list, with components d and u (as returned by choose_k)
 #' @param diag_K Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Passed from `plmm()`. 
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
-#' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
 #' @param ... Not used yet
 #'
 #' @return List with these components: 
-#' * ncol_X: The number of columns in the original design matrix 
-#' * std_X: standardized design matrix 
-#' * y: The vector of outcomes 
 #' * S: The singular values of K 
 #' * U: the left singular values of K (same as left singular values of X). 
-#' * ns: the indices for the nonsingular values of std_X
-#' * penalty.factor: the penalty factors for the penalized non-singular values 
 #' * snp_names: Formatted column names of the design matrix 
 #'
 #'@keywords internal
@@ -32,7 +29,10 @@
 #' prep2 <- plmm_prep(X = admix$X, y = admix$y, diag_K = TRUE, trace = TRUE)
 #' }
 #' 
-plmm_prep <- function(X,
+plmm_prep <- function(std_X,
+                      std_X_n,
+                      std_X_p,
+                      p,
                       y,
                       k = NULL,
                       K = NULL,
@@ -46,32 +46,23 @@ plmm_prep <- function(X,
   ## coersion
   U <- s <- eta <- NULL
   
-  # designate the dimensions of the original design matrix 
-  n <- nrow(X)
-  p <- ncol(X) 
-  
-  # standardize X
-  # NB: the following line will eliminate singular columns (eg monomorphic SNPs)
-  #  from the design matrix. 
-  std_X <- ncvreg::std(X)
-  
-  # identify nonsingular values in the standardized X matrix  
-  ns <- attr(std_X, "nonsingular")
-  
-  # keep only those penalty factors which penalize non-singular values 
-  penalty.factor <- penalty.factor[ns]
-  
-  # designate the dimensions of the standardized design matrix, with only ns columns
-  n_stdX <- nrow(std_X)
-  p_stdX <- ncol(std_X)
-  
   # set default k and create indicator 'trunc' to pass to plmm_svd
   if(is.null(k)){
-    k <- min(n_stdX, p_stdX)
-    trunc <- FALSE
-  } else if(!is.null(k) & (k < min(n_stdX, p_stdX))){
+    if('matrix' %in% class(std_X)){
+      k <- min(std_X_n, std_X_p)
+      trunc <- FALSE
+    }
+    
+    if("FBM" %in% class(std_X)){
+      # for FBM data, default k is 10% of the # of observations 
+      k <- trunc(std_X_n*0.1)
+      trunc <- TRUE
+    }
+    
+  }
+  if(!is.null(k) & (k < min(std_X_n, std_X_p))){
     trunc <- TRUE
-  } else if(!(k %in% 1:min(n_stdX,p_stdX))){
+  } else if(!(k %in% 1:min(std_X_n, std_X_p))){
     stop("\nk value is out of bounds. 
          \nIf specified, k must be an integer in the range from 1 to min(nrow(X), ncol(X)). 
          \nwhere X does not include singular columns. For help detecting singularity,
@@ -109,7 +100,6 @@ plmm_prep <- function(X,
   if(trace){cat("\nStarting singular value decomposition.")}
   if(sum(c(flag1, flag2, flag3)) == 0){
     # set default K: if not specified and not diagonal, use realized relatedness matrix
-    # NB: relatedness_mat(X) standardizes X! 
     if(is.null(K) & is.null(s)){
       # NB: the is.null(S) keeps you from overwriting the 3 preceding cases 
       if(trace){cat("\nUsing the default definition of the realized relatedness matrix.")}
@@ -137,17 +127,13 @@ plmm_prep <- function(X,
   
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
-    p = p,
-    n = n, 
-    y = y,
+    # include X and y here b/c I will need them for cross validation 
     std_X = std_X,
+    y = y,
     s = s,
     U = U,
-    ns = ns,
-    eta = eta_star, # carry eta over to fit 
-    penalty.factor = penalty.factor,
     trace = trace,
-    snp_names = if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)))
+    snp_names = if (is.null(colnames(std_X))) paste("snp", 1:std_X_p, sep="") else std_X_p))
   
   return(ret)
   

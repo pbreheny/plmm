@@ -104,15 +104,23 @@ process_plink <- function(data_dir,
   
 
 # identify monomorphic SNPs --------------------------------
+  # first, save the dimensions of the *original* (pre-standardized) design matrix,
+  # as this count will count the constant (monomorphic) SNPs as part of the 
+  # number of columns
+  obj$n <- obj$genotypes$nrow
+  obj$p <- obj$genotypes$ncol
+  
   constants_idx <- apply(X = counts[1:3,],
                                           MARGIN = 2,
                                           # see which ~called~ features have all same value
                                           FUN = function(c){sum(c == sum(c)) > 0})
-  
-  ns <- which(!constants_idx) # need this for analysis downstream
-  cat("\nThere are ", sum(constants_idx), " constant features in the data",
-      file = outfile, append = TRUE)
   if(!quiet){
+  cat("\nThere are ", obj$genotypes$nrow, " observations and ",
+      obj$genotypes$ncol, " features in the specified PLINK files.")
+  ns <- which(!constants_idx) # need this for analysis downstream
+  cat("\nOf these, there are ", sum(constants_idx), " constant features in the data",
+      file = outfile, append = TRUE)
+  
     cat("\nThere are ", sum(constants_idx), " constant features in the data")
   }
   
@@ -189,12 +197,16 @@ process_plink <- function(data_dir,
   scale_info <- bigstatsr::big_scale()(obj$genotypes)
   # now, save the new object -- this will have imputed values and constants_idx
   obj$ns <- ns
-  obj$center <- scale_info$center
-  obj$scale <- scale_info$scale
+  # naming these center and scale values so that I know they relate to the first
+  # standardization; there will be another standardization after the rotation
+  # in plmm_fit().
+  obj$std_X_center <- scale_info$center[obj$ns]
+  obj$std_X_scale <- scale_info$scale[obj$ns]
   obj$std_X <- big_std(X = obj$genotypes,
-                           center = obj$center,
-                           scale = obj$scale,
+                           center = scale_info$center,
+                           scale = scale_info$scale,
                            ns = obj$ns)
+
   obj <- bigsnpr::snp_save(obj)
   
   cat("\nDone with standardization. File formatting in progress.",
