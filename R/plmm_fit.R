@@ -65,14 +65,14 @@ plmm_fit <- function(prep,
     # otherwise, use the user-supplied value (this is mainly for simulation)
     eta <- eta_star
   }
-  browser()
+
   # rotate data ----------------------------------------------------------------
   if('matrix' %in% class(prep$std_X)) {
     w <- (eta * prep$s + (1 - eta))^(-1/2)
     wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
     rot_X <- wUt %*% cbind(1, prep$std_X)
     rot_y <- wUt %*% prep$y
-    # re-standardize rotated rot_X
+    # re-standardize rot_X
     stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
     stdrot_X_noInt <- stdrot_X_temp$scaled_X
     stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
@@ -107,26 +107,55 @@ plmm_fit <- function(prep,
                          res = std_X_with_intcpt)
     # rotate X and y
     rot_X <- bigstatsr::FBM(nrow = wUt$nrow, ncol = std_X_with_intcpt$ncol)
-    bigstatsr::big_apply(wUt,
-                         a.FUN = function(X, ind, B, res){
-                           res[ind,] <- X[ind,]%*%B[,ind]
+    bigstatsr::big_apply(X = std_X_with_intcpt,
+                         a.FUN = function(X,
+                                          ind,
+                                          wUt,
+                                          res){
+                           # TODO: revisit this to improve computational efficiency
+                           for(i in 1:nrow(wUt)){
+                             r <- wUt[i,,drop=FALSE]
+                             v <- bigstatsr::big_cprodVec(X = X, y.row = r)
+                             # browser()
+                             res[i, ind] <- t(v)
+                           }
+                           
                          },
                          a.combine = rbind,
-                         ind = bigstatsr::rows_along(X),
-                         B = std_X_with_intcpt,
+                         wUt = wUt,
                          res = rot_X)
+
+    rot_y <- bigstatsr::big_prodVec(X = wUt, 
+                                    y.col = prep$y)
+    
+    # re-scale rot_X
+    rot_X_scale_info <- bigstatsr::big_scale()(rot_X)
+    # stdrot_X_center <- rot_X_scale_info$center
+    stdrot_X_scale <- rot_X_scale_info$scale
+    stdrot_X <- big_std(X = rot_X,
+                   # center = stdrot_X_center, # NB: do not re-center rotated data
+                   scale = stdrot_X_scale,
+                   ns = 2:rot_X$ncol)
     
   }
-  
+
   # settings for model fitting -------------------------------------------
   # calculate population var without mean 0; will need this for call to ncvfit()
-  xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
+  if('matrix' %in% class(prep$std_X)){
+    xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
+  } else if('FBM' %in% class(prep$std_X)){
+    xtx <- bigstatsr::big_apply(X = stdrot_X,
+                     a.FUN = function(X, ind){
+                       mean(X[,ind]^2, na.rm = TRUE)
+                     })
+  }
+  
   
   if(prep$trace){cat("\nSetup complete. Beginning model fitting.")}
   
   # remove initial values for coefficients representing columns with singular values
   init <- init[prep$ns] 
-
+  browser() # PICK UP HERE! 
   # set up lambda -------------------------------------------------------
   if (missing(lambda)) {
     lambda <- setup_lambda(X = stdrot_X,

@@ -10,22 +10,27 @@
 #'
 #' @return A standardized matrix of class FBM
 #' @keywords internal
-big_std <- function(X, center, scale, ns, fbm = TRUE){
-  # allocate space 
-  centeredX <- bigstatsr::FBM(X$nrow, X$ncol)
-  bigstatsr::big_apply(X = X,
-                       a.FUN = function(X, ind, center, res){
-                         res[,ind] <- sweep(x = X[,ind],
-                                            MARGIN = 2,
-                                            STATS = center[ind],
-                                            FUN = "-")},
-                       a.combine = cbind,
-                       ncores = bigstatsr::nb_cores(),
-                       center = center,
-                       res = centeredX)
+big_std <- function(X, center = NULL, scale, ns, fbm = TRUE){
+  if(is.null(center)){
+    centered_X <- X
+  } else {
+    # allocate space 
+    centered_X <- bigstatsr::FBM(X$nrow, X$ncol)
+    bigstatsr::big_apply(X = X,
+                         a.FUN = function(X, ind, center, res){
+                           res[,ind] <- sweep(x = X[,ind],
+                                              MARGIN = 2,
+                                              STATS = center[ind],
+                                              FUN = "-")},
+                         a.combine = cbind,
+                         ncores = bigstatsr::nb_cores(),
+                         center = center,
+                         res = centered_X)
+  }
   
-  scaledX <- bigstatsr::FBM(centeredX$nrow, centeredX$ncol)
-  bigstatsr::big_apply(X = centeredX, 
+  
+  scaled_X <- bigstatsr::FBM(centered_X$nrow, centered_X$ncol)
+  bigstatsr::big_apply(X = centered_X, 
                        a.FUN = function(X, ind, scale, res){
                          res[,ind] <- sweep(x = X[,ind],
                                MARGIN = 2,
@@ -36,12 +41,10 @@ big_std <- function(X, center, scale, ns, fbm = TRUE){
                        ind = ns, 
                        ncores = bigstatsr::nb_cores(),
                        scale = scale,
-                       res = scaledX)
+                       res = scaled_X)
   
-  # subset the features so that constant features (monomorphic SNPs) are not 
-  # included in analysis
-  std_X <- bigstatsr::big_copy(scaledX, ind.col = ns)
   
-  return(std_X)
+  
+  return(scaled_X)
   
 }

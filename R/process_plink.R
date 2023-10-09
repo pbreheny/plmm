@@ -202,10 +202,14 @@ process_plink <- function(data_dir,
   # in plmm_fit().
   obj$std_X_center <- scale_info$center[obj$ns]
   obj$std_X_scale <- scale_info$scale[obj$ns]
-  obj$std_X <- big_std(X = obj$genotypes,
+  tmp <- big_std(X = obj$genotypes,
                            center = scale_info$center,
                            scale = scale_info$scale,
                            ns = obj$ns)
+  # subset the features so that constant features (monomorphic SNPs) are not 
+  # included in analysis
+  obj$std_X <- bigstatsr::big_copy(tmp, ind.col = ns)
+  
 
   obj <- bigsnpr::snp_save(obj)
   
