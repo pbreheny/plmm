@@ -1,7 +1,7 @@
 #' Compute sequence of lambda values
 #'
 #' This function allows you compute a sequence of lambda values for plmm models.
-#' @param X Rotated and standardized design matrix which *includes* the intercept column if present. May include clinical covariates and other non-SNP data.
+#' @param X Rotated and standardized design matrix which *includes* the intercept column if present. May include clinical covariates and other non-SNP data. This can be either a 'matrix' or 'FBM' object. 
 #' @param y Continuous outcome vector.
 #' @param intercept Logical: does X contain an intercept column? Defaults to TRUE.
 #' @param alpha Tuning parameter for the Mnet estimator which controls the relative contributions from the MCP/SCAD penalty and the ridge, or L2 penalty. alpha=1 is equivalent to MCP/SCAD penalty, while alpha=0 would be equivalent to ridge regression. However, alpha=0 is not supported; alpha may be arbitrarily small, but not exactly 0.
@@ -32,31 +32,52 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   
   
   # label dimensions of X 
-  n <- nrow(X)
-  p <- ncol(X) # including intercept 
-
-  # identify which variables (e.g. SNPs) to penalize 
-  # penalty.factor <- penalty.factor[-1] # remove intercept from indicator 
-  penalty.factor <- c(0, penalty.factor) # NB: I changed this on Nov. 2
-  # TODO: verify this change in penalty factor adjustment 
-  ind <- which(penalty.factor != 0)
-  # set up a fit from which to derive residuals 
-  if (length(ind) != (p-1)) { # case 1: not all `p` columns are to be penalized
-    fit <- stats::glm(y ~ -1 + X[, -ind, drop = FALSE], family='gaussian')
-  } else { # case 2: all columns are penalized 
-    fit <- stats::glm(y ~ -1 + X[, 1, drop = FALSE], family='gaussian')
+  if('matrix' %in% class(X)){
+    n <- nrow(X)
+    p <- ncol(X) # including intercept 
+  } else if ('FBM' %in% class(X)){
+    n <- X$nrow
+    p <- X$ncol 
   }
 
-  # determine the maximum value for lambda 
-  decomp_backsolve <- abs(crossprod(X[,ind], fit$residuals)) / penalty.factor[ind]
-  zmax <- max(stats::na.exclude(decomp_backsolve)) /n
+  # identify which variables (e.g. SNPs) to penalize 
+  penalty.factor <- c(0, penalty.factor) 
+  # NB: don't penalize the intercept!
+  p_ind <- which(penalty.factor != 0) # p = penalized
+  np_ind <- which(penalty.factor == 0) # np = not penalized
+  
+  # set up a fit using non-penalized covariates -- use this to derive residuals 
+  if (length(p_ind) != (p-1)) { # case 1: not all `p` columns are to be penalized
+    if('matrix' %in% class(X)){
+      fit <- stats::glm(y ~ -1 + X[, np_ind, drop = FALSE], family='gaussian')
+    } else if ('FBM' %in% class(X)){
+      tmp_X <- X[,np_ind] - 1
+      fit <- stats::glm(y ~ tmp_X, family = 'gaussian')
+    }
+    
+  } else { # case 2: all columns are penalized (here, intercept is the only 'np_ind')
+    if('matrix' %in% class(X)){
+      fit <- stats::glm(y ~ -1 + X[, 1, drop = FALSE], family='gaussian')
+    } else if ('FBM' %in% class(X)){
+      tmp_X <- as.matrix(X[,1]) - 1 
+      fit <- stats::glm(y ~ tmp_X, family='gaussian')
+    }
+    
+  }
+
+  # determine the maximum value for lambda
+  if('matrix' %in% class(X)){
+    decomp_backsolve <- abs(crossprod(X[,p_ind], fit$residuals))/penalty.factor[p_ind]
+  } else if ('FBM' %in% class(X)){
+    cprod <- bigstatsr::big_cprodVec(X = X, ind.col = p_ind, y.row = y)
+    decomp_backsolve <- abs(cprod)/penalty.factor[p_ind]
+  }
+  zmax <- max(stats::na.exclude(decomp_backsolve))/n
   lambda.max <- zmax/alpha
   
   
   # error check 
   if(!is.finite(log(lambda.max))){stop("log(lambda.max) is not finite")}
-
-  
   
   # Default is .001 if the number of observations is larger than the number of 
   # covariates and .05 otherwise. A value of lambda.min = 0 is not supported. 

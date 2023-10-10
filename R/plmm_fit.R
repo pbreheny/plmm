@@ -14,6 +14,8 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
+#' @param ... Optional arguments to `bigstatsr::big_spLinReg()` (if X is filebacked) 
+#' 
 #' @return A list with these components: 
 #' * std_X: The standardized design matrix 
 #' * rot_X: first partial result of data rotation 
@@ -47,7 +49,8 @@ plmm_fit <- function(prep,
                      convex = TRUE,
                      warn = TRUE,
                      init = NULL,
-                     returnX = TRUE){
+                     returnX = TRUE,
+                     ...){
 
   # error checking ------------------------------------------------------------
   if (gamma <= 1 & penalty=="MCP") stop("gamma must be greater than 1 for the MC penalty", call.=FALSE)
@@ -100,10 +103,9 @@ plmm_fit <- function(prep,
     # fill in other columns with values of std_X
     bigstatsr::big_apply(prep$std_X,
                          a.FUN = function(X, ind, res){
-                           res[,ind] <- res[,ind] + X[,ind]
+                           res[,ind+1] <- X[,ind]
                          },
                          a.combine = cbind,
-                         ind = 2:prep$std_X$ncol,
                          res = std_X_with_intcpt)
     # rotate X and y
     rot_X <- bigstatsr::FBM(nrow = wUt$nrow, ncol = std_X_with_intcpt$ncol)
@@ -138,7 +140,7 @@ plmm_fit <- function(prep,
                    ns = 2:rot_X$ncol)
     
   }
-
+  
   # settings for model fitting -------------------------------------------
   # calculate population var without mean 0; will need this for call to ncvfit()
   if('matrix' %in% class(prep$std_X)){
@@ -153,35 +155,42 @@ plmm_fit <- function(prep,
   
   if(prep$trace){cat("\nSetup complete. Beginning model fitting.")}
   
-  # remove initial values for coefficients representing columns with singular values
-  init <- init[prep$ns] 
-  browser() # PICK UP HERE! 
   # set up lambda -------------------------------------------------------
-  if (missing(lambda)) {
-    lambda <- setup_lambda(X = stdrot_X,
-                           y = rot_y,
-                           alpha = alpha,
-                           nlambda = nlambda,
-                           lambda.min = lambda.min,
-                           penalty.factor = prep$penalty.factor)
-    user.lambda <- FALSE
-  } else {
-    # make sure (if user-supplied sequence) is in DESCENDING order
-    if(length(lambda) > 1){
-      if (max(diff(lambda)) > 0) stop("\nUser-supplied lambda sequence must be in descending (largest -> smallest) order")
+  if('matrix' %in% class(stdrot_X)){
+    if (missing(lambda)) {
+      lambda <- setup_lambda(X = stdrot_X,
+                             y = rot_y,
+                             alpha = alpha,
+                             nlambda = nlambda,
+                             lambda.min = lambda.min,
+                             penalty.factor = penalty.factor)
+      user.lambda <- FALSE
+    } else {
+      # make sure (if user-supplied sequence) is in DESCENDING order
+      if(length(lambda) > 1){
+        if (max(diff(lambda)) > 0) stop("\nUser-supplied lambda sequence must be in descending (largest -> smallest) order")
+      }
+      nlambda <- length(lambda)
+      user.lambda <- TRUE
     }
-    nlambda <- length(lambda)
-    user.lambda <- TRUE
   }
-  
+   
   # make sure to *not* penalize the intercept term 
-  new.penalty.factor <- c(0, prep$penalty.factor)
+  new.penalty.factor <- c(0, penalty.factor)
   
   # placeholders for results
   init <- c(0, init) # add initial value for intercept
-  resid <- drop(rot_y - stdrot_X %*% init)
-  linear.predictors <- matrix(NA, nrow = nrow(stdrot_X), ncol=nlambda)
-  b <- matrix(NA, nrow=ncol(stdrot_X), ncol=nlambda) 
+  browser() # PICK UP HERE!
+  if('matrix' %in% class(stdrot_X)){
+    r <- drop(rot_y - stdrot_X %*% init)
+    linear.predictors <- matrix(NA, nrow = nrow(stdrot_X), ncol=nlambda)
+    b <- matrix(NA, nrow=ncol(stdrot_X), ncol=nlambda) 
+  } else if ("FBM" %in% class(stdrot_X)){
+    r <- rot_y - bigstatsr::big_prodVec(X = stdrot_X, y.col = init)
+    # linear.predictors <- matrix(NA, nrow = stdrot_X$nrow, ncol = nlambda)
+    # b <- matrix(NA, nrow = stdrot_X$ncol, ncol = nlambda)
+  }
+  
   iter <- integer(nlambda)
   converged <- logical(nlambda)
   loss <- numeric(nlambda)
@@ -190,17 +199,33 @@ plmm_fit <- function(prep,
   ## set up progress bar -- this can take a while
   if(prep$trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
   ## TODO: think about putting this loop in C
-  for (ll in 1:nlambda){
-    lam <- lambda[ll]
-    res <- ncvreg::ncvfit(stdrot_X, rot_y, init, resid, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
-    b[, ll] <- init <- res$beta
-    linear.predictors[,ll] <- stdrot_X%*%(res$beta)
-    iter[ll] <- res$iter
-    converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
-    loss[ll] <- res$loss
-    resid <- res$resid
-    if(prep$trace){setTxtProgressBar(pb, ll)}
+  if('matrix' %in% class(stdrot_X)){
+    for (ll in 1:nlambda){
+      lam <- lambda[ll]
+      res <- ncvreg::ncvfit(stdrot_X, rot_y, init, resid = r, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
+      b[, ll] <- init <- res$beta
+      linear.predictors[,ll] <- stdrot_X%*%(res$beta)
+      iter[ll] <- res$iter
+      converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
+      loss[ll] <- res$loss
+      r <- res$resid
+      if(prep$trace){setTxtProgressBar(pb, ll)}
+    }
+    
+  } else if ('FBM' %in% class(stdrot_X)){
+      res <- bigstatsr::big_spLinReg(X = stdrot_X,
+                                     y.train = rot_y,
+                                     alphas = alpha,
+                                     nlambda = nlambda,
+                                     pf.X = new.penalty.factor,
+                                     dfmax = dfmax,
+                                     warn = warn,
+                                     base.train = r,
+                                     ...)
+    
   }
+  
+  
   ret <- structure(list(
     y = prep$y,
     p = prep$p, 

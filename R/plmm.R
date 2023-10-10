@@ -25,7 +25,8 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
-#' 
+#' @param ... Optional arguments to `bigstatsr::big_spLinReg()` (if X is filebacked) 
+#'
 #' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
 #' 
 #' @importFrom zeallot %<-%
@@ -168,11 +169,9 @@ plmm <- function(X,
   
   # set up defaults --------------------------------------------------
   if(is.null(dfmax)){dfmax <- std_X_p + 1}
-  if(is.null(penalty.factor)){penalty.factor <- rep(1, std_X_p)}
   
-  # TODO: work out the lines below
-  # keep only those penalty factors which penalize non-singular values 
-  # penalty.factor <- penalty.factor[ns]
+  # default: penalize everything except the intercept, which we will add later
+  if(is.null(penalty.factor)){penalty.factor <- rep(1, std_X_p)}
   
   # set default init
   if(is.null(init)){init <- rep(0, std_X_p)}
@@ -220,7 +219,7 @@ plmm <- function(X,
 
 
   # prep (SVD)-------------------------------------------------
-  if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
+  if(trace){cat("\nInput data passed all checks.")}
   the_prep <- plmm_prep(std_X = std_X,
                         std_X_n = std_X_n,
                         std_X_p = std_X_p,
@@ -247,7 +246,8 @@ plmm <- function(X,
                       eps = eps,
                       max.iter = max.iter,
                       warn = warn,
-                      init = init)
+                      init = init,
+                      ...)
 
   
   # format results ---------------------------------------------------
