@@ -58,7 +58,7 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
     }
     
     dimnames(std_X) <- list(row_names,
-                        obj$map$marker.ID)
+                        obj$map$marker.ID[obj$ns])
     # TODO fix this error: Error in dimnames(X) <- list(row_names, o
     
     cat("\nReminder: the X that is returned here is column-standardized.
@@ -77,7 +77,7 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
     #     \n require writing the 'meat and potatoes' of plmm() in C++, which is a work in progress. For now, 
     #     \n functions from package bigsnpr may be used for analyzing FBM data.")
     
-    std_X <- obj$std_X
+    # std_X <- obj$std_X
     
     cat("\nReminder: the X that is returned here is column-standardized.
         \nA copy of the original data is available via the 'genotypes' matrix in the .rds object")

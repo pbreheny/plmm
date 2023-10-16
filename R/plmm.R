@@ -25,7 +25,6 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
-#' @param ... Optional arguments to `bigstatsr::big_spLinReg()` (if X is filebacked) 
 #'
 #' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
 #' 
@@ -246,8 +245,7 @@ plmm <- function(X,
                       eps = eps,
                       max.iter = max.iter,
                       warn = warn,
-                      init = init,
-                      ...)
+                      init = init)
 
   
   # format results ---------------------------------------------------

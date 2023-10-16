@@ -26,7 +26,7 @@ plmm_svd <- function(X, k, trunc, trace, ...){
       U <- decomp$u
     } else {
       # case 2: truncated SVD -----------------------------
-      if(trace){cat("\nUsing truncated SVD with k singular values")}
+      if(trace){cat("\nUsing truncated SVD with", k ,"singular values")}
       if('FBM' %in% class(X)){
         decomp <- bigstatsr::big_randomSVD(X = X, k = k, ...)
         d <- decomp$d

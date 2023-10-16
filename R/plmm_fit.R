@@ -14,7 +14,6 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
-#' @param ... Optional arguments to `bigstatsr::big_spLinReg()` (if X is filebacked) 
 #' 
 #' @return A list with these components: 
 #' * std_X: The standardized design matrix 
@@ -49,8 +48,7 @@ plmm_fit <- function(prep,
                      convex = TRUE,
                      warn = TRUE,
                      init = NULL,
-                     returnX = TRUE,
-                     ...){
+                     returnX = TRUE){
 
   # error checking ------------------------------------------------------------
   if (gamma <= 1 & penalty=="MCP") stop("gamma must be greater than 1 for the MC penalty", call.=FALSE)
@@ -213,15 +211,18 @@ plmm_fit <- function(prep,
     }
     
   } else if ('FBM' %in% class(stdrot_X)){
-      res <- bigstatsr::big_spLinReg(X = stdrot_X,
+      res <- big_spLinReg(X = stdrot_X,
                                      y.train = rot_y,
+                                     ind.col = 2:stdrot_X$ncol,
                                      alphas = alpha,
                                      nlambda = nlambda,
-                                     pf.X = new.penalty.factor,
+                                     pf.X = penalty.factor,
                                      dfmax = dfmax,
-                                     warn = warn,
-                                     base.train = r,
-                                     ...)
+                                     base.train = bigstatsr::big_prodVec(X = stdrot_X,
+                                                                         y.col = init),
+                                     warn = warn)
+      # QUESTION: should I include 'r' here ^^? 
+      # TODO: add a way to pass additional args to this function via '...'
     
   }
   
