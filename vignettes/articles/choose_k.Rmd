@@ -13,13 +13,13 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(penalizedLMM)
+library(plmm)
 library(corrplot)
 ```
 
 ## Context & motivation
 
-One of the novel features of the `penalizedLMM` package is in the way our methods address the relationships among samples (e.g., patients/participants) in the data. Unlike other mixed models packages like `lme4`, our package does not based relationships on a grouping factor. Rather, relationships are described as a matrix with cell values capturing the degree of relationship among each pair of samples. Let $\mathbf{X}$ represent the $n \times p$ design matrix of the data, and let $\tilde{\mathbf{X}}$ be the standardized $\mathbf{X}$ [1]. We call the $n \times n$ relationship matrix $\mathbf{K}$. By default, $\mathbf{K}$ is estimated from the data using the from data using $\mathbf{K} = \frac{1}{p} \tilde{\mathbf{X}}\tilde{\mathbf{X}}^\top$ [2].
+One of the novel features of the `plmm` package is in the way our methods address the relationships among samples (e.g., patients/participants) in the data. Unlike other mixed models packages like `lme4`, our package does not based relationships on a grouping factor. Rather, relationships are described as a matrix with cell values capturing the degree of relationship among each pair of samples. Let $\mathbf{X}$ represent the $n \times p$ design matrix of the data, and let $\tilde{\mathbf{X}}$ be the standardized $\mathbf{X}$ [1]. We call the $n \times n$ relationship matrix $\mathbf{K}$. By default, $\mathbf{K}$ is estimated from the data using the from data using $\mathbf{K} = \frac{1}{p} \tilde{\mathbf{X}}\tilde{\mathbf{X}}^\top$ [2].
 
 The rotation that is used in `plmm_prep()` (an internal function in `plmm`) requires a singular value decomposition (SVD) of $\mathbf{K}$. This becomes an expensive calculation when $n$ is large. To improve the computational time of this calculation, we include an optional argument $k$ in our `plmm()` function -- this $k$ is the parameter to invoke *truncated* SVD. The truncated SVD of a matrix has been shown to be the optimal rank $k$ approximation to that matrix (Eckart-Young-Mirsky theorem) [3]. We use $\mathbf{A}_k$ to represent the rank $k$ approximation of $\mathbf{K}$, and we implement this approximation using truncated SVD using `RSpectra::svds()`.
 

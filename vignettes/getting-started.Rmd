@@ -1,9 +1,9 @@
 ---
-title: "Getting started with penalizedLMM"
+title: "Getting started with plmm"
 output: rmarkdown::html_vignette
 author: "Tabitha Peter"
 vignette: >
-  %\VignetteIndexEntry{getting-started}
+  %\VignetteIndexEntry{Getting started with plmm}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -20,26 +20,26 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(penalizedLMM)
+library(plmm)
 ```
 
 **NOTE**: This vignette is under development -- not all of the examples here are fully worked through. My work here is an example of [working with the garage door open](https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu).
 
 ## Introduction 
 
-`penalizedLMM` is an `R` package created for the purpose of fitting penalized regression models to high dimensional data, particularly that in which the observations are not independent. This kind of data arises often in the context of genetics (*e.g.* GWAS dealing with population structure), and this will be the motivation for the examples presented here.
+`plmm` is an `R` package created for the purpose of fitting penalized regression models to high dimensional data, particularly that in which the observations are not independent. This kind of data arises often in the context of genetics (*e.g.* GWAS dealing with population structure), and this will be the motivation for the examples presented here.
 
 At this time, the package is designed for linear regression only -- that is, we are considering only continuous (numeric) outcomes. In the future, I would like to extend this package to handle logistic regression (to handle dichotomous outcomes). 
 
-Since we are focused on penalized regression in this package, `penalizedLMM` offers 3 choices of penalty: the minimax concave (MCP), the smoothly clipped absolute deviation (SCAD), and the least absolute shrinkage and selection operator (LASSO).  Much of the work in this package is built on the concepts/techniques provided in the `ncvreg` [package](https://github.com/pbreheny/ncvreg), whose author is [my dissertation advisor](https://myweb.uiowa.edu/pbreheny/). 
+Since we are focused on penalized regression in this package, `plmm` offers 3 choices of penalty: the minimax concave (MCP), the smoothly clipped absolute deviation (SCAD), and the least absolute shrinkage and selection operator (LASSO).  Much of the work in this package is built on the concepts/techniques provided in the `ncvreg` [package](https://github.com/pbreheny/ncvreg), whose author is [my dissertation advisor](https://myweb.uiowa.edu/pbreheny/). 
 
-`penalizedLMM` currently includes two example data sets: 
+`plmm` currently includes two example data sets: 
 
   * `admix` is a small data set (197 observations, 100 SNPs) that describes individuals of different racial backgrounds. The outcome of `admix` is simulated to include population structure effects (*i.e.* race/ethnicity have an impact on the SNP associations). 
   
   * `penncath_lite` (data on coronary artery disease from the [PennCath study](https://pubmed.ncbi.nlm.nih.gov/21239051/)) is a mid-sized, high dimensional data set (1401 observations, 4217 SNPs) with several health outcomes as well as age and sex information. This data set is a subset of a much larger data set (the original data has over 800K SNPs). For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
   
-In this overview, I will provide a demo of the main functions in `penalizedLMM` using the `admix` data. Checkout the 'Working with PLINK files' vignette to see a demo of processing the `penncath_lite` data from the original PLINK file formats. 
+In this overview, I will provide a demo of the main functions in `plmm` using the `admix` data. Checkout the 'Working with PLINK files' vignette to see a demo of processing the `penncath_lite` data from the original PLINK file formats. 
 
 
 ## Basic model fitting 

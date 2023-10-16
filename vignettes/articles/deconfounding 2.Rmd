@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(penalizedLMM)
+library(plmm)
 ```
 
 

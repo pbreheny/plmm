@@ -158,7 +158,7 @@ process_plink <- function(data_dir,
       cat("\n ***************** NOTE ********************************
           \n August 2023: With the xgboost imputation method, there have been some issues (particularly
           \n on Mac OS) with warnings that appear saying 'NA or NaN values in the 
-          \n resulting correlation matrix.' However, we (penalizedLMM authors) have
+          \n resulting correlation matrix.' However, we (plmm authors) have
           \n not seen missing values appear in the results -- the imputed data
           \n does not show any NA or NaN values, and models fit on these data run without issue. 
           \n We are actively investigating this warning message, and will

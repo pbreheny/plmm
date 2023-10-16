@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(penalizedLMM)
+library(plmm)
 library(data.table) # for fread()
 library(ggplot2)
 library(dplyr) # for mutate() and bind_rows()
@@ -326,7 +326,7 @@ Example to come here... in the future, I want to adapt `ncvreg:::local_mfdr()` t
 
 ## References & acknowledgements
 
-The `mfdr()` function I have incorporated here in our `penalizedLMM` package is based on Ryan Miller's joint work with Patrick Breheny in the `ncvreg::mfdr()` package. To read more about their work, see [Miller & Breheny (2023) in Stats in Medicine](https://doi.org/10.1002/sim.9678).
+The `mfdr()` function I have incorporated here in our `plmm` package is based on Ryan Miller's joint work with Patrick Breheny in the `ncvreg::mfdr()` package. To read more about their work, see [Miller & Breheny (2023) in Stats in Medicine](https://doi.org/10.1002/sim.9678).
 
 Penncath data: These data describe coronary artery disease outcomes from the [PennCath study](https://pubmed.ncbi.nlm.nih.gov/21239051/)). This data set is a subset of a much larger data set (the original data has over 800K SNPs); I chose to create a 'lite' version for vignette purposes. For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
 
