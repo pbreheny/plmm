@@ -211,15 +211,13 @@ plmm_fit <- function(prep,
     }
     
   } else if ('FBM' %in% class(stdrot_X)){
-      res <- big_spLinReg(X = stdrot_X,
+      res <- biglasso_fit(X = stdrot_X,
                                      y.train = rot_y,
                                      ind.col = 2:stdrot_X$ncol,
                                      alphas = alpha,
                                      nlambda = nlambda,
                                      pf.X = penalty.factor,
                                      dfmax = dfmax,
-                                     base.train = bigstatsr::big_prodVec(X = stdrot_X,
-                                                                         y.col = init),
                                      warn = warn)
       # QUESTION: should I include 'r' here ^^? 
       # TODO: add a way to pass additional args to this function via '...'
