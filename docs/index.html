@@ -41,12 +41,13 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/choose_k.html">Choosing k -- an eigenproblem</a>
-    <a class="dropdown-item" href="articles/deconfounding.html">deconfounding</a>
-    <a class="dropdown-item" href="articles/explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="articles/mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="articles/plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="articles/A-plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="articles/C-explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="articles/D-deconfounding.html">deconfounding</a>
+    <a class="dropdown-item" href="articles/E-mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="articles/getting-started.html">Getting started with penalizedLMM</a>
+    <a class="dropdown-item" href="articles/notation.html">Notes on notation</a>
   </div>
 </li>
       </ul>
@@ -89,11 +90,8 @@
 <p>The branches of this repo are organized in the following way:</p>
 <ul>
 <li><p><code>master</code> is the main branch with all the latest updates</p></li>
-<li><p><code>fix_lp</code> is a development branch where we are fixing what I think is a bug in <code><a href="reference/untransform.html">untransform()</a></code>. We noticed that our mean squared prediction error (MSPE) was really large for PLMMs where predictions were made based on the linear predictor. I am still troubleshooting what’s going on here…</p></li>
 <li><p><code>fbm</code> is a development branch where I am working to extend our current methods to analyze data from a design matrix stored as a file-backed object (a Filebacked Big Matrix, or FBM). See package <a href="https://privefl.github.io/bigstatsr/" class="external-link">bigstatsr</a> for more info on these objects.</p></li>
-<li><p><code>mfdr</code> is a development branch where I am working to create an <code><a href="reference/mfdr.html">mfdr()</a></code> method for <code>plmm</code> objects. See <code><a href="https://rdrr.io/pkg/ncvreg/man/mfdr.html" class="external-link">ncvreg::mfdr()</a></code> for inspiration.</p></li>
-<li><p><code>fam_lmm</code> is a development branch where I am thinking about how the framework <code><a href="reference/plmm.html">plmm()</a></code> uses for analyzing relationships can be used in contexts where penalization is not necessary. Example: family-based data which are not high-dimensional.</p></li>
-<li><p><code>setup-lambda</code> is a development branch where we are resolving a bug in <code>setup_lambda</code>. Stay tuned for updates on this.</p></li>
+<li><p><code>refine_workflow</code> is an <strong>archived</strong> branch in which I explored changing the workflow to make cross validation more efficient. This change involved moving the rotation step into <code><a href="reference/plmm_prep.html">plmm_prep()</a></code>, instead of having that step as part of model fitting in <code><a href="reference/plmm_fit.html">plmm_fit()</a></code>. I found that this change was not compatible with cross validation, for reasons that I am currently writing up as part of a paper. Once that paper is done, I will delete this branch.</p></li>
 <li><p><code>blup</code> is an <strong>archived</strong> branch previously focused on improving the implementation of the Best Linear Unbiased Predictor method</p></li>
 <li><p><code>develop/Yujing</code> is an <strong>archived</strong> branch. We will be deleting this branch soon – for internal use only.</p></li>
 </ul>

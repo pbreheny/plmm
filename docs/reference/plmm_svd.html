@@ -28,12 +28,13 @@ This is an internal function to plmm_prep()"><!-- mathjax --><script src="https:
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
-    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/A-plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/C-explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/D-deconfounding.html">deconfounding</a>
+    <a class="dropdown-item" href="../articles/E-mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
+    <a class="dropdown-item" href="../articles/notation.html">Notes on notation</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -59,33 +60,21 @@ This is an internal function to <code><a href="plmm_prep.html">plmm_prep()</a></
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plmm_svd</span><span class="op">(</span><span class="va">std_X</span>, <span class="va">n</span>, <span class="va">p</span>, <span class="va">diag_K</span>, <span class="va">K</span>, <span class="va">k</span>, <span class="va">trace</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plmm_svd</span><span class="op">(</span><span class="va">X</span>, <span class="va">k</span>, <span class="va">trunc</span>, <span class="va">trace</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>std_X</dt>
-<dd><p>The standardized X matrix</p></dd>
-
-
-<dt>n</dt>
-<dd><p>The number of rows in X</p></dd>
-
-
-<dt>p</dt>
-<dd><p>The number of columns in X</p></dd>
-
-
-<dt>diag_K</dt>
-<dd><p>Logical: is K a diagonal matrix? Defaults to FALSE.</p></dd>
-
-
-<dt>K</dt>
-<dd><p>Optional argument indicating the relatedness matrix to be used. See details.</p></dd>
+    <dl><dt>X</dt>
+<dd><p>The standardized design matrix</p></dd>
 
 
 <dt>k</dt>
 <dd><p>Optional integer argument indicating the number of singular values to use in a truncated SVD. See details.</p></dd>
+
+
+<dt>trunc</dt>
+<dd><p>Logical: should truncated SVD be used?</p></dd>
 
 
 <dt>trace</dt>
@@ -95,24 +84,10 @@ This is an internal function to <code><a href="plmm_prep.html">plmm_prep()</a></
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The kind of SVD implemented here will depend on the combination of arguments supplied.
-Let svd(K) be defined as t(U)SU, since K is symmetric in a PLMM context. We can
-let svd(std_X) be defined as t(U)DU, and write S = (D^2)/p (a good derivation exercise, for those who are interested).</p>
-<p>Broadly speaking, there are three cases:
-(1) K is not user-specified, (2) K is a matrix, and (3) K is a list.</p>
-<p>In case 1:</p><ul><li><p>(a) if K is not specified but diag_K = TRUE: K is treated as the identity matrix.
-All S = rep(1, n), and U = diag(n)</p></li>
-<li><p>(b) if K is not specified, diag_K = FALSE, and k = min(n,p):
-use base::svd(K), where K = relatedness_mat(std_X)</p></li>
-<li><p>(c) if K is not specified, diag_K = FALSE, and k &lt; min(n,p):
-use RSpectra::svds(K, k = k), where K = relatedness_mat(std_X)</p></li>
-</ul><p>In case 2:</p><ul><li><p>(a): if K is a matrix and diag_K = TRUE: observations will be treated as unrelated,
-where S = sort(diag(K), decreasing = T) and columns of U are the columns of an
-identity matrix sorted on the values of S.</p></li>
-<li><p>(b): if K is a matrix and k = min(n,p): use base::svd(K)</p></li>
-<li><p>(c): if K is a matrix and k &lt; min(n,p): use RSpectra::svds(K, k)</p></li>
-</ul><p>In case 3:
-if K is a list, D and U are simply passed from <code><a href="choose_k.html">choose_k()</a></code> &amp; D is transformed to S.</p>
-<p>Any scenarios outside of those outlined will error out.</p>
+(1) if trunc = FALSE
+use base::svd(K)
+(2) if trunc = TRUE
+use RSpectra::svds(K, k = k)</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -24,12 +24,13 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
-    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/A-plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/C-explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/D-deconfounding.html">deconfounding</a>
+    <a class="dropdown-item" href="../articles/E-mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
+    <a class="dropdown-item" href="../articles/notation.html">Notes on notation</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -80,13 +81,13 @@ We have not implemented something like mFDR for LMMs yet</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span>, <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">mfdr</span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         EF  S mFDR</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.98118 -1 -1    1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.91505  0  0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.85338  0  0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.79586  0  0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.74223  0  0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.69220  0  0    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        EF  S mFDR</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5988 -1 -1    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5809  0  0    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5636  0  0    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5468  0  0    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5305  0  0    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5147  1  1    1</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

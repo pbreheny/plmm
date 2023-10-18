@@ -28,12 +28,13 @@ This is an internal function for cv.plmm"><!-- mathjax --><script src="https://c
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
-    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/A-plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/C-explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/D-deconfounding.html">deconfounding</a>
+    <a class="dropdown-item" href="../articles/E-mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
+    <a class="dropdown-item" href="../articles/notation.html">Notes on notation</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -135,10 +136,10 @@ This is an internal function for <code>cv.plmm</code></p>
     
 
 <p>A list with these components:</p><ul><li><p>std_X: The standardized design matrix</p></li>
-<li><p>SUX: first partial result of data rotation</p></li>
-<li><p>SUy: second partial result of data rotation</p></li>
+<li><p>rot_X: first partial result of data rotation</p></li>
+<li><p>rot_y: second partial result of data rotation</p></li>
 <li><p>eta: numeric value representing the ratio of variances.</p></li>
-<li><p>std_SUX: re-standardized rotated design matrix. This is 'fed' into <code>plmm_fit()</code>.</p></li>
+<li><p>std_rot_X: re-standardized rotated design matrix. This is 'fed' into <code>plmm_fit()</code>.</p></li>
 <li><p>b: The values returned in the 'beta' argument of the ncvfit() object</p></li>
 <li><p>lambda: The sequence of lambda values used in model fitting</p></li>
 <li><p>iter: The number of iterations at each given lambda value</p></li>

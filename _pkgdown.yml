@@ -44,6 +44,7 @@ reference:
   - title: Other model fitting methods (and some helper functions)
     contents: 
     - convexMin
+    - residuals.plmm
     - v_hat
     
   - title: Data (pre)processing and wrangling
@@ -76,7 +77,6 @@ reference:
     
   - title: internal
     contents: 
-    - coef.list
     - cvf
     - delta
     - estimate_eta

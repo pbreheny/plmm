@@ -179,7 +179,7 @@ Marginal false discovery rates also give us another way to select $\lambda$: ins
 
 Let's do a similar model comparison, this time using the `penncath_lite` data. 
 
-```{r penncath_lite_process}
+```{r penncath_lite_process, eval=FALSE}
 # preprocess PLINK files
 penncath_lite <- process_plink(
   data_dir = plink_example(parent = TRUE),
@@ -188,7 +188,9 @@ penncath_lite <- process_plink(
   impute = TRUE, # mode imputation is default 
   outfile = "process_penncath")
 
+```
 
+```{r}
 # read in the data to global environment
 pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"))
 
