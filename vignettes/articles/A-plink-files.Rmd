@@ -19,7 +19,7 @@ The `penncath_lite` data is in the PLINK format (i.e., bed/bim/fam files), so I 
 
 Note: I am reading in the data using `plink_example()`, a function that serves as a wrapper to `base::system.file()`. This is simply because the exact filepath is different for the user than for the developer. If you save the PLINK files in a location other than the directory where you installed `penalizedLMM`, just adjust your choice of directory in the following function calls. 
 
-```{r penncath_lite_process, eval=FALSE}
+```{r penncath_lite_process}
 # preprocess PLINK files
 penncath_lite <- process_plink(
   data_dir = plink_example(parent = TRUE),

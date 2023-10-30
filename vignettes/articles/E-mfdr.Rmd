@@ -191,7 +191,8 @@ penncath_lite <- process_plink(
 ```
 
 ```{r}
-# read in the data to global environment
+# read in the data to global environment 
+# NB: this assumes article A ('Plink Files') has already been run. 
 pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"))
 
 str(pen) # Three objects here
