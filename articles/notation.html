@@ -41,12 +41,11 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
-    <a class="dropdown-item" href="../articles/deconfounding%202.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/A-plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/C-explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/D-deconfounding.html">Deconfounding</a>
+    <a class="dropdown-item" href="../articles/E-mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with plmm</a>
     <a class="dropdown-item" href="../articles/notation.html">Notes on notation</a>
   </div>
@@ -119,32 +118,51 @@ respectively.</p></li>
 column-standardized <span class="math inline">\(X\)</span>, in which
 each of the <span class="math inline">\(p\)</span> columns has mean 0
 and standard deviation 1.</p></li>
-<li><p><span class="math inline">\(\mathbf{U}\)</span> and <span class="math inline">\(\mathbf{d}\)</span> are the right singular vectors
-and singular values of <span class="math inline">\(\mathbf{X}\)</span>,
-as one would obtain from the singular value decomposition (SVD). The
-diagonal matrix which has the <span class="math inline">\(d\)</span>
-values along the diagonal is denoted <span class="math inline">\(\mathbf{D}\)</span>.</p></li>
+<li><p><span class="math inline">\(\mathcal{U}\)</span> and <span class="math inline">\(\mathbf{\mathcal{d}}\)</span> are the right
+singular vectors and singular values of <span class="math inline">\(\mathbf{X}\)</span>, as one would obtain from the
+singular value decomposition (SVD), i.e. <span class="math inline">\(\text{svd}(\mathbf{X)} \equiv
+\mathcal{U}\mathcal{D}\mathcal{V}^\top\)</span>. The diagonal matrix
+which has the values of <span class="math inline">\(\mathbf{\mathcal{d}}\)</span> along the diagonal
+is denoted <span class="math inline">\(\mathcal{D}\)</span>.</p></li>
 <li><p><span class="math inline">\(\mathbf{K} \equiv
 \frac{1}{p}\mathbf{X}\mathbf{X}^{\top}\)</span>, which is often referred
 to in the literature as the realized relatedness matrix (RRM). <span class="math inline">\(\mathbf{K}\)</span> has dimension <span class="math inline">\(n \times n\)</span>. Note that <span class="math inline">\(\mathbf{K}\)</span> can be obtained from the SVD
 of <span class="math inline">\(\mathbf{X}\)</span>, i.e., <span class="math inline">\(\mathbf{K} \equiv
 \frac{1}{p}\mathbf{X}\mathbf{X}^{\top} =
-\mathbf{U}\frac{1}{p}\mathbf{D}^2\mathbf{U}^{\top} =
-\mathbf{U}\mathbf{S}\mathbf{U}^{\top}\)</span>, where <span class="math inline">\(\mathbf{S}\)</span> is the diagonal matrix whose
-diagonal values are <span class="math inline">\(\frac{d_k^2}{p}\)</span>.</p></li>
-<li><p><span class="math inline">\(\mathbf{V}\)</span> is …</p></li>
-<li><p><span class="math inline">\(\eta\)</span> is …</p></li>
+\mathcal{U}\frac{1}{p}\mathcal{D}^2\mathcal{U}^{\top} =
+\mathcal{U}\mathcal{S}\mathcal{U}^{\top}\)</span>, where <span class="math inline">\(\mathcal{S}\)</span> is the diagonal matrix whose
+diagonal values are <span class="math inline">\(\frac{\mathcal{d}_k^2}{p}\)</span>.</p></li>
+<li><p><span class="math inline">\(\sigma^2_e\)</span> is the variance
+of the outcome attributed to random error, and <span class="math inline">\(\sigma^2_s\)</span> is the variance of the outcome
+attributed to population structure.</p></li>
+<li><p><span class="math inline">\(\eta\)</span> is the ratio <span class="math inline">\(\frac{\sigma^2_s}{\sigma^2_e}\)</span>.
+Conceptually, this is the proportion of the variance of <span class="math inline">\(\mathbf{y}\)</span> attributable to additive
+genetic factors, commonly referred to as the <em>narrow-sense
+heritability</em>. The parameter <span class="math inline">\(\eta\)</span> also describes the data-generating
+model’s signal to noise ratio (SNR).</p></li>
+<li><p><span class="math inline">\(\mathbf{V}\)</span> is the variance
+of the outcome, where <span class="math inline">\(\mathbb{V}({\mathbf{y}}) = \eta \mathbf{K} + (1 -
+\eta)\mathbf{I}_n\)</span>.</p></li>
 <li><p><span class="math inline">\(\mathbf{w}\)</span> is the vector of
-weights defined as …</p></li>
-<li><p><span class="math inline">\(\tilde{\mathbf{X}}\)</span> is the
-matrix ….</p></li>
-<li><p><span class="math inline">\(\tilde{\mathbb{X}}\)</span> is the
-matrix ….</p></li>
+weights defined as <span class="math inline">\((\eta\mathbf{\mathcal{s}}
++ (1-\eta))^{-1/2}\)</span>. The values in <span class="math inline">\(\mathbf{w}\)</span> are the nonzero values of the
+diagonal matrix <span class="math inline">\((\eta\mathcal{S} + (1 -
+\eta)\mathbf{I})^{-1/2}\)</span>.</p></li>
+<li><p><span class="math inline">\({\mathcal{X}} \equiv
+\mathbf{W}\mathcal{U}^\top\mathbf{X}\)</span> is the rotated data, or
+the data on the transformed scale.</p></li>
+<li><p><span class="math inline">\(\tilde{\mathcal{y}} \equiv
+\mathbf{W}\mathcal{U}^\top\mathbf{y}\)</span> is the outcome on the
+rotated scale.</p></li>
+<li><p><span class="math inline">\(\tilde{\mathcal{X}}\)</span> is the
+<strong>standardized</strong> rotated data. This standardization
+involves scaling, but not centering.</p></li>
 </ul>
 <p>Looking over this list, you will notice some conventions:</p>
 <ul>
 <li>Matrices are denoted with uppercase letters</li>
-<li>Vectors are denoted with boldface lowercase letters</li>
+<li>Vectors are denoted with <strong>boldface</strong> lowercase
+letters</li>
 <li>Scalar values are denoted with lowercase letters</li>
 </ul>
 </div>
@@ -157,9 +175,9 @@ matrix ….</p></li>
 <code>y</code></p></li>
 <li><p><span class="math inline">\(\mathbf{X}\)</span> is
 <code>std_X</code></p></li>
-<li><p><span class="math inline">\(\tilde{\mathbf{X}}\)</span> is
+<li><p><span class="math inline">\({\mathcal{X}}\)</span> is
 <code>rot_X</code></p></li>
-<li><p><span class="math inline">\(\tilde{\mathbb{X}}\)</span> is
+<li><p><span class="math inline">\(\tilde{\mathcal{X}}\)</span> is
 <code>stdrot_X</code></p></li>
 <li><p><span class="math inline">\(\mathbf{X}\boldsymbol{\beta}\)</span>
 is <code>Xb</code></p></li>

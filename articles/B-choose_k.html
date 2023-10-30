@@ -41,12 +41,11 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
-    <a class="dropdown-item" href="../articles/deconfounding%202.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/A-plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/C-explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/D-deconfounding.html">Deconfounding</a>
+    <a class="dropdown-item" href="../articles/E-mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with plmm</a>
     <a class="dropdown-item" href="../articles/notation.html">Notes on notation</a>
   </div>
@@ -74,7 +73,7 @@ horseshoes…</h3>
             
       
       
-      <div class="d-none name"><code>choose_k.Rmd</code></div>
+      <div class="d-none name"><code>B-choose_k.Rmd</code></div>
     </div>
 
     
@@ -196,7 +195,7 @@ matrices produced by both approximations above, comparing to the true
 <span>         tl.col <span class="op">=</span> <span class="st">'grey40'</span>,</span>
 <span>         addgrid.col <span class="op">=</span> <span class="cn">NA</span>, </span>
 <span>         tl.pos <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="choose_k_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<p><img src="B-choose_k_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>Now that we have some approximations, we can use <code>cv.plmm</code>
 to see the results:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -206,22 +205,22 @@ to see the results:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="choose_k_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<p><img src="B-choose_k_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1500):</span></span>
+<span><span class="co">#&gt; -------------------------------------------------</span></span>
+<span><span class="co">#&gt;   Nonzero coefficients: 27</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 2.72</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.649</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
 <span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1370):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
 <span><span class="co">#&gt;   Nonzero coefficients: 29</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.86</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.690</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1455):</span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 27</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 3.05</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.745</span></span></code></pre></div>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 2.75</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.659</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

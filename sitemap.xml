@@ -4,16 +4,19 @@
     <loc>/404.html</loc>
   </url>
   <url>
-    <loc>/articles/choose_k.html</loc>
+    <loc>/articles/A-plink-files.html</loc>
   </url>
   <url>
-    <loc>/articles/deconfounding 2.html</loc>
+    <loc>/articles/B-choose_k.html</loc>
   </url>
   <url>
-    <loc>/articles/deconfounding.html</loc>
+    <loc>/articles/C-explore_options.html</loc>
   </url>
   <url>
-    <loc>/articles/explore_options.html</loc>
+    <loc>/articles/D-deconfounding.html</loc>
+  </url>
+  <url>
+    <loc>/articles/E-mfdr.html</loc>
   </url>
   <url>
     <loc>/articles/getting-started.html</loc>
@@ -22,13 +25,7 @@
     <loc>/articles/index.html</loc>
   </url>
   <url>
-    <loc>/articles/mfdr.html</loc>
-  </url>
-  <url>
     <loc>/articles/notation.html</loc>
-  </url>
-  <url>
-    <loc>/articles/plink-files.html</loc>
   </url>
   <url>
     <loc>/authors.html</loc>

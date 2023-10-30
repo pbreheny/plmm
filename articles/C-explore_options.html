@@ -41,12 +41,11 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
-    <a class="dropdown-item" href="../articles/deconfounding%202.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/A-plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/C-explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/D-deconfounding.html">Deconfounding</a>
+    <a class="dropdown-item" href="../articles/E-mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with plmm</a>
     <a class="dropdown-item" href="../articles/notation.html">Notes on notation</a>
   </div>
@@ -72,7 +71,7 @@
             
       
       
-      <div class="d-none name"><code>explore_options.Rmd</code></div>
+      <div class="d-none name"><code>C-explore_options.Rmd</code></div>
     </div>
 
     
@@ -117,7 +116,7 @@ option <code>diag_K = T</code>.</p>
 <span><span class="va">fit_admix2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, diag_K <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_admix1</span><span class="op">)</span>;<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit_admix2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="explore_options_files/figure-html/diag_K-1.png" width="700"></p>
+<p><img src="C-explore_options_files/figure-html/diag_K-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="svd-implementation">SVD implementation<a class="anchor" aria-label="anchor" href="#svd-implementation"></a>
@@ -158,7 +157,7 @@ the code below illustrates:</p>
 <span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> approx_times), <span class="at">linetype =</span> <span class="st">'dashed'</span>) <span class="sc">+</span> </span>
 <span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"nrow(X): the dimension of the K matrix"</span>,</span>
 <span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"SVD time in seconds"</span>)</span></code></pre></div>
-<p><img src="explore_options_files/figure-html/svd_example-1.png" width="700"></p>
+<p><img src="C-explore_options_files/figure-html/svd_example-1.png" width="700"></p>
 <p>You can use <code><a href="../reference/choose_k.html">choose_k()</a></code> to implement truncated singular
 value decomposition (SVD). This is what is shown above via
 <code><a href="https://rdrr.io/pkg/RSpectra/man/svds.html" class="external-link">RSpectra::svds()</a></code>.</p>
@@ -211,7 +210,7 @@ LP does not incorporate that structure.</p>
 <span><span class="va">cv_admix1_blup</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.plmm.html">cv.plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, type <span class="op">=</span> <span class="st">"blup"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_admix1</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_admix1_blup</span><span class="op">)</span></span></code></pre></div>
-<p><img src="explore_options_files/figure-html/blup_example-1.png" width="700"></p>
+<p><img src="C-explore_options_files/figure-html/blup_example-1.png" width="700"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_admix1</span><span class="op">)</span>;<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_admix1_blup</span><span class="op">)</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
