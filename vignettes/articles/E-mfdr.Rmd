@@ -178,16 +178,12 @@ penncath_lite <- process_plink(
   gz = TRUE, # NB: PLINK data that ships with package comes gzipped
   impute = TRUE, # mode imputation is default 
   outfile = "process_penncath")
-
-<<<<<<< HEAD:vignettes/articles/E-mfdr.Rmd
 ```
 
 ```{r}
 # read in the data to global environment 
 # NB: this assumes article A ('Plink Files') has already been run. 
-=======
 # read in the data to global environment
->>>>>>> master:vignettes/articles/mfdr.Rmd
 pen <- get_data(path = paste0(plink_example(parent = TRUE), "/penncath_lite"))
 
 str(pen) # Three objects here
