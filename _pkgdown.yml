@@ -30,6 +30,7 @@ reference:
     - loss.plmm
     - log_lik
     - logLik_nonnull
+    - residuals.plmm
     
   - title: Coefficient methods for LMMs and PLMMs
     contents:

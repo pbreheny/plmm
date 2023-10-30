@@ -1,3 +1,3 @@
 if (requireNamespace("tinytest", quietly=TRUE) ){
-  tinytest::test_package("penalizedLMM", pattern="^[^_].*\\.[rR]$")
+  tinytest::test_package("plmm", pattern="^[^_].*\\.[rR]$")
 }

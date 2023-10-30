@@ -34,7 +34,7 @@ PLMM format: a function to format the output of a model constructed with \code{p
 
 \dontrun{
 # NB: this is an internal function (i.e. it's not exported)
-# these examples won't work unless you have penalizedLMM::: 
+# these examples won't work unless you have plmm::: 
 prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
 fit1 <- plmm_fit(prep = prep1)
 res1 <- plmm_format(fit1)

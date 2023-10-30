@@ -46,7 +46,7 @@ choose_k <- function(X,
   # calculate true K 
   if(trace){cat('\nCalcuating the relatedness matrix')}
   std_X <- ncvreg::std(X)
-  K <- penalizedLMM::relatedness_mat(X)
+  K <- plmm::relatedness_mat(X)
   # note: relatedness_mat() standardizes X and scales the singular values of K by 1/p
 
   # set up loop 

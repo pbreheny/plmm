@@ -1,7 +1,8 @@
 #' @keywords internal
+#' @aliases plmm-package NULL
 "_PACKAGE"
 
-#' @useDynLib penalizedLMM, .registration=TRUE
+#' @useDynLib plmm, .registration=TRUE
 
 ## usethis namespace: start
 #' @import methods

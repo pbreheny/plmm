@@ -45,7 +45,7 @@ convexMin <- function(b, X, penalty, gamma, l2, family = "gaussian", penalty.fac
         eigen.min <- min(eigen(crossprod(Xu)/n - diag(p.., length(p..), length(p..)))$values)
       }
     } else {
-      stop('penalizedLMM only supports family = `gaussian`!')
+      stop('plmm currently only supports family = `gaussian`!')
     }
     if (eigen.min < 0) {
       val <- i
