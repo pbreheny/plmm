@@ -18,8 +18,8 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   #   (and in so doing, leave out the ith fold)
   cv.args$prep$std_X <- full_cv_prep$std_X[fold!=i, ,drop=FALSE]
   # NB: need center & scale values here! Will pass this to untransform() via predict.list
-  attr(cv.args$prep$std_X, "center") <- attr(full_cv_prep$std_X, "center")
-  attr(cv.args$prep$std_X, "scale") <- attr(full_cv_prep$std_X, "scale")
+  attr(cv.args$prep$std_X, "center") <- attr(full_cv_prep$std_X[fold!=i, ,drop=FALSE], "center")
+  attr(cv.args$prep$std_X, "scale") <- attr(full_cv_prep$std_X[fold!=i, ,drop=FALSE], "scale")
   cv.args$prep$U <- full_cv_prep$U[fold!=i, , drop=FALSE]
   cv.args$prep$y <- full_cv_prep$y[fold!=i] 
   

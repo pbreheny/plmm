@@ -51,7 +51,8 @@ plmm_format <- function(fit,
   beta_vals <- untransform(res_b = fit$b,
                            ns = fit$ns,
                            p = fit$p,
-                           std_X = ncvreg::std(X),
+                           std_X = ncvreg::std(X), 
+                           # TODO: should not be calculating this standardization again.
                            rot_X = fit$rot_X,
                            stdrot_X = fit$stdrot_X)
   
