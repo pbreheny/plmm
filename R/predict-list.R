@@ -5,7 +5,6 @@
 #' @param newX A design matrix used for computing predicted values (i.e, the test data).
 #' @param type A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details. 
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
-#' @param prep Optional argument. Result of the call to `plmm_prep` which corresponds to the `fit` argument. Required if \code{type == 'blup'}. 
 #' @param V11 Variance-covariance matrix of the training data. Extracted from `estimated_V` that is generated using all observations. Required if \code{type == 'blup'}. 
 #' @param V21 Covariance matrix between the training and the testing data. Extracted from `estimated_V` that is generated using all observations. Required if \code{type == 'blup'}. 
 #' @param ... Additional optional arguments
@@ -26,7 +25,6 @@ predict.list <- function(fit,
                          newX,
                          type=c("lp", "blup"),
                          idx=1:length(fit$lambda),
-                         prep = NULL,
                          V11 = NULL,
                          V21 = NULL, ...) {
   
@@ -65,9 +63,8 @@ predict.list <- function(fit,
       
     # test1 <- V21 %*% chol2inv(chol(V11)) # true 
     # TODO: to find the inverse of V11 using svd results of K, i.e., the inverse of a submatrix, might need to use Woodbury's formula 
-
-    ranef <- V21 %*% chol2inv(chol(V11)) %*% (fit$y - cbind(1, prep$std_X) %*% beta_vals)
-
+    resid_train <- (fit$y - cbind(1, std_X) %*% beta_vals)
+    ranef <- V21 %*% chol2inv(chol(V11)) %*% resid_train
     blup <- Xb + ranef
     
     return(blup)

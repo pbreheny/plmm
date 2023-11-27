@@ -51,7 +51,6 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
                          std_X = cv.args$prep$std_X,
                          newX = test_X,
                          type = 'blup',
-                         prep = cv.args$prep, 
                          V11 = V11,
                          V21 = V21, ...)
     
