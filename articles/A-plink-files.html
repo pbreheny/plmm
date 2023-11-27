@@ -8,8 +8,8 @@
 <meta name="description" content="plmm">
 <title>Processing PLINK files • plmm</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Processing PLINK files">
 <meta property="og:description" content="plmm">
@@ -91,6 +91,10 @@ This is simply because the exact filepath is different for the user than
 for the developer. If you save the PLINK files in a location other than
 the directory where you installed <code>plmm</code>, just adjust your
 choice of directory in the following function calls.</p>
+<p>Since this article processess raw plink files, I am not actually
+going to run this code – doing so causes errors when building this site
+due to the local file paths. This is just an example of what I have done
+to process PLINK files in my work.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># preprocess PLINK files</span></span>
 <span><span class="va">penncath_lite</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/process_plink.html">process_plink</a></span><span class="op">(</span></span>
@@ -98,43 +102,12 @@ choice of directory in the following function calls.</p>
 <span>  prefix <span class="op">=</span> <span class="st">"penncath_lite"</span>,</span>
 <span>  gz <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># NB: PLINK data that ships with package comes gzipped</span></span>
 <span>  impute <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># mode imputation is default </span></span>
-<span>  outfile <span class="op">=</span> <span class="st">"process_penncath"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Logging to process_penncath.log</span></span>
-<span><span class="co">#&gt; Preprocessing penncath_lite data:</span></span>
-<span><span class="co">#&gt; Creating  penncath_lite .rds</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Unzipping .gz files - this could take a second</span></span>
-<span><span class="co">#&gt; There are  124  constant features in the data</span></span>
-<span><span class="co">#&gt; There are a total of  3514 SNPs with missing values</span></span>
-<span><span class="co">#&gt; Of these,  13  are missing in at least 50% of the samples</span></span>
-<span><span class="co">#&gt; Imputing the missing values using  mode  method</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Done with imputation. Processed files now saved as .rds object.</span></span></code></pre></div>
+<span>  outfile <span class="op">=</span> <span class="st">"process_penncath"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read in the data to global environment</span></span>
 <span><span class="va">pen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span>path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="../reference/plink_example.html">plink_example</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="st">"/penncath_lite"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pen</span><span class="op">)</span> <span class="co"># Three objects here</span></span>
-<span><span class="co">#&gt; List of 3</span></span>
-<span><span class="co">#&gt;  $ X  : num [1:1401, 1:4367] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "dimnames")=List of 2</span></span>
-<span><span class="co">#&gt;   .. ..$ : chr [1:1401] "1" "2" "3" "4" ...</span></span>
-<span><span class="co">#&gt;   .. ..$ : chr [1:4367] "rs3107153" "rs2455124" "rs10915476" "rs4592237" ...</span></span>
-<span><span class="co">#&gt;  $ fam:'data.frame': 1401 obs. of  6 variables:</span></span>
-<span><span class="co">#&gt;   ..$ family.ID  : int [1:1401] 10002 10004 10005 10007 10008 10009 10010 10011 10012 10013 ...</span></span>
-<span><span class="co">#&gt;   ..$ sample.ID  : int [1:1401] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
-<span><span class="co">#&gt;   ..$ paternal.ID: int [1:1401] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;   ..$ maternal.ID: int [1:1401] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;   ..$ sex        : int [1:1401] 1 2 1 1 1 1 1 2 1 2 ...</span></span>
-<span><span class="co">#&gt;   ..$ affection  : int [1:1401] 1 1 2 1 2 2 2 1 2 -9 ...</span></span>
-<span><span class="co">#&gt;  $ map:'data.frame': 4367 obs. of  6 variables:</span></span>
-<span><span class="co">#&gt;   ..$ chromosome  : int [1:4367] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
-<span><span class="co">#&gt;   ..$ marker.ID   : chr [1:4367] "rs3107153" "rs2455124" "rs10915476" "rs4592237" ...</span></span>
-<span><span class="co">#&gt;   ..$ genetic.dist: int [1:4367] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;   ..$ physical.pos: int [1:4367] 2056735 3188505 4275291 4280630 4286036 4302161 4364564 4388885 4606471 4643688 ...</span></span>
-<span><span class="co">#&gt;   ..$ allele1     : chr [1:4367] "C" "T" "T" "G" ...</span></span>
-<span><span class="co">#&gt;   ..$ allele2     : chr [1:4367] "T" "C" "C" "A" ...</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pen</span><span class="op">)</span> <span class="co"># Three objects here</span></span></code></pre></div>
 <p>In addition to the genotype data, I want to analyze a continuous
 phenotype stored in an external data file. I will load that here:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -149,36 +122,16 @@ phenotype stored in an external data file. I will load that here:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pen_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">pen</span><span class="op">$</span><span class="va">X</span>,</span>
 <span>                     y <span class="op">=</span> <span class="va">pen_cl</span><span class="op">$</span><span class="va">hdl_impute</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in plmm(X = pen$X, y = pen_cl$hdl_impute): The number of observations is large, and k is not specified.</span></span>
-<span><span class="co">#&gt;     </span></span>
-<span><span class="co">#&gt; This can dramatically increase computational time -- the SVD calculation is expensive.</span></span>
-<span><span class="co">#&gt;             </span></span>
-<span><span class="co">#&gt; If the observations are unrelated, please set diag_K = TRUE. SVD is not needed in this case.</span></span>
-<span><span class="co">#&gt;             </span></span>
-<span><span class="co">#&gt; Otherwise, consider using choose_k() first to get an approximation for your relatedness matrix.</span></span>
 <span><span class="co"># to see a progress bar and progress messages, set trace = TRUE</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pen_fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "beta_vals"         "lambda"            "eta"              </span></span>
-<span><span class="co">#&gt;  [4] "s"                 "U"                 "rot_y"            </span></span>
-<span><span class="co">#&gt;  [7] "linear.predictors" "penalty"           "gamma"            </span></span>
-<span><span class="co">#&gt; [10] "alpha"             "convex.min"        "loss"             </span></span>
-<span><span class="co">#&gt; [13] "penalty.factor"    "ns_idx"            "p"                </span></span>
-<span><span class="co">#&gt; [16] "n"                 "iter"              "converged"</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pen_fit</span><span class="op">)</span></span></code></pre></div>
 <p>We can summarize this fit at the 25th <span class="math inline">\(\lambda\)</span> value:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pen_fit</span>, lambda <span class="op">=</span> <span class="va">pen_fit</span><span class="op">$</span><span class="va">lambda</span><span class="op">[</span><span class="fl">25</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized regression model with n=, p=4368 at lambda=0.8758</span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt; The model converged </span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt; # of non-zero coefficients:  25 </span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pen_fit</span>, lambda <span class="op">=</span> <span class="va">pen_fit</span><span class="op">$</span><span class="va">lambda</span><span class="op">[</span><span class="fl">25</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p>And we can plot the coefficient paths; note that in these graphs,
 regions shaded in grey corresponds to values of <span class="math inline">\(\lambda\)</span> for which the model fit is
 nonconvex. See <code><a href="https://rdrr.io/pkg/ncvreg/man/plot.ncvreg.html" class="external-link">ncvreg::plot.ncvreg()</a></code> for details.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pen_fit</span><span class="op">)</span></span></code></pre></div>
-<p><img src="A-plink-files_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 <p>We can implement cross-validation for this model using the code
 below:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -188,16 +141,9 @@ below:</p>
 <span><span class="co">#   show a progress bar for each fold. </span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pen_cv</span>, lambda <span class="op">=</span> <span class="st">"min"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.9885):</span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 14</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 156.20</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 12.498</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pen_cv</span><span class="op">)</span></span></code></pre></div>
-<p><img src="A-plink-files_files/figure-html/penncath_cv-1.png" width="700"></p>
-<p>More to come…</p>
+<p>Will add more here later…</p>
   </main>
 </div>
 
