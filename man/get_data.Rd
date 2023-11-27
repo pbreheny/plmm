@@ -33,7 +33,7 @@ The rows of \code{X} will be sorted to align in the same order as in \code{fam},
 }
 \examples{
 \dontrun{
-pen <- get_data(path = "inst/extdata/penncath_lite")
+pen <- get_data(path = "../temp_files/penncath_lite", trace = TRUE)
 }
 
 }

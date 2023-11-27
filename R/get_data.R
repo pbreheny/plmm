@@ -17,7 +17,7 @@
 #' 
 #' @examples
 #' \dontrun{
-#' pen <- get_data(path = "inst/extdata/penncath_lite")
+#' pen <- get_data(path = "../temp_files/penncath_lite", trace = TRUE)
 #' }
 #' 
 #' @details
@@ -51,13 +51,14 @@ get_data <- function(path, returnX, trace = TRUE){
   obj$fam <- data.table::setorderv(x = obj$fam, 
                                    cols = c('family.ID', 'sample.ID'))
   
-  
+
   if(returnX){
     X <- obj$genotypes[,]
+    dimnames(X) <- list(obj$fam$sample.ID, obj$map$marker.ID)
     
     # order rows of X to match fam file
     X <- X[match(rownames(X), obj$fam$sample.ID), ]
-    dimnames(X) <- list(obj$fam$sample.ID, obj$map$marker.ID)
+    
     # TODO: is there a better way to do this other than 'match()'? 
     
     if(!(all.equal(obj$fam$sample.ID, as.numeric(rownames(X))))){
