@@ -6,6 +6,7 @@ editor_options:
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  eval = FALSE,
   collapse = TRUE,
   comment = "#>"
 )
@@ -18,6 +19,8 @@ library(plmm)
 The `penncath_lite` data is in the PLINK format (i.e., bed/bim/fam files), so I need to do some preprocessing first. The `process_plink` function uses functions from the [bigsnpr package](https://privefl.github.io/bigsnpr/reference/index.html) to do some quality control filtering steps. The result of the `process_plink` function is an object with 1) a matrix of genotypes and 2) a vector with the indices of any constant features (e.g., SNPs with no variation across the sample). 
 
 Note: I am reading in the data using `plink_example()`, a function that serves as a wrapper to `base::system.file()`. This is simply because the exact filepath is different for the user than for the developer. If you save the PLINK files in a location other than the directory where you installed `plmm`, just adjust your choice of directory in the following function calls. 
+
+Since this article processess raw plink files, I am not actually going to run this code -- doing so causes errors when building this site due to the local file paths. This is just an example of what I have done to process PLINK files in my work. 
 
 ```{r penncath_lite_process}
 # preprocess PLINK files
