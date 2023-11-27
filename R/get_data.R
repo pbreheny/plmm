@@ -47,17 +47,19 @@ get_data <- function(path, returnX, trace = TRUE){
     }
   }
   
+  # order fam data by FID and IID
+  obj$fam <- data.table::setorderv(x = obj$fam, 
+                                   cols = c('family.ID', 'sample.ID'))
+  
+  
   if(returnX){
     X <- obj$genotypes[,]
-    dimnames(X) <- list(obj$fam$sample.ID,
-                        obj$map$marker.ID)
     
-    
-    obj$fam <- data.table::setorderv(x = obj$fam, 
-                                     cols = c('family.ID', 'sample.ID'))
-    
+    # order rows of X to match fam file
     X <- X[match(rownames(X), obj$fam$sample.ID), ]
+    dimnames(X) <- list(obj$fam$sample.ID, obj$map$marker.ID)
     # TODO: is there a better way to do this other than 'match()'? 
+    
     if(!(all.equal(obj$fam$sample.ID, as.numeric(rownames(X))))){
       stop("\nThere is an issue with the alignment between the rownames of the genotype data and the sample IDs. 
            \nWere there individuals represented in the .bed file who are not in the .fam file, or vice versa?
@@ -71,10 +73,6 @@ get_data <- function(path, returnX, trace = TRUE){
         \n At this time, plmm() cannot analyze design matrix X in this FBM format. Allowing such an option will
         \n require writing the 'meat and potatoes' of plmm() in C++, which is a work in progress. For now, 
         \n functions from package bigsnpr may be used for analyzing FBM data.")
-    
-    
-    obj$fam <- data.table::setorderv(x = obj$fam, 
-                                     cols = c('family.ID', 'sample.ID'))
     
     
     warning("\nSorting the returned X matrix is not yet implemented for file-backed data.
