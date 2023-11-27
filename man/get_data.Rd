@@ -5,12 +5,10 @@
 \title{Read in processed data
 This function is intended to be called after \code{process_plink()} has been called once.}
 \usage{
-get_data(path, row_id = NULL, returnX, trace = TRUE)
+get_data(path, returnX, trace = TRUE)
 }
 \arguments{
 \item{path}{The file path to the RDS object containing the processed data. Do not add the '.rds' extension to the path.}
-
-\item{row_id}{Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL.}
 
 \item{returnX}{Logical: Should the design matrix be returned as a numeric matrix that will be stored in memory. By default, this will be FALSE if the object sizes exceeds 100 Mb.}
 
@@ -28,6 +26,10 @@ A list with four components:
 \description{
 Read in processed data
 This function is intended to be called after \code{process_plink()} has been called once.
+}
+\details{
+In the returned list, the \code{fam} data will be sorted by family and by individual, as in \code{dplyr::arrange(family.ID, sample.ID)}.
+The rows of \code{X} will be sorted to align in the same order as in \code{fam}, where rownames of \code{X} will be sample ID.
 }
 \examples{
 \dontrun{

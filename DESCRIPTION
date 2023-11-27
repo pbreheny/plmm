@@ -24,7 +24,6 @@ Suggests:
     graphics, 
     grDevices, 
     parallel, 
-    data.table,
     MASS, 
     knitr, 
     rmarkdown
@@ -41,5 +40,6 @@ Imports:
     tinytest,
     RSpectra,
     bigstatsr,
-    bigsnpr
+    bigsnpr,
+    data.table
     

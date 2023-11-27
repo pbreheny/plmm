@@ -2,7 +2,6 @@
 #' This function is intended to be called after `process_plink()` has been called once. 
 #' 
 #' @param path The file path to the RDS object containing the processed data. Do not add the '.rds' extension to the path. 
-#' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL. 
 #' @param returnX Logical: Should the design matrix be returned as a numeric matrix that will be stored in memory. By default, this will be FALSE if the object sizes exceeds 100 Mb.
 #' @param trace Logical: Should trace messages be shown? Default is TRUE. 
 #' 
@@ -11,6 +10,9 @@
 #'  * fam, a data frame containing the pedigree information (like a .fam file in PLINK)
 #'  * map, a data frame containing the feature information (like a .bim file in PLINK)
 #'  * constants_idx A vector indicating the which columns of X contain constant features (features with no variance). 
+#' 
+#' @importFrom data.table setorderv
+#' 
 #' @export
 #' 
 #' @examples
@@ -18,7 +20,12 @@
 #' pen <- get_data(path = "inst/extdata/penncath_lite")
 #' }
 #' 
-get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
+#' @details
+#' In the returned list, the `fam` data will be sorted by family and by individual, as in `dplyr::arrange(family.ID, sample.ID)`.
+#' The rows of `X` will be sorted to align in the same order as in `fam`, where rownames of `X` will be sample ID. 
+#' 
+#' 
+get_data <- function(path, returnX, trace = TRUE){
   
   rds <- paste0(path, ".rds")
   bk <- paste0(path, ".bk") # .bk will be present if RDS was created with bigsnpr methods 
@@ -42,16 +49,20 @@ get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
   
   if(returnX){
     X <- obj$genotypes[,]
-    if(!is.null(row_id)){
-      if(row_id == "iid"){row_names <- obj$fam$sample.ID}
-      if(row_id == "fid"){row_names <- obj$fam$family.ID}
-    } else {
-      row_names <- 1:length(obj$fam$sample.ID)
-    }
-    
-    dimnames(X) <- list(row_names,
+    dimnames(X) <- list(obj$fam$sample.ID,
                         obj$map$marker.ID)
     
+    
+    obj$fam <- data.table::setorderv(x = obj$fam, 
+                                     cols = c('family.ID', 'sample.ID'))
+    
+    X <- X[match(rownames(X), obj$fam$sample.ID), ]
+    # TODO: is there a better way to do this other than 'match()'? 
+    if(!(all.equal(obj$fam$sample.ID, as.numeric(rownames(X))))){
+      stop("\nThere is an issue with the alignment between the rownames of the genotype data and the sample IDs. 
+           \nWere there individuals represented in the .bed file who are not in the .fam file, or vice versa?
+           \nPlease ensure that your PLINK files represent all the same individuals before analyzing data with PLMM.")
+    }
     return(list(X = X,
                 fam = obj$fam,
                 map = obj$map))
@@ -60,6 +71,16 @@ get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
         \n At this time, plmm() cannot analyze design matrix X in this FBM format. Allowing such an option will
         \n require writing the 'meat and potatoes' of plmm() in C++, which is a work in progress. For now, 
         \n functions from package bigsnpr may be used for analyzing FBM data.")
+    
+    
+    obj$fam <- data.table::setorderv(x = obj$fam, 
+                                     cols = c('family.ID', 'sample.ID'))
+    
+    
+    warning("\nSorting the returned X matrix is not yet implemented for file-backed data.
+            \nFor analyses, remember to sort to sort the rows of the genotype data 
+            in the same order as the rows of the family data, so that matrices X and Z have same pattern!")
+    
     return(list(X = obj$genotypes,
                 fam = obj$fam,
                 map = obj$map))
