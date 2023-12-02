@@ -132,11 +132,11 @@ structure?</li>
 <code>blup</code> option makes an improvement:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">cvg</span><span class="op">$</span><span class="va">cvm</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 3.208073</span></span>
+<span><span class="co">#&gt; [1] 5.64968</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">cvp</span><span class="op">$</span><span class="va">cve</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 3.577806</span></span>
+<span><span class="co">#&gt; [1] 5.605844</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">cvp_blup</span><span class="op">$</span><span class="va">cve</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 3.200618</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 3.501982</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="mse">MSE<a class="anchor" aria-label="anchor" href="#mse"></a>
@@ -146,11 +146,11 @@ structure?</li>
 <code>plmm</code> + BLUP.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/matrix-products.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">l</span><span class="op">$</span><span class="va">beta</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cvg</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2.099743</span></span>
+<span><span class="co">#&gt; [1] 2.257436</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/matrix-products.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">l</span><span class="op">$</span><span class="va">beta</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cvp</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1.667633</span></span>
+<span><span class="co">#&gt; [1] 1.549666</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/matrix-products.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">l</span><span class="op">$</span><span class="va">beta</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cvp_blup</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1.667633</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 1.015167</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
