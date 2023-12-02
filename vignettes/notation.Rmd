@@ -21,58 +21,104 @@ library(rmarkdown)
 
 The purpose of this short vignette is to document the notation conventions for the math and programming related to PLMM. We begin with the math, and then translate our math notation into naming objects in our source code. 
 
+Throughout this document, the reader will notice some notation conventions: 
+
+  - Matrices are denoted with **boldface**, UPPERCASE letters
+  - Vectors are denoted with **boldface** lowercase letters
+  - Scalar values and indices are denoted with lowercase letters
+  - the $\bar{}$ modifier indicates (column) standardization
+  - the $\tilde{}$ modifier indicates rotation
+  - the $\dot{}$ modifier indicates scaled pre-rotation
+  - the $\ddot{}$ modifier indicates scaled post-rotation
+  
 
 ## Math notation 
+Here are the concepts we need to denote, in order of their usage in our derivations. I have blocked these into sections corresponding to the steps of the model fitting process. 
 
-Here are the concepts we need to denote, in order of their usage in our derivations: 
+### Statistical model (the overall framework)
 
-  - $n$ and $p$ are the dimensions of our data, where $n$ is the number of *observations* (e.g., number of patients, number of samples, etc.) and $p$ is the number of *features* (e.g., number of SNPs, number of variables, number of covariates, etc.). 
-  
-  - For indices: 
-    - $i \in 1,..., n$ indexes observations
-    - $j \in 1,..., p$ indexes features
-    - $k \in 1,...,v$ indexes singular values. Note that $\text{max}(k) = \text{min}(n, p)$.
-    - $ll \in 1,...,l$ indexes values of lasso tuning parameter $\lambda$
-  
-  - $X$ and $\mathbf{y}$ are the $n \times p$ design matrix of our data and the $n \times 1$ vector of outcomes, respectively. 
-  
-  - $\mathbf{X}$ is the column-standardized $X$, in which each of the $p$ columns has mean 0 and standard deviation 1. 
-  
-  - $\mathcal{U}$ and $\mathbf{\mathcal{d}}$ are the right singular vectors and singular values of $\mathbf{X}$, as one would obtain from the singular value decomposition (SVD), i.e. $\text{svd}(\mathbf{X)} \equiv \mathcal{U}\mathcal{D}\mathcal{V}^\top$. The diagonal matrix which has the values of $\mathbf{\mathcal{d}}$ along the diagonal is denoted $\mathcal{D}$. 
-  
-  - $\mathbf{K} \equiv \frac{1}{p}\mathbf{X}\mathbf{X}^{\top}$, which is often referred to in the literature as the realized relatedness matrix (RRM). $\mathbf{K}$ has dimension $n \times n$. Note that $\mathbf{K}$ can be obtained from the SVD of $\mathbf{X}$, i.e., $\mathbf{K} \equiv \frac{1}{p}\mathbf{X}\mathbf{X}^{\top} = \mathcal{U}\frac{1}{p}\mathcal{D}^2\mathcal{U}^{\top} = \mathcal{U}\mathcal{S}\mathcal{U}^{\top}$, where $\mathcal{S}$ is the diagonal matrix whose diagonal values are $\frac{\mathcal{d}_k^2}{p}$. 
-  
-  - $\sigma^2_e$ is the variance of the outcome attributed to random error, and $\sigma^2_s$ is the variance of the outcome attributed to population structure. 
-  
-  - $\eta$ is the ratio $\frac{\sigma^2_s}{\sigma^2_e}$. Conceptually, this is the proportion of the variance of $\mathbf{y}$ attributable to additive genetic factors, commonly referred to as the *narrow-sense heritability*. The parameter $\eta$ also describes the data-generating model’s signal to noise ratio (SNR). 
-  
-  - $\mathbf{V}$ is the variance of the outcome, where $\mathbb{V}({\mathbf{y}}) = \eta \mathbf{K} + (1 - \eta)\mathbf{I}_n$. 
-  
-  - $\mathbf{w}$ is the vector of weights defined as $(\eta\mathbf{\mathcal{s}} + (1-\eta))^{-1/2}$. The values in $\mathbf{w}$ are the nonzero values of the diagonal matrix $(\eta\mathcal{S} + (1 - \eta)\mathbf{I})^{-1/2}$. 
-  
-  - ${\mathcal{X}} \equiv \mathbf{W}\mathcal{U}^\top\mathbf{X}$ is the rotated data, or the data on the transformed scale. 
-  
-  - $\tilde{\mathcal{y}} \equiv \mathbf{W}\mathcal{U}^\top\mathbf{y}$ is the outcome on the rotated scale. 
-  
-  - $\tilde{\mathcal{X}}$ is the **standardized** rotated data. This standardization involves scaling, but not centering. 
-  
-Looking over this list, you will notice some conventions: 
+The overall model can be written as 
 
-  - Matrices are denoted with uppercase letters
-  - Vectors are denoted with **boldface** lowercase letters
-  - Scalar values are denoted with lowercase letters
+$$
+\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{Z}\mathbf{g} + \boldsymbol{\epsilon}
+$$
+
+or equivalently as 
+$$
+\mathbf{y} = \bar{\mathbf{X}}\dot{\boldsymbol{\beta}} + \boldsymbol{\gamma} + \boldsymbol{\epsilon}
+$$
+where: 
+
+  - $\mathbf{X}$ and $\mathbf{y}$ are the $n \times p$ design matrix of our data and the $n \times 1$ vector of outcomes, respectively. Here, $n$ is the number of *observations* (e.g., number of patients, number of samples, etc.) and $p$ is the number of *features* (e.g., number of SNPs, number of variables, number of covariates, etc.). 
+  
+  - $\bar{\mathbf{X}}$ is the column-standardized $\mathbf{X}$, in which each of the $p$ columns has mean 0 and standard deviation 1. 
+  
+  - $\dot{\boldsymbol{\beta}}$ represents the coefficients on the standardized scale.
+  
+  - $\mathbf{Z}$ is a $n \times b$ matrix of indicators corresponding to a grouping structure, and $\mathbf{g}$ is the vector of values describing how each grouping is associated with $\mathbf{y}$. In real data, these values often unknown. 
+  
+  - $\boldsymbol{\epsilon}$ is the $n \times 1$ vector of noise. 
+  
+This model assumes: 
+
+  - $\boldsymbol{\epsilon} \perp \boldsymbol{\gamma}$
+  - $\boldsymbol{\epsilon} \sim N(0, \sigma^2_{\epsilon}\mathbf{I})$
+  - $\boldsymbol{\gamma} \sim N(0, \sigma^2_{s}\mathbf{K})$
+  
+  
+Under these assumptions, we may write $\mathbf{y} \sim N(\mathbf{X}\boldsymbol{\beta}, \boldsymbol{\Sigma})$
+  
+**Indices**: 
+
+  - $i \in 1,..., n$ indexes observations 
+  - $j \in 1,..., p$ indexes features
+  - $h \in 1,..., b$ indexes the batches (e.g., different family groups, different data collection sites, etc.)
+  
+### Decomposition and rotation (prep and first part of fit)
+
+  - Beginning with a singular value decomposition, we have $\mathbf{U}$ and $\mathbf{d}$ are the right singular vectors and singular values of $\mathbf{X}$, as one would obtain from the singular value decomposition (SVD), i.e. $\text{svd}(\mathbf{X)} \equiv \mathbf{U}\mathbf{D}\mathbf{V}^\top$. The elements of $\mathbf{d}$ are the diagonal values of $\mathbf{D}$.
+  
+  - $k$ represents the number of nonzero eigenvalues represented in $\mathbf{U}$ and $\mathbf{d}$, so $k \leq \text{min}(n,p)$. 
+  
+  - $\mathbf{S} \equiv \frac{1}{p}\mathbf{D}^2$ is the $k \times k$ diagonal matrix whose diagonal values are $\frac{d_k^2}{p}$.
+  
+  - $\mathbf{K} \equiv \frac{1}{p}\mathbf{X}\mathbf{X}^{\top}$, which is often referred to in the literature as the realized relatedness matrix (RRM). $\mathbf{K}$ has dimension $n \times n$. Note that $\mathbf{K}$ can be obtained from the SVD of $\mathbf{X}$, i.e., $\mathbf{U}\mathbf{S}\mathbf{U}^{\top}$, where $\mathbf{S}$ is the diagonal matrix whose diagonal values are $\frac{d_k^2}{p}$. 
+  
+  - $\eta$ is the ratio $\frac{\sigma^2_s}{\sigma^2_e + \sigma^2_s}$. Conceptually, this is the proportion of the variance of $\mathbf{y}$ attributable to additive genetic factors, commonly referred to as the *narrow-sense heritability*. The parameter $\eta$ also describes the data-generating model’s signal to noise ratio (SNR). 
+  
+  - $\mathbf{\Sigma}$ is the variance of the outcome, where $\mathbb{V}({\mathbf{y}}) = \eta \mathbf{K} + (1 - \eta)\mathbf{I}_n$. 
+  
+  - $\mathbf{w}$ is the vector of weights defined as $(\eta\mathbf{\mathbf{s}} + (1-\eta))^{-1/2}$. The values in $\mathbf{w}$ are the nonzero values of the diagonal matrix $\mathbf{W} \equiv (\eta\mathbf{S} + (1 - \eta)\mathbf{I})^{-1/2}$. 
+  
+  - The matrix to be used in rotating ( or *preconditioning*) the data is $\mathbf{\Sigma}^{-1/2} \equiv \mathbf{W}\mathbf{U}^\top$.
+  
+  - $\tilde{\mathbf{X}} \equiv \mathbf{W}\mathbf{U}^\top\mathbf{X}$ is the rotated data, or the data on the transformed scale. 
+  
+  - $\tilde{\mathbf{y}} \equiv \mathbf{\Sigma}^{-1/2}\mathbf{y}$ is the outcome on the rotated scale. 
+  
+  - $\bar{\tilde{\mathbf{X}}}$ is the **standardized** rotated data. Note: This standardization involves scaling, but not centering. 
+  
+  
+### Model fitting with penalization  
+
+We fit $\tilde{\mathbf{y}} \sim \bar{\tilde{\mathbf{X}}} \ddot{\hat{\boldsymbol{\beta}}}$ using a penalized linear mixed model. The penalty parameter values (e.g., values of the lasso tuning parameter) are indexed by $\lambda_l \in 1,..., t$.  
+
+### Rescaling results (format)
+
+To obtain the estimated coefficients on the original scale, the values estimated by the model must be unscaled (or 'untransformed') twice: once to adjust for the post-rotation standardization, and again to adjust for the pre-rotation standardization. This process could be written $\ddot{\hat{\boldsymbol{\beta}}} \rightarrow \dot{\hat{\boldsymbol{\beta}}} \rightarrow  \hat{\boldsymbol{\beta}}$. 
+
 
 ## Object names in source code 
 
 In the code, we denote the objects above in this way: 
 
-  - $X$ and $y$ are `X` and `y`
+  - $\mathbf{X}$ and $\mathbf{y}$ are `X` and `y`
   
-  - $\mathbf{X}$ is `std_X`
+  - $\bar{\mathbf{X}}$ is `std_X`
   
-  - ${\mathcal{X}}$ is `rot_X`
+  - $\tilde{\mathbf{X}}$ is `rot_X`
   
-  - $\tilde{\mathcal{X}}$ is `stdrot_X`
+  - $\bar{\tilde{\mathbf{X}}}$ is `stdrot_X`
   
   - $\mathbf{X}\boldsymbol{\beta}$ is `Xb`
 
