@@ -57,15 +57,15 @@ get_data <- function(path, returnX, trace = TRUE){
     dimnames(X) <- list(obj$fam$sample.ID, obj$map$marker.ID)
     
     # order rows of X to match fam file
-    X <- X[match(rownames(X), obj$fam$sample.ID), ]
-    
+    # X <- X[match(rownames(X), obj$fam$sample.ID), ]
+    # TODO: is this ordering something that is wise to do? 
     # TODO: is there a better way to do this other than 'match()'? 
     
-    if(!(all.equal(obj$fam$sample.ID, as.numeric(rownames(X))))){
-      stop("\nThere is an issue with the alignment between the rownames of the genotype data and the sample IDs. 
-           \nWere there individuals represented in the .bed file who are not in the .fam file, or vice versa?
-           \nPlease ensure that your PLINK files represent all the same individuals before analyzing data with PLMM.")
-    }
+    # if(!(all.equal(obj$fam$sample.ID, as.numeric(rownames(X))))){
+    #   stop("\nThere is an issue with the alignment between the rownames of the genotype data and the sample IDs. 
+    #        \nWere there individuals represented in the .bed file who are not in the .fam file, or vice versa?
+    #        \nPlease ensure that your PLINK files represent all the same individuals before analyzing data with PLMM.")
+    # }
     return(list(X = X,
                 fam = obj$fam,
                 map = obj$map))
@@ -76,10 +76,10 @@ get_data <- function(path, returnX, trace = TRUE){
         \n functions from package bigsnpr may be used for analyzing FBM data.")
     
     
-    warning("\nSorting the returned X matrix is not yet implemented for file-backed data.
-            \nFor analyses, remember to sort to sort the rows of the genotype data 
-            in the same order as the rows of the family data, so that matrices X and Z have same pattern!")
-    
+    # warning("\nSorting the returned X matrix is not yet implemented for file-backed data.
+    #         \nFor analyses, remember to sort to sort the rows of the genotype data 
+    #         in the same order as the rows of the family data, so that matrices X and Z have same pattern!")
+    # 
     return(list(X = obj$genotypes,
                 fam = obj$fam,
                 map = obj$map))
