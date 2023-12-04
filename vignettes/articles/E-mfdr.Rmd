@@ -170,6 +170,8 @@ Marginal false discovery rates also give us another way to select $\lambda$: ins
 
 Let's do a similar model comparison, this time using the `penncath_lite` data. 
 
+TODO: Will come back and finish adding the output here later; 
+
 ```{r penncath_lite_process, eval=FALSE}
 # preprocess PLINK files
 penncath_lite <- process_plink(
@@ -180,7 +182,7 @@ penncath_lite <- process_plink(
   outfile = "process_penncath")
 ```
 
-```{r}
+```{r, eval=FALSE}
 # read in the data to global environment 
 # NB: this assumes article A ('Plink Files') has already been run. 
 # read in the data to global environment
@@ -192,7 +194,7 @@ str(pen) # Three objects here
 
 These data represent 1,401 individuals and 4,367 SNPs from a GWAS study. For the sake of example, let's use [hdl](https://www.cdc.gov/cholesterol/ldl_hdl.htm#:~:text=HDL%20(high%2Ddensity%20lipoprotein),for%20heart%20disease%20and%20stroke.) (high-density lipoprotein cholesterol) as our outcome. 
 
-```{r}
+```{r, eval=FALSE}
 # NB: the 'quiet' option in process_plink()  will silence the printed messages
 pen_cl <- read.csv(plink_example(path = 'penncath_clinical.csv'))
 
@@ -203,7 +205,7 @@ pen$y <- ifelse(is.na(pen_cl$hdl),
 
 
 #### fit 1 
-```{r pen1}
+```{r pen1, eval=FALSE}
 # construct a cross-validated lasso model 
 cv_pen1 <- cv.plmm(X = pen$X,
               y = pen$y,
@@ -225,7 +227,7 @@ In our next model, we will use MCP instead of lasso.
 
 #### fit 2 
 
-```{r pen2}
+```{r pen2, eval=FALSE}
 pen$k <- choose_k(pen$X, returnKapprox = T)
 
 cv_pen2 <- cv.plmm(X = pen$X,
@@ -242,7 +244,7 @@ summary(cv_pen2)
 
 Finally, we will model the 'penncath' data one more time using sex and the first few principal components 
 
-```{r pen_pca}
+```{r pen_pca, eval=FALSE}
 pen$std_X <- ncvreg::std(pen$X)
 pen_pca <- prcomp(pen$std_X, center = F, scale. = F)
 
@@ -258,7 +260,7 @@ plot(x = 1:10,
 pen_PCs <- pen_pca$x
 ```
 
-```{r pen3}
+```{r pen3, eval=FALSE}
 pen$X_plus_fixed_eff <- cbind(pen$fam[,c("sex")], pen_PCs[,1:10], pen$X)
 
 cv_pen3 <- cv.plmm(X = pen$X_plus_fixed_eff,
@@ -279,13 +281,13 @@ summary(cv_pen3)
 
 Comparing the three fits with the 'penncath' data, we can observe the following:
 
-```{r pen_compare}
+```{r pen_compare, eval=FALSE}
 par(mfrow = c(2,3))
 plot(cv_pen1); plot(cv_pen2); plot(cv_pen3)
 plot(pen1); plot(pen2); plot(pen3)
 ```
 
-```{r}
+```{r, eval=FALSE}
 pen_comparison <- rbind(pen_mfdr1, pen_mfdr2, pen_mfdr3) |>
   as.data.table(keep.rownames='lambda')
 pen_comparison[, model := paste0("Model ", 1:3)]
@@ -295,7 +297,7 @@ pen_comparison[, .(model, EF, S, mFDR)] |>
 
 We can also look at how mFDR changes among the three models: 
 
-```{r pen_mfdr_graph}
+```{r pen_mfdr_graph, eval=FALSE}
 compare_mfdr <- rbind(mfdr(pen1), mfdr(pen2), mfdr(pen3)) |>
   as.data.table(keep.rownames='lambda')
 compare_mfdr[, model := c(rep("lasso", 100),
