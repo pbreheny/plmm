@@ -47,10 +47,10 @@ get_data <- function(path, returnX, trace = TRUE){
     }
   }
   
-  # order fam data by FID and IID
-  obj$fam <- data.table::setorderv(x = obj$fam, 
-                                   cols = c('family.ID', 'sample.ID'))
-  
+  # TODO: should I order fam data by FID and IID? 
+  # obj$fam <- data.table::setorderv(x = obj$fam, 
+  #                                  cols = c('family.ID', 'sample.ID'))
+  # 
 
   if(returnX){
     X <- obj$genotypes[,]
