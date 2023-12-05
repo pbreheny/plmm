@@ -2,7 +2,7 @@
 #'
 #' @param fit A list of parameters describing the output of a model constructed with \code{plmm_fit}
 #' @param convex convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
-#' @param dfmax dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
+#' @param dfmax (future idea; not yet incorporated) Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
 #' @param X Design matrix. May include clinical covariates and other non-SNP data. 
 #' 
 #' @return A list with the components: 
@@ -29,45 +29,19 @@
 #' }
 
 plmm_format <- function(fit,
-                        convex = TRUE,
-                        dfmax = fit$p + 1, 
+                        # dfmax = fit$p + 1, 
                         X){
-  # eliminate saturated lambda values, if any
-  ind <- !is.na(fit$iter)
-  iter <- fit$iter[ind]
-  converged <- fit$converged[ind]
-  lambda <- fit$lambda[ind]
-  loss <- fit$loss[ind]
-  if (fit$warn & sum(iter) == fit$max.iter) warning("\nMaximum number of iterations reached")
-  convex.min <- if (convex) convexMin(b = fit$b,
-                                      X = fit$stdrot_X,
-                                      penalty = fit$penalty,
-                                      gamma = fit$gamma, 
-                                      l2 = fit$lambda*(1-fit$alpha),
-                                      family = 'gaussian',
-                                      penalty.factor = fit$penalty.factor) else NULL
-  
-  # reverse the transformations of the beta values 
-  beta_vals <- untransform(res_b = fit$b,
-                           ns = fit$ns,
-                           p = fit$p,
-                           std_X = ncvreg::std(X), 
-                           # TODO: should not be calculating this standardization again.
-                           rot_X = fit$rot_X,
-                           stdrot_X = fit$stdrot_X)
-  
-  if(fit$trace){cat("\nBeta values are estimated -- almost done!")}
   
   # give the matrix of beta_values readable names 
   # SNPs (or covariates) on the rows, lambda values on the columns
   varnames <- c("(Intercept)", fit$snp_names)
-  dimnames(beta_vals) <- list(varnames, lamNames(fit$lambda))
+  dimnames(fit$beta_vals) <- list(varnames, lamNames(fit$lambda))
   
   colnames(fit$linear.predictors) <- lamNames(fit$lambda)
 
   ## output
-  val <- structure(list(beta_vals = beta_vals,
-                        lambda = lambda,
+  val <- structure(list(beta_vals = fit$beta_vals,
+                        lambda = fit$lambda,
                         eta = fit$eta,
                         s = fit$s,
                         U = fit$U,
@@ -76,14 +50,14 @@ plmm_format <- function(fit,
                         penalty = fit$penalty,
                         gamma = fit$gamma,
                         alpha = fit$alpha,
-                        convex.min = convex.min,
-                        loss = loss,
+                        convex.min = fit$convex.min,
+                        loss = fit$loss,
                         penalty.factor = fit$penalty.factor,
                         ns_idx = c(1, 1 + fit$ns), # PAY ATTENTION HERE! 
                         p = fit$p,
                         n = fit$n, 
-                        iter = iter,
-                        converged = converged),
+                        iter = fit$iter,
+                        converged = fit$converged),
                    class = "plmm")
   
   

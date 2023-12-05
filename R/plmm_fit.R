@@ -60,27 +60,20 @@ plmm_fit <- function(prep,
   if (length(init)!=prep$p) stop("Dimensions of init and X do not match", call.=FALSE)
   
   if(prep$trace){cat("\nBeginning standardization + rotation.")}
-  
-  # estimate eta if needed
-  if (is.null(prep$eta)) {
-    eta <- estimate_eta(s = prep$s, U = prep$U, y = prep$y) 
-  } else {
-    # otherwise, use the user-supplied value (this is mainly for simulation)
-    eta <- prep$eta
-  }
 
   # rotate data
-  w <- (eta * prep$s + (1 - eta))^(-1/2)
+  w <- (prep$eta * prep$s + (1 - prep$eta))^(-1/2)
   wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
   rot_X <- wUt %*% cbind(1, prep$std_X)
   rot_y <- wUt %*% prep$y
-  # re-standardize rotated rot_X
+  # re-standardize rotated rot_X, *without* rescaling the intercept!
   stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
   stdrot_X_noInt <- stdrot_X_temp$scaled_X
   stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
-  attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
+  attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals 
   # calculate population var without mean 0; will need this for call to ncvfit()
   xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
+  
   
   if(prep$trace){cat("\nSetup complete. Beginning model fitting.")}
   
@@ -132,6 +125,33 @@ plmm_fit <- function(prep,
     resid <- res$resid
     if(prep$trace){setTxtProgressBar(pb, ll)}
   }
+  
+  # eliminate saturated lambda values, if any
+  ind <- !is.na(iter)
+  iter <- iter[ind]
+  converged <- converged[ind]
+  lambda <- lambda[ind]
+  loss <- loss[ind]
+  if (warn & sum(iter) == max.iter) warning("\nMaximum number of iterations reached")
+  convex.min <- if (convex) convexMin(b = b,
+                                      X = stdrot_X,
+                                      penalty = penalty,
+                                      gamma = gamma, 
+                                      l2 = lambda*(1-alpha),
+                                      family = 'gaussian',
+                                      penalty.factor = penalty.factor) else NULL
+  
+  # reverse the transformations of the beta values 
+  if(prep$trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
+
+  beta_vals <- untransform(res_b = b,
+                           ns = prep$ns,
+                           p = prep$p,
+                           std_X_details = prep$std_X_details,
+                           rot_X = rot_X,
+                           stdrot_X = stdrot_X)
+  
+  
   ret <- structure(list(
     y = prep$y,
     p = prep$p, 
@@ -142,9 +162,9 @@ plmm_fit <- function(prep,
     rot_y = rot_y,
     stdrot_X = stdrot_X,
     lambda = lambda,
-    b = b,
+    beta_vals = beta_vals,
     linear.predictors = linear.predictors,
-    eta = eta,
+    eta = prep$eta,
     iter = iter,
     converged = converged, 
     loss = loss, 

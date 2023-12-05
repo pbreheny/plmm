@@ -29,17 +29,9 @@ predict.list <- function(fit,
                          V21 = NULL, ...) {
   
   type <- match.arg(type)
-  # get beta values from fit -- these coefficients are on the transformed scale
-  raw_beta_vals <- fit$b[, idx, drop = FALSE]
-  
-  # reverse the post-rotation standardization of the beta values 
-  beta_vals <- untransform(res_b = raw_beta_vals,
-                           ns = fit$ns,
-                           p = fit$p,
-                           std_X = std_X,
-                           rot_X = fit$rot_X,
-                           stdrot_X = fit$stdrot_X,
-                           partial = TRUE)
+  # browser()
+  # get beta values (for nonsingular features) from fit
+  beta_vals <- fit$beta_vals[,idx,drop = FALSE]
   
   # format dim. names
   if(is.null(dim(beta_vals))) {
@@ -49,22 +41,27 @@ predict.list <- function(fit,
     # case 2: beta_vals is a matrix
     colnames(beta_vals) <- lamNames(fit$lambda)
   }
-
+  # browser()
   # calculate the estimated mean values for test data 
-  Xb <- cbind(1, newX) %*% beta_vals
+  a <- beta_vals[1,]
+  b <- beta_vals[-1,,drop=FALSE]
+  b_ns <- b[fit$ns,,drop=FALSE]
+  
+  Xb <- sweep(newX %*% b_ns, 2, a, "+")
   
   # for linear predictor, return mean values 
   if (type=="lp") return(drop(Xb))
   
   # for blup, will incorporate the estimated variance 
   if (type == "blup"){
-      
+    
     # covariance comes from selected rows and columns from estimated_V that is generated in the overall fit (V11, V21)
-      
+    
     # test1 <- V21 %*% chol2inv(chol(V11)) # true 
     # TODO: to find the inverse of V11 using svd results of K, i.e., the inverse of a submatrix, might need to use Woodbury's formula 
-    resid_train <- (fit$y - cbind(1, std_X) %*% beta_vals)
-    ranef <- V21 %*% chol2inv(chol(V11)) %*% resid_train
+    Xb_train <- sweep(std_X %*% b_ns, 2, a, "+")
+    resid_train <- (fit$y - Xb_train)
+    ranef <- V21 %*% (chol2inv(chol(V11)) %*% resid_train)
     blup <- Xb + ranef
     
     return(blup)
