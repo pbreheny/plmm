@@ -114,7 +114,8 @@ cv.plmm <- function(X,
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
     parallel::clusterExport(cluster, c("X", "y", "K", "fold", "type", "cv.args", "estimated_V"), envir=environment())
     parallel::clusterCall(cluster, function() library(plmm))
-    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, X=X, y=y, fold=fold, type=type, cv.args=cv.args, 
+    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, X=X, y=y,
+                                        fold=fold, type=type, cv.args=cv.args, 
                                         estimated_V = estimated_V)
   }
   
