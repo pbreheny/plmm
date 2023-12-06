@@ -10,7 +10,6 @@
   newX,
   type = c("lp", "blup"),
   idx = 1:length(fit$lambda),
-  prep = NULL,
   V11 = NULL,
   V21 = NULL,
   ...
@@ -26,8 +25,6 @@
 \item{type}{A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details.}
 
 \item{idx}{Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.}
-
-\item{prep}{Optional argument. Result of the call to \code{plmm_prep} which corresponds to the \code{fit} argument. Required if \code{type == 'blup'}.}
 
 \item{V11}{Variance-covariance matrix of the training data. Extracted from \code{estimated_V} that is generated using all observations. Required if \code{type == 'blup'}.}
 

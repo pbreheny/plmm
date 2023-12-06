@@ -16,8 +16,9 @@ plmm_fit(
   eps = 1e-04,
   max.iter = 10000,
   convex = TRUE,
-  warn = TRUE,
+  dfmax = prep$p + 1,
   init = NULL,
+  warn = TRUE,
   returnX = TRUE
 )
 }
@@ -40,13 +41,15 @@ plmm_fit(
 
 \item{max.iter}{Maximum number of iterations (total across entire path). Default is 10000.}
 
-\item{warn}{Return warning messages for failures to converge and model saturation? Default is TRUE.}
+\item{convex}{convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.}
+
+\item{dfmax}{(future idea; not yet incorporated) Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.}
 
 \item{init}{Initial values for coefficients. Default is 0 for all columns of X.}
 
-\item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
+\item{warn}{Return warning messages for failures to converge and model saturation? Default is TRUE.}
 
-\item{penalty.factor}{A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.}
+\item{returnX}{Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.}
 }
 \value{
 A list with these components:

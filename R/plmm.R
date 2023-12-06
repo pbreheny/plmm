@@ -163,13 +163,12 @@ plmm <- function(X,
                       eps = eps,
                       max.iter = max.iter,
                       warn = warn,
-                      init = init)
+                      init = init,
+                      convex = convex,
+                      dfmax = dfmax)
 
   if(trace){cat("\nBeta values are estimated -- almost done!")}
-  the_final_product <- plmm_format(fit = the_fit, 
-                                   convex = convex,
-                                   dfmax = dfmax, 
-                                   X = X)
+  the_final_product <- plmm_format(fit = the_fit, X = X)
   
   return(the_final_product)
   

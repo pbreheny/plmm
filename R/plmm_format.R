@@ -1,8 +1,6 @@
 #' PLMM format: a function to format the output of a model constructed with \code{plmm_fit}
 #'
 #' @param fit A list of parameters describing the output of a model constructed with \code{plmm_fit}
-#' @param convex convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
-#' @param dfmax (future idea; not yet incorporated) Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
 #' @param X Design matrix. May include clinical covariates and other non-SNP data. 
 #' 
 #' @return A list with the components: 
@@ -29,7 +27,6 @@
 #' }
 
 plmm_format <- function(fit,
-                        # dfmax = fit$p + 1, 
                         X){
   
   # give the matrix of beta_values readable names 
