@@ -6,7 +6,7 @@
 \usage{
 \method{predict}{list}(
   fit,
-  std_X,
+  oldX,
   newX,
   type = c("lp", "blup"),
   idx = 1:length(fit$lambda),
@@ -18,7 +18,7 @@
 \arguments{
 \item{fit}{A list with the components returned by \code{plmm_fit}.}
 
-\item{std_X}{The standardized design matrix of training data, \emph{pre-rotation}.}
+\item{oldX}{The standardized design matrix of training data, \emph{pre-rotation}.}
 
 \item{newX}{A design matrix used for computing predicted values (i.e, the test data).}
 

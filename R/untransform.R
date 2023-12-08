@@ -1,6 +1,6 @@
 #' Untransform coefficient values back to the original scale 
 #' 
-#' This function unwinds both steps of the standardization process to obtain
+#' This function unwinds the initial standardization of the data to obtain 
 #' coefficient values on their original scale. It is called by plmm_format().
 #' 
 #' @param untransformed_b1 The estimated coefficients on the standardized scale

@@ -168,7 +168,7 @@ plmm <- function(X,
                       dfmax = dfmax)
 
   if(trace){cat("\nBeta values are estimated -- almost done!")}
-  the_final_product <- plmm_format(fit = the_fit, X = X)
+  the_final_product <- plmm_format(prep = the_prep, fit = the_fit, X = X)
   
   return(the_final_product)
   

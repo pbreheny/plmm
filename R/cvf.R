@@ -41,7 +41,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   
   if(type == "lp"){
     yhat <- predict.list(fit = fit.i,
-                          std_X = cv.args$prep$std_X,
+                          oldX = cv.args$prep$std_X,
                           newX = test_X,
                           type = 'lp')
     # yhat <- matrix(data = drop(Xbeta), nrow = length(y_test)) 
@@ -53,7 +53,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
     V11 <- estimated_V[fold!=i, fold!=i, drop = FALSE] 
     
     yhat <- predict.list(fit = fit.i,
-                         std_X = cv.args$prep$std_X,
+                         oldX = cv.args$prep$std_X,
                          newX = test_X,
                          type = 'blup',
                          V11 = V11,

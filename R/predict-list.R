@@ -1,7 +1,7 @@
 #' Predict method for a list used in cross-validation (within \code{cvf})
 #'
 #' @param fit  A list with the components returned by `plmm_fit`. 
-#' @param std_X The standardized design matrix of training data, *pre-rotation*. 
+#' @param oldX The standardized design matrix of training data, *pre-rotation*. 
 #' @param newX A design matrix used for computing predicted values (i.e, the test data).
 #' @param type A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details. 
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.
@@ -21,7 +21,7 @@
 #'
 
 predict.list <- function(fit,
-                         std_X,
+                         oldX,
                          newX,
                          type=c("lp", "blup"),
                          idx=1:length(fit$lambda),
@@ -31,7 +31,7 @@ predict.list <- function(fit,
   type <- match.arg(type)
   # browser()
   # get beta values (for nonsingular features) from fit
-  beta_vals <- fit$beta_vals[,idx,drop = FALSE]
+  beta_vals <- fit$untransformed_b1[,idx,drop = FALSE]
   
   # format dim. names
   if(is.null(dim(beta_vals))) {
@@ -45,9 +45,8 @@ predict.list <- function(fit,
   # calculate the estimated mean values for test data 
   a <- beta_vals[1,]
   b <- beta_vals[-1,,drop=FALSE]
-  b_ns <- b[fit$ns,,drop=FALSE]
   
-  Xb <- sweep(newX %*% b_ns, 2, a, "+")
+  Xb <- sweep(newX %*% b, 2, a, "+")
   
   # for linear predictor, return mean values 
   if (type=="lp") return(drop(Xb))
@@ -58,7 +57,7 @@ predict.list <- function(fit,
     # browser()
     # test1 <- V21 %*% chol2inv(chol(V11)) # true 
     # TODO: to find the inverse of V11 using svd results of K, i.e., the inverse of a submatrix, might need to use Woodbury's formula 
-    Xb_train <- sweep(std_X %*% b_ns, 2, a, "+")
+    Xb_train <- sweep(oldX %*% b, 2, a, "+")
     resid_train <- (fit$y - Xb_train)
     ranef <- V21 %*% (chol2inv(chol(V11)) %*% resid_train)
     blup <- Xb + ranef

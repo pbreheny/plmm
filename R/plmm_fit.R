@@ -144,12 +144,10 @@ plmm_fit <- function(prep,
                                       penalty.factor = new.penalty.factor) else NULL
   
 
-  # reverse the POST-ROTATION standardization 
-  # create placeholder vector
-  untransformed_b1 <- beta_vals
-  
-  # un-scale the non-intercept values & fill in the placeholder
-  untransformed_b1[-1,] <- sweep(x = beta_vals[-1, , drop=FALSE],
+  # reverse the POST-ROTATION standardization on estimated betas  
+  untransformed_b1 <- b # create placeholder vector
+  untransformed_b1[-1,] <- sweep(x = b[-1, , drop=FALSE], 
+                                 # un-scale the non-intercept values & fill in the placeholder
                                  MARGIN = 1, # beta values are on rows 
                                  STATS = attr(stdrot_X, 'scale'),
                                  FUN = "/")
@@ -166,7 +164,7 @@ plmm_fit <- function(prep,
     rot_y = rot_y,
     stdrot_X = stdrot_X,
     lambda = lambda,
-    beta_vals = beta_vals,
+    b = b,
     untransformed_b1 = untransformed_b1,
     linear.predictors = linear.predictors,
     eta = prep$eta,
