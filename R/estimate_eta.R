@@ -5,17 +5,50 @@
 #' @param y Continuous outcome vector.
 #' @export
 #' @keywords internal
-estimate_eta <- function(s, U, y, eta_star){
-  # TODO: could also pass 'R' (the residuals... instead of y.)
+estimate_eta <- function(s, U, y){
+
+  # optimize over \hat\beta_0 and \eta
+  opt <- optim(par = c(0.1, 0.01),
+                  fn = null_model_nll,
+                  y = y,
+                  s = s,
+                  U = U,
+                  method = "BFGS")
   
-  # coercion
-  eta <- NULL
   
-  # estimate eta 
-  rot_y <- crossprod(U, y)
-  opt <- stats::optimize(f=log_lik, c(0.01, 0.99), rot_y=rot_y, s=s)
-  eta <- opt$minimum 
+  return(list(eta = opt$par[1],
+              beta0 = opt$par[2]))
+}
+
+#' a helper function for 2-dim optimization
+#' @param params A vector of 2 elements, corresponding to eta and beta0 
+#' The latter is the coefficient of the null model
+#' @param y A vector of outcomes 
+#' @param U The left singular vectors of data X 
+#' @param s the vector of singular values of data X 
+null_model_nl <- function(params, y, U, s){
+  
+  # name parameters
+  eta <- params[1]
+  beta0 <- params[2]
   
   
-  return(eta)
+  # create intercept (for null model, this is the only predictor)
+  intcpt <- rep(1, length(y))
+  
+  # get \Sigma^2_{-1/2} piece
+  w <- (eta * s + (1 - eta))^(-1/2)
+  wUt <- sweep(x = t(U), MARGIN = 1, STATS = w, FUN = "*")
+  rot_y <- wUt %*% y 
+  rot_intcpt <- wUt %*% intcpt
+  
+  # distribution of null model 
+  res <- dnorm(x = rot_y,
+        mean = rot_intcpt%*%beta0)
+  
+  # TODO: need one more step here; this function must return a scalar
+  # ret <- ?
+  
+  return(-1*ret) # want to use minimization in optim()
+
 }
