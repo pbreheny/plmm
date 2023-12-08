@@ -8,10 +8,13 @@
 estimate_eta <- function(s, U, y, eta_star){
   # TODO: could also pass 'R' (the residuals... instead of y.)
   
+  # calculate null model 
+  
   # coercion
   eta <- NULL
   
   # estimate eta 
+  # TODO: maybe use dnorm()?? 
   rot_y <- crossprod(U, y)
   opt <- stats::optimize(f=log_lik, c(0.01, 0.99), rot_y=rot_y, s=s)
   eta <- opt$minimum 

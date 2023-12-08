@@ -29,6 +29,15 @@
 plmm_format <- function(fit,
                         X){
   
+  # reverse the transformations of the beta values 
+  if(prep$trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
+  
+  # get beta values back in original scale; reverse the PRE-ROTATION standardization 
+  untransformed_b2 <- untransform(untransformed_b1 = fit$untransformed_b1,
+                                  ns = fit$ns,
+                                  std_X_details = fit$std_X_details,
+                                  p = fit$p)
+  
   # give the matrix of beta_values readable names 
   # SNPs (or covariates) on the rows, lambda values on the columns
   varnames <- c("(Intercept)", fit$snp_names)
@@ -37,7 +46,8 @@ plmm_format <- function(fit,
   colnames(fit$linear.predictors) <- lamNames(fit$lambda)
 
   ## output
-  val <- structure(list(beta_vals = fit$beta_vals,
+  val <- structure(list(beta_vals = untransformed_b2,
+                        rotated_scale_beta_vals = fit$untransformed_b1,
                         lambda = fit$lambda,
                         eta = fit$eta,
                         s = fit$s,

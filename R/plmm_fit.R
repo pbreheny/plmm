@@ -143,21 +143,23 @@ plmm_fit <- function(prep,
                                       family = 'gaussian',
                                       penalty.factor = new.penalty.factor) else NULL
   
-  # reverse the transformations of the beta values 
-  if(prep$trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
 
-  beta_vals <- untransform(res_b = b,
-                           ns = prep$ns,
-                           p = prep$p,
-                           std_X_details = prep$std_X_details,
-                           rot_X = rot_X,
-                           stdrot_X = stdrot_X)
+  # reverse the POST-ROTATION standardization 
+  # create placeholder vector
+  untransformed_b1 <- beta_vals
+  
+  # un-scale the non-intercept values & fill in the placeholder
+  untransformed_b1[-1,] <- sweep(x = beta_vals[-1, , drop=FALSE],
+                                 MARGIN = 1, # beta values are on rows 
+                                 STATS = attr(stdrot_X, 'scale'),
+                                 FUN = "/")
   
   
   ret <- structure(list(
     y = prep$y,
     p = prep$p, 
     n = prep$n, 
+    std_X_details = prep$std_X_details,
     s = prep$s,
     U = prep$U,
     rot_X = rot_X,
@@ -165,6 +167,7 @@ plmm_fit <- function(prep,
     stdrot_X = stdrot_X,
     lambda = lambda,
     beta_vals = beta_vals,
+    untransformed_b1 = untransformed_b1,
     linear.predictors = linear.predictors,
     eta = prep$eta,
     iter = iter,
