@@ -63,7 +63,7 @@ plmm_fit <- function(prep,
   
   # estimate eta if needed
   if (is.null(prep$eta)) {
-    eta <- estimate_eta(s = prep$s, U = prep$U, y = prep$y) 
+    eta <- estimate_eta(s = prep$s, U = prep$U, y = prep$y)$eta 
   } else {
     # otherwise, use the user-supplied value (this is mainly for simulation)
     eta <- prep$eta

@@ -16,7 +16,7 @@ estimate_eta <- function(s, U, y){
                   method = "BFGS")
   
   
-  return(list(eta = opt$par[1],
+  return(list(eta = c(opt$par[1]),
               beta0 = opt$par[2]))
 }
 
@@ -26,7 +26,9 @@ estimate_eta <- function(s, U, y){
 #' @param y A vector of outcomes 
 #' @param U The left singular vectors of data X 
 #' @param s the vector of singular values of data X 
-null_model_nl <- function(params, y, U, s){
+#' 
+#' @keywords internal
+null_model_nll <- function(params, y, U, s){
   
   # name parameters
   eta <- params[1]
@@ -41,13 +43,16 @@ null_model_nl <- function(params, y, U, s){
   wUt <- sweep(x = t(U), MARGIN = 1, STATS = w, FUN = "*")
   rot_y <- wUt %*% y 
   rot_intcpt <- wUt %*% intcpt
-  
+  # browser()
+  # wUt_svd <- tcrossprod(wUt) |> svd()
   # distribution of null model 
-  res <- dnorm(x = rot_y,
-        mean = rot_intcpt%*%beta0)
+  res <- mvtnorm::dmvnorm(x = drop(rot_y),
+               mean = drop(rot_intcpt*beta0),
+               sigma = tcrossprod(wUt),
+               log = TRUE)
   
   # TODO: need one more step here; this function must return a scalar
-  # ret <- ?
+  ret <- sum(res)
   
   return(-1*ret) # want to use minimization in optim()
 
