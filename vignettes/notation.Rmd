@@ -51,9 +51,11 @@ $$ where:
 
 -   $\dot{\boldsymbol{\beta}}$ represents the coefficients on the standardized scale.
 
--   $\mathbf{Z}$ is a $n \times b$ matrix of indicators corresponding to a grouping structure, and $\boldsymbol{\gamma}$ is the vector of values describing how each grouping is associated with $\mathbf{y}$. In real data, these values often unknown.
+-   $\mathbf{Z}$ is a $n \times b$ matrix of indicators corresponding to a grouping structure, and $\boldsymbol{\gamma}$ is the vector of values describing how each grouping is associated with $\mathbf{y}$. In real data, these values typically unknown.
 
 -   $\boldsymbol{\epsilon}$ is the $n \times 1$ vector of noise.
+
+We define the realized (or empirical) relatedness matrix as $\mathbf{K} \equiv \frac{1}{p}\dot{\mathbf{X}}\dot{\mathbf{X}}^\top$
 
 This model assumes:
 
@@ -61,7 +63,7 @@ This model assumes:
 -   $\boldsymbol{\epsilon} \sim N(0, \sigma^2_{\epsilon}\mathbf{I})$
 -   $\mathbf{u} \sim N(0, \sigma^2_{s}\mathbf{K})$
 
-Under these assumptions, we may write $\mathbf{y} \sim N(\mathbf{X}\boldsymbol{\beta}, \boldsymbol{\Sigma})$
+Under these assumptions, we may write $\mathbf{y} \sim N(\dot{\mathbf{X}}\dot{\boldsymbol{\beta}}, \boldsymbol{\Sigma})$
 
 **Indices**:
 
@@ -71,15 +73,15 @@ Under these assumptions, we may write $\mathbf{y} \sim N(\mathbf{X}\boldsymbol{\
 
 ### Decomposition and rotation (prep and first part of fit)
 
--   Beginning with a singular value decomposition, we have $\mathbf{U}$ and $\mathbf{d}$ are the right singular vectors and singular values of $\mathbf{X}$, as one would obtain from the singular value decomposition (SVD), i.e. $\text{svd}(\mathbf{X)} \equiv \mathbf{U}\mathbf{D}\mathbf{V}^\top$. The elements of $\mathbf{d}$ are the diagonal values of $\mathbf{D}$. Note, random effect $\mathbf{u}$ is distinct from the columns of matrix $\mathbf{U}$.
+-   Beginning with a singular value decomposition, we have $\mathbf{U}$ and $\mathbf{d}$ are the right singular vectors and singular values of $\dot{\mathbf{X}}$, as one would obtain from the singular value decomposition (SVD), i.e. $\text{svd}(\mathbf{X)} \equiv \mathbf{U}\mathbf{D}\mathbf{V}^\top$. The elements of $\mathbf{d}$ are the diagonal values of $\mathbf{D}$. Note, random effect $\mathbf{u}$ is distinct from the columns of matrix $\mathbf{U}$.
 
 -   $k$ represents the number of nonzero eigenvalues represented in $\mathbf{U}$ and $\mathbf{d}$, so $k \leq \text{min}(n,p)$.
 
 -   $\mathbf{S} \equiv \frac{1}{p}\mathbf{D}^2$ is the $k \times k$ diagonal matrix whose diagonal values are $\frac{d_k^2}{p}$.
 
--   $\mathbf{K} \equiv \frac{1}{p}\dot{\mathbf{X}}\dot{\mathbf{X}}^{\top}$, which is often referred to in the literature as the realized relatedness matrix (RRM). $\mathbf{K}$ has dimension $n \times n$. Note that $\mathbf{K}$ can be obtained from the SVD of $\mathbf{X}$, i.e., $\mathbf{U}\mathbf{S}\mathbf{U}^{\top}$, where $\mathbf{S}$ is the diagonal matrix whose diagonal values are $\frac{d_k^2}{p}$.
+-   Again, $\mathbf{K} \equiv \frac{1}{p}\dot{\mathbf{X}}\dot{\mathbf{X}}^{\top}$is often referred to in the literature as the realized relatedness matrix (RRM) or genomic relatedness matrix (GRM). $\mathbf{K}$ has dimension $n \times n$. Note that $\mathbf{K}$ can be obtained from the SVD of $\dot{\mathbf{X}}$, i.e., $\mathbf{U}\mathbf{S}\mathbf{U}^{\top}$, where $\mathbf{S}$ is the diagonal matrix whose diagonal values are $\frac{d_k^2}{p}$.
 
--   $\eta$ is the ratio $\frac{\sigma^2_s}{\sigma^2_e + \sigma^2_s}$. Conceptually, this is the proportion of the variance of $\mathbf{y}$ attributable to additive genetic factors, commonly referred to as the *narrow-sense heritability*. The parameter $\eta$ also describes the data-generating model's signal to noise ratio (SNR).
+-   $\eta$ is the ratio $\frac{\sigma^2_s}{\sigma^2_e + \sigma^2_s}$. We estimate $\hat{\eta}$ from a null model (more details to come).
 
 -   $\mathbf{\Sigma}$ is the variance of the outcome, where $\mathbb{V}({\mathbf{y}}) = \eta \mathbf{K} + (1 - \eta)\mathbf{I}_n$.
 
@@ -87,15 +89,15 @@ Under these assumptions, we may write $\mathbf{y} \sim N(\mathbf{X}\boldsymbol{\
 
 -   The matrix to be used in rotating ( or *preconditioning*) the data is $\mathbf{\Sigma}^{-1/2} \equiv \mathbf{W}\mathbf{U}^\top$.
 
--   $\tilde{\dot{\mathbf{X}}} \equiv \mathbf{W}\mathbf{U}^\top\mathbf{X}$ is the rotated data, or the data on the transformed scale.
+-   $\tilde{\dot{\mathbf{X}}} \equiv \mathbf{W}\mathbf{U}^\top\dot{\mathbf{X}}$ is the rotated data, or the data on the transformed scale.
 
 -   $\tilde{\mathbf{y}} \equiv \mathbf{\Sigma}^{-1/2}\mathbf{y}$ is the outcome on the rotated scale.
 
--   $\ddot{\tilde{\mathbf{X}}}$ is the **standardized** rotated data. Note: This standardization involves scaling, but not centering.
+-   $\ddot{\tilde{\mathbf{X}}}$ is the **standardized** rotated data. Note: This standardization involves scaling, but not centering. This post-rotation standardization impacts the estimated coefficients as well; we define ${\ddot{\boldsymbol{\beta}}}$ as the estimated coefficients on this scale.
 
 ### Model fitting with penalization
 
-We fit $\tilde{\mathbf{y}} \sim \ddot{\tilde{\mathbf{X}}} \hat{\ddot{\boldsymbol{\beta}}}$ using a penalized linear mixed model. The penalty parameter values (e.g., values of the lasso tuning parameter) are indexed by $\lambda_l \in 1,..., t$.
+We fit $\tilde{\mathbf{y}} \sim \ddot{\tilde{\mathbf{X}}}$ using a penalized linear mixed model, and obtain $\hat{\ddot{\boldsymbol{\beta}}}$ as our estimated coefficients. The penalty parameter values (e.g., values of the lasso tuning parameter) are indexed by $\lambda_l \in 1,..., t$.
 
 ### Rescaling results (format)
 
