@@ -88,14 +88,10 @@ letters</li>
 <li>Vectors are denoted with <strong>boldface</strong> lowercase
 letters</li>
 <li>Scalar values and indices are denoted with lowercase letters</li>
-<li>the <span class="math inline">\(\bar{}\)</span> modifier indicates
+<li>the <span class="math inline">\(\dot{}\)</span> modifier indicates
 (column) standardization</li>
 <li>the <span class="math inline">\(\tilde{}\)</span> modifier indicates
 rotation</li>
-<li>the <span class="math inline">\(\dot{}\)</span> modifier indicates
-scaled pre-rotation</li>
-<li>the <span class="math inline">\(\ddot{}\)</span> modifier indicates
-scaled post-rotation</li>
 </ul>
 <div class="section level2">
 <h2 id="math-notation">Math notation<a class="anchor" aria-label="anchor" href="#math-notation"></a>
@@ -108,12 +104,12 @@ steps of the model fitting process.</p>
 </h3>
 <p>The overall model can be written as</p>
 <p><span class="math display">\[
-\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{Z}\mathbf{g} +
-\boldsymbol{\epsilon}
+\mathbf{y} = \mathbf{X}\boldsymbol{\beta} +
+\mathbf{Z}\boldsymbol{\gamma} + \boldsymbol{\epsilon}
 \]</span></p>
 <p>or equivalently as <span class="math display">\[
-\mathbf{y} = \bar{\mathbf{X}}\dot{\boldsymbol{\beta}} +
-\boldsymbol{\gamma} + \boldsymbol{\epsilon}
+\mathbf{y} = \dot{\mathbf{X}}\dot{\boldsymbol{\beta}} + \mathbf{u} +
+\boldsymbol{\epsilon}
 \]</span> where:</p>
 <ul>
 <li><p><span class="math inline">\(\mathbf{X}\)</span> and <span class="math inline">\(\mathbf{y}\)</span> are the <span class="math inline">\(n \times p\)</span> design matrix of our data and
@@ -123,30 +119,34 @@ of <em>observations</em> (e.g., number of patients, number of samples,
 etc.) and <span class="math inline">\(p\)</span> is the number of
 <em>features</em> (e.g., number of SNPs, number of variables, number of
 covariates, etc.).</p></li>
-<li><p><span class="math inline">\(\bar{\mathbf{X}}\)</span> is the
+<li><p><span class="math inline">\(\dot{\mathbf{X}}\)</span> is the
 column-standardized <span class="math inline">\(\mathbf{X}\)</span>, in
 which each of the <span class="math inline">\(p\)</span> columns has
-mean 0 and standard deviation 1.</p></li>
+mean 0 and standard deviation 1. Note: <span class="math inline">\(\dot{\mathbf{X}}\)</span> excludes any singular
+features (columns of constants) in the original <span class="math inline">\(\mathbf{X}\)</span>.</p></li>
 <li><p><span class="math inline">\(\dot{\boldsymbol{\beta}}\)</span>
 represents the coefficients on the standardized scale.</p></li>
 <li><p><span class="math inline">\(\mathbf{Z}\)</span> is a <span class="math inline">\(n \times b\)</span> matrix of indicators
-corresponding to a grouping structure, and <span class="math inline">\(\mathbf{g}\)</span> is the vector of values
-describing how each grouping is associated with <span class="math inline">\(\mathbf{y}\)</span>. In real data, these values
-often unknown.</p></li>
+corresponding to a grouping structure, and <span class="math inline">\(\boldsymbol{\gamma}\)</span> is the vector of
+values describing how each grouping is associated with <span class="math inline">\(\mathbf{y}\)</span>. In real data, these values
+typically unknown.</p></li>
 <li><p><span class="math inline">\(\boldsymbol{\epsilon}\)</span> is the
 <span class="math inline">\(n \times 1\)</span> vector of
 noise.</p></li>
 </ul>
+<p>We define the realized (or empirical) relatedness matrix as <span class="math inline">\(\mathbf{K} \equiv
+\frac{1}{p}\dot{\mathbf{X}}\dot{\mathbf{X}}^\top\)</span></p>
 <p>This model assumes:</p>
 <ul>
 <li><span class="math inline">\(\boldsymbol{\epsilon} \perp
-\boldsymbol{\gamma}\)</span></li>
+\mathbf{u}\)</span></li>
 <li><span class="math inline">\(\boldsymbol{\epsilon} \sim N(0,
 \sigma^2_{\epsilon}\mathbf{I})\)</span></li>
-<li><span class="math inline">\(\boldsymbol{\gamma} \sim N(0,
+<li><span class="math inline">\(\mathbf{u} \sim N(0,
 \sigma^2_{s}\mathbf{K})\)</span></li>
 </ul>
-<p>Under these assumptions, we may write <span class="math inline">\(\mathbf{y} \sim N(\mathbf{X}\boldsymbol{\beta},
+<p>Under these assumptions, we may write <span class="math inline">\(\mathbf{y} \sim
+N(\dot{\mathbf{X}}\dot{\boldsymbol{\beta}},
 \boldsymbol{\Sigma})\)</span></p>
 <p><strong>Indices</strong>:</p>
 <ul>
@@ -167,28 +167,27 @@ etc.)</li>
 </h3>
 <ul>
 <li><p>Beginning with a singular value decomposition, we have <span class="math inline">\(\mathbf{U}\)</span> and <span class="math inline">\(\mathbf{d}\)</span> are the right singular vectors
-and singular values of <span class="math inline">\(\mathbf{X}\)</span>,
-as one would obtain from the singular value decomposition (SVD),
-i.e. <span class="math inline">\(\text{svd}(\mathbf{X)} \equiv
+and singular values of <span class="math inline">\(\dot{\mathbf{X}}\)</span>, as one would obtain
+from the singular value decomposition (SVD), i.e. <span class="math inline">\(\text{svd}(\mathbf{X)} \equiv
 \mathbf{U}\mathbf{D}\mathbf{V}^\top\)</span>. The elements of <span class="math inline">\(\mathbf{d}\)</span> are the diagonal values of
-<span class="math inline">\(\mathbf{D}\)</span>.</p></li>
+<span class="math inline">\(\mathbf{D}\)</span>. Note, random effect
+<span class="math inline">\(\mathbf{u}\)</span> is distinct from the
+columns of matrix <span class="math inline">\(\mathbf{U}\)</span>.</p></li>
 <li><p><span class="math inline">\(k\)</span> represents the number of
 nonzero eigenvalues represented in <span class="math inline">\(\mathbf{U}\)</span> and <span class="math inline">\(\mathbf{d}\)</span>, so <span class="math inline">\(k \leq \text{min}(n,p)\)</span>.</p></li>
 <li><p><span class="math inline">\(\mathbf{S} \equiv
 \frac{1}{p}\mathbf{D}^2\)</span> is the <span class="math inline">\(k
 \times k\)</span> diagonal matrix whose diagonal values are <span class="math inline">\(\frac{d_k^2}{p}\)</span>.</p></li>
-<li><p><span class="math inline">\(\mathbf{K} \equiv
-\frac{1}{p}\mathbf{X}\mathbf{X}^{\top}\)</span>, which is often referred
-to in the literature as the realized relatedness matrix (RRM). <span class="math inline">\(\mathbf{K}\)</span> has dimension <span class="math inline">\(n \times n\)</span>. Note that <span class="math inline">\(\mathbf{K}\)</span> can be obtained from the SVD
-of <span class="math inline">\(\mathbf{X}\)</span>, i.e., <span class="math inline">\(\mathbf{U}\mathbf{S}\mathbf{U}^{\top}\)</span>,
+<li><p>Again, <span class="math inline">\(\mathbf{K} \equiv
+\frac{1}{p}\dot{\mathbf{X}}\dot{\mathbf{X}}^{\top}\)</span>is often
+referred to in the literature as the realized relatedness matrix (RRM)
+or genomic relatedness matrix (GRM). <span class="math inline">\(\mathbf{K}\)</span> has dimension <span class="math inline">\(n \times n\)</span>. Note that <span class="math inline">\(\mathbf{K}\)</span> can be obtained from the SVD
+of <span class="math inline">\(\dot{\mathbf{X}}\)</span>, i.e., <span class="math inline">\(\mathbf{U}\mathbf{S}\mathbf{U}^{\top}\)</span>,
 where <span class="math inline">\(\mathbf{S}\)</span> is the diagonal
 matrix whose diagonal values are <span class="math inline">\(\frac{d_k^2}{p}\)</span>.</p></li>
 <li><p><span class="math inline">\(\eta\)</span> is the ratio <span class="math inline">\(\frac{\sigma^2_s}{\sigma^2_e +
-\sigma^2_s}\)</span>. Conceptually, this is the proportion of the
-variance of <span class="math inline">\(\mathbf{y}\)</span> attributable
-to additive genetic factors, commonly referred to as the
-<em>narrow-sense heritability</em>. The parameter <span class="math inline">\(\eta\)</span> also describes the data-generating
-model’s signal to noise ratio (SNR).</p></li>
+\sigma^2_s}\)</span>. We estimate <span class="math inline">\(\hat{\eta}\)</span> from a null model (more
+details to come).</p></li>
 <li><p><span class="math inline">\(\mathbf{\Sigma}\)</span> is the
 variance of the outcome, where <span class="math inline">\(\mathbb{V}({\mathbf{y}}) = \eta \mathbf{K} + (1 -
 \eta)\mathbf{I}_n\)</span>.</p></li>
@@ -200,24 +199,28 @@ diagonal matrix <span class="math inline">\(\mathbf{W} \equiv
 <li><p>The matrix to be used in rotating ( or <em>preconditioning</em>)
 the data is <span class="math inline">\(\mathbf{\Sigma}^{-1/2} \equiv
 \mathbf{W}\mathbf{U}^\top\)</span>.</p></li>
-<li><p><span class="math inline">\(\tilde{\mathbf{X}} \equiv
-\mathbf{W}\mathbf{U}^\top\mathbf{X}\)</span> is the rotated data, or the
-data on the transformed scale.</p></li>
+<li><p><span class="math inline">\(\tilde{\dot{\mathbf{X}}} \equiv
+\mathbf{W}\mathbf{U}^\top\dot{\mathbf{X}}\)</span> is the rotated data,
+or the data on the transformed scale.</p></li>
 <li><p><span class="math inline">\(\tilde{\mathbf{y}} \equiv
 \mathbf{\Sigma}^{-1/2}\mathbf{y}\)</span> is the outcome on the rotated
 scale.</p></li>
-<li><p><span class="math inline">\(\bar{\tilde{\mathbf{X}}}\)</span> is
+<li><p><span class="math inline">\(\ddot{\tilde{\mathbf{X}}}\)</span> is
 the <strong>standardized</strong> rotated data. Note: This
-standardization involves scaling, but not centering.</p></li>
+standardization involves scaling, but not centering. This post-rotation
+standardization impacts the estimated coefficients as well; we define
+<span class="math inline">\({\ddot{\boldsymbol{\beta}}}\)</span> as the
+estimated coefficients on this scale.</p></li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="model-fitting-with-penalization">Model fitting with penalization<a class="anchor" aria-label="anchor" href="#model-fitting-with-penalization"></a>
 </h3>
 <p>We fit <span class="math inline">\(\tilde{\mathbf{y}} \sim
-\bar{\tilde{\mathbf{X}}} \ddot{\hat{\boldsymbol{\beta}}}\)</span> using
-a penalized linear mixed model. The penalty parameter values (e.g.,
-values of the lasso tuning parameter) are indexed by <span class="math inline">\(\lambda_l \in 1,..., t\)</span>.</p>
+\ddot{\tilde{\mathbf{X}}}\)</span> using a penalized linear mixed model,
+and obtain <span class="math inline">\(\hat{\ddot{\boldsymbol{\beta}}}\)</span> as our
+estimated coefficients. The penalty parameter values (e.g., values of
+the lasso tuning parameter) are indexed by <span class="math inline">\(\lambda_l \in 1,..., t\)</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="rescaling-results-format">Rescaling results (format)<a class="anchor" aria-label="anchor" href="#rescaling-results-format"></a>
@@ -226,8 +229,8 @@ values of the lasso tuning parameter) are indexed by <span class="math inline">\
 values estimated by the model must be unscaled (or ‘untransformed’)
 twice: once to adjust for the post-rotation standardization, and again
 to adjust for the pre-rotation standardization. This process could be
-written <span class="math inline">\(\ddot{\hat{\boldsymbol{\beta}}}
-\rightarrow \dot{\hat{\boldsymbol{\beta}}} \rightarrow
+written <span class="math inline">\(\hat{\ddot{\boldsymbol{\beta}}}
+\rightarrow \hat{\dot{\boldsymbol{\beta}}} \rightarrow
 \hat{\boldsymbol{\beta}}\)</span>.</p>
 </div>
 </div>
@@ -238,13 +241,13 @@ written <span class="math inline">\(\ddot{\hat{\boldsymbol{\beta}}}
 <ul>
 <li><p><span class="math inline">\(\mathbf{X}\)</span> and <span class="math inline">\(\mathbf{y}\)</span> are <code>X</code> and
 <code>y</code></p></li>
-<li><p><span class="math inline">\(\bar{\mathbf{X}}\)</span> is
+<li><p><span class="math inline">\(\dot{\mathbf{X}}\)</span> is
 <code>std_X</code></p></li>
-<li><p><span class="math inline">\(\tilde{\mathbf{X}}\)</span> is
+<li><p><span class="math inline">\(\tilde{\dot{\mathbf{X}}}\)</span> is
 <code>rot_X</code></p></li>
-<li><p><span class="math inline">\(\bar{\tilde{\mathbf{X}}}\)</span> is
+<li><p><span class="math inline">\(\ddot{\tilde{\mathbf{X}}}\)</span> is
 <code>stdrot_X</code></p></li>
-<li><p><span class="math inline">\(\mathbf{X}\boldsymbol{\beta}\)</span>
+<li><p><span class="math inline">\(\dot{\mathbf{X}}\dot{\boldsymbol{\beta}}\)</span>
 is <code>Xb</code></p></li>
 </ul>
 </div>
