@@ -1,5 +1,5 @@
 #' PLMM format: a function to format the output of a model constructed with \code{plmm_fit}
-#'
+#' 
 #' @param fit A list of parameters describing the output of a model constructed with \code{plmm_fit}
 #' @param X Design matrix. May include clinical covariates and other non-SNP data. 
 #' 
@@ -15,21 +15,11 @@
 #' 
 #' @keywords internal
 #'
-#' @examples
-#' 
-#' \dontrun{
-#' # NB: this is an internal function (i.e. it's not exported)
-#' # these examples won't work unless you have plmm::: 
-#' prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
-#' fit1 <- plmm_fit(prep = prep1)
-#' res1 <- plmm_format(fit1)
-#' 
-#' }
 
-plmm_format <- function(prep, fit, X){
+plmm_format <- function(fit, X){
   
   # reverse the transformations of the beta values 
-  if(prep$trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
+  if(fit$trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   
   # get beta values back in original scale; reverse the PRE-ROTATION standardization 
   untransformed_b2 <- untransform(untransformed_b1 = fit$untransformed_b1,
