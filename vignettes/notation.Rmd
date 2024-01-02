@@ -19,107 +19,100 @@ library(plmm)
 library(rmarkdown)
 ```
 
-The purpose of this short vignette is to document the notation conventions for the math and programming related to PLMM. We begin with the math, and then translate our math notation into naming objects in our source code. 
+The purpose of this short vignette is to document the notation conventions for the math and programming related to PLMM. We begin with the math, and then translate our math notation into naming objects in our source code.
 
-Throughout this document, the reader will notice some notation conventions: 
+Throughout this document, the reader will notice some notation conventions:
 
-  - Matrices are denoted with **boldface**, UPPERCASE letters
-  - Vectors are denoted with **boldface** lowercase letters
-  - Scalar values and indices are denoted with lowercase letters
-  - the $\bar{}$ modifier indicates (column) standardization
-  - the $\tilde{}$ modifier indicates rotation
-  - the $\dot{}$ modifier indicates scaled pre-rotation
-  - the $\ddot{}$ modifier indicates scaled post-rotation
-  
+-   Matrices are denoted with **boldface**, UPPERCASE letters
+-   Vectors are denoted with **boldface** lowercase letters
+-   Scalar values and indices are denoted with lowercase letters
+-   the $\dot{}$ modifier indicates (column) standardization
+-   the $\tilde{}$ modifier indicates rotation
 
-## Math notation 
-Here are the concepts we need to denote, in order of their usage in our derivations. I have blocked these into sections corresponding to the steps of the model fitting process. 
+## Math notation
+
+Here are the concepts we need to denote, in order of their usage in our derivations. I have blocked these into sections corresponding to the steps of the model fitting process.
 
 ### Statistical model (the overall framework)
 
-The overall model can be written as 
+The overall model can be written as
 
 $$
-\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{Z}\mathbf{g} + \boldsymbol{\epsilon}
+\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{Z}\boldsymbol{\gamma} + \boldsymbol{\epsilon}
 $$
 
-or equivalently as 
-$$
-\mathbf{y} = \bar{\mathbf{X}}\dot{\boldsymbol{\beta}} + \boldsymbol{\gamma} + \boldsymbol{\epsilon}
-$$
-where: 
+or equivalently as $$
+\mathbf{y} = \dot{\mathbf{X}}\dot{\boldsymbol{\beta}} + \mathbf{u} + \boldsymbol{\epsilon}
+$$ where:
 
-  - $\mathbf{X}$ and $\mathbf{y}$ are the $n \times p$ design matrix of our data and the $n \times 1$ vector of outcomes, respectively. Here, $n$ is the number of *observations* (e.g., number of patients, number of samples, etc.) and $p$ is the number of *features* (e.g., number of SNPs, number of variables, number of covariates, etc.). 
-  
-  - $\bar{\mathbf{X}}$ is the column-standardized $\mathbf{X}$, in which each of the $p$ columns has mean 0 and standard deviation 1. 
-  
-  - $\dot{\boldsymbol{\beta}}$ represents the coefficients on the standardized scale.
-  
-  - $\mathbf{Z}$ is a $n \times b$ matrix of indicators corresponding to a grouping structure, and $\mathbf{g}$ is the vector of values describing how each grouping is associated with $\mathbf{y}$. In real data, these values often unknown. 
-  
-  - $\boldsymbol{\epsilon}$ is the $n \times 1$ vector of noise. 
-  
-This model assumes: 
+-   $\mathbf{X}$ and $\mathbf{y}$ are the $n \times p$ design matrix of our data and the $n \times 1$ vector of outcomes, respectively. Here, $n$ is the number of *observations* (e.g., number of patients, number of samples, etc.) and $p$ is the number of *features* (e.g., number of SNPs, number of variables, number of covariates, etc.).
 
-  - $\boldsymbol{\epsilon} \perp \boldsymbol{\gamma}$
-  - $\boldsymbol{\epsilon} \sim N(0, \sigma^2_{\epsilon}\mathbf{I})$
-  - $\boldsymbol{\gamma} \sim N(0, \sigma^2_{s}\mathbf{K})$
-  
-  
-Under these assumptions, we may write $\mathbf{y} \sim N(\mathbf{X}\boldsymbol{\beta}, \boldsymbol{\Sigma})$
-  
-**Indices**: 
+-   $\dot{\mathbf{X}}$ is the column-standardized $\mathbf{X}$, in which each of the $p$ columns has mean 0 and standard deviation 1. Note: $\dot{\mathbf{X}}$ excludes any singular features (columns of constants) in the original $\mathbf{X}$.
 
-  - $i \in 1,..., n$ indexes observations 
-  - $j \in 1,..., p$ indexes features
-  - $h \in 1,..., b$ indexes the batches (e.g., different family groups, different data collection sites, etc.)
-  
+-   $\dot{\boldsymbol{\beta}}$ represents the coefficients on the standardized scale.
+
+-   $\mathbf{Z}$ is a $n \times b$ matrix of indicators corresponding to a grouping structure, and $\boldsymbol{\gamma}$ is the vector of values describing how each grouping is associated with $\mathbf{y}$. In real data, these values typically unknown.
+
+-   $\boldsymbol{\epsilon}$ is the $n \times 1$ vector of noise.
+
+We define the realized (or empirical) relatedness matrix as $\mathbf{K} \equiv \frac{1}{p}\dot{\mathbf{X}}\dot{\mathbf{X}}^\top$
+
+This model assumes:
+
+-   $\boldsymbol{\epsilon} \perp \mathbf{u}$
+-   $\boldsymbol{\epsilon} \sim N(0, \sigma^2_{\epsilon}\mathbf{I})$
+-   $\mathbf{u} \sim N(0, \sigma^2_{s}\mathbf{K})$
+
+Under these assumptions, we may write $\mathbf{y} \sim N(\dot{\mathbf{X}}\dot{\boldsymbol{\beta}}, \boldsymbol{\Sigma})$
+
+**Indices**:
+
+-   $i \in 1,..., n$ indexes observations
+-   $j \in 1,..., p$ indexes features
+-   $h \in 1,..., b$ indexes the batches (e.g., different family groups, different data collection sites, etc.)
+
 ### Decomposition and rotation (prep and first part of fit)
 
-  - Beginning with a singular value decomposition, we have $\mathbf{U}$ and $\mathbf{d}$ are the right singular vectors and singular values of $\mathbf{X}$, as one would obtain from the singular value decomposition (SVD), i.e. $\text{svd}(\mathbf{X)} \equiv \mathbf{U}\mathbf{D}\mathbf{V}^\top$. The elements of $\mathbf{d}$ are the diagonal values of $\mathbf{D}$.
-  
-  - $k$ represents the number of nonzero eigenvalues represented in $\mathbf{U}$ and $\mathbf{d}$, so $k \leq \text{min}(n,p)$. 
-  
-  - $\mathbf{S} \equiv \frac{1}{p}\mathbf{D}^2$ is the $k \times k$ diagonal matrix whose diagonal values are $\frac{d_k^2}{p}$.
-  
-  - $\mathbf{K} \equiv \frac{1}{p}\mathbf{X}\mathbf{X}^{\top}$, which is often referred to in the literature as the realized relatedness matrix (RRM). $\mathbf{K}$ has dimension $n \times n$. Note that $\mathbf{K}$ can be obtained from the SVD of $\mathbf{X}$, i.e., $\mathbf{U}\mathbf{S}\mathbf{U}^{\top}$, where $\mathbf{S}$ is the diagonal matrix whose diagonal values are $\frac{d_k^2}{p}$. 
-  
-  - $\eta$ is the ratio $\frac{\sigma^2_s}{\sigma^2_e + \sigma^2_s}$. Conceptually, this is the proportion of the variance of $\mathbf{y}$ attributable to additive genetic factors, commonly referred to as the *narrow-sense heritability*. The parameter $\eta$ also describes the data-generating model’s signal to noise ratio (SNR). 
-  
-  - $\mathbf{\Sigma}$ is the variance of the outcome, where $\mathbb{V}({\mathbf{y}}) = \eta \mathbf{K} + (1 - \eta)\mathbf{I}_n$. 
-  
-  - $\mathbf{w}$ is the vector of weights defined as $(\eta\mathbf{\mathbf{s}} + (1-\eta))^{-1/2}$. The values in $\mathbf{w}$ are the nonzero values of the diagonal matrix $\mathbf{W} \equiv (\eta\mathbf{S} + (1 - \eta)\mathbf{I})^{-1/2}$. 
-  
-  - The matrix to be used in rotating ( or *preconditioning*) the data is $\mathbf{\Sigma}^{-1/2} \equiv \mathbf{W}\mathbf{U}^\top$.
-  
-  - $\tilde{\mathbf{X}} \equiv \mathbf{W}\mathbf{U}^\top\mathbf{X}$ is the rotated data, or the data on the transformed scale. 
-  
-  - $\tilde{\mathbf{y}} \equiv \mathbf{\Sigma}^{-1/2}\mathbf{y}$ is the outcome on the rotated scale. 
-  
-  - $\bar{\tilde{\mathbf{X}}}$ is the **standardized** rotated data. Note: This standardization involves scaling, but not centering. 
-  
-  
-### Model fitting with penalization  
+-   Beginning with a singular value decomposition, we have $\mathbf{U}$ and $\mathbf{d}$ are the right singular vectors and singular values of $\dot{\mathbf{X}}$, as one would obtain from the singular value decomposition (SVD), i.e. $\text{svd}(\mathbf{X)} \equiv \mathbf{U}\mathbf{D}\mathbf{V}^\top$. The elements of $\mathbf{d}$ are the diagonal values of $\mathbf{D}$. Note, random effect $\mathbf{u}$ is distinct from the columns of matrix $\mathbf{U}$.
 
-We fit $\tilde{\mathbf{y}} \sim \bar{\tilde{\mathbf{X}}} \ddot{\hat{\boldsymbol{\beta}}}$ using a penalized linear mixed model. The penalty parameter values (e.g., values of the lasso tuning parameter) are indexed by $\lambda_l \in 1,..., t$.  
+-   $k$ represents the number of nonzero eigenvalues represented in $\mathbf{U}$ and $\mathbf{d}$, so $k \leq \text{min}(n,p)$.
+
+-   $\mathbf{S} \equiv \frac{1}{p}\mathbf{D}^2$ is the $k \times k$ diagonal matrix whose diagonal values are $\frac{d_k^2}{p}$.
+
+-   Again, $\mathbf{K} \equiv \frac{1}{p}\dot{\mathbf{X}}\dot{\mathbf{X}}^{\top}$is often referred to in the literature as the realized relatedness matrix (RRM) or genomic relatedness matrix (GRM). $\mathbf{K}$ has dimension $n \times n$. Note that $\mathbf{K}$ can be obtained from the SVD of $\dot{\mathbf{X}}$, i.e., $\mathbf{U}\mathbf{S}\mathbf{U}^{\top}$, where $\mathbf{S}$ is the diagonal matrix whose diagonal values are $\frac{d_k^2}{p}$.
+
+-   $\eta$ is the ratio $\frac{\sigma^2_s}{\sigma^2_e + \sigma^2_s}$. We estimate $\hat{\eta}$ from a null model (more details to come).
+
+-   $\mathbf{\Sigma}$ is the variance of the outcome, where $\mathbb{V}({\mathbf{y}}) = \eta \mathbf{K} + (1 - \eta)\mathbf{I}_n$.
+
+-   $\mathbf{w}$ is the vector of weights defined as $(\eta\mathbf{\mathbf{s}} + (1-\eta))^{-1/2}$. The values in $\mathbf{w}$ are the nonzero values of the diagonal matrix $\mathbf{W} \equiv (\eta\mathbf{S} + (1 - \eta)\mathbf{I})^{-1/2}$.
+
+-   The matrix to be used in rotating ( or *preconditioning*) the data is $\mathbf{\Sigma}^{-1/2} \equiv \mathbf{W}\mathbf{U}^\top$.
+
+-   $\tilde{\dot{\mathbf{X}}} \equiv \mathbf{W}\mathbf{U}^\top\dot{\mathbf{X}}$ is the rotated data, or the data on the transformed scale.
+
+-   $\tilde{\mathbf{y}} \equiv \mathbf{\Sigma}^{-1/2}\mathbf{y}$ is the outcome on the rotated scale.
+
+-   $\ddot{\tilde{\mathbf{X}}}$ is the **standardized** rotated data. Note: This standardization involves scaling, but not centering. This post-rotation standardization impacts the estimated coefficients as well; we define ${\ddot{\boldsymbol{\beta}}}$ as the estimated coefficients on this scale.
+
+### Model fitting with penalization
+
+We fit $\tilde{\mathbf{y}} \sim \ddot{\tilde{\mathbf{X}}}$ using a penalized linear mixed model, and obtain $\hat{\ddot{\boldsymbol{\beta}}}$ as our estimated coefficients. The penalty parameter values (e.g., values of the lasso tuning parameter) are indexed by $\lambda_l \in 1,..., t$.
 
 ### Rescaling results (format)
 
-To obtain the estimated coefficients on the original scale, the values estimated by the model must be unscaled (or 'untransformed') twice: once to adjust for the post-rotation standardization, and again to adjust for the pre-rotation standardization. This process could be written $\ddot{\hat{\boldsymbol{\beta}}} \rightarrow \dot{\hat{\boldsymbol{\beta}}} \rightarrow  \hat{\boldsymbol{\beta}}$. 
+To obtain the estimated coefficients on the original scale, the values estimated by the model must be unscaled (or 'untransformed') twice: once to adjust for the post-rotation standardization, and again to adjust for the pre-rotation standardization. This process could be written $\hat{\ddot{\boldsymbol{\beta}}} \rightarrow \hat{\dot{\boldsymbol{\beta}}} \rightarrow \hat{\boldsymbol{\beta}}$.
 
+## Object names in source code
 
-## Object names in source code 
+In the code, we denote the objects above in this way:
 
-In the code, we denote the objects above in this way: 
+-   $\mathbf{X}$ and $\mathbf{y}$ are `X` and `y`
 
-  - $\mathbf{X}$ and $\mathbf{y}$ are `X` and `y`
-  
-  - $\bar{\mathbf{X}}$ is `std_X`
-  
-  - $\tilde{\mathbf{X}}$ is `rot_X`
-  
-  - $\bar{\tilde{\mathbf{X}}}$ is `stdrot_X`
-  
-  - $\mathbf{X}\boldsymbol{\beta}$ is `Xb`
+-   $\dot{\mathbf{X}}$ is `std_X`
 
+-   $\tilde{\dot{\mathbf{X}}}$ is `rot_X`
 
+-   $\ddot{\tilde{\mathbf{X}}}$ is `stdrot_X`
+
+-   $\dot{\mathbf{X}}\dot{\boldsymbol{\beta}}$ is `Xb`

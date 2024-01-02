@@ -72,7 +72,9 @@ plmm_fit <- function(prep,
   stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
   stdrot_X_noInt <- stdrot_X_temp$scaled_X
   stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
-  attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals 
+
+  attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
+
   # calculate population var without mean 0; will need this for call to ncvfit()
   xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
   
