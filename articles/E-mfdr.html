@@ -143,12 +143,12 @@ prediction.</p>
 <span><span class="co"># look at results </span></span>
 <span><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="va">cv_fit1</span><span class="op">$</span><span class="va">fit</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_fit1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; lasso-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0700):</span></span>
+<span><span class="co">#&gt; lasso-penalized model with n=197 and p=100</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0679):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 60</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.68</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.638</span></span>
+<span><span class="co">#&gt;   Nonzero coefficients: 62</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 2.82</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.680</span></span>
 <span><span class="co"># Calculate mFdr</span></span>
 <span><span class="co"># head(mfdr(fit1))</span></span>
 <span><span class="va">mfdr1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span><span class="op">[</span><span class="va">cv_fit1</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span></span></code></pre></div>
@@ -179,12 +179,12 @@ prediction.</p>
 <span><span class="co"># look at results </span></span>
 <span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="va">cv_fit2</span><span class="op">$</span><span class="va">fit</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_fit2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1491):</span></span>
+<span><span class="co">#&gt; MCP-penalized model with n=197 and p=100</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1361):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 28</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.97</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.723</span></span>
+<span><span class="co">#&gt;   Nonzero coefficients: 30</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 3.28</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.812</span></span>
 <span><span class="co"># Calculate mFdr</span></span>
 <span><span class="co"># head(mfdr(fit2))</span></span>
 <span><span class="va">mfdr2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span><span class="op">[</span><span class="va">cv_fit2</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span></span></code></pre></div>
@@ -237,7 +237,7 @@ model:</p>
 <span><span class="co"># look at results </span></span>
 <span><span class="va">fit3</span> <span class="op">&lt;-</span> <span class="va">cv_fit3</span><span class="op">$</span><span class="va">fit</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_fit3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
+<span><span class="co">#&gt; MCP-penalized model with n=197 and p=104</span></span>
 <span><span class="co">#&gt; At minimum cross-validation error (lambda=0.2092):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
 <span><span class="co">#&gt;   Nonzero coefficients: 15</span></span>
@@ -278,14 +278,14 @@ values</caption>
 <tbody>
 <tr class="odd">
 <td align="left">Model 1</td>
-<td align="right">8.32</td>
-<td align="right">59</td>
+<td align="right">8.72</td>
+<td align="right">61</td>
 <td align="right">0.14</td>
 </tr>
 <tr class="even">
 <td align="left">Model 2</td>
-<td align="right">1.28</td>
-<td align="right">27</td>
+<td align="right">1.40</td>
+<td align="right">29</td>
 <td align="right">0.05</td>
 </tr>
 <tr class="odd">

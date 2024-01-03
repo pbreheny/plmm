@@ -122,6 +122,11 @@ approximation.</p>
 <p>To help users choose a suitable <span class="math inline">\(k\)</span> value to use, we offer the function
 <code><a href="../reference/choose_k.html">choose_k()</a></code>, which I will describe below with an extended
 example.</p>
+<p><strong>NOTE</strong>: (2024/01/02) My latest simulations are showing
+that truncating the SVD can worsen prediction performance, especially
+for the BLUP prediction method. When using a <span class="math inline">\(k &lt; \text{min}(n,p)\)</span>, make sure to keep
+checking on prediction error and false discovery rate in order to assess
+the impact of truncated SVD.</p>
 </div>
 <div class="section level2">
 <h2 id="what-this-looks-like-in-practice">What this looks like in practice<a class="anchor" aria-label="anchor" href="#what-this-looks-like-in-practice"></a>
@@ -208,19 +213,19 @@ to see the results:</p>
 <p><img src="B-choose_k_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1243):</span></span>
+<span><span class="co">#&gt; MCP-penalized model with n=197 and p=100</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1361):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 37</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.36</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.535</span></span>
+<span><span class="co">#&gt;   Nonzero coefficients: 30</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 3.34</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.828</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1491):</span></span>
+<span><span class="co">#&gt; MCP-penalized model with n=197 and p=100</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1321):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 28</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.62</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.620</span></span></code></pre></div>
+<span><span class="co">#&gt;   Nonzero coefficients: 34</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 2.79</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.670</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>

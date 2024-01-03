@@ -57,11 +57,10 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for list</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span></span>
 <span>  <span class="va">fit</span>,</span>
-<span>  <span class="va">std_X</span>,</span>
+<span>  <span class="va">oldX</span>,</span>
 <span>  <span class="va">newX</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lp"</span>, <span class="st">"blup"</span><span class="op">)</span>,</span>
 <span>  idx <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">lambda</span><span class="op">)</span>,</span>
-<span>  prep <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  V11 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  V21 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -74,7 +73,7 @@
 <dd><p>A list with the components returned by <code>plmm_fit</code>.</p></dd>
 
 
-<dt>std_X</dt>
+<dt>oldX</dt>
 <dd><p>The standardized design matrix of training data, <em>pre-rotation</em>.</p></dd>
 
 
@@ -88,10 +87,6 @@
 
 <dt>idx</dt>
 <dd><p>Vector of indices of the penalty parameter <code>lambda</code> at which predictions are required. By default, all indices are returned.</p></dd>
-
-
-<dt>prep</dt>
-<dd><p>Optional argument. Result of the call to <code>plmm_prep</code> which corresponds to the <code>fit</code> argument. Required if <code>type == 'blup'</code>.</p></dd>
 
 
 <dt>V11</dt>

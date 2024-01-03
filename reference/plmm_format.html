@@ -54,21 +54,13 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plmm_format</span><span class="op">(</span><span class="va">fit</span>, convex <span class="op">=</span> <span class="cn">TRUE</span>, dfmax <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">p</span> <span class="op">+</span> <span class="fl">1</span>, <span class="va">X</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plmm_format</span><span class="op">(</span><span class="va">fit</span>, <span class="va">X</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>fit</dt>
 <dd><p>A list of parameters describing the output of a model constructed with <code>plmm_fit</code></p></dd>
-
-
-<dt>convex</dt>
-<dd><p>convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.</p></dd>
-
-
-<dt>dfmax</dt>
-<dd><p>dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.</p></dd>
 
 
 <dt>X</dt>
@@ -88,19 +80,6 @@
 <li><p>converged: The convergence status at each value of lambda</p></li>
 </ul></div>
 
-    <div class="section level2">
-    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co"># NB: this is an internal function (i.e. it's not exported)</span></span></span>
-<span class="r-in"><span><span class="co"># these examples won't work unless you have plmm::: </span></span></span>
-<span class="r-in"><span><span class="va">prep1</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm_prep.html">plmm_prep</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, trace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm_fit.html">plmm_fit</a></span><span class="op">(</span>prep <span class="op">=</span> <span class="va">prep1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">res1</span> <span class="op">&lt;-</span> <span class="fu">plmm_format</span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-</code></pre></div>
-    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
