@@ -86,7 +86,7 @@ predict.plmm <- function(object,
     ###################
     # used to compute #
     ################### 
-    
+    # TODO: verify the following lines; is this calculation of V11 correct? 
     V11 <- v_hat(object, K)
     
     # cannot use U, S when computing V21, because nv=0. V is needed to restore X 

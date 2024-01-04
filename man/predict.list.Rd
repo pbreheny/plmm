@@ -6,11 +6,10 @@
 \usage{
 \method{predict}{list}(
   fit,
-  std_X,
+  oldX,
   newX,
   type = c("lp", "blup"),
   idx = 1:length(fit$lambda),
-  prep = NULL,
   V11 = NULL,
   V21 = NULL,
   ...
@@ -19,15 +18,13 @@
 \arguments{
 \item{fit}{A list with the components returned by \code{plmm_fit}.}
 
-\item{std_X}{The standardized design matrix of training data, \emph{pre-rotation}.}
+\item{oldX}{The standardized design matrix of training data, \emph{pre-rotation}.}
 
 \item{newX}{A design matrix used for computing predicted values (i.e, the test data).}
 
 \item{type}{A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details.}
 
 \item{idx}{Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.}
-
-\item{prep}{Optional argument. Result of the call to \code{plmm_prep} which corresponds to the \code{fit} argument. Required if \code{type == 'blup'}.}
 
 \item{V11}{Variance-covariance matrix of the training data. Extracted from \code{estimated_V} that is generated using all observations. Required if \code{type == 'blup'}.}
 

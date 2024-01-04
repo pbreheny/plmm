@@ -27,6 +27,8 @@ While using truncated SVD can improve computational time by orders of magnitude,
 
 To help users choose a suitable $k$ value to use, we offer the function `choose_k()`, which I will describe below with an extended example.
 
+**NOTE**: (2024/01/02) My latest simulations are showing that truncating the SVD can worsen prediction performance, especially for the BLUP prediction method. When using a $k < \text{min}(n,p)$, make sure to keep checking on prediction error and false discovery rate in order to assess the impact of truncated SVD. 
+
 ## What this looks like in practice
 
 Consider again the `admix` genotype data with the simulated continuous outcome. Suppose I want to approximate $\mathbf{K}$. I could use the following:

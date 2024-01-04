@@ -9,7 +9,8 @@
 #' @param lambda A user-specified sequence of lambda values. By default, a sequence of values of length nlambda is computed, equally spaced on the log scale.
 #' @param eps Convergence threshold. The algorithm iterates until the RMSD for the change in linear predictors for each coefficient is less than eps. Default is \code{1e-4}.
 #' @param max.iter Maximum number of iterations (total across entire path). Default is 10000.
-#' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
+#' @param convex convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.
+#' @param dfmax (future idea; not yet incorporated) Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
@@ -42,8 +43,9 @@ plmm_fit <- function(prep,
                      eps = 1e-04,
                      max.iter = 10000,
                      convex = TRUE,
-                     warn = TRUE,
+                     dfmax = prep$p + 1,
                      init = NULL,
+                     warn = TRUE,
                      returnX = TRUE){
   
   # set default gamma (will need this for cv.plmm)
@@ -60,27 +62,22 @@ plmm_fit <- function(prep,
   if (length(init)!=prep$p) stop("Dimensions of init and X do not match", call.=FALSE)
   
   if(prep$trace){cat("\nBeginning standardization + rotation.")}
-  
-  # estimate eta if needed
-  if (is.null(prep$eta)) {
-    eta <- estimate_eta(s = prep$s, U = prep$U, y = prep$y)$eta 
-  } else {
-    # otherwise, use the user-supplied value (this is mainly for simulation)
-    eta <- prep$eta
-  }
 
   # rotate data
-  w <- (eta * prep$s + (1 - eta))^(-1/2)
+  w <- (prep$eta * prep$s + (1 - prep$eta))^(-1/2)
   wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
   rot_X <- wUt %*% cbind(1, prep$std_X)
   rot_y <- wUt %*% prep$y
-  # re-standardize rotated rot_X
+  # re-standardize rotated rot_X, *without* rescaling the intercept!
   stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
   stdrot_X_noInt <- stdrot_X_temp$scaled_X
   stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
+
   attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
+
   # calculate population var without mean 0; will need this for call to ncvfit()
   xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
+  
   
   if(prep$trace){cat("\nSetup complete. Beginning model fitting.")}
   
@@ -132,10 +129,37 @@ plmm_fit <- function(prep,
     resid <- res$resid
     if(prep$trace){setTxtProgressBar(pb, ll)}
   }
+  
+  # eliminate saturated lambda values, if any
+  ind <- !is.na(iter)
+  iter <- iter[ind]
+  converged <- converged[ind]
+  lambda <- lambda[ind]
+  loss <- loss[ind]
+  if (warn & sum(iter) == max.iter) warning("\nMaximum number of iterations reached")
+  convex.min <- if (convex) convexMin(b = b,
+                                      X = stdrot_X,
+                                      penalty = penalty,
+                                      gamma = gamma, 
+                                      l2 = lambda*(1-alpha),
+                                      family = 'gaussian',
+                                      penalty.factor = new.penalty.factor) else NULL
+  
+
+  # reverse the POST-ROTATION standardization on estimated betas  
+  untransformed_b1 <- b # create placeholder vector
+  untransformed_b1[-1,] <- sweep(x = b[-1, , drop=FALSE], 
+                                 # un-scale the non-intercept values & fill in the placeholder
+                                 MARGIN = 1, # beta values are on rows 
+                                 STATS = attr(stdrot_X, 'scale'),
+                                 FUN = "/")
+  
+  
   ret <- structure(list(
     y = prep$y,
     p = prep$p, 
     n = prep$n, 
+    std_X_details = prep$std_X_details,
     s = prep$s,
     U = prep$U,
     rot_X = rot_X,
@@ -143,8 +167,9 @@ plmm_fit <- function(prep,
     stdrot_X = stdrot_X,
     lambda = lambda,
     b = b,
+    untransformed_b1 = untransformed_b1,
     linear.predictors = linear.predictors,
-    eta = eta,
+    eta = prep$eta,
     iter = iter,
     converged = converged, 
     loss = loss, 

@@ -15,7 +15,6 @@ estimate_eta <- function(s, U, y){
                   U = U,
                   method = "BFGS")
   
-  
   return(list(eta = c(opt$par[1]),
               beta0 = opt$par[2]))
 }
@@ -51,7 +50,6 @@ null_model_nll <- function(params, y, U, s){
                sigma = tcrossprod(wUt),
                log = TRUE)
   
-  # TODO: need one more step here; this function must return a scalar
   ret <- sum(res)
   
   return(-1*ret) # want to use minimization in optim()

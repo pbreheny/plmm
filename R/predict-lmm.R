@@ -39,8 +39,8 @@ predict.lmm <- function(object,
   
   type <- match.arg(type)
   beta_vals <- coef.lmm(object) # includes intercept 
-  p <- object$ncol_X 
-  n <- object$nrow_X 
+  p <- object$p 
+  n <- object$n
   
   # addressing each type: 
   

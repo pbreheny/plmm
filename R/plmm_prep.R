@@ -65,6 +65,12 @@ plmm_prep <- function(X,
   n_stdX <- nrow(std_X)
   p_stdX <- ncol(std_X)
   
+  # name scaling and centering values (will need these later; see 'untransform()')
+  std_X_details <- list(
+    center = attr(std_X, 'center'), # singular columns have center = 0
+    scale = attr(std_X, 'scale') # singular columns have scale = 0
+  )
+  
   # set default k and create indicator 'trunc' to pass to plmm_svd
   if(is.null(k)){
     k <- min(n_stdX, p_stdX)
@@ -133,6 +139,13 @@ plmm_prep <- function(X,
          \n Or did you set diag_K = TRUE and specifiy a k value at the same time?")
   }
   
+  # estimate eta if needed
+  if (is.null(eta_star)) {
+    eta <- estimate_eta(s = s, U = U, y = y) 
+  } else {
+    # otherwise, use the user-supplied value (this option is mainly for simulation)
+    eta <- eta_star
+  }
   
   
   # return values to be passed into plmm_fit(): 
@@ -141,10 +154,11 @@ plmm_prep <- function(X,
     n = n, 
     y = y,
     std_X = std_X,
+    std_X_details = std_X_details,
     s = s,
     U = U,
     ns = ns,
-    eta = eta_star, # carry eta over to fit 
+    eta = eta, # carry eta over to fit 
     penalty.factor = penalty.factor,
     trace = trace,
     snp_names = if (is.null(colnames(X))) paste("K", 1:ncol(X), sep="") else colnames(X)))

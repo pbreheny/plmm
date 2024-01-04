@@ -163,13 +163,12 @@ plmm <- function(X,
                       eps = eps,
                       max.iter = max.iter,
                       warn = warn,
-                      init = init)
-  
-  if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
-  the_final_product <- plmm_format(fit = the_fit, 
-                                   convex = convex,
-                                   dfmax = dfmax, 
-                                   X = X)
+                      init = init,
+                      convex = convex,
+                      dfmax = dfmax)
+
+  if(trace){cat("\nBeta values are estimated -- almost done!")}
+  the_final_product <- plmm_format(fit = the_fit, X = X)
   
   return(the_final_product)
   
