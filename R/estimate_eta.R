@@ -36,13 +36,13 @@ null_model_nll <- function(params, y, U, s){
   
   # create intercept (for null model, this is the only predictor)
   intcpt <- rep(1, length(y))
-  
+  # browser()
   # get \Sigma^2_{-1/2} piece
   w <- (eta * s + (1 - eta))^(-1/2)
   wUt <- sweep(x = t(U), MARGIN = 1, STATS = w, FUN = "*")
   rot_y <- wUt %*% y 
   rot_intcpt <- wUt %*% intcpt
-  # browser()
+  
   # wUt_svd <- tcrossprod(wUt) |> svd()
   # distribution of null model 
   res <- mvtnorm::dmvnorm(x = drop(rot_y),
