@@ -7,13 +7,16 @@
 #' @keywords internal
 estimate_eta <- function(s, U, y){
 
-  # optimize over \hat\beta_0 and \eta
+  # optimize over \eta and \beta_0 
   opt <- optim(par = c(0.1, 0.01),
                   fn = null_model_nll,
                   y = y,
                   s = s,
                   U = U,
-                  method = "BFGS")
+                  method = "L-BFGS-B",
+               # use box constraints to ensure 0 < \hat \eta < 1
+               lower = c(0.0001, -Inf),
+               upper = c(0.9999, Inf))
   
   return(list(eta = c(opt$par[1]),
               beta0 = opt$par[2]))
@@ -36,22 +39,18 @@ null_model_nll <- function(params, y, U, s){
   
   # create intercept (for null model, this is the only predictor)
   intcpt <- rep(1, length(y))
-  # browser()
+  
   # get \Sigma^2_{-1/2} piece
   w <- (eta * s + (1 - eta))^(-1/2)
   wUt <- sweep(x = t(U), MARGIN = 1, STATS = w, FUN = "*")
   rot_y <- wUt %*% y 
   rot_intcpt <- wUt %*% intcpt
   
-  # wUt_svd <- tcrossprod(wUt) |> svd()
-  # distribution of null model 
+  # distribution of null model on rotated scale 
   res <- mvtnorm::dmvnorm(x = drop(rot_y),
                mean = drop(rot_intcpt*beta0),
-               sigma = tcrossprod(wUt),
                log = TRUE)
-  
-  ret <- sum(res)
-  
-  return(-1*ret) # want to use minimization in optim()
+
+  return(-1*res) # optim() does minimization, so I need the neg. log. lik.
 
 }
