@@ -15,11 +15,10 @@
 #' 
 #' @keywords internal
 
-plmm_svd <- function(X, k, trunc, trace){
+svd_X <- function(X, k, trunc, trace){
   # case 1: full SVD -----------------------------------  
   if(!trunc){
     if(trace){cat("\nUsing full SVD")}
-    # NB: the is.null(S) keeps you from overwriting case 2 (a)
     decomp <- svd(X, nv = 0)
     d <- decomp$d
     U <- decomp$u

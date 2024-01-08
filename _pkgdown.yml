@@ -80,14 +80,15 @@ reference:
     contents: 
     - cvf
     - delta
+    - eigen_K
     - estimate_eta
     - lamNames
     - plmm_format
     - plmm_prep
-    - plmm_svd
     - predict.list
     - scale_varp
     - setup_lambda
+    - svd_X
     - untransform
     - varp
     

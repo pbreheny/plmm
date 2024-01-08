@@ -71,7 +71,7 @@ plmm_prep <- function(X,
     scale = attr(std_X, 'scale') # singular columns have scale = 0
   )
   
-  # set default k and create indicator 'trunc' to pass to plmm_svd
+  # set default k and create indicator 'trunc' to pass to svd_X
   if(is.null(k)){
     k <- min(n_stdX, p_stdX)
     trunc <- FALSE
@@ -87,7 +87,7 @@ plmm_prep <- function(X,
   # set default: if diag_K not specified, set to false
   if(is.null(diag_K)){diag_K <- FALSE}
   
-  # handle the cases where no SVD is needed: 
+  # handle the cases where no decomposition is needed: 
   # case 1: K is the identity matrix 
   flag1 <- diag_K & is.null(K)
   if(flag1){
@@ -111,32 +111,49 @@ plmm_prep <- function(X,
     U <- K$U
   }
 
-  # otherwise, need to do SVD:
-  if(trace){cat("\nStarting singular value decomposition.")}
+
+  # otherwise, need to do decomposition:
+  if(trace){cat("\nStarting decomposition.")}
   if(sum(c(flag1, flag2, flag3)) == 0){
     # set default K: if not specified and not diagonal, use realized relatedness matrix
     # NB: relatedness_mat(X) standardizes X! 
     if(is.null(K) & is.null(s)){
-      # NB: the is.null(S) keeps you from overwriting the 3 preceding cases 
+      # NB: the is.null(s) keeps you from overwriting the 3 preceding special cases 
+      
+      # approach to decomposition:
+      # n > p: take SVD of X
+      # n <= p: construct K, then take eigen(K)
+      if(n_stdX > p_stdX){
       if(trace){cat("\nUsing the default definition of the realized relatedness matrix.")}
-      svd_res <- plmm_svd(X = std_X, k = k, trunc = trunc, trace = trace)
+      svd_res <- svd_X(X = std_X, k = k, trunc = trunc, trace = trace)
       s <- (svd_res$d^2)*(1/p)
       U <- svd_res$U
+      } else if (n_stdX <= p_stdX){
+        if(trace){cat("\nCalculating eigendecomposition of std_X")}
+        eigen_res <- eigen_K(std_X, p) 
+        s <- eigen_res$s
+        U <- eigen_res$U
+      }
+      
     } else {
-      # last case: K is a user-supplied matrix
-      svd_res <- plmm_svd(X = K, k = k, trunc = trunc, trace = trace)
-      s <- svd_res$d
-      U <- svd_res$U
+      # last case: K is a user-supplied matrix 
+      eigen_res <- eigen(K)
+      s <- eigen_res$values
+      U <- eigen_res$vectors
     }
     
   }
-  
+
   # error check: what if the combination of args. supplied was none of the SVD cases above?
   if(is.null(s) | is.null(U)){
-    stop("\nSomething is wrong in the SVD. The combination of supplied arguments does not match any cases handled in 
-         \n plmm_svd(), the internal function called by plmm() via plmm_prep().
-         \n Re-examine the supplied arguments -- should you have set diag_K = TRUE?
-         \n Or did you set diag_K = TRUE and specifiy a k value at the same time?")
+    stop("\nSomething is wrong in the SVD/eigendecomposition.
+    \nThe combination of supplied arguments does not match any cases handled in 
+         \n svd_X(), the internal function called by plmm() via plmm_prep().
+         \n Re-examine the supplied arguments -- here are some common mistakes:
+         \n \tDid you supply a list to K? Check its element names -- they must be 's' and 'U'. 
+         \n \t \t *If you used choose_k(), make sure you are supplying the 'svd_K' element returned from that function's result as the 'K' here.*
+         \n \tDid you intend to set diag_K = TRUE?
+         \n \tDid you set diag_K = TRUE and specifiy a k value at the same time? This combination of arguments is incompatible.")
   }
   
   # estimate eta if needed
