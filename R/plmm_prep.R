@@ -106,14 +106,13 @@ plmm_prep <- function(X,
   flag3 <- !is.null(K) & ('list' %in% class(K))
   if(flag3){
     if(trace){cat("\nK is a list; will pass SVD components from list to model fitting.")}
-    # case 3: K is a user-supplied list, as returned from choose_k()
     s <- K$s # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
     U <- K$U
   }
 
   # otherwise, need to do SVD:
-  if(trace){cat("\nStarting singular value decomposition.")}
   if(sum(c(flag1, flag2, flag3)) == 0){
+    if(trace){cat("\nStarting singular value decomposition.")}
     # set default K: if not specified and not diagonal, use realized relatedness matrix
     # NB: relatedness_mat(X) standardizes X! 
     if(is.null(K) & is.null(s)){
@@ -130,7 +129,6 @@ plmm_prep <- function(X,
     }
     
   }
-  
   # error check: what if the combination of args. supplied was none of the SVD cases above?
   if(is.null(s) | is.null(U)){
     stop("\nSomething is wrong in the SVD. The combination of supplied arguments does not match any cases handled in 
