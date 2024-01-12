@@ -118,7 +118,7 @@ plmm <- function(X,
     if (typeof(K)=="integer") storage.mode(X) <- "double" # change K to X 
     if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
     if (is.list(K)) {
-      if(!('d' %in% names(K) & 'U' %in% names(K))){stop('Components d and U not both found in list supplied for K.')}
+      if(!('s' %in% names(K) & 'U' %in% names(K))){stop('Components s and U not both found in list supplied for K.')}
     }
     # last thing: check dimensions
     if (is.matrix(K)){
