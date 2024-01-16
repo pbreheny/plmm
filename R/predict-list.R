@@ -29,7 +29,6 @@ predict.list <- function(fit,
                          V21 = NULL, ...) {
   
   type <- match.arg(type)
-  # browser()
   # get beta values (for nonsingular features) from fit
   beta_vals <- fit$untransformed_b1[,idx,drop = FALSE]
   
@@ -41,7 +40,6 @@ predict.list <- function(fit,
     # case 2: beta_vals is a matrix
     colnames(beta_vals) <- lamNames(fit$lambda)
   }
-  # browser()
   # calculate the estimated mean values for test data 
   a <- beta_vals[1,]
   b <- beta_vals[-1,,drop=FALSE]
@@ -54,7 +52,6 @@ predict.list <- function(fit,
   # for blup, will incorporate the estimated variance 
   if (type == "blup"){
     # covariance comes from selected rows and columns from estimated_V that is generated in the overall fit (V11, V21)
-    # browser()
     # test1 <- V21 %*% chol2inv(chol(V11)) # true 
     # TODO: to find the inverse of V11 using svd results of K, i.e., the inverse of a submatrix, might need to use Woodbury's formula 
     Xb_train <- sweep(oldX %*% b, 2, a, "+")

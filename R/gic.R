@@ -21,6 +21,7 @@ gic <- function(fit, ic=c("bic", "hdbic"), rot_X, rot_y, s){
   UseMethod("gic")
 }
 
+#' @export
 gic.default <- function(fit, ic=c("bic", "hdbic"), rot_X, rot_y, s){
   stop("This function should be used with an object of class plmm_fit")
 }
