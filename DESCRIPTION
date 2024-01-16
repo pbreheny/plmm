@@ -23,23 +23,21 @@ Suggests:
     ggmix, 
     graphics, 
     grDevices, 
-    parallel, 
+    parallel,
+    popkin,
     MASS, 
     knitr, 
-    rmarkdown
+    rmarkdown,
+    tinytest
 Imports: 
-    bnpsd,
+    bigstatsr,
+    bigsnpr,
+    data.table,
     glmnet,
     Matrix,
     methods,
     ncvreg,
-    popkin,
+    RSpectra,
     stats,
     utils,
-    zeallot,
-    tinytest,
-    RSpectra,
-    bigstatsr,
-    bigsnpr,
-    data.table
-    
+    zeallot
