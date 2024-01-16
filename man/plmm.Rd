@@ -90,6 +90,9 @@ fit_admix2 <- plmm(X = admix$X, y = admix$y, k = 50)
 s2 <- summary(fit_admix2, idx = 99)
 print(s2)
 
+# an example with p > n:
+fit_admix3 <- plmm(X = admix$X[1:50, ], y = admix$y[1:50])
+
 # now use PLINK data files
 \dontrun{
 
