@@ -75,7 +75,6 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.plmm.html">cv.plmm</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span>, <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'.Random.seed' is not an integer vector but of type 'NULL', so ignored</span>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="va">cv</span><span class="op">$</span><span class="va">fit</span></span></span>
 <span class="r-in"><span><span class="fu">mfdr_plot</span><span class="op">(</span><span class="fu"><a href="mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"l"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="mfdr_plot-1.png" alt="" width="700" height="433"></span>
