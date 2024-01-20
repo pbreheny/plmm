@@ -15,11 +15,10 @@ corrplot::corrplot(as.matrix(K), is.corr = F)
 hat_eta <- hat_beta0 <-rep(NA_integer_, 100)
 pb <- txtProgressBar(0, 100, style = 3)
 for(i in 1:100){
-  res <- test_eta_estimation(sig_s = 1,
+  res <- test_eta_estimation(sig_s = 3,
                              sig_eps = 1,
                              beta0 = 2, 
-                             K = as.matrix(K),
-                             init.vals = c(0.5, 0.1))
+                             K = as.matrix(K))
   hat_eta[i] <- res$hat_eta
   hat_beta0[i] <- res$hat_beta0
   setTxtProgressBar(pb, i)

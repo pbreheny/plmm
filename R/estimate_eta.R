@@ -46,10 +46,7 @@ null_model <- function(params, y, U, s){
   w <- w2^(-1/2)
   wUt <- sweep(x = t(U), MARGIN = 1, STATS = w, FUN = "*")
   rot_y <- wUt %*% y
-  # centered_y <- y - mean(y)
-  # rot_y <- crossprod(U, centered_y)
   rot_intcpt <- (wUt %*% intcpt)
-  # rot_intcpt <- crossprod(U, intcpt)
   rot_mean <- drop(rot_intcpt*beta0)
   
   # distribution of null model on rotated scale
@@ -57,12 +54,12 @@ null_model <- function(params, y, U, s){
                mean = rot_mean,
                log = TRUE) # use log scale for numerical stability
   return(-1*res) # optim() does minimization, so I need the neg. log. lik.
+
   # working out the nLL myself: 
   # constant <- n*log(2*pi)
-  # log_det_W2 <- sum(log(w2))
-  # rot_resid <- crossprod((rot_y - rot_mean), diag(w)%*%(rot_y - rot_mean))
-  # nll <- 0.5*(constant + log_det_W2 + rot_resid) 
-  # return(nll) 
+  # rot_resid <- crossprod(rot_y - rot_mean)
+  # nll <- 0.5*(constant + rot_resid)
+  # return(nll)
 
 }
 
@@ -94,4 +91,3 @@ test_eta_estimation <- function(sig_s, sig_eps, beta0, K, ...){
   return(list(hat_eta = tmp$eta,
               hat_beta0 = tmp$beta0))
 }
-
