@@ -40,6 +40,9 @@
 #' s2 <- summary(fit_admix2, idx = 99)
 #' print(s2)
 #' 
+#' # an example with p > n:
+#' fit_admix3 <- plmm(X = admix$X[1:50, ], y = admix$y[1:50])
+#' 
 #' # now use PLINK data files
 #' \dontrun{
 #' 
@@ -118,7 +121,7 @@ plmm <- function(X,
     if (typeof(K)=="integer") storage.mode(X) <- "double" # change K to X 
     if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
     if (is.list(K)) {
-      if(!('d' %in% names(K) & 'U' %in% names(K))){stop('Components d and U not both found in list supplied for K.')}
+      if(!('s' %in% names(K) & 'U' %in% names(K))){stop('Components s and U not both found in list supplied for K.')}
     }
     # last thing: check dimensions
     if (is.matrix(K)){
