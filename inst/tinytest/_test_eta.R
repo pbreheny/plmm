@@ -64,3 +64,17 @@ summary(hat_eta); boxplot(hat_eta)
 summary(hat_r)
 summary(hat_beta0) 
 
+# test 4 -------------
+K <- generate_K(4,5, mu = seq(0.7, 1.3, length.out = 5))
+hat_eta <- hat_r <- hat_beta0 <- rep(NA_integer_, 100)
+pb <- txtProgressBar(0, 100, style = 3)
+for(i in 1:100){
+  res <- test_eta_estimation_null_mean_0(sig_s = 3,
+                                    sig_eps = 1,
+                                    beta0 = 0.5, 
+                                    K = K)
+  hat_eta[i] <- res$hat_eta
+  setTxtProgressBar(pb, i)
+}
+
+summary(hat_eta); boxplot(hat_eta)
