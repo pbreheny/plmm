@@ -1,7 +1,7 @@
 ## code to prepare `admix_raw` dataset goes here
 # load libraries
 library(dplyr)
-library(penalizedLMM)
+library(plmm)
 # read in data for examples 
 admix_raw <- read.delim("https://s3.amazonaws.com/pbreheny-data-sets/admixture.txt")
 # str(admix_raw) # includes 197 obs., 100 SNPs, and racial category 
@@ -34,7 +34,7 @@ noise <- rnorm(n = nrow(admix_raw))
 true_X <- as.matrix(admix_raw)
 y <- true_X%*%true_beta + noise
 
-# test this data with a couple of the penalizedLMM functions
+# test this data with a couple of the plmm functions
 fit <- cv.plmm(X = admix_raw, y = y, penalty = "lasso") 
 summary(fit); fit$fit$beta_vals[,fit$min]
 

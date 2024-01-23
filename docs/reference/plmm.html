@@ -26,12 +26,13 @@ NB: this function is simply a wrapper for plmm_prep -&amp;gt; plmm_fit -&amp;gt;
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
-    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/A-plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/C-explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/D-deconfounding.html">deconfounding</a>
+    <a class="dropdown-item" href="../articles/E-mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
+    <a class="dropdown-item" href="../articles/notation.html">Notes on notation</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -100,7 +101,8 @@ NB: this function is simply a wrapper for plmm_prep -&gt; plmm_fit -&gt; plmm_fo
 
 
 <dt>diag_K</dt>
-<dd><p>Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE.</p></dd>
+<dd><p>Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Defaults to FALSE.
+Note: plmm() does not check to see if a matrix is diagonal. If you want to use a diagonal K matrix, you must set diag_K = TRUE.</p></dd>
 
 
 <dt>eta_star</dt>
@@ -176,22 +178,22 @@ NB: this function is simply a wrapper for plmm_prep -&gt; plmm_fit -&gt; plmm_fo
 <span class="r-in"><span><span class="va">fit_admix1</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_admix1</span>, idx <span class="op">=</span> <span class="fl">99</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.00105</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=, p=101 at lambda=0.0309</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  98 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  82 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># using admix data and k = 50 </span></span></span>
 <span class="r-in"><span><span class="va">fit_admix2</span> <span class="op">&lt;-</span> <span class="fu">plmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, k <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit_admix2</span>, idx <span class="op">=</span> <span class="fl">99</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.0359</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=, p=101 at lambda=0.0335</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  28 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  30 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># now use PLINK data files</span></span></span>

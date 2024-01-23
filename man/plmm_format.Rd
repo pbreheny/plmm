@@ -4,14 +4,10 @@
 \alias{plmm_format}
 \title{PLMM format: a function to format the output of a model constructed with \code{plmm_fit}}
 \usage{
-plmm_format(fit, convex = TRUE, dfmax = fit$p + 1, X)
+plmm_format(fit, X)
 }
 \arguments{
 \item{fit}{A list of parameters describing the output of a model constructed with \code{plmm_fit}}
-
-\item{convex}{convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.}
-
-\item{dfmax}{dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.}
 
 \item{X}{Design matrix. May include clinical covariates and other non-SNP data.}
 }
@@ -29,16 +25,5 @@ A list with the components:
 }
 \description{
 PLMM format: a function to format the output of a model constructed with \code{plmm_fit}
-}
-\examples{
-
-\dontrun{
-# NB: this is an internal function (i.e. it's not exported)
-# these examples won't work unless you have penalizedLMM::: 
-prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
-fit1 <- plmm_fit(prep = prep1)
-res1 <- plmm_format(fit1)
-
-}
 }
 \keyword{internal}

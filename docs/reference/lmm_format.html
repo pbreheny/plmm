@@ -24,12 +24,13 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
-    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/A-plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/C-explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/D-deconfounding.html">deconfounding</a>
+    <a class="dropdown-item" href="../articles/E-mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
+    <a class="dropdown-item" href="../articles/notation.html">Notes on notation</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -53,7 +54,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">lmm_format</span><span class="op">(</span><span class="va">fit</span>, convex <span class="op">=</span> <span class="cn">TRUE</span>, dfmax <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">ncol_X</span> <span class="op">+</span> <span class="fl">1</span>, <span class="va">X</span>, <span class="va">K</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">lmm_format</span><span class="op">(</span><span class="va">fit</span>, dfmax <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">ncol_X</span> <span class="op">+</span> <span class="fl">1</span>, <span class="va">X</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -62,20 +63,12 @@
 <dd><p>A list of parameters describing the output of a model constructed with <code>lmm_fit</code></p></dd>
 
 
-<dt>convex</dt>
-<dd><p>convex Calculate index for which objective function ceases to be locally convex? Default is TRUE.</p></dd>
-
-
 <dt>dfmax</dt>
 <dd><p>dfmax Upper bound for the number of nonzero coefficients. Default is no upper bound. However, for large data sets, computational burden may be heavy for models with a large number of nonzero coefficients.</p></dd>
 
 
 <dt>X</dt>
 <dd><p>Design matrix. May include clinical covariates and other non-SNP data.</p></dd>
-
-
-<dt>K</dt>
-<dd><p>Similarity matrix used to rotate the data. This will be passed from plmm() as (1) NULL, in which case relatedness_mat(std(X)) is used, (2) a matrix or (3) a list with components d and u (eigenvalues and eigenvectors, respectively).</p></dd>
 
 </dl></div>
     <div class="section level2">

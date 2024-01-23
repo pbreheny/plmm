@@ -4,7 +4,25 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/articles/A-plink-files.html</loc>
+  </url>
+  <url>
+    <loc>/articles/B-choose_k.html</loc>
+  </url>
+  <url>
+    <loc>/articles/C-explore_options.html</loc>
+  </url>
+  <url>
+    <loc>/articles/D-deconfounding.html</loc>
+  </url>
+  <url>
+    <loc>/articles/E-mfdr.html</loc>
+  </url>
+  <url>
     <loc>/articles/choose_k.html</loc>
+  </url>
+  <url>
+    <loc>/articles/deconfounding 2.html</loc>
   </url>
   <url>
     <loc>/articles/deconfounding.html</loc>
@@ -23,6 +41,9 @@
   </url>
   <url>
     <loc>/articles/mfdr.html</loc>
+  </url>
+  <url>
+    <loc>/articles/notation.html</loc>
   </url>
   <url>
     <loc>/articles/plink-files.html</loc>
@@ -44,6 +65,9 @@
   </url>
   <url>
     <loc>/reference/coef.list.html</loc>
+  </url>
+  <url>
+    <loc>/reference/coef.lmm 2.html</loc>
   </url>
   <url>
     <loc>/reference/coef.lmm.html</loc>
@@ -100,10 +124,19 @@
     <loc>/reference/lasso_pca10.html</loc>
   </url>
   <url>
+    <loc>/reference/lmm 2.html</loc>
+  </url>
+  <url>
     <loc>/reference/lmm.html</loc>
   </url>
   <url>
+    <loc>/reference/lmm_fit 2.html</loc>
+  </url>
+  <url>
     <loc>/reference/lmm_fit.html</loc>
+  </url>
+  <url>
+    <loc>/reference/lmm_format 2.html</loc>
   </url>
   <url>
     <loc>/reference/lmm_format.html</loc>
@@ -115,7 +148,13 @@
     <loc>/reference/lmm_lasso.html</loc>
   </url>
   <url>
+    <loc>/reference/lmm_prep 2.html</loc>
+  </url>
+  <url>
     <loc>/reference/lmm_prep.html</loc>
+  </url>
+  <url>
+    <loc>/reference/lmm_untransform 2.html</loc>
   </url>
   <url>
     <loc>/reference/lmm_untransform.html</loc>
@@ -136,7 +175,13 @@
     <loc>/reference/mfdr.html</loc>
   </url>
   <url>
+    <loc>/reference/mfdr_plot 2.html</loc>
+  </url>
+  <url>
     <loc>/reference/mfdr_plot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/pedigree 2.html</loc>
   </url>
   <url>
     <loc>/reference/pedigree.html</loc>
@@ -190,6 +235,9 @@
     <loc>/reference/predict.list.html</loc>
   </url>
   <url>
+    <loc>/reference/predict.lmm 2.html</loc>
+  </url>
+  <url>
     <loc>/reference/predict.lmm.html</loc>
   </url>
   <url>
@@ -215,6 +263,9 @@
   </url>
   <url>
     <loc>/reference/relatedness_mat.html</loc>
+  </url>
+  <url>
+    <loc>/reference/residuals.plmm.html</loc>
   </url>
   <url>
     <loc>/reference/rotate_data.html</loc>

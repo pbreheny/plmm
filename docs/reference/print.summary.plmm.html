@@ -24,12 +24,13 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/choose_k.html">Choosing k -- an eigenproblem</a>
-    <a class="dropdown-item" href="../articles/deconfounding.html">deconfounding</a>
-    <a class="dropdown-item" href="../articles/explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="../articles/mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="../articles/plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/A-plink-files.html">Processing PLINK files</a>
+    <a class="dropdown-item" href="../articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
+    <a class="dropdown-item" href="../articles/C-explore_options.html">Exploring different modeling options</a>
+    <a class="dropdown-item" href="../articles/D-deconfounding.html">deconfounding</a>
+    <a class="dropdown-item" href="../articles/E-mfdr.html">Inference with marginal false discovery rates</a>
     <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
+    <a class="dropdown-item" href="../articles/notation.html">Notes on notation</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -76,21 +77,21 @@
 <span class="r-in"><span><span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit</span>, lambda <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">lambda</span><span class="op">[</span><span class="fl">97</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">s3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fit2</span>, idx <span class="op">=</span> <span class="fl">25</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.00121</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=, p=101 at lambda=0.00121</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  98 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=197, p=101 at lambda=0.00121</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> MCP-penalized regression model with n=, p=101 at lambda=0.00121</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> # of non-zero coefficients:  98 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> SCAD-penalized regression model with n=197, p=101 at lambda=0.18395</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SCAD-penalized regression model with n=, p=101 at lambda=0.18395</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> The model converged </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------------</span>

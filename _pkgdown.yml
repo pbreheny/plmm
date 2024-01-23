@@ -30,6 +30,7 @@ reference:
     - loss.plmm
     - log_lik
     - logLik_nonnull
+    - residuals.plmm
     
   - title: Coefficient methods for LMMs and PLMMs
     contents:
@@ -44,6 +45,7 @@ reference:
   - title: Other model fitting methods (and some helper functions)
     contents: 
     - convexMin
+    - residuals.plmm
     - v_hat
     
   - title: Data (pre)processing and wrangling
@@ -76,17 +78,17 @@ reference:
     
   - title: internal
     contents: 
-    - coef.list
     - cvf
     - delta
+    - eigen_K
     - estimate_eta
     - lamNames
     - plmm_format
     - plmm_prep
-    - plmm_svd
     - predict.list
     - scale_varp
     - setup_lambda
+    - svd_X
     - untransform
     - varp
     

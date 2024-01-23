@@ -71,7 +71,7 @@ cv.plmm <- function(X,
   # implement full model fit 
   fit.args <- c(list(prep = prep, penalty = penalty), list(...))
   fit <- do.call('plmm_fit', fit.args)
-  fit_to_return <- plmm_format(fit, X = X)
+  fit_to_return <- plmm_format(fit = fit, X = X)
   
   # set up arguments for cv 
   cv.args <- fit.args
@@ -113,8 +113,9 @@ cv.plmm <- function(X,
   if (!missing(cluster)) {
     if (!inherits(cluster, "cluster")) stop("cluster is not of class 'cluster'; see ?makeCluster", call.=FALSE)
     parallel::clusterExport(cluster, c("X", "y", "K", "fold", "type", "cv.args", "estimated_V"), envir=environment())
-    parallel::clusterCall(cluster, function() library(penalizedLMM))
-    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, X=X, y=y, fold=fold, type=type, cv.args=cv.args, 
+    parallel::clusterCall(cluster, function() library(plmm))
+    fold.results <- parallel::parLapply(cl=cluster, X=1:max(fold), fun=cvf, X=X, y=y,
+                                        fold=fold, type=type, cv.args=cv.args, 
                                         estimated_V = estimated_V)
   }
   

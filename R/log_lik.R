@@ -1,4 +1,4 @@
-#' Evaluate the negative log-likelihood of a null Gaussian penalizedLMM model
+#' Evaluate the negative log-likelihood of a null Gaussian plmm model
 #'
 #' This function allows you to evaluate the negtive log-likelihood of a linear mixed model under the assumption of a null model in order to estimate the variance parameter, eta.
 #' @param eta The proportion of variance in the outcome that is attributable to causal SNP effects. In other words, SNR. Sometimes referred to as the narrow-sense heritability.

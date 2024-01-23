@@ -1,7 +1,7 @@
-Package: penalizedLMM
+Package: plmm
 Title: Fit nonconvex-penalized linear mixed models to account for the presence of unobserved confounding effects
-Version: 2.1.1
-Date: 2023-09-07
+Version: 2.2.0
+Date: 2023-10-16
 Authors@R: c(
     person("Anna C.","Reisetter", role = c("aut"),
         email = "anna-reisetter@uiowa.edu",
@@ -9,10 +9,10 @@ Authors@R: c(
     person("Patrick J.", "Breheny", role = "aut", 
         comment = c(ORCID = "0000-0002-0650-1119")),
     person("Tabitha K.", "Peter", role = c("aut", "cre"),
-    email = "tabitha-peter@uiowa.edu"),
+        email = "tabitha-peter@uiowa.edu"),
     person("Yujiing", "Lu", role = "aut"))
 VignetteBuilder: knitr 
-Description: Fit a penalized linear mixed model that corrects for unobserved confounding factors. penalizedLMM infers and corrects for the presence of unobserved confounding effects such as population stratification and environmental heterogeneity. It then fits a linear model via lasso penalized maximum likelihood. Originally designed for the multivariate analysis of SNP data, penalizedLMM eliminates the need for LD pruning and subpopulation-specific analyses. Functions for the appropriate processing of PLINK files are also supplied. 
+Description: Fit a penalized linear mixed model that corrects for unobserved confounding factors. plmm infers and corrects for the presence of unobserved confounding effects such as population stratification and environmental heterogeneity. It then fits a linear model via lasso penalized maximum likelihood. Originally designed for the multivariate analysis of SNP data, plmm eliminates the need for LD pruning and subpopulation-specific analyses. Functions for the appropriate processing of PLINK files are also supplied. 
 Depends: R (>= 3.5.0)
 License: GPL-3
 Encoding: UTF-8
@@ -24,7 +24,6 @@ Suggests:
     graphics, 
     grDevices, 
     parallel, 
-    data.table,
     MASS, 
     knitr, 
     rmarkdown
@@ -41,5 +40,6 @@ Imports:
     tinytest,
     RSpectra,
     bigstatsr,
-    bigsnpr
+    bigsnpr,
+    data.table
     

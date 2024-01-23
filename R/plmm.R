@@ -42,6 +42,9 @@
 #' s2 <- summary(fit_admix2, idx = 99)
 #' print(s2)
 #' 
+#' # an example with p > n:
+#' fit_admix3 <- plmm(X = admix$X[1:50, ], y = admix$y[1:50])
+#' 
 #' # now use PLINK data files
 #' \dontrun{
 #' 
@@ -205,7 +208,7 @@ plmm <- function(X,
     if (typeof(K)=="integer") storage.mode(std_X) <- "double" # change K to X 
     if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
     if (is.list(K)) {
-      if(!('d' %in% names(K) & 'U' %in% names(K))){stop('Components d and U not both found in list supplied for K.')}
+      if(!('s' %in% names(K) & 'U' %in% names(K))){stop('Components s and U not both found in list supplied for K.')}
     }
     # last thing: check dimensions
     if (is.matrix(K)){
@@ -227,6 +230,7 @@ plmm <- function(X,
                         K = K,
                         k = k,
                         diag_K = diag_K,
+                        fbm_flag = fbm_flag,
                         trace = trace)
 
   
@@ -236,6 +240,7 @@ plmm <- function(X,
   the_fit <- plmm_fit(prep = the_prep,
                       eta_star = eta_star,
                       penalty.factor = penalty.factor,
+                      fbm_flag = fbm_flag,
                       penalty = penalty,
                       gamma = gamma,
                       alpha = alpha,
@@ -247,19 +252,20 @@ plmm <- function(X,
                       warn = warn,
                       init = init)
 
-  
+  if(trace){cat("\nBeta values are estimated -- almost done!")}
   # format results ---------------------------------------------------
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   if(fbm_flag){
-    
+    # TODO: work format through for FBM case 
   } else {
     the_final_product <- plmm_format(fit = the_fit, 
-                                     convex = convex,
-                                     dfmax = dfmax, 
+                                     # convex = convex,
+                                     # dfmax = dfmax, 
                                      X = X)
     
   }
-  
+
+
   return(the_final_product)
   
   

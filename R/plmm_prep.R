@@ -10,6 +10,7 @@
 #' @param K Similarity matrix used to rotate the data. This should either be a known matrix that reflects the covariance of y, or an estimate (Default is \eqn{\frac{1}{p}(XX^T)}, where X is standardized). This can also be a list, with components d and u (as returned by choose_k)
 #' @param diag_K Logical: should K be a diagonal matrix? This would reflect observations that are unrelated, or that can be treated as unrelated. Passed from `plmm()`. 
 #' @param eta_star Optional argument to input a specific eta term rather than estimate it from the data. If K is a known covariance matrix that is full rank, this should be 1.
+#' @param fbm_flag Logical: is std_X an FBM type object? This is set internally by `plmm()`. 
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
 #' @param ... Not used yet
 #'
@@ -24,7 +25,7 @@
 #' 
 #' \dontrun{
 #' # this is an internal function; to call this, you would need to use the triple 
-#' # colon, eg penalizedLMM:::plmm_prep()
+#' # colon, eg plmm:::plmm_prep()
 #' prep1 <- plmm_prep(X = admix$X, y = admix$y, trace = TRUE)
 #' prep2 <- plmm_prep(X = admix$X, y = admix$y, diag_K = TRUE, trace = TRUE)
 #' }
@@ -46,20 +47,6 @@ plmm_prep <- function(std_X,
   ## coersion
   U <- s <- eta <- NULL
   
-  # set default k and create indicator 'trunc' to pass to plmm_svd
-  if(is.null(k)){
-    if('matrix' %in% class(std_X)){
-      k <- min(std_X_n, std_X_p)
-      trunc <- FALSE
-    }
-    
-    if("FBM" %in% class(std_X)){
-      # for FBM data, default k is 10% of the # of observations 
-      k <- trunc(std_X_n*0.1)
-      trunc <- TRUE
-    }
-    
-  }
   if(!is.null(k) & (k < min(std_X_n, std_X_p))){
     trunc <- TRUE
   } else if(!(k %in% 1:min(std_X_n, std_X_p))){
@@ -72,7 +59,7 @@ plmm_prep <- function(std_X,
   # set default: if diag_K not specified, set to false
   if(is.null(diag_K)){diag_K <- FALSE}
   
-  # handle the cases where no SVD is needed: 
+  # handle the cases where no decomposition is needed: 
   # case 1: K is the identity matrix 
   flag1 <- diag_K & is.null(K)
   if(flag1){
@@ -91,47 +78,74 @@ plmm_prep <- function(std_X,
   flag3 <- !is.null(K) & ('list' %in% class(K))
   if(flag3){
     if(trace){cat("\nK is a list; will pass SVD components from list to model fitting.")}
-    # case 3: K is a user-supplied list, as returned from choose_k()
     s <- K$s # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
     U <- K$U
   }
 
   # otherwise, need to do SVD:
-  if(trace){cat("\nStarting singular value decomposition.")}
   if(sum(c(flag1, flag2, flag3)) == 0){
+    if(trace){cat("\nStarting decomposition.")}
     # set default K: if not specified and not diagonal, use realized relatedness matrix
     if(is.null(K) & is.null(s)){
-      # NB: the is.null(S) keeps you from overwriting the 3 preceding cases 
-      if(trace){cat("\nUsing the default definition of the realized relatedness matrix.")}
-      svd_res <- plmm_svd(X = std_X, k = k, trunc = trunc, trace = trace)
+      # NB: the is.null(s) keeps you from overwriting the 3 preceding special cases 
+      
+      # approach to decomposition:
+      # n > p: take SVD of X
+      # n <= p: construct K, then take eigen(K)
+      if(std_X_n > std_X_p){
+      if(trace){
+        cat("\nCalculating the SVD of X")}
+      svd_res <- svd_X(std_X = std_X, k = k, trunc = trunc, trace = trace)
       s <- (svd_res$d^2)*(1/p)
       U <- svd_res$U
+      } else if (std_X_n <= std_X_p){
+        if(trace){cat("\nCalculating eigendecomposition of K")}
+        eigen_res <- eigen_K(std_X, p) 
+        s <- eigen_res$s
+        U <- eigen_res$U
+      }
+      
     } else {
-      # last case: K is a user-supplied matrix
-      svd_res <- plmm_svd(X = K, k = k, trunc = trunc, trace = trace)
-      s <- svd_res$d
-      U <- svd_res$U
+      # last case: K is a user-supplied matrix 
+      eigen_res <- eigen(K)
+      s <- eigen_res$values*(1/p) # note: our definition of the RRM averages over the number of features
+      U <- eigen_res$vectors
     }
     
   }
-  
+
   # error check: what if the combination of args. supplied was none of the SVD cases above?
   if(is.null(s) | is.null(U)){
-    stop("\nSomething is wrong in the SVD. The combination of supplied arguments does not match any cases handled in 
-         \n plmm_svd(), the internal function called by plmm() via plmm_prep().
-         \n Re-examine the supplied arguments -- should you have set diag_K = TRUE?
-         \n Or did you set diag_K = TRUE and specifiy a k value at the same time?")
+    stop("\nSomething is wrong in the SVD/eigendecomposition.
+    \nThe combination of supplied arguments does not match any cases handled in 
+         \n svd_X(), the internal function called by plmm() via plmm_prep().
+         \n Re-examine the supplied arguments -- here are some common mistakes:
+         \n \tDid you supply a list to K? Check its element names -- they must be 's' and 'U'. 
+         \n \t \t *If you used choose_k(), make sure you are supplying the 'svd_K' element returned from that function's result as the 'K' here.*
+         \n \tDid you intend to set diag_K = TRUE?
+         \n \tDid you set diag_K = TRUE and specifiy a k value at the same time? This combination of arguments is incompatible.")
   }
   
+  # estimate eta if needed
+  if (is.null(eta_star)) {
+    eta <- estimate_eta(s = s, U = U, y = y) 
+  } else {
+    # otherwise, use the user-supplied value (this option is mainly for simulation)
+    eta <- eta_star
+  }
   
   
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
-    # include X and y here b/c I will need them for cross validation 
+    # include std_X and y here b/c I will need them for cross validation 
     std_X = std_X,
     y = y,
     s = s,
     U = U,
+    std_X_details = std_X_details,
+    ns = ns,
+    eta = eta, # carry eta over to fit 
+    penalty.factor = penalty.factor,
     trace = trace,
     snp_names = if (is.null(colnames(std_X))) paste("snp", 1:std_X_p, sep="") else std_X_p))
   

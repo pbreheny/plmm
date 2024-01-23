@@ -18,8 +18,8 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   #   (and in so doing, leave out the ith fold)
   cv.args$prep$std_X <- full_cv_prep$std_X[fold!=i, ,drop=FALSE]
   # NB: need center & scale values here! Will pass this to untransform() via predict.list
-  attr(cv.args$prep$std_X, "center") <- attr(full_cv_prep$std_X, "center")
-  attr(cv.args$prep$std_X, "scale") <- attr(full_cv_prep$std_X, "scale")
+  # attr(cv.args$prep$std_X, "center") <- attr(full_cv_prep$std_X[fold!=i, ,drop=FALSE], "center")
+  # attr(cv.args$prep$std_X, "scale") <- attr(full_cv_prep$std_X[fold!=i, ,drop=FALSE], "scale")
   cv.args$prep$U <- full_cv_prep$U[fold!=i, , drop=FALSE]
   cv.args$prep$y <- full_cv_prep$y[fold!=i] 
   
@@ -27,8 +27,13 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   test_X <- full_cv_prep$std_X[fold==i, , drop=FALSE] 
   test_y <- full_cv_prep$y[fold==i]
   
+  # OLD WAY 
   # NB: eta used in each fold comes from the overall fit.args. If user-supplied, then 
   # use that in all fold; if not, estimate eta in each fold 
+  
+  # NEW WAY 
+  # I moved estimate_eta() into prep, so that this is only done once. In doing this,
+  # I am assuming that the eta is the same across the training and testing data.
 
   # fit a plmm within each fold 
   # lambda stays the same for each fold; comes from the overall fit in cv_plmm()
@@ -36,7 +41,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   
   if(type == "lp"){
     yhat <- predict.list(fit = fit.i,
-                          std_X = cv.args$prep$std_X,
+                          oldX = cv.args$prep$std_X,
                           newX = test_X,
                           type = 'lp')
     # yhat <- matrix(data = drop(Xbeta), nrow = length(y_test)) 
@@ -48,10 +53,9 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
     V11 <- estimated_V[fold!=i, fold!=i, drop = FALSE] 
     
     yhat <- predict.list(fit = fit.i,
-                         std_X = cv.args$prep$std_X,
+                         oldX = cv.args$prep$std_X,
                          newX = test_X,
                          type = 'blup',
-                         prep = cv.args$prep, 
                          V11 = V11,
                          V21 = V21, ...)
     

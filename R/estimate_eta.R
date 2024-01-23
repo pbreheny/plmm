@@ -7,6 +7,8 @@
 #' @keywords internal
 estimate_eta <- function(s, U, y){
   
+  # calculate null model 
+  
   # coercion
   eta <- NULL
   # estimate eta 

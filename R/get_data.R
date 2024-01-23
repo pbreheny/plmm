@@ -3,28 +3,34 @@
 #' 
 #' @param path The file path to the RDS object containing the processed data. Do not add the '.rds' extension to the path. 
 #' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL. 
-#' @param fbm Logical: Should the design matrix be returned as an object of type Filebacked Big Matrix (FBM) as opposed to a numeric matrix that will be stored in memory. By default, this will be TRUE if the object sizes exceeds 100 Mb.
+#' @param returnX Logical: Should the design matrix be returned as a numeric matrix that will be stored in memory. By default, this will be FALSE if the object sizes exceeds 100 Mb.
 #' @param trace Logical: Should trace messages be shown? Default is TRUE. 
 #' 
-#' @return A list with four components: 
+#' @return A list with these components: 
 #'  * std_X, the column-standardized design matrix as either (1) a numeric matrix or (2) a filebacked matrix (FBM). See `bigstatsr::FBM()` and `bigsnpr::bigSnp-class` documentation for details. 
 #'  * fam, a data frame containing the pedigree information (like a .fam file in PLINK)
 #'  * map, a data frame containing the feature information (like a .bim file in PLINK)
 #'  * ns: A vector indicating the which columns of X contain nonsingular features (i.e., features with variance != 0. 
 #'  * center: A vector of values for centering each column in X
 #'  * scale: A vector of values for scaling each column in X 
+#' 
+#' @importFrom data.table setorderv
+#' 
 #' @export
 #' 
 #' @examples
 #' \dontrun{
-#' pen <- get_data(path = "inst/extdata/penncath_lite")
+#' pen <- get_data(path = "../temp_files/penncath_lite", trace = TRUE)
 #' }
 #' 
 #' @details
 #' The .rds object should have an 'std_X' element - this is what will be used as the design matrix for analysis. This design matrix should *not* include an intercept column (this will be added later in `plmm_fit`()).
 #' 
+#' In the returned list, the `fam` data will be sorted by family and by individual, as in `dplyr::arrange(family.ID, sample.ID)`.
+#' The rows of `X` will be sorted to align in the same order as in `fam`, where rownames of `X` will be sample ID. 
 #' 
-get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
+#' 
+get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
   
   rds <- paste0(path, ".rds")
   bk <- paste0(path, ".bk") # .bk will be present if RDS was created with bigsnpr methods 
@@ -36,18 +42,18 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
   }
   
   # return data in a tractable format 
-  if (missing(fbm)) {
+  if (missing(returnX)) {
     if (utils::object.size(obj$std_X) > 1e8) {
       warning("\nDue to the large size of X (>100 Mb), X has been returned as a file-backed matrix (FBM).
               \nTo turn this message off, explicitly specify fbm=TRUE or fbm=FALSE).")
-      fbm <- TRUE
+      returnX <- TRUE
     } else {
       # if it fits, it ships 
-      fbm <- FALSE
+      returnX <- FALSE
     }
   }
   
-  if(!fbm){
+  if(returnX){
     # get std_X as a matrix 
     std_X <- obj$std_X[,]
     if(!is.null(row_id)){
@@ -61,7 +67,15 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
                         obj$map$marker.ID[obj$ns])
     # TODO fix this error: Error in dimnames(X) <- list(row_names, o
     
-    cat("\nReminder: the X that is returned here is column-standardized.
+    
+    if(!(all.equal(obj$fam$sample.ID, as.numeric(rownames(std_X))))){
+      stop("\nThere is an issue with the alignment between the rownames of the genotype data and the sample IDs.
+           \nWere there individuals represented in the .bed file who are not in the .fam file, or vice versa?
+           \nPlease ensure that your PLINK files represent all the same individuals before analyzing data with PLMM.")
+    }
+    
+    
+    cat("\nReminder: the X that is returned here is column-standardized, with constant features removed.
         \nA copy of the original data is available via the 'genotypes' matrix in the .rds object")
     return(list(n = obj$n,
                 p = obj$p,
@@ -73,11 +87,6 @@ get_data <- function(path, row_id = NULL, fbm, trace = TRUE){
                 ns = obj$ns))
   } else {
     cat("Note: The design matrix is being returned as a file-backed matrix (FBM) -- see bigstatsr::FBM() for details.")
-    #     \n At this time, plmm() cannot analyze design matrix X in this FBM format. Allowing such an option will
-    #     \n require writing the 'meat and potatoes' of plmm() in C++, which is a work in progress. For now, 
-    #     \n functions from package bigsnpr may be used for analyzing FBM data.")
-    
-    # std_X <- obj$std_X
     
     cat("\nReminder: the X that is returned here is column-standardized.
         \nA copy of the original data is available via the 'genotypes' matrix in the .rds object")

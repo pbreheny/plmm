@@ -2,7 +2,7 @@
 % Please edit documentation in R/log_lik.R
 \name{log_lik}
 \alias{log_lik}
-\title{Evaluate the negative log-likelihood of a null Gaussian penalizedLMM model}
+\title{Evaluate the negative log-likelihood of a null Gaussian plmm model}
 \usage{
 log_lik(eta, rot_y, s)
 }
