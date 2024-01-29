@@ -108,6 +108,9 @@ plmm_prep <- function(X,
     if(trace){cat("\nK is a list; will pass SVD components from list to model fitting.")}
     s <- K$s # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
     U <- K$U
+    # TODO: add a check for signs
+    # sign_check <- flip_signs(X = std_X, U = U, V = U, d = s)
+    # U <- sign_check$U
   }
 
   # otherwise, need to do SVD:
@@ -127,11 +130,17 @@ plmm_prep <- function(X,
       svd_res <- svd_X(X = std_X, k = k, trunc = trunc, trace = trace)
       s <- (svd_res$d^2)*(1/p)
       U <- svd_res$U
+      # TODO: add a check for signs 
+      # sign_check <- flip_signs(X = std_X, U = U, V = U, d = s)
+      # U <- sign_check$U
       } else if (n_stdX <= p_stdX){
         if(trace){cat("\nCalculating eigendecomposition of K")}
         eigen_res <- eigen_K(std_X, p) 
         s <- eigen_res$s
         U <- eigen_res$U
+        # check signs 
+        sign_check <- flip_signs(X = eigen_res$K, U = U, V = U, d = s)
+        U <- sign_check$U
       }
       
     } else {
@@ -139,9 +148,13 @@ plmm_prep <- function(X,
       eigen_res <- eigen(K)
       s <- eigen_res$values
       U <- eigen_res$vectors
+      # check signs
+      sign_check <- flip_signs(X = K, U = U, V = U, d = s)
+      U <- sign_check$U
     }
     
   }
+
 
   # error check: what if the combination of args. supplied was none of the SVD cases above?
   if(is.null(s) | is.null(U)){
