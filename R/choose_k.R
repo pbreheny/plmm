@@ -8,7 +8,7 @@
 #' @param eps A percentage indicating the largest permissible approximation error between the true and approximate relatedness matrices. Defaults to 0.1 (10% error).
 #' @param trace Logical: should progress bars and messages be printed to the console? Defaults to TRUE. 
 #' @param type The type of norm to use in determining distance between true and approximate K. Defaults to 'F', for Frobenious norm. See Matrix::norm() for details.
-#' @param returnKapprox Logical: in addition to the list of SVD components for approximated K, should the approximation be returned as a matrix? Defaults to FALSE. 
+#' @param returnKapprox Logical: in addition to the list of SVD components for approximated K, should the approximation be returned as a matrix? Defaults to TRUE. 
 #' @param returnK Logical: should the true K (as in relatedness_mat(X)) be returned? Defaults to FALSE.  
 #' 
 #' @return A list with at least 3 items:
@@ -34,7 +34,7 @@ choose_k <- function(X,
                      eps = 0.1,
                      trace = TRUE,
                      type = "F",
-                     returnKapprox = FALSE,
+                     returnKapprox = TRUE,
                      returnK = FALSE){
   
   # set defaults 
@@ -97,7 +97,7 @@ choose_k <- function(X,
   )
   
   # optional items to return:
-  if(returnKapprox){ret$K_approx = A_k}
+  if(returnKapprox){ret$svd_K$K_approx = A_k}
   if(returnK){ret$K = K}
   
   return(ret)
