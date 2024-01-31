@@ -108,9 +108,10 @@ plmm_prep <- function(X,
     if(trace){cat("\nK is a list; will pass SVD components from list to model fitting.")}
     s <- K$s # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
     U <- K$U
-    # TODO: add a check for signs
-    # sign_check <- flip_signs(X = std_X, U = U, V = U, d = s)
-    # U <- sign_check$U
+    # TODO: add a check for signs and list names
+    # stopifnot("K_approx" %in% names(K))
+    sign_check <- flip_signs(X = K$K_approx, U = U, V = U, d = s)
+    U <- sign_check$U
   }
 
   # otherwise, need to do SVD:
