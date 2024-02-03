@@ -176,8 +176,8 @@ plmm_prep <- function(X,
     # otherwise, use the user-supplied value (this option is mainly for simulation)
     eta <- eta_star
   }
-  
-  
+
+
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
     p = p,

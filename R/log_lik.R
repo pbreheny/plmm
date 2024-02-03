@@ -15,9 +15,7 @@
 #' (log_lik(eta = fit$eta, rot_y = U%*%admix$y, s = ev$values ))
 #' }
 
-log_lik <- function(eta, rot_y, s){
-
-  n <- dim(rot_y)[1]
+log_lik <- function(eta, rot_y, s, n){
 
   # evaluate log determinant
   sd <- eta * s + (1 - eta)
@@ -33,7 +31,6 @@ log_lik <- function(eta, rot_y, s){
   nLL <- 0.5*(n*log(2*pi) + ldet + n + n*log(ss))
   # TODO: double check the derivation for this. Do we need the factor of n 
   #   in the last term? 
-
   return(nLL)
 
 }
