@@ -11,5 +11,6 @@ eigen_K <- function(std_X, p){
   K <- tcrossprod(std_X)/p
   decomp <- eigen(K)
   return(list(s = decomp$values,
-              U = decomp$vectors))
+              U = decomp$vectors,
+              K = K))
 }

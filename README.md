@@ -1,5 +1,5 @@
 <!-- badges: start -->
-[![GitHub version](https://img.shields.io/static/v1?label=GitHub&message=2.2.0&color=blue&logo=github)](https://github.com/pbreheny/plmm)
+[![GitHub version](https://img.shields.io/static/v1?label=GitHub&message=2.2.1&color=blue&logo=github)](https://github.com/pbreheny/plmm)
 [![R-CMD-check](https://github.com/pbreheny/plmm/workflows/R-CMD-check/badge.svg)](https://github.com/pbreheny/plmm/actions)
 <!-- badges: end -->
 

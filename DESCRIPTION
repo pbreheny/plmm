@@ -1,7 +1,7 @@
 Package: plmm
 Title: Fit nonconvex-penalized linear mixed models to account for the presence of unobserved confounding effects
-Version: 2.2.0
-Date: 2023-10-16
+Version: 2.2.1
+Date: 2024-01-16
 Authors@R: c(
     person("Anna C.","Reisetter", role = c("aut"),
         email = "anna-reisetter@uiowa.edu",
@@ -18,28 +18,26 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Suggests: 
     ggmix, 
     graphics, 
     grDevices, 
-    parallel, 
+    parallel,
+    popkin,
     MASS, 
     knitr, 
-    rmarkdown
+    rmarkdown,
+    tinytest
 Imports: 
-    bnpsd,
+    bigstatsr,
+    bigsnpr,
+    data.table,
     glmnet,
     Matrix,
     methods,
     ncvreg,
-    popkin,
+    RSpectra,
     stats,
     utils,
-    zeallot,
-    tinytest,
-    RSpectra,
-    bigstatsr,
-    bigsnpr,
-    data.table
-    
+    zeallot

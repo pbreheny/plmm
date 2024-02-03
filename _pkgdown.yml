@@ -7,12 +7,6 @@ template:
       pkgdown-nav-height: 100px
 
 reference:
-  - title: Generating data
-    contents:
-    - sim_ps_dat
-    - sim_environ_eff
-    - sim_ps_x
-    
   - title: Fitting penalized linear mixed models (PLMMs - the featured presentation) 
     contents:
     - choose_k

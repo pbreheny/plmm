@@ -36,7 +36,7 @@ null_model <- function(params, y, U, s){
   # name parameters
   eta <- params[1]
   beta0 <- params[2]
-  
+
   # create intercept (for null model, this is the only predictor)
   n <- length(y)
   intcpt <- rep(1, n)

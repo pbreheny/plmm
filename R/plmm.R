@@ -116,7 +116,7 @@ plmm <- function(X,
     # first, check type/class:
     if (!inherits(K, "matrix") & !is.list(K)) {
       tmp <- try(K <- stats::model.matrix(~0+., data=K), silent=TRUE)
-      if (inherits(tmp, "try-error")) stop("K must be either (1) able to be coerced to a matrix or (2) be a list.", call.=FALSE)
+      if (inherits(tmp, "try-error")) stop("K must be either (1) able to be coerced to a matrix or (2) be a list with elements 's' and 'U'.", call.=FALSE)
     }
     if (typeof(K)=="integer") storage.mode(X) <- "double" # change K to X 
     if (typeof(K)=="character") stop("K must be a numeric matrix", call.=FALSE)
@@ -145,7 +145,7 @@ plmm <- function(X,
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
   
   
-  if(trace){cat("Passed all checks. Beginning singular value decomposition.\n")}
+  if(trace){cat("\nPassed all checks. Beginning singular value decomposition.\n")}
   the_prep <- plmm_prep(X = X,
                         y = y,
                         K = K,
