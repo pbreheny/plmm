@@ -74,7 +74,9 @@ null_model <- function(params, y, U, s){
 #' @keywords internal
 test_eta_estimation <- function(sig_s, sig_eps, beta0, K, ...){
   
-  # true_eta <- sig_s/(sig_s + sig_eps)
+  # Note: true_eta <- sig_s/(sig_s + sig_eps)
+  
+  # simulate data
   intcpt <- rep(1, nrow(K))
   
   u <- mvtnorm::rmvnorm(n = 1,
@@ -86,6 +88,16 @@ test_eta_estimation <- function(sig_s, sig_eps, beta0, K, ...){
   y <- intcpt*beta0 + u + eps # null model = intercept only model s
 
   eig_K <- eigen(K)
+  nz <- which(eig_K$values > 0.00000001)
+
+  # check signs 
+  sign_check <- flip_signs(X = K,
+                           U = eig_K$vectors[,nz],
+                           V = eig_K$vectors[,nz], 
+                           d = eig_K$values[nz])
+  U <- sign_check$U
+  
+  # estimate eta
   tmp <- estimate_eta(s = eig_K$values, U = eig_K$vectors, y = y, ...)
   
   return(list(hat_eta = tmp$eta,

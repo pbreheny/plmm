@@ -25,6 +25,7 @@ foo2 <- plmm(X = admix$X, y = admix$y, K = admix$trunc_K$svd_K)
 # eta is known and then see which approach (keeping singular values = 0 or not)
 # gives the accurate result 
 K3 <- generate_K(4,5, mu = seq(0.7, 1.3, length.out = 5))
+K3_trunc <- RSpectra::eigs(K3, k = 4)
 hat_eta <- hat_beta0 <-rep(NA_integer_, 100)
 pb <- txtProgressBar(0, 100, style = 3)
 for(i in 1:100){
@@ -32,9 +33,12 @@ for(i in 1:100){
                              sig_eps = 1,
                              beta0 = 2,
                              K = K3)
-  hat_eta[i] <- res
+
+  hat_eta[i] <- res$hat_eta
+  hat_beta0[i] <- res$hat_beta0
   setTxtProgressBar(pb, i)
 }
 
 summary(hat_eta); boxplot(hat_eta)
+summary(hat_beta0)
 
