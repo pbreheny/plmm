@@ -16,7 +16,7 @@ estimate_eta <- function(s, U, y, eta_star){
   # estimate eta 
   # TODO: maybe use dnorm()?? 
   rot_y <- crossprod(U, y)
-  opt <- stats::optimize(f=log_lik, c(0.01, 0.99), rot_y=rot_y, s=s)
+  opt <- stats::optimize(f=log_lik, c(0.01, 0.99), rot_y=rot_y, s=s, n=nrow(U))
   eta <- opt$minimum 
   
   
