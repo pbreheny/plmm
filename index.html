@@ -91,9 +91,9 @@
 <p>The branches of this repo are organized in the following way:</p>
 <ul>
 <li><p><code>master</code> is the main branch with all the latest updates</p></li>
-<li><p><code>change_eigen_default</code> is a development branch where I am working to change the default approach for calculating the decomposition done in the internal function <code><a href="reference/plmm_prep.html">plmm_prep()</a></code> in order to make it faster.</p></li>
 <li><p><code>estimate_eta</code> is a development branch where we are working through an alternative approach for estimating <span class="math inline"><em>η</em></span>.</p></li>
 <li><p><code>fbm</code> is a development branch where I am working to extend our current methods to analyze data from a design matrix stored as a file-backed object (a Filebacked Big Matrix, or FBM). See package <a href="https://privefl.github.io/bigstatsr/" class="external-link">bigstatsr</a> for more info on these objects.</p></li>
+<li><p><code>sign_flip</code> is a development branch where I am toying with how to handle the issues caused by +/- signs being flipped as part of truncated SVD.</p></li>
 <li><p><code>refine_workflow</code> is an <strong>archived</strong> branch in which I explored changing the workflow to make cross validation more efficient. This change involved moving the rotation step into <code><a href="reference/plmm_prep.html">plmm_prep()</a></code>, instead of having that step as part of model fitting in <code><a href="reference/plmm_fit.html">plmm_fit()</a></code>. I found that this change was not compatible with cross validation, for reasons that I am currently writing up as part of a paper. Once that paper is done, I will delete this branch.</p></li>
 </ul>
 </div>
