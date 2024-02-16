@@ -39,6 +39,7 @@ plmm_prep <- function(std_X,
                       K = NULL,
                       diag_K = NULL,
                       eta_star = NULL,
+                      fbm_flag,
                       penalty.factor = rep(1, ncol(X)),
                       trace = NULL, 
                       ...){
@@ -47,13 +48,17 @@ plmm_prep <- function(std_X,
   ## coersion
   U <- s <- eta <- NULL
   
-  if(!is.null(k) & (k < min(std_X_n, std_X_p))){
-    trunc <- TRUE
-  } else if(!(k %in% 1:min(std_X_n, std_X_p))){
-    stop("\nk value is out of bounds. 
+  if(!is.null(k)){
+    
+    if(k < min(std_X_n, std_X_p)){
+      trunc <- TRUE
+    } else {
+      stop("\nk value is out of bounds. 
          \nIf specified, k must be an integer in the range from 1 to min(nrow(X), ncol(X)). 
          \nwhere X does not include singular columns. For help detecting singularity,
          \nsee ncvreg::std()")
+    }
+    
   }
   
   # set default: if diag_K not specified, set to false
@@ -81,7 +86,7 @@ plmm_prep <- function(std_X,
     s <- K$s # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
     U <- K$U
   }
-
+ 
   # otherwise, need to do SVD:
   if(sum(c(flag1, flag2, flag3)) == 0){
     if(trace){cat("\nStarting decomposition.")}
@@ -93,14 +98,15 @@ plmm_prep <- function(std_X,
       # n > p: take SVD of X
       # n <= p: construct K, then take eigen(K)
       if(std_X_n > std_X_p){
-      if(trace){
-        cat("\nCalculating the SVD of X")}
-      svd_res <- svd_X(std_X = std_X, k = k, trunc = trunc, trace = trace)
-      s <- (svd_res$d^2)*(1/p)
-      U <- svd_res$U
+      if(trace){cat("\nSince n > p, PLMM is calculating the SVD of X.")}
+        svd_res <- svd_X(std_X = std_X, k = k, trunc = trunc,
+                         fbm_flag = fbm_flag, trace = trace)
+        s <- (svd_res$d^2)*(1/p)
+        U <- svd_res$U
+      
       } else if (std_X_n <= std_X_p){
-        if(trace){cat("\nCalculating eigendecomposition of K")}
-        eigen_res <- eigen_K(std_X, p) 
+        if(trace){cat("\nSince n > p, PLMM is calculating the eigendecomposition of K")}
+        eigen_res <- eigen_K(std_X, p, fbm_flag = fbm_flag) 
         s <- eigen_res$s
         U <- eigen_res$U
       }
@@ -134,6 +140,10 @@ plmm_prep <- function(std_X,
     eta <- eta_star
   }
   
+# if FBM, keep U filebacked
+  if(fbm_flag){
+    U <- bigstatsr::as_FBM(U)
+  }
   
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
@@ -142,12 +152,16 @@ plmm_prep <- function(std_X,
     y = y,
     s = s,
     U = U,
-    std_X_details = std_X_details,
-    ns = ns,
     eta = eta, # carry eta over to fit 
-    penalty.factor = penalty.factor,
-    trace = trace,
-    snp_names = if (is.null(colnames(std_X))) paste("snp", 1:std_X_p, sep="") else std_X_p))
+    trace = trace))
+  
+  # label SNPs, if applicable
+    if (is.null(colnames(std_X))){
+      snp_names <- paste("snp", 1:std_X_p, sep="") 
+    } else {
+      snp_names <- std_X_p
+      }
+  ret$snp_names <- snp_names
   
   return(ret)
   

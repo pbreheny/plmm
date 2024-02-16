@@ -4,6 +4,7 @@
 #' NB: this function is simply a wrapper for plmm_prep -> plmm_fit -> plmm_format
 #' @param X Design matrix object or a string with the file path to a design matrix. If a string, string will be passed to `get_data()`. 
 #' * Note: X may include clinical covariates and other non-SNP data, but no missing values are allowed.
+#' @param fbm Logical: should X be treated as filebacked? Relevant only when X is a string to be passed to `get_data()`. Defaults to NULL, using the default setttings of `get_data()` to determine whether X should be stored in memory.
 #' @param std_needed Logical: does the supplied X need to be standardized? Defaults to FALSE, since `process_plink()` standardizes the design matrix by default. 
 #' @param y Continuous outcome vector. Defaults to NULL, assuming that the outcome is the 6th column in the .fam PLINK file data. Can also be a user-supplied numeric vector. 
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
@@ -73,6 +74,7 @@
 
 
 plmm <- function(X,
+                 fbm = NULL,
                  std_needed = FALSE,
                  y = NULL,
                  k = NULL, 
@@ -98,9 +100,20 @@ plmm <- function(X,
 # check X types -------------------------------------------------
   ## string with a filepath -----------------------------
   if("character" %in% class(X)){
-    dat <- get_data(path = X, returnX = TRUE, trace = trace)
+    if(is.null(fbm)){
+      dat <- get_data(path = X, trace = trace)
+    } else if (fbm){
+      dat <- get_data(path = X, returnX = FALSE, trace = trace)
+    } else if (!fbm){
+      dat <- get_data(path = X, returnX = TRUE, trace = trace)
+    }
+    
     std_X <- dat$std_X
-    if("FBM.code256" %in% class(X) | "FBM" %in% class(X)){fbm_flag <- TRUE} else {fbm_flag <- FALSE}
+    if("FBM.code256" %in% class(std_X) | "FBM" %in% class(std_X)){
+      fbm_flag <- TRUE
+    } else {
+        fbm_flag <- FALSE
+        }
   }
   ## FBM object ----------------
   if("FBM.code256" %in% class(X) | "FBM" %in% class(X)){stop("To analyze data from a file-backed X matrix, meta-data must also be supplied. 
@@ -147,11 +160,12 @@ plmm <- function(X,
       std_X_scale <- attr(std_X, 'scale')
       ns <- attr(std_X, 'nonsingular')
       # designate the dimensions of the standardized design matrix, with only ns columns
-      std_X_n <- nrow(std_X)
-      std_X_p <- ncol(std_X)
     }
     
   }
+  # designate dimensions of the 
+  std_X_n <- nrow(std_X)
+  std_X_p <- ncol(std_X)
   
   #  check y types -------------------------------
   # if y is null, use .fam file 
@@ -210,7 +224,7 @@ plmm <- function(X,
     if (is.list(K)) {
       if(!('s' %in% names(K) & 'U' %in% names(K))){stop('Components s and U not both found in list supplied for K.')}
     }
-    # last thing: check dimensions
+    # last check: look at dimensions
     if (is.matrix(K)){
       if (dim(K)[1] != std_X_n || dim(K)[2] != std_X_n) stop("Dimensions of K and X do not match", call.=FALSE)
     } else if (is.list(K)) {
@@ -218,6 +232,23 @@ plmm <- function(X,
     }
   
   }
+  
+  # create a list that captures the centering/scaling for std_X; will need this 
+  # later, see `untransform()`
+  if(fbm_flag){
+    std_X_details <- list(
+      center = dat$std_X_center,
+      scale = dat$std_X_scale,
+      ns = dat$ns
+    )
+  } else {
+    std_X_details <- list(
+      center = attr(std_X, 'center'), # singular columns have center = 0
+      scale = attr(std_X, 'scale'), # singular columns have scale = 0
+      ns = attr(std_X, "nonsingular")
+    )
+  }
+  
 
 
   # prep (SVD)-------------------------------------------------
@@ -233,11 +264,11 @@ plmm <- function(X,
                         fbm_flag = fbm_flag,
                         trace = trace)
 
-  
-
   # rotate & fit -------------------------------------------------------------
   if(trace){cat("Beginning model fitting.\n")}
+  
   the_fit <- plmm_fit(prep = the_prep,
+                      std_X_details = std_X_details,
                       eta_star = eta_star,
                       penalty.factor = penalty.factor,
                       fbm_flag = fbm_flag,

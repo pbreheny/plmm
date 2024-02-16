@@ -2,7 +2,7 @@
 #' This function is intended to be called after `process_plink()` has been called once. 
 #' 
 #' @param path The file path to the RDS object containing the processed data. Do not add the '.rds' extension to the path. 
-#' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to NULL. 
+#' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to "iid". 
 #' @param returnX Logical: Should the design matrix be returned as a numeric matrix that will be stored in memory. By default, this will be FALSE if the object sizes exceeds 100 Mb.
 #' @param trace Logical: Should trace messages be shown? Default is TRUE. 
 #' 
@@ -30,7 +30,7 @@
 #' The rows of `X` will be sorted to align in the same order as in `fam`, where rownames of `X` will be sample ID. 
 #' 
 #' 
-get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
+get_data <- function(path, row_id = "iid", returnX, trace = TRUE){
   
   rds <- paste0(path, ".rds")
   bk <- paste0(path, ".bk") # .bk will be present if RDS was created with bigsnpr methods 
@@ -56,18 +56,16 @@ get_data <- function(path, row_id = NULL, returnX, trace = TRUE){
   if(returnX){
     # get std_X as a matrix 
     std_X <- obj$std_X[,]
-    if(!is.null(row_id)){
-      if(row_id == "iid"){row_names <- obj$fam$sample.ID}
-      if(row_id == "fid"){row_names <- obj$fam$family.ID}
-    } else {
-      row_names <- 1:length(obj$fam$sample.ID)
-    }
+    
+    # set row names 
+    if(row_id == "iid"){row_names <- obj$fam$sample.ID}
+    if(row_id == "fid"){row_names <- obj$fam$family.ID}
+    
     
     dimnames(std_X) <- list(row_names,
-                        obj$map$marker.ID[obj$ns])
+                            obj$map$marker.ID[obj$ns])
     # TODO fix this error: Error in dimnames(X) <- list(row_names, o
-    
-    
+ 
     if(!(all.equal(obj$fam$sample.ID, as.numeric(rownames(std_X))))){
       stop("\nThere is an issue with the alignment between the rownames of the genotype data and the sample IDs.
            \nWere there individuals represented in the .bed file who are not in the .fam file, or vice versa?

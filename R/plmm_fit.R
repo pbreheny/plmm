@@ -1,6 +1,7 @@
 #' PLMM fit: a function that fits a PLMM using the values returned by plmm_prep()
 #' This is an internal function for \code{cv.plmm}
 #' @param prep A list as returned from \code{plmm_prep}
+#' @param std_X_details A list with components 'center' (values used to center X), 'scale' (values used to scale X), and 'ns' (indices for nonsignular columns of X)
 #' @param eta_star The ratio of variances (passed from plmm())
 #' @param penalty.factor A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
 #' @param fbm_flag Logical: is std_X an FBM object? Passed from `plmm()`.
@@ -36,6 +37,7 @@
 #'
 
 plmm_fit <- function(prep, 
+                     std_X_details,
                      eta_star,
                      penalty.factor,
                      fbm_flag,
@@ -77,7 +79,7 @@ plmm_fit <- function(prep,
     stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
     attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
   } else if ('FBM' %in% class(prep$std_X)){
-    w <- (eta * prep$s + (1 - eta))^(-1/2)
+    w <- (prep$eta * prep$s + (1 - prep$eta))^(-1/2)
     Ut <- bigstatsr::big_transpose(prep$U)
     wUt <- bigstatsr::FBM(Ut$nrow, Ut$ncol)
     bigstatsr::big_apply(Ut,
@@ -147,7 +149,7 @@ plmm_fit <- function(prep,
                      })
   }
   
-  if(prep$trace){cat("\nRotation complete.Beginning model fitting.")}
+  if(prep$trace){cat("\nRotation complete. Beginning model fitting.")}
   
   # set up lambda -------------------------------------------------------
   if('matrix' %in% class(stdrot_X)){
@@ -169,12 +171,14 @@ plmm_fit <- function(prep,
     }
   }
    
-  # make sure to *not* penalize the intercept term 
-  new.penalty.factor <- c(0, penalty.factor)
+# keep only those penalty factors which penalize non-singular values 
+penalty.factor <- penalty.factor[std_X_details$ns]
+# make sure to *not* penalize the intercept term 
+new.penalty.factor <- c(0, penalty.factor)
   
   # placeholders for results
   init <- c(0, init) # add initial value for intercept
-  browser() # PICK UP HERE!
+  
   if('matrix' %in% class(stdrot_X)){
     r <- drop(rot_y - stdrot_X %*% init)
     linear.predictors <- matrix(NA, nrow = nrow(stdrot_X), ncol=nlambda)
@@ -208,14 +212,18 @@ plmm_fit <- function(prep,
     }
     
   } else if ('FBM' %in% class(stdrot_X)){
-      res <- biglasso_fit(X = stdrot_X,
-                                     y.train = rot_y,
-                                     ind.col = 2:stdrot_X$ncol,
-                                     alphas = alpha,
-                                     nlambda = nlambda,
-                                     pf.X = penalty.factor,
-                                     dfmax = dfmax,
-                                     warn = warn)
+      res <- rawfit_gaussian(X = stdrot_X,
+                             y = rot_y,
+                             init = init,
+                             r = r,
+                             xtx = xtx,
+                             penalty = penalty,
+                             lambda = lam,
+                             eps = eps,
+                             max_iter = max.iter, 
+                             gamma = gamma,
+                             multiplier = penalty.factor,
+                             alpha = alpha)
       # QUESTION: should I include 'r' here ^^? 
       # TODO: add a way to pass additional args to this function via '...'
     
