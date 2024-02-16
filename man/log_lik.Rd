@@ -2,27 +2,22 @@
 % Please edit documentation in R/log_lik.R
 \name{log_lik}
 \alias{log_lik}
-\title{Evaluate the negative log-likelihood of a null Gaussian plmm model}
+\title{Evaluate the negative log-likelihood of an intercept-only Gaussian plmm model}
 \usage{
-log_lik(eta, rot_y, s)
+log_lik(eta, n, s, U, y)
 }
 \arguments{
 \item{eta}{The proportion of variance in the outcome that is attributable to causal SNP effects. In other words, SNR. Sometimes referred to as the narrow-sense heritability.}
 
-\item{rot_y}{The the continuous outcome, y, rotated by the eigenvectors of the similarity matrix, K.}
+\item{n}{The number of observations}
 
-\item{s}{The eigenvalues of the similarity matrix, K.}
+\item{s}{The singular values of K, the realized relationship matrix}
+
+\item{U}{The left-singular vectors of the \emph{standardized} design matrix}
+
+\item{y}{Continuous outcome vector.}
 }
 \description{
-This function allows you to evaluate the negtive log-likelihood of a linear mixed model under the assumption of a null model in order to estimate the variance parameter, eta.
-}
-\examples{
-\dontrun{
-admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix 
-ev <- eigen(admix$K)
-U <- ev$vectors
-fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
-(log_lik(eta = fit$eta, rot_y = U\%*\%admix$y, s = ev$values ))
-}
+This function allows you to evaluate the negative log-likelihood of a linear mixed model under the assumption of a null model in order to estimate the variance parameter, eta.
 }
 \keyword{internal}

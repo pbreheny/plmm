@@ -46,6 +46,7 @@ test_eta_estimation <- function(sig_s, sig_eps, K, ...){
   nz <- which(eig_K$values > 0.00000001)
 
   # check signs 
+  # TODO: determine if we need this here
   # sign_check <- flip_signs(X = K,
   #                          U = eig_K$vectors[,nz],
   #                          V = eig_K$vectors[,nz], 

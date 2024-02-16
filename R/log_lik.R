@@ -1,6 +1,6 @@
-#' Evaluate the negative log-likelihood of a null Gaussian plmm model
+#' Evaluate the negative log-likelihood of an intercept-only Gaussian plmm model
 #'
-#' This function allows you to evaluate the negtive log-likelihood of a linear mixed model under the assumption of a null model in order to estimate the variance parameter, eta.
+#' This function allows you to evaluate the negative log-likelihood of a linear mixed model under the assumption of a null model in order to estimate the variance parameter, eta.
 #' @param eta The proportion of variance in the outcome that is attributable to causal SNP effects. In other words, SNR. Sometimes referred to as the narrow-sense heritability.
 #' @param n The number of observations 
 #' @param s The singular values of K, the realized relationship matrix
@@ -8,14 +8,6 @@
 #' @param y Continuous outcome vector.
 #' @keywords internal
 #' 
-#' @examples 
-#' \dontrun{
-#' admix$K <- relatedness_mat(admix$X) # create an estimated covariance matrix 
-#' ev <- eigen(admix$K)
-#' U <- ev$vectors
-#' fit <- plmm(X = admix$X, y = admix$y, K = admix$K)
-#' (log_lik(eta = fit$eta, rot_y = U%*%admix$y, s = ev$values ))
-#' }
 
 log_lik <- function(eta, n, s, U, y){
 
@@ -41,10 +33,6 @@ log_lik <- function(eta, n, s, U, y){
   intcpt_crossprod <- crossprod(rot_intcpt)
   intcpt_y_crossprod <- crossprod(rot_intcpt, rot_y)
   hat_beta_mle <- drop(intcpt_y_crossprod/intcpt_crossprod)
-  # alternative:   
-  # numerator <- c(w2^-1)*intcpt_y_crossprod
-  # denominator <- c(w2^-1)*intcpt_crossprod
-  # hat_beta_mle <- numerator/denominator
   
   # using hat_beta_mle, calculate the quadratic term from the log likelihood
   rot_e <- rot_y - (rot_intcpt*hat_beta_mle) # e = 'error', y - mean

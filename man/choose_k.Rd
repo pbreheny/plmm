@@ -11,7 +11,7 @@ choose_k(
   eps = 0.1,
   trace = TRUE,
   type = "F",
-  returnKapprox = FALSE,
+  returnKapprox = TRUE,
   returnK = FALSE
 )
 }
@@ -32,7 +32,7 @@ choose_k(
 
 \item{type}{The type of norm to use in determining distance between true and approximate K. Defaults to 'F', for Frobenious norm. See Matrix::norm() for details.}
 
-\item{returnKapprox}{Logical: in addition to the list of SVD components for approximated K, should the approximation be returned as a matrix? Defaults to FALSE.}
+\item{returnKapprox}{Logical: in addition to the list of SVD components for approximated K, should the approximation be returned as a matrix? Defaults to TRUE.}
 
 \item{returnK}{Logical: should the true K (as in relatedness_mat(X)) be returned? Defaults to FALSE.}
 }

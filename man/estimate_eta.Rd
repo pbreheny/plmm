@@ -5,9 +5,11 @@
 \title{Estimate eta (to be used in rotating the data)
 This function is called internally by \code{plmm()}}
 \usage{
-estimate_eta(s, U, y, eta_star)
+estimate_eta(n, s, U, y, eta_star)
 }
 \arguments{
+\item{n}{The number of observations}
+
 \item{s}{The singular values of K, the realized relationship matrix}
 
 \item{U}{The left-singular vectors of the \emph{standardized} design matrix}
