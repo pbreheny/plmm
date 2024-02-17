@@ -110,8 +110,8 @@ plmm_prep <- function(X,
     U <- K$U
     # TODO: add a check for signs and list names
     # stopifnot("K_approx" %in% names(K))
-    sign_check <- flip_signs(X = K$K_approx, U = U, V = U, d = s)
-    U <- sign_check$U
+    # sign_check <- flip_signs(X = K$K_approx, U = U, V = U, d = s)
+    # U <- sign_check$U
   }
 
   # otherwise, need to do SVD:
@@ -140,8 +140,8 @@ plmm_prep <- function(X,
         s <- eigen_res$s
         U <- eigen_res$U
         # check signs 
-        sign_check <- flip_signs(X = eigen_res$K, U = U, V = U, d = s)
-        U <- sign_check$U
+        # sign_check <- flip_signs(X = eigen_res$K, U = U, V = U, d = s)
+        # U <- sign_check$U
       }
       
     } else {
@@ -150,8 +150,8 @@ plmm_prep <- function(X,
       s <- eigen_res$values
       U <- eigen_res$vectors
       # check signs
-      sign_check <- flip_signs(X = K, U = U, V = U, d = s)
-      U <- sign_check$U
+      # sign_check <- flip_signs(X = K, U = U, V = U, d = s)
+      # U <- sign_check$U
     }
     
   }
