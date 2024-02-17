@@ -33,10 +33,10 @@ The branches of this repo are organized in the following way:
 
   - `master` is the main branch with all the latest updates
   
-  - `change_eigen_default` is a development branch where I am working to change the default approach for calculating the decomposition done in the internal function `plmm_prep()` in order to make it faster. 
-  
   - `estimate_eta` is a development branch where we are working through an alternative approach for estimating $\eta$. 
   
   - `fbm` is a development branch where I am working to extend our current methods to analyze data from a design matrix stored as a file-backed object (a Filebacked Big Matrix, or FBM). See package [bigstatsr](https://privefl.github.io/bigstatsr/) for more info on these objects. 
+  
+  - `sign_flip` is a development branch where I am toying with how to handle the issues caused by +/- signs being flipped as part of truncated SVD. 
   
   - `refine_workflow` is an **archived** branch in which I explored changing the workflow to make cross validation more efficient. This change involved moving the rotation step into `plmm_prep()`, instead of having that step as part of model fitting in `plmm_fit()`. I found that this change was not compatible with cross validation, for reasons that I am currently writing up as part of a paper. Once that paper is done, I will delete this branch. 

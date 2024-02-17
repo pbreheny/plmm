@@ -22,7 +22,6 @@ foo2 <- plmm(X = admix$X, y = admix$y, K = admix$trunc_K$svd_K)
 plot(foo1); plot(foo2)
 foo1$eta; foo2$eta
 
-
 # see what happens if data are high dim 
 admix_50 <- sample(1:nrow(admix$X), 50) |> sort()
 admix_hd <- list(
@@ -30,6 +29,21 @@ admix_hd <- list(
   y = admix$y[admix_50],
   race = admix$race[admix_50]
 )
+
+# since we get such different estimates for eta, let's try a simulation where 
+# eta is known and then see which approach (keeping singular values = 0 or not)
+# gives the accurate result 
+K3 <- generate_K(4,5, mu = seq(0.7, 1.3, length.out = 5))
+K3_trunc <- RSpectra::eigs(K3, k = 4)
+
+pb <- txtProgressBar(0, 100, style = 3)
+for(i in 1:100){
+  hat_eta[i] <- test_eta_estimation(sig_s = 3,
+                             sig_eps = 1,
+                             K = K3)
+  setTxtProgressBar(pb, i)
+}
+
 
 admix_hd$K <- relatedness_mat(admix_hd$X)
 admix_hd$trunc_K <- choose_k(admix_hd$X)

@@ -84,6 +84,7 @@ NB: this function is simply a wrapper for plmm_prep -> plmm_fit -> plmm_format
 fit_admix1 <- plmm(X = admix$X, y = admix$y)
 s1 <- summary(fit_admix1, idx = 99)
 print(s1)
+plot(fit_admix1)
 
 # using admix data and k = 50 
 fit_admix2 <- plmm(X = admix$X, y = admix$y, k = 50)
