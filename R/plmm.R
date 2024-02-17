@@ -24,6 +24,7 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
+#' @param lippert_eta Logical: if TRUE, use Lippert (2011) method for estimating eta. This should be set to TRUE only for simulation purposes. 
 #' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
 #' 
 #' @importFrom zeallot %<-%
@@ -83,7 +84,8 @@ plmm <- function(X,
                  warn = TRUE,
                  penalty.factor = rep(1, ncol(X)),
                  init = rep(0, ncol(X)),
-                 trace = FALSE) {
+                 trace = FALSE,
+                 lippert_eta = FALSE) {
 
   ## check types 
   if("character" %in% class(X)){
@@ -153,7 +155,8 @@ plmm <- function(X,
                         diag_K = diag_K,
                         eta_star = eta_star,
                         penalty.factor = penalty.factor,
-                        trace = trace)
+                        trace = trace,
+                        lippert_eta = lippert_eta)
 
   if(trace){cat("Beginning model fitting.\n")}
   the_fit <- plmm_fit(prep = the_prep,

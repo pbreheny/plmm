@@ -33,8 +33,7 @@ lippert_loglik <- function(eta, rot_y, s, n){
   # evaluate the negative log likelihood
   # NB: keep constant here to be consistent with log_lik.lm() method
   nLL <- 0.5*(n*log(2*pi) + ldet + n + n*log(ss))
-  # TODO: double check the derivation for this. Do we need the factor of n 
-  #   in the last term? 
+
   return(nLL)
   
 }

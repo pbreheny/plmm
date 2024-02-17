@@ -29,8 +29,72 @@ for(i in 1:100){
 
 summary(lippert_hat_eta); boxplot(lippert_hat_eta) # compare to true eta of sig_s/(sig_eps + sig_s)
 
-## using the real outcome --------
 
+### try out different scenarios for variance --------------------
+# quick function to do some further simulations 
+compare_variances <- function(nrep, K, sig_s, sig_eps){
+  hat_eta <- lippert_hat_eta <- rep(NA_integer_, nrep)
+  pb <- txtProgressBar(0, nrep, style = 3)
+  for(i in 1:nrep){
+    # my derivation (has intercept)
+    res <- test_eta_estimation(sig_s = sig_s,
+                               sig_eps = sig_eps,
+                               K = K)
+    hat_eta[i] <- res
+    
+    # Lippert/Rakitsch way (null model has mean 0)
+    lippert_hat_eta[i] <- lippert_test_eta_estimation(sig_s = sig_s,
+                                                      sig_eps = sig_eps,
+                                                      K = K)
+    setTxtProgressBar(pb, i)
+  }
+  
+  return(list(
+    intercept = hat_eta,
+    zero_mean = lippert_hat_eta
+  ))
+  
+}
+
+
+equal_part_variance <- compare_variances(nrep = 100, K = K,
+                                         sig_s = 1, sig_eps = 1)
+
+summary(equal_part_variance$intercept)
+summary(equal_part_variance$zero_mean)
+
+heavy_structure <- compare_variances(nrep = 100, K = K,
+                                     sig_s = 3, sig_eps = 1)
+
+summary(heavy_structure$intercept)
+summary(heavy_structure$zero_mean)
+
+light_structure <- compare_variances(nrep = 100, K = K,
+                                     sig_s = 1, sig_eps = 2)
+
+
+summary(light_structure$intercept)
+summary(light_structure$zero_mean)
+
+no_structure <- compare_variances(nrep = 100, K = K,
+                                  sig_s = 0.01, sig_eps = 1)
+
+summary(no_structure$intercept)
+summary(no_structure$zero_mean)
+
+## compare using the real outcome --------
+fit1 <- plmm(X = admix$X, y = admix$y); fit1$eta
+fit2 <- plmm(X = admix$X, y = admix$y, lippert_eta = TRUE); fit2$eta
+
+# high-dim case 
+keep50 <- sample(x = 1:nrow(admix$X), size = 50)
+admix_hd <- list(
+  X = admix$X[keep50, ],
+  y = admix$y[keep50],
+  race = admix$race[keep50]
+)
+fit3 <- plmm(X = admix_hd$X, y = admix_hd$y); fit3$eta
+fit4 <- plmm(X = admix_hd$X, y = admix_hd$y, lippert_eta = TRUE); fit4$eta
 
 # Look at a toy K matrix -------------
 # TODO: is this a sensible way to test eta estimation?? Still thinking about this...
