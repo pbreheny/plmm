@@ -6,6 +6,18 @@
 \usage{
 rotate(s, U, eta, y = NULL, X = NULL)
 }
+\arguments{
+\item{s}{vector of eigenvalues of X}
+
+\item{U}{left singular vectors of X}
+
+\item{eta}{estimated variance parameter}
+
+\item{y}{vector of outcomes}
+
+\item{X}{design matrix}
+}
 \description{
 a function to rotate data (or 'precondition' data) onto the transformed scale
 }
+\keyword{internal}

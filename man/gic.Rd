@@ -4,7 +4,7 @@
 \alias{gic}
 \title{General information criterion method of selecting lambda for "plmm" class}
 \usage{
-gic(fit, ic = c("bic", "hdbic"), std_X, y, U, s, eta)
+gic(fit, ic = c("bic", "hdbic", "ebic"), std_X, U, s, eta)
 }
 \arguments{
 \item{fit}{An object of class "plmm" where svd_detail has been set to TRUE (the default)}

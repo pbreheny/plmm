@@ -20,7 +20,7 @@
 #' @export
 #' 
 #' @examples 
-#' /dontrun{
+#' \dontrun{
 #' #' # compare basic LM with LMM (latter accounts for family relationships)
 #' fit1 <- lmm(X = pedigree$X, y = pedigree$clinical$y, diag_K = TRUE)
 #' fit2 <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
