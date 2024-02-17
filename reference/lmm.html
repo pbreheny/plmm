@@ -134,16 +134,12 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># compare basic LM with LMM (latter accounts for family relationships)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co">#' # compare basic LM with LMM (latter accounts for family relationships)</span></span></span>
 <span class="r-in"><span><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="fu">lmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">pedigree</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">pedigree</span><span class="op">$</span><span class="va">clinical</span><span class="op">$</span><span class="va">y</span>, diag_K <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="fu">lmm</span><span class="op">(</span>X <span class="op">=</span> <span class="va">pedigree</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">pedigree</span><span class="op">$</span><span class="va">clinical</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="va">pedigree</span><span class="op">$</span><span class="va">K</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit1</span><span class="op">$</span><span class="va">beta_vals</span>; <span class="va">fit2</span><span class="op">$</span><span class="va">beta_vals</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   (Intercept)          SNP1          SNP2          SNP3          SNP4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.0003503854  0.1065171689 -0.0268920813  0.0530833917  1.5323230554 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          SNP5 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  0.1150140154 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)        SNP1        SNP2        SNP3        SNP4        SNP5 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -0.04117730  0.07839887  0.03227283  0.01780894  1.53309627  0.16117830 </span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

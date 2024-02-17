@@ -78,6 +78,8 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">plmm</span><span class="op">)</span></span></code></pre></div>
+<p><strong>This page is under construction</strong> – DO NOT follow this
+like a tutorial yet.</p>
 <div class="section level2">
 <h2 id="context">Context<a class="anchor" aria-label="anchor" href="#context"></a>
 </h2>
@@ -99,8 +101,6 @@ structure?</li>
 <code>plmm</code> with the BLUP option.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glmnet.stanford.edu" class="external-link">glmnet</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: Matrix</span></span>
-<span><span class="co">#&gt; Loaded glmnet 4.1-8</span></span>
 <span><span class="va">gb</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span><span class="op">=</span><span class="fl">100</span>, <span class="va">p</span><span class="op">=</span><span class="fl">256</span>, <span class="va">s</span><span class="op">=</span><span class="fl">4</span>, <span class="va">gamma</span><span class="op">=</span><span class="fl">6</span>, <span class="va">beta</span><span class="op">=</span><span class="fl">2</span>, <span class="va">B</span><span class="op">=</span><span class="fl">20</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">B</span><span class="op">*</span><span class="va">p</span><span class="op">)</span>, <span class="va">B</span>, <span class="va">p</span><span class="op">)</span></span>
 <span>  <span class="va">z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">B</span>, each<span class="op">=</span><span class="va">n</span><span class="op">/</span><span class="va">B</span><span class="op">)</span></span>
@@ -121,9 +121,7 @@ structure?</li>
 <span></span>
 <span><span class="co"># look at K -- note that this data scenario has a 'finer' population structure</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/taiyun/corrplot" class="external-link">corrplot</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; corrplot 0.92 loaded</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/corrplot/man/corrplot.html" class="external-link">corrplot</a></span><span class="op">(</span><span class="fu"><a href="../reference/relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">l</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>, is.corr <span class="op">=</span> <span class="cn">F</span>, tl.pos <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="D-deconfounding_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <div class="section level3">
 <h3 id="mspe">MSPE<a class="anchor" aria-label="anchor" href="#mspe"></a>
 </h3>
@@ -132,11 +130,8 @@ structure?</li>
 <code>blup</code> option makes an improvement:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">cvg</span><span class="op">$</span><span class="va">cvm</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 4.305307</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">cvp</span><span class="op">$</span><span class="va">cve</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 5.165537</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">cvp_blup</span><span class="op">$</span><span class="va">cve</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2.697061</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">cvp_blup</span><span class="op">$</span><span class="va">cve</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="mse">MSE<a class="anchor" aria-label="anchor" href="#mse"></a>
@@ -146,11 +141,8 @@ structure?</li>
 <code>plmm</code> + BLUP.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/matrix-products.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">l</span><span class="op">$</span><span class="va">beta</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cvg</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2.030761</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/matrix-products.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">l</span><span class="op">$</span><span class="va">beta</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cvp</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1.691818</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/matrix-products.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">l</span><span class="op">$</span><span class="va">beta</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cvp_blup</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.9747791</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/matrix-products.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">l</span><span class="op">$</span><span class="va">beta</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cvp_blup</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/drop.html" class="external-link">drop</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -81,13 +81,13 @@ We have not implemented something like mFDR for LMMs yet</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span>, <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">mfdr</span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        EF S mFDR</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5997  0 0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5818  0 0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5645  0 0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5476  0 0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5313  0 0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5155  1 1    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        EF  S mFDR</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.6133 -1 -1    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5950  0  0    0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5773  1  1    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5601  1  1    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5434  1  1    1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 0.5272  1  1    1</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

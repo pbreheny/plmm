@@ -67,6 +67,12 @@
     <loc>/reference/estimate_eta.html</loc>
   </url>
   <url>
+    <loc>/reference/flip_signs.html</loc>
+  </url>
+  <url>
+    <loc>/reference/generate_K.html</loc>
+  </url>
+  <url>
     <loc>/reference/get_data.html</loc>
   </url>
   <url>
@@ -95,9 +101,6 @@
   </url>
   <url>
     <loc>/reference/lmm_untransform.html</loc>
-  </url>
-  <url>
-    <loc>/reference/logLik_nonnull.html</loc>
   </url>
   <url>
     <loc>/reference/log_lik.html</loc>
@@ -163,6 +166,9 @@
     <loc>/reference/residuals.plmm.html</loc>
   </url>
   <url>
+    <loc>/reference/rotate.html</loc>
+  </url>
+  <url>
     <loc>/reference/scale_varp.html</loc>
   </url>
   <url>
@@ -176,6 +182,12 @@
   </url>
   <url>
     <loc>/reference/svd_X.html</loc>
+  </url>
+  <url>
+    <loc>/reference/test_eta_estimation.html</loc>
+  </url>
+  <url>
+    <loc>/reference/toy_corr_dat.html</loc>
   </url>
   <url>
     <loc>/reference/untransform.html</loc>
