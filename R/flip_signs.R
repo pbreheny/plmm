@@ -42,12 +42,14 @@ flip_signs <- function(X, U, d, V, svd_list = NULL){
   right_signs <- rep(NA, ncol(V))
   
   # create a list of matrices, each representing UDV' for a single eigenvalue 
-  for(k in 1:length(d)){
+  Sum <- 0
+  for (k in 1:length(d)){
   terms_for_sums[[k]] <- d[k]*as.matrix(tcrossprod(U[,k], V[,k]))
+  Sum <- Sum + terms_for_sums[[k]]
   }
 
-  for(k in 1:length(d)){
-    F_ <- X - Reduce("+", terms_for_sums[-k]) # note: "F" stands for "flip"
+  for (k in 1:length(d)){
+    F_ <- X - (Sum - terms_for_sums[[k]]) # note: "F" stands for "flip"
     
     # determine signs for U
     cp1 <- crossprod(U[,k], F_[,k]) |> drop() # CP = cross product 
@@ -58,8 +60,8 @@ flip_signs <- function(X, U, d, V, svd_list = NULL){
     right_signs[k] <- sum(sign(cp2)*(cp2^2))
     
     # determine corrected signs
-    if(left_signs[k]*right_signs[k] < 0){
-      if(left_signs[k] < right_signs[k]){
+    if (left_signs[k]*right_signs[k] < 0){
+      if (left_signs[k] < right_signs[k]){
         left_signs[k] <- -1*left_signs[k]
       } else {
         right_signs[k] <- -1*right_signs[k]
@@ -73,10 +75,6 @@ flip_signs <- function(X, U, d, V, svd_list = NULL){
   V <- sweep(V, 2, sign(right_signs), "*")
   
   return(list(U = U, V = V))
-  
-  # alternative approach: 
-  # f <- optimize(f = sign_sum_signed_inner_prod,
-  #               maximum = TRUE)
   
   
 }
