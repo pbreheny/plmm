@@ -51,6 +51,7 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
     if('matrix' %in% class(X)){
       fit <- stats::glm(y ~ -1 + X[, np_ind, drop = FALSE], family='gaussian')
     } else if ('FBM' %in% class(X)){
+      # TODO: need to discuss the lines below with Patrick, make sure this is right
       tmp_X <- X[,np_ind] - 1
       fit <- stats::glm(y ~ tmp_X, family = 'gaussian')
     }

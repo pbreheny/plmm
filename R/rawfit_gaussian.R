@@ -36,18 +36,41 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
   # initialize indicators for active set 
   active <- which(a != 0) 
   
-  # setup r (the residuals)
-  r_new <- r
-  # TODO: address the case below where r could be NA
-  # if(is.na(r[1])){
-  #   r <- y
-  #   
-  # }
+  ## setup r (the residuals) ----
+  r_new <- as.double(r)
+  # address the case below where r could be NA
+  if (is.na(r_new[1])) {
+    bigstatsr::big_apply(X = X,
+                         a.FUN = function(X, ind, y, a, res){
+                           res[ind] <- y - crossprod(X[ind,], a)
+                         },
+                         a.combine = c,
+                         ind = bigstatsr::rows_along(X),
+                         ncores = bigstatsr::nb_cores(),
+                         a = a,
+                         res = r_new,
+                         y = y)
+  } else {
+    r_new <- as.double(r)
+  }
   
   
+  ## setup v (sums of squares) ----
+  v <- rep(NA_integer_, )
+  if (is.na(xtx[1])){
+    # create v for case where xtx is NA 
+    # GOAL: function(X, n, j) {
+    #   nn <- n * j
+    #   val <- sum(X[nn + (1:n)]^2)
+    #   return(val)
+    # }
+    # TODO: translate the above into a big_apply() call
+   #  big_apply()
+    
+  } else {
+    v <- xtx 
+  }
   
-  # setup v (sums of squares)
-  # TODO: come back and create v for case where xtx is NA 
   
   # setup z 
   z <- rep(NA_integer_, p)

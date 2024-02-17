@@ -170,6 +170,7 @@ plmm_fit <- function(prep,
       user.lambda <- TRUE
     }
   }
+  # TODO: come back here and add setup_lambda for filebacked case
    
 # keep only those penalty factors which penalize non-singular values 
 penalty.factor <- penalty.factor[std_X_details$ns]
@@ -186,7 +187,7 @@ new.penalty.factor <- c(0, penalty.factor)
   } else if ("FBM" %in% class(stdrot_X)){
     r <- rot_y - bigstatsr::big_prodVec(X = stdrot_X, y.col = init)
     # linear.predictors <- matrix(NA, nrow = stdrot_X$nrow, ncol = nlambda)
-    # b <- matrix(NA, nrow = stdrot_X$ncol, ncol = nlambda)
+    b <- matrix(NA, nrow = stdrot_X$ncol, ncol = nlambda)
   }
   
   iter <- integer(nlambda)
