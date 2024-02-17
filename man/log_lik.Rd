@@ -4,7 +4,7 @@
 \alias{log_lik}
 \title{Evaluate the negative log-likelihood of an intercept-only Gaussian plmm model}
 \usage{
-log_lik(eta, n, s, U, y)
+log_lik(eta, n, s, U, y, rot_y = NULL)
 }
 \arguments{
 \item{eta}{The proportion of variance in the outcome that is attributable to causal SNP effects. In other words, SNR. Sometimes referred to as the narrow-sense heritability.}
@@ -16,6 +16,8 @@ log_lik(eta, n, s, U, y)
 \item{U}{The left-singular vectors of the \emph{standardized} design matrix}
 
 \item{y}{Continuous outcome vector.}
+
+\item{rot_y}{Optional: if y has already been rotated, then this can be supplied. This option is designed for the \code{log_lik()} call within \code{gic()}, where a \code{fit} object is being supplied.}
 }
 \description{
 This function allows you to evaluate the negative log-likelihood of a linear mixed model under the assumption of a null model in order to estimate the variance parameter, eta.

@@ -4,27 +4,27 @@
 \alias{gic}
 \title{General information criterion method of selecting lambda for "plmm" class}
 \usage{
-gic(fit, ic = c("bic", "hdbic"), rot_X, rot_y, s)
+gic(fit, ic = c("bic", "hdbic"), std_X, y, U, s, eta)
 }
 \arguments{
 \item{fit}{An object of class "plmm" where svd_detail has been set to TRUE (the default)}
 
 \item{ic}{Information criterion that should be used to select lambda. Currently supports BIC or HDBIC. Defaults to BIC.}
 
-\item{rot_X}{Optional: Rotated design matrix including rotated intercept and unpenalized columns, if present. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
+\item{std_X}{The standardized design matrix}
 
-\item{rot_y}{Optional: Rotated outcome vector. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
+\item{U}{Optional: Left singular eigenvectors of X}
 
 \item{s}{Optional: Eigenvalues from similarity matrix used for model fitting. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.}
+
+\item{eta}{Optional: Estimate of variance parameter eta}
 }
 \description{
 General information criterion method of selecting lambda for "plmm" class
 }
 \examples{
-fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-std_X <- ncvreg::std(admix$X)
-wUt <- diag(fit$s)\%*\%fit$U
-gic_res <- gic(fit = fit, ic = "bic", rot_X = wUt\%*\%std_X, rot_y = wUt\%*\%admix$y, s = fit$s)
+fit <- plmm(X = admix$X, y = admix$y)
+gic_res <- gic(fit = fit, ic = "bic", std_X = ncvreg::std(admix$X))
 names(gic_res)
 range(gic_res$gic, na.rm = TRUE) # NAs will result from monomorphic SNPs
 }

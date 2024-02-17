@@ -43,10 +43,10 @@ test_eta_estimation <- function(sig_s, sig_eps, K, ...){
   y <- intcpt + u + eps # null model = intercept only model s
 
   eig_K <- eigen(K)
-  nz <- which(eig_K$values > 0.00000001)
-
+  
   # check signs 
   # TODO: determine if we need this here
+  # nz <- which(eig_K$values > 0.00000001
   # sign_check <- flip_signs(X = K,
   #                          U = eig_K$vectors[,nz],
   #                          V = eig_K$vectors[,nz], 
@@ -54,8 +54,11 @@ test_eta_estimation <- function(sig_s, sig_eps, K, ...){
   # U <- sign_check$U
   
   # estimate eta
-  tmp <- estimate_eta(n = length(y), s = eig_K$values, U = eig_K$vectors, y = y,
+  eta <- estimate_eta(n = length(y),
+                      s = eig_K$values,
+                      U = eig_K$vectors,
+                      y = y,
                        ...)
   
-  return(tmp)
+  return(eta)
 }

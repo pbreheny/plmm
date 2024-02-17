@@ -6,14 +6,16 @@
 #' @param s The singular values of K, the realized relationship matrix
 #' @param U The left-singular vectors of the *standardized* design matrix
 #' @param y Continuous outcome vector.
+#' @param rot_y Optional: if y has already been rotated, then this can be supplied. This option is designed for the `log_lik()` call within `gic()`, where a `fit` object is being supplied.
 #' @keywords internal
 #' 
 
-log_lik <- function(eta, n, s, U, y){
+log_lik <- function(eta, n, s, U, y, rot_y = NULL){
 
   # first, the constant (comes from 1st term in derivation)
   constant <- n*log(2*pi)
   
+  # TODO: think about simplifying what follows with `rotate()`
   # we will need the sum of the nonzero values from the diagonal matrix of weights
   w2 <- ((eta*s) + (1 - eta))
   
@@ -23,7 +25,12 @@ log_lik <- function(eta, n, s, U, y){
   # rotate y 
   w <- w2^(-1/2)
   wUt <- sweep(x = t(U), MARGIN = 1, STATS = w, FUN = "*")
-  rot_y <- wUt %*% y
+  
+  
+  if(is.null(rot_y) & !(missing(y))){
+    rot_y <- wUt %*% y
+  } 
+  
   
   # rotate the intercept (this is the only term in the null model)
   intcpt <- rep(1, n)
@@ -43,6 +50,6 @@ log_lik <- function(eta, n, s, U, y){
   # NB: keep constant here to be consistent with log_lik.lm() method
   nLL <- 0.5*(constant + n*log(quad_term) + sum_det_log + n)
   
-  return(nLL)
+  return(drop(nLL))
 
 }

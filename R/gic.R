@@ -2,56 +2,64 @@
 #'
 #' @param fit An object of class "plmm" where svd_detail has been set to TRUE (the default)
 #' @param ic Information criterion that should be used to select lambda. Currently supports BIC or HDBIC. Defaults to BIC.
-#' @param rot_X Optional: Rotated design matrix including rotated intercept and unpenalized columns, if present. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
-#' @param rot_y Optional: Rotated outcome vector. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
+#' @param std_X The standardized design matrix
+#' @param U Optional: Left singular eigenvectors of X
 #' @param s Optional: Eigenvalues from similarity matrix used for model fitting. If not returned as part of \code{plmm} because \code{returnX == FALSE}, must be supplied explicitly.
+#' @param eta Optional: Estimate of variance parameter eta 
 #' @importFrom zeallot %<-%
 #' @export
 #' 
 #' @examples
-#' fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
-#' std_X <- ncvreg::std(admix$X)
-#' wUt <- diag(fit$s)%*%fit$U
-#' gic_res <- gic(fit = fit, ic = "bic", rot_X = wUt%*%std_X, rot_y = wUt%*%admix$y, s = fit$s)
+#' fit <- plmm(X = admix$X, y = admix$y)
+#' gic_res <- gic(fit = fit, ic = "bic", std_X = ncvreg::std(admix$X))
 #' names(gic_res)
 #' range(gic_res$gic, na.rm = TRUE) # NAs will result from monomorphic SNPs
 
 
-gic <- function(fit, ic=c("bic", "hdbic"), rot_X, rot_y, s){
+gic <- function(fit, ic=c("bic", "hdbic"), std_X, y, U, s, eta){
   UseMethod("gic")
 }
 
 #' @export
-gic.default <- function(fit, ic=c("bic", "hdbic"), rot_X, rot_y, s){
+gic.default <- function(fit, ic=c("bic", "hdbic"), std_X, U, s, eta){
   stop("This function should be used with an object of class plmm_fit")
 }
 
 #' @export
-gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), rot_X, rot_y, s){
+gic.plmm <- function(fit, ic=c("bic", "hdbic", "ebic"), std_X, U, s, eta){
 
   # TODO: need to deal with situations where dim rot_X != dim X because of singularity
 
   n <- p <- NULL
 
-  if (missing(rot_X)){
-    if (is.null(fit$rot_X)) stop('Rotated X matrix must be supplied as part of fit object or rot_X argument.')
-    rot_X <- fit$rot_X
+  if (missing(eta)){
+    if (is.null(fit$eta)) stop('Eta estimate must be supplied as part of fit object or s argument.')
+    eta <- fit$eta
   }
-
-  if (missing(rot_y)){
-    if (is.null(fit$rot_y)) stop('Rotated y vector must be supplied as part of fit object or rot_y argument.')
-    rot_y <- fit$rot_y
-  }
-
+  
   if (missing(s)){
     if (is.null(fit$s)) stop('Eigenvalues must be supplied as part of fit object or s argument.')
     s <- fit$s
   }
+  
+  if (missing(U)){
+    if (is.null(fit$U)) stop('Eigenvectors must be supplied as part of fit object or s argument.')
+    U <- fit$U
+  }
 
-
-c(n, p) %<-% dim(rot_X[,-1]) # this assumes there is an intercept column
+  # rotate X (rot_y is returned by fit)
+  w <- (eta * s + (1 - eta))^(-1/2)
+  wUt <- sweep(x = t(U), MARGIN = 1, STATS = w, FUN = "*")
+  rot_X <- wUt %*% cbind(1, std_X)
+  # re-standardize rotated rot_X, *without* rescaling the intercept!
+  # TODO: make this more efficient; should I add an option for fit() to return stdrot_X?
+  stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
+  stdrot_X_noInt <- stdrot_X_temp$scaled_X
+  stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
+  
+c(n, p) %<-% dim(stdrot_X[,-1]) # this assumes there is an intercept column
 eta <- fit$eta
-ll <- log_lik(eta = eta, rot_y = crossprod(fit$U, fit$y), s = s) # TODO: what difference does it make if this is log_lik_nonnull?
+ll <- log_lik(eta = eta, rot_y = fit$rot_y, U = U, s = s, n = nrow(std_X)) # TODO: what difference does it make if this is log_lik_nonnull?
 j <- predict.plmm(fit, type='nvars')
 jj <- pmin(j, p/2) # dont' give smaller penalties for larger models
 df <- j + 2 # +1 for intercept, +1 for sigma2
