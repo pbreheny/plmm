@@ -30,21 +30,6 @@ admix_hd <- list(
   race = admix$race[admix_50]
 )
 
-# since we get such different estimates for eta, let's try a simulation where 
-# eta is known and then see which approach (keeping singular values = 0 or not)
-# gives the accurate result 
-K3 <- generate_K(4,5, mu = seq(0.7, 1.3, length.out = 5))
-K3_trunc <- RSpectra::eigs(K3, k = 4)
-
-pb <- txtProgressBar(0, 100, style = 3)
-for(i in 1:100){
-  hat_eta[i] <- test_eta_estimation(sig_s = 3,
-                             sig_eps = 1,
-                             K = K3)
-  setTxtProgressBar(pb, i)
-}
-
-
 admix_hd$K <- relatedness_mat(admix_hd$X)
 admix_hd$trunc_K <- choose_k(admix_hd$X)
 
@@ -55,3 +40,21 @@ plot(foo3); plot(foo4) # notably different
 foo3$eta; foo4$eta # eta estimates are polar opposites
 dim(admix_hd$trunc_K$svd_K$K_approx) # U here is n x n, coming from eigen(K)
 dim(admix_hd$trunc_K$svd_K$U) # U here is n x k -- eigenvalues = 0 are *excluded* 
+
+# since we get such different estimates for eta, let's try a simulation where 
+# eta is known and then see which approach (keeping singular values = 0 or not)
+# gives the accurate result 
+pb <- txtProgressBar(0, 100, style = 3)
+hat_eta_Klist <- hat_eta_Kmat <- rep(NA, 100)
+for(i in 1:100){
+  hat_eta_Klist[i] <- test_eta_estimation(sig_s = 3,
+                                    sig_eps = 1,
+                                    K = admix$trunc_K$svd_K)
+  
+  hat_eta_Kmat[i] <- test_eta_estimation(sig_s = 3,
+                                          sig_eps = 1,
+                                          K = admix$trunc_K$svd_K$K_approx)
+  setTxtProgressBar(pb, i)
+}
+summary(hat_eta_Klist)
+summary(hat_eta_Kmat)

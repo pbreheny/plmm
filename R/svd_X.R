@@ -19,17 +19,19 @@ svd_X <- function(X, k, trunc, trace){
   # case 1: full SVD -----------------------------------  
   if(!trunc){
     if(trace){cat("\nUsing full SVD")}
-    decomp <- svd(X, nv = 0)
+    decomp <- svd(X)
     d <- decomp$d
     U <- decomp$u
+    V <- decomp$v
   } else {
     # case 2: truncated SVD -----------------------------
     if(trace){cat("\nUsing truncated SVD with k singular values")}
-    decomp <- RSpectra::svds(A = X, nv = 0, k = k)
+    decomp <- RSpectra::svds(A = X, k = k)
     d <- decomp$d
     U <- decomp$u
+    V <- decomp$v
   }
   
-  res <- list(d = d, U = U)
+  res <- list(d = d, U = U, V = V)
   return(res)
 }
