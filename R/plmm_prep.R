@@ -171,7 +171,7 @@ plmm_prep <- function(X,
   
   # estimate eta if needed
   if (is.null(eta_star)) {
-    eta <- estimate_eta(s = s, U = U, y = y) 
+    eta <- estimate_eta(n = n, s = s, U = U, y = y) 
   } else {
     # otherwise, use the user-supplied value (this option is mainly for simulation)
     eta <- eta_star

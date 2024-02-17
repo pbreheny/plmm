@@ -146,7 +146,7 @@ if(mean(test[,2] - test[,4]) > 5) stop("PLMM and GLMNET predictions are far off 
 # NB: the 5 above is chosen arbitrarily, based on my experience with the admix data 
 
 
-# Test: is resid. method working ----------------------------------------------
+# Test 7: is resid. method working ----------------------------------------------
 R <- residuals(object = plmm(admix$X, admix$y, penalty = "lasso",
                                   diag_K = TRUE, lambda = lambda0))
 
@@ -157,3 +157,16 @@ for(j in 1:ncol(ncv_R)){
 }
 
 tinytest::expect_equivalent(R, ncv_R)
+
+# Test 8: make sure eta is estimated correctly ---------------
+K8 <- relatedness_mat(admix$X)
+hat_eta <- rep(NA_integer_, 100)
+for(i in 1:100){
+  hat_eta[i] <- plmm:::test_eta_estimation(sig_s = 2,
+                             sig_eps = 1,
+                             K = K8)
+}
+# estimated eta should be within 5% of the true value
+tinytest::expect_equivalent(current = mean(hat_eta), 
+                            target = 2/3,
+                            tolerance = 0.05)

@@ -20,15 +20,15 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Suggests: 
-    ggmix, 
     graphics, 
     grDevices, 
     parallel,
-    popkin,
     MASS, 
     knitr, 
     rmarkdown,
-    tinytest
+    tinytest,
+    mvtnorm,
+    ggmix
 Imports: 
     bigstatsr,
     bigsnpr,
