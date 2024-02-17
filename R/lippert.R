@@ -1,12 +1,17 @@
 #' the estimation of eta using the Lippert (2011) derivation
-lippert_estimate_eta <- function(n, s, U, y, eta_star){
+#'
+#' @param n Number of observations 
+#' @param s Eigenvalues of K
+#' @param U Eigenvectors of K
+#' @param y Outcome vector 
+lippert_estimate_eta <- function(n, s, U, y){
   
   # coercion
   eta <- NULL
   
   # estimate eta 
   rot_y <- crossprod(U, y)
-  opt <- stats::optimize(f=log_lik, c(0.01, 0.99), rot_y=rot_y, s=s, n=nrow(U))
+  opt <- stats::optimize(f=lippert_loglik, c(0.01, 0.99), rot_y=rot_y, s=s, n=nrow(U))
   eta <- opt$minimum 
   
   return(eta)
@@ -32,4 +37,36 @@ lippert_loglik <- function(eta, rot_y, s, n){
   #   in the last term? 
   return(nLL)
   
+}
+
+#' a function to write tests of estimate_eta
+#' @param sig_s Variance attributable to structure 
+#' @param sig_eps Variance of random error 
+#' @param K Matrix to use as relatedness matrix.
+#' @param ... Additional args to pass into `estimate_eta()`
+#' @keywords internal
+lippert_test_eta_estimation <- function(sig_s, sig_eps, K, ...){
+  
+  # Note: true_eta <- sig_s/(sig_s + sig_eps)
+  
+  # simulate data
+  intcpt <- rep(1, nrow(K))
+  
+  u <- mvtnorm::rmvnorm(n = 1,
+                        sigma = sig_s*K) |> drop()
+  
+  eps <- mvtnorm::rmvnorm(n = 1,
+                          sigma = sig_eps*diag(nrow = nrow(K))) |> drop()
+  
+  y <- intcpt + u + eps # null model = intercept only model s
+  
+  eig_K <- eigen(K)
+  
+  # estimate eta
+  eta <- lippert_estimate_eta(n = length(y),
+                      s = eig_K$values,
+                      U = eig_K$vectors,
+                      y = y)
+  
+  return(eta)
 }
