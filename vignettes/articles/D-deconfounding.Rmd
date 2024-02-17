@@ -5,7 +5,8 @@ title: "Deconfounding"
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
@@ -13,6 +14,8 @@ knitr::opts_chunk$set(
 library(plmm)
 ```
 
+
+**This page is under construction** -- DO NOT follow this like a tutorial yet.
 
 ## Context 
 

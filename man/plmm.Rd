@@ -84,11 +84,15 @@ NB: this function is simply a wrapper for plmm_prep -> plmm_fit -> plmm_format
 fit_admix1 <- plmm(X = admix$X, y = admix$y)
 s1 <- summary(fit_admix1, idx = 99)
 print(s1)
+plot(fit_admix1)
 
 # using admix data and k = 50 
 fit_admix2 <- plmm(X = admix$X, y = admix$y, k = 50)
 s2 <- summary(fit_admix2, idx = 99)
 print(s2)
+
+# an example with p > n:
+fit_admix3 <- plmm(X = admix$X[1:50, ], y = admix$y[1:50])
 
 # now use PLINK data files
 \dontrun{

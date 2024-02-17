@@ -20,10 +20,13 @@
 #' @export
 #' 
 #' @examples 
-#' # compare basic LM with LMM (latter accounts for family relationships)
+#' \dontrun{
+#' #' # compare basic LM with LMM (latter accounts for family relationships)
 #' fit1 <- lmm(X = pedigree$X, y = pedigree$clinical$y, diag_K = TRUE)
 #' fit2 <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
 #' fit1$beta_vals; fit2$beta_vals
+#' }
+
 
 lmm <- function(X,
                  y,

@@ -5,7 +5,8 @@ title: "Exploring different modeling options"
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
@@ -14,6 +15,9 @@ library(plmm)
 library(data.table)
 library(ggplot2)
 ```
+
+
+**This page is under construction** -- DO NOT follow this like a tutorial yet.
 
 The `plmm()` function has many options, so this article aims to provide an overview (and comparison) of several of these model fitting options. This is a more detailed presentation than what is provided in the "Getting started" vignette.
 

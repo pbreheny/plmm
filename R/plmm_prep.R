@@ -85,6 +85,10 @@ plmm_prep <- function(std_X,
     if(trace){cat("\nK is a list; will pass SVD components from list to model fitting.")}
     s <- K$s # no need to adjust singular values by p; choose_k() does this via relatedness_mat()
     U <- K$U
+    # TODO: add a check for list names
+    # stopifnot("K_approx" %in% names(K))
+    # sign_check <- flip_signs(X = K$K_approx, U = U, V = U, d = s)
+    # U <- sign_check$U
   }
  
   # otherwise, need to do SVD:
@@ -109,6 +113,9 @@ plmm_prep <- function(std_X,
         eigen_res <- eigen_K(std_X, p, fbm_flag = fbm_flag) 
         s <- eigen_res$s
         U <- eigen_res$U
+        # check signs 
+        # sign_check <- flip_signs(X = eigen_res$K, U = U, V = U, d = s)
+        # U <- sign_check$U
       }
       
     } else {
@@ -116,9 +123,13 @@ plmm_prep <- function(std_X,
       eigen_res <- eigen(K)
       s <- eigen_res$values*(1/p) # note: our definition of the RRM averages over the number of features
       U <- eigen_res$vectors
+      # check signs
+      # sign_check <- flip_signs(X = K, U = U, V = U, d = s)
+      # U <- sign_check$U
     }
     
   }
+
 
   # error check: what if the combination of args. supplied was none of the SVD cases above?
   if(is.null(s) | is.null(U)){
@@ -134,17 +145,17 @@ plmm_prep <- function(std_X,
   
   # estimate eta if needed
   if (is.null(eta_star)) {
-    eta <- estimate_eta(s = s, U = U, y = y) 
+    eta <- estimate_eta(n = n, s = s, U = U, y = y) 
   } else {
     # otherwise, use the user-supplied value (this option is mainly for simulation)
     eta <- eta_star
   }
-  
+
 # if FBM, keep U filebacked
   if(fbm_flag){
     U <- bigstatsr::as_FBM(U)
   }
-  
+
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
     # include std_X and y here b/c I will need them for cross validation 

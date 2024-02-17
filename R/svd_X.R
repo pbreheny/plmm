@@ -15,7 +15,6 @@
 #'    use RSpectra::svds(K, k = k)
 #' 
 #' @keywords internal
-
 svd_X <- function(std_X, k, trunc, fbm_flag, trace, ...){
   if(fbm_flag){
     if(!trunc){
@@ -45,8 +44,9 @@ svd_X <- function(std_X, k, trunc, fbm_flag, trace, ...){
       d <- decomp$d
       U <- decomp$u 
     }
+
   }
   
-  res <- list(d = d, U = U)
+  res <- list(d = d, U = U, V = V)
   return(res)
 }
