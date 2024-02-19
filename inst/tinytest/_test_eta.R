@@ -1,9 +1,18 @@
 # Testing different ways to estimate eta 
 
 # Tests using the admix data-----------
- 
-## compare eta estimates from simulated outcome ---------------
+# prepare a high dim version of admix data as well
+keep50 <- sample(x = 1:nrow(admix$X), size = 50)
+admix_hd <- list(
+  X = admix$X[keep50, ],
+  y = admix$y[keep50],
+  race = admix$race[keep50]
+)
+
 K <- relatedness_mat(admix$X)
+K_hd <- relatedness_mat(admix_hd$X)
+
+## compare eta estimates from simulated outcome ---------------
 hat_eta <- rep(NA_integer_, 100)
 pb <- txtProgressBar(0, 100, style = 3)
 for(i in 1:100){
@@ -31,32 +40,7 @@ summary(lippert_hat_eta); boxplot(lippert_hat_eta) # compare to true eta of sig_
 
 
 ### try out different scenarios for variance --------------------
-# quick function to do some further simulations 
-compare_variances <- function(nrep, K, sig_s, sig_eps){
-  hat_eta <- lippert_hat_eta <- rep(NA_integer_, nrep)
-  pb <- txtProgressBar(0, nrep, style = 3)
-  for(i in 1:nrep){
-    # my derivation (has intercept)
-    res <- test_eta_estimation(sig_s = sig_s,
-                               sig_eps = sig_eps,
-                               K = K)
-    hat_eta[i] <- res
-    
-    # Lippert/Rakitsch way (null model has mean 0)
-    lippert_hat_eta[i] <- lippert_test_eta_estimation(sig_s = sig_s,
-                                                      sig_eps = sig_eps,
-                                                      K = K)
-    setTxtProgressBar(pb, i)
-  }
-  
-  return(list(
-    intercept = hat_eta,
-    zero_mean = lippert_hat_eta
-  ))
-  
-}
-
-
+### comparisons with intercept ----------------------------------------
 equal_part_variance <- compare_variances(nrep = 100, K = K,
                                          sig_s = 1, sig_eps = 1)
 
@@ -82,17 +66,40 @@ no_structure <- compare_variances(nrep = 100, K = K,
 summary(no_structure$intercept)
 summary(no_structure$zero_mean)
 
+# what if y is centered? 
+
+equal_part_variance_centered <- compare_variances(nrep = 100, 
+                                                  K = K,
+                                                  sig_s = 1,
+                                                  sig_eps = 1,
+                                                  intercept = TRUE,
+                                                  center_y = TRUE)
+
+summary(equal_part_variance_centered$intercept)
+summary(equal_part_variance_centered$zero_mean)
+
+test <- compare_variances(nrep = 100, 
+                          K = K_hd,
+                          sig_s = 0.5,
+                          sig_eps = 1,
+                          intercept = TRUE,
+                          center_y = TRUE)
+summary(test$intercept)
+summary(test$zero_mean)
+### comparisons with no intercept ---------------------------
+eq_var_no_int <- compare_variances(nrep = 100,
+                                   K = K,
+                                   sig_s = 1,
+                                   sig_eps = 1,
+                                   intercept = FALSE)
+summary(eq_var_no_int$intercept)
+summary(eq_var_no_int$zero_mean)
+
 ## compare using the real outcome --------
 fit1 <- plmm(X = admix$X, y = admix$y); fit1$eta
 fit2 <- plmm(X = admix$X, y = admix$y, lippert_eta = TRUE); fit2$eta
 
 # high-dim case 
-keep50 <- sample(x = 1:nrow(admix$X), size = 50)
-admix_hd <- list(
-  X = admix$X[keep50, ],
-  y = admix$y[keep50],
-  race = admix$race[keep50]
-)
 fit3 <- plmm(X = admix_hd$X, y = admix_hd$y); fit3$eta
 fit4 <- plmm(X = admix_hd$X, y = admix_hd$y, lippert_eta = TRUE); fit4$eta
 

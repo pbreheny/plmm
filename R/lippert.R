@@ -42,22 +42,31 @@ lippert_loglik <- function(eta, rot_y, s, n){
 #' @param sig_s Variance attributable to structure 
 #' @param sig_eps Variance of random error 
 #' @param K Matrix to use as relatedness matrix.
+#' @param intercept Logical: should the outcome be simulated with an intercept? Defaults to TRUE. 
+#' @param center_y  Logical: should y be centered? Defaults to FALSE. (Note: this option only makes sense if intercept = TRUE)
 #' @param ... Additional args to pass into `estimate_eta()`
 #' @keywords internal
-lippert_test_eta_estimation <- function(sig_s, sig_eps, K, ...){
+lippert_test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE, 
+                                        center_y = FALSE, ...){
   
   # Note: true_eta <- sig_s/(sig_s + sig_eps)
   
   # simulate data
-  intcpt <- rep(1, nrow(K))
-  
   u <- mvtnorm::rmvnorm(n = 1,
                         sigma = sig_s*K) |> drop()
   
   eps <- mvtnorm::rmvnorm(n = 1,
                           sigma = sig_eps*diag(nrow = nrow(K))) |> drop()
   
-  y <- intcpt + u + eps # null model = intercept only model s
+  y <- u + eps 
+  if (intercept){
+    intcpt <- rep(1, nrow(K))
+    y <- y + intcpt
+    
+    if (center_y){
+      y <- y - mean(y)
+    }
+  }
   
   eig_K <- eigen(K)
   
