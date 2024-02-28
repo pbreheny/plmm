@@ -48,10 +48,14 @@ plmm_prep <- function(std_X,
   ## coersion
   U <- s <- eta <- NULL
   
+  if(is.null(k)){
+    trunc_flag <- FALSE
+  }
+  
   if(!is.null(k)){
     
     if(k < min(std_X_n, std_X_p)){
-      trunc <- TRUE
+      trunc_flag <- TRUE
     } else {
       stop("\nk value is out of bounds. 
          \nIf specified, k must be an integer in the range from 1 to min(nrow(X), ncol(X)). 
@@ -63,7 +67,7 @@ plmm_prep <- function(std_X,
   
   # set default: if diag_K not specified, set to false
   if(is.null(diag_K)){diag_K <- FALSE}
-  
+ 
   # handle the cases where no decomposition is needed: 
   # case 1: K is the identity matrix 
   flag1 <- diag_K & is.null(K)
@@ -103,9 +107,9 @@ plmm_prep <- function(std_X,
       # n <= p: construct K, then take eigen(K)
       if(std_X_n > std_X_p){
       if(trace){cat("\nSince n > p, PLMM is calculating the SVD of X.")}
-        svd_res <- svd_X(std_X = std_X, k = k, trunc = trunc,
+        svd_res <- svd_X(std_X = std_X, k = k, trunc_flag = trunc_flag,
                          fbm_flag = fbm_flag, trace = trace)
-        s <- (svd_res$d^2)*(1/p)
+        s <- (svd_res$d^2)*(1/std_X_p)
         U <- svd_res$U
       
       } else if (std_X_n <= std_X_p){
@@ -121,7 +125,7 @@ plmm_prep <- function(std_X,
     } else {
       # last case: K is a user-supplied matrix 
       eigen_res <- eigen(K)
-      s <- eigen_res$values*(1/p) # note: our definition of the RRM averages over the number of features
+      s <- eigen_res$values*(1/std_X_p) # note: our definition of the RRM averages over the number of features
       U <- eigen_res$vectors
       # check signs
       # sign_check <- flip_signs(X = K, U = U, V = U, d = s)
@@ -142,10 +146,10 @@ plmm_prep <- function(std_X,
          \n \tDid you intend to set diag_K = TRUE?
          \n \tDid you set diag_K = TRUE and specifiy a k value at the same time? This combination of arguments is incompatible.")
   }
-  
+ 
   # estimate eta if needed
   if (is.null(eta_star)) {
-    eta <- estimate_eta(n = n, s = s, U = U, y = y) 
+    eta <- estimate_eta(n = std_X_n, s = s, U = U, y = y) 
   } else {
     # otherwise, use the user-supplied value (this option is mainly for simulation)
     eta <- eta_star

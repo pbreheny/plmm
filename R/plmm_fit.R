@@ -69,7 +69,7 @@ plmm_fit <- function(prep,
 
   # rotate data ----------------------------------------------------------------
   if('matrix' %in% class(prep$std_X)) {
-    w <- (eta * prep$s + (1 - eta))^(-1/2)
+    w <- (prep$eta * prep$s + (1 - prep$eta))^(-1/2)
     wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
     rot_X <- wUt %*% cbind(1, prep$std_X)
     rot_y <- wUt %*% prep$y
@@ -152,28 +152,27 @@ plmm_fit <- function(prep,
   if(prep$trace){cat("\nRotation complete. Beginning model fitting.")}
   
   # set up lambda -------------------------------------------------------
-  if('matrix' %in% class(stdrot_X)){
-    if (missing(lambda)) {
-      lambda <- setup_lambda(X = stdrot_X,
-                             y = rot_y,
-                             alpha = alpha,
-                             nlambda = nlambda,
-                             lambda.min = lambda.min,
-                             penalty.factor = penalty.factor)
-      user.lambda <- FALSE
-    } else {
-      # make sure (if user-supplied sequence) is in DESCENDING order
-      if(length(lambda) > 1){
-        if (max(diff(lambda)) > 0) stop("\nUser-supplied lambda sequence must be in descending (largest -> smallest) order")
-      }
-      nlambda <- length(lambda)
-      user.lambda <- TRUE
+  
+  if (missing(lambda)) {
+    lambda <- setup_lambda(X = stdrot_X,
+                           y = rot_y,
+                           alpha = alpha,
+                           nlambda = nlambda,
+                           lambda.min = lambda.min,
+                           penalty.factor = penalty.factor)
+    user.lambda <- FALSE
+  } else {
+    # make sure (if user-supplied sequence) is in DESCENDING order
+    if(length(lambda) > 1){
+      if (max(diff(lambda)) > 0) stop("\nUser-supplied lambda sequence must be in descending (largest -> smallest) order")
     }
+    nlambda <- length(lambda)
+    user.lambda <- TRUE
   }
-  # TODO: come back here and add setup_lambda for filebacked case
-   
-# keep only those penalty factors which penalize non-singular values 
-penalty.factor <- penalty.factor[std_X_details$ns]
+  
+  
+  # keep only those penalty factors which penalize non-singular values 
+  penalty.factor <- penalty.factor[std_X_details$ns]
 # make sure to *not* penalize the intercept term 
 new.penalty.factor <- c(0, penalty.factor)
   
@@ -202,7 +201,7 @@ new.penalty.factor <- c(0, penalty.factor)
   if('matrix' %in% class(stdrot_X)){
     for (ll in 1:nlambda){
       lam <- lambda[ll]
-      res <- ncvreg::ncvfit(stdrot_X, rot_y, init, resid = r, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
+      res <- ncvreg::ncvfit(stdrot_X, rot_y, init, r, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
       b[, ll] <- init <- res$beta
       linear.predictors[,ll] <- stdrot_X%*%(res$beta)
       iter[ll] <- res$iter
@@ -225,7 +224,6 @@ new.penalty.factor <- c(0, penalty.factor)
                              gamma = gamma,
                              multiplier = penalty.factor,
                              alpha = alpha)
-      # QUESTION: should I include 'r' here ^^? 
       # TODO: add a way to pass additional args to this function via '...'
     
   }

@@ -50,6 +50,9 @@
 #' # now use PLINK data files
 #' \dontrun{
 #' 
+#' # file-backed example
+#' plmm(X = "~/tmp_files/penncath_lite", fbm = TRUE, trace = TRUE)
+#' 
 #' penncath_mid <- process_plink(prefix = "penncath_mid", dataDir = plink_example(path="penncath_mid.fam", parent=T))
 #' penncath_clinical <- read.csv(plink_example(path="penncath_clinical.csv"))
 #' # for the sake of illustration, I use a simple mean imputation for the outcome 
@@ -266,7 +269,7 @@ plmm <- function(X,
                         trace = trace)
 
   # rotate & fit -------------------------------------------------------------
-  if(trace){cat("Beginning model fitting.\n")}
+  if(trace){cat("\nBeginning model fitting.\n")}
   
   the_fit <- plmm_fit(prep = the_prep,
                       std_X_details = std_X_details,

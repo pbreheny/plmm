@@ -15,9 +15,9 @@
 #'    use RSpectra::svds(K, k = k)
 #' 
 #' @keywords internal
-svd_X <- function(std_X, k, trunc, fbm_flag, trace, ...){
+svd_X <- function(std_X, k, trunc_flag, fbm_flag, trace, ...){
   if(fbm_flag){
-    if(!trunc){
+    if(!trunc_flag){
       # case 1: full SVD ----------------------------------- 
       if(trace){cat("\nUsing full SVD, which requires loading std_X into memory.")}
       decomp <- svd(std_X[,], nv = 0)
@@ -26,27 +26,31 @@ svd_X <- function(std_X, k, trunc, fbm_flag, trace, ...){
     } else {
       # case 2: truncated SVD -----------------------------
       if(trace){cat("\nUsing truncated SVD with", k ,"singular values")}
-      decomp <- bigstatsr::big_randomSVD(X = X, k = k, ...)
+      decomp <- bigstatsr::big_randomSVD(std_X, k = k, ...)
       d <- decomp$d
       U <- decomp$u |> bigstatsr::as_FBM()
     }
   } else {
+
     # case 1: full SVD -----------------------------------  
-    if(!trunc){
+    if(!trunc_flag){
       if(trace){cat("\nUsing full SVD")}
-      decomp <- svd(X, nv = 0)
+      decomp <- svd(std_X, nv = 0)
       d <- decomp$d
       U <- decomp$u
     } else {
       # case 2: truncated SVD -----------------------------
       if(trace){cat("\nUsing truncated SVD with", k ,"singular values")}
-      decomp <- RSpectra::svds(A = X, k = k, ...)
+      decomp <- RSpectra::svds(A = std_X, k = k, ...)
       d <- decomp$d
       U <- decomp$u 
     }
 
   }
   
-  res <- list(d = d, U = U, V = V)
+  res <- list(d = d, U = U)
+  if(!is.null(decomp$V)) {
+    res$V <- decomp$V
+  }
   return(res)
 }
