@@ -55,7 +55,7 @@ plmm_fit <- function(prep,
                      init = NULL,
                      warn = TRUE,
                      returnX = TRUE){
-
+  
   # error checking ------------------------------------------------------------
   if (gamma <= 1 & penalty=="MCP") stop("gamma must be greater than 1 for the MC penalty", call.=FALSE)
   if (gamma <= 2 & penalty=="SCAD") stop("gamma must be greater than 2 for the SCAD penalty", call.=FALSE)
@@ -66,7 +66,7 @@ plmm_fit <- function(prep,
   # if (length(init)!=prep$std_X$ncol) stop("Dimensions of init and X do not match", call.=FALSE)
   
   if(prep$trace){cat("Beginning standardization + rotation.")}
-
+  
   # rotate data ----------------------------------------------------------------
   if('matrix' %in% class(prep$std_X)) {
     w <- (prep$eta * prep$s + (1 - prep$eta))^(-1/2)
@@ -124,7 +124,7 @@ plmm_fit <- function(prep,
                          a.combine = rbind,
                          wUt = wUt,
                          res = rot_X)
-
+    
     rot_y <- bigstatsr::big_prodVec(X = wUt, 
                                     y.col = prep$y)
     
@@ -133,9 +133,9 @@ plmm_fit <- function(prep,
     # stdrot_X_center <- rot_X_scale_info$center
     stdrot_X_scale <- rot_X_scale_info$scale
     stdrot_X <- big_std(X = rot_X,
-                   # center = stdrot_X_center, # NB: do not re-center rotated data
-                   scale = stdrot_X_scale,
-                   ns = 2:rot_X$ncol)
+                        # center = stdrot_X_center, # NB: do not re-center rotated data
+                        scale = stdrot_X_scale,
+                        ns = 2:rot_X$ncol)
     
   }
   
@@ -144,9 +144,9 @@ plmm_fit <- function(prep,
     xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
   } else if('FBM' %in% class(prep$std_X)){
     xtx <- bigstatsr::big_apply(X = stdrot_X,
-                     a.FUN = function(X, ind){
-                       mean(X[,ind]^2, na.rm = TRUE)
-                     })
+                                a.FUN = function(X, ind){
+                                  mean(X[,ind]^2, na.rm = TRUE)
+                                })
   }
   
   if(prep$trace){cat("\nRotation complete. Beginning model fitting.")}
@@ -173,8 +173,8 @@ plmm_fit <- function(prep,
   
   # keep only those penalty factors which penalize non-singular values 
   penalty.factor <- penalty.factor[std_X_details$ns]
-# make sure to *not* penalize the intercept term 
-new.penalty.factor <- c(0, penalty.factor)
+  # make sure to *not* penalize the intercept term 
+  new.penalty.factor <- c(0, penalty.factor)
   
   # placeholders for results
   init <- c(0, init) # add initial value for intercept
@@ -185,7 +185,7 @@ new.penalty.factor <- c(0, penalty.factor)
     b <- matrix(NA, nrow=ncol(stdrot_X), ncol=nlambda) 
   } else if ("FBM" %in% class(stdrot_X)){
     r <- rot_y - bigstatsr::big_prodVec(X = stdrot_X, y.col = init)
-    # linear.predictors <- matrix(NA, nrow = stdrot_X$nrow, ncol = nlambda)
+    linear.predictors <- matrix(NA, nrow = stdrot_X$nrow, ncol = nlambda)
     b <- matrix(NA, nrow = stdrot_X$ncol, ncol = nlambda)
   }
   
@@ -201,7 +201,19 @@ new.penalty.factor <- c(0, penalty.factor)
   if('matrix' %in% class(stdrot_X)){
     for (ll in 1:nlambda){
       lam <- lambda[ll]
-      res <- ncvreg::ncvfit(stdrot_X, rot_y, init, r, xtx, penalty, gamma, alpha, lam, eps, max.iter, new.penalty.factor, warn)
+      res <- ncvreg::ncvfit(stdrot_X,
+                            rot_y, 
+                            init,
+                            r,
+                            xtx,
+                            penalty,
+                            gamma,
+                            alpha,
+                            lam,
+                            eps, 
+                            max.iter,
+                            new.penalty.factor,
+                            warn)
       b[, ll] <- init <- res$beta
       linear.predictors[,ll] <- stdrot_X%*%(res$beta)
       iter[ll] <- res$iter
@@ -212,6 +224,8 @@ new.penalty.factor <- c(0, penalty.factor)
     }
     
   } else if ('FBM' %in% class(stdrot_X)){
+    for (ll in 1:nlambda){
+      lam <- lambda[ll]
       res <- rawfit_gaussian(X = stdrot_X,
                              y = rot_y,
                              init = init,
@@ -225,7 +239,16 @@ new.penalty.factor <- c(0, penalty.factor)
                              multiplier = penalty.factor,
                              alpha = alpha)
       # TODO: add a way to pass additional args to this function via '...'
-    
+      b[,ll] <- init <- res$beta
+      linear.predictors[,ll] <- bigstatsr::big_prodVec(X = stdrot_X,
+                                                       y.col = res$beta)
+      # TODO: add a check for iteration
+      # iter[ll] <- res$iter
+      # converged[ll] <- ifelse(res$iter < max.iter, TRUE, FALSE)
+      loss[ll] <- res$loss
+      r <- res$resid
+      if(prep$trace){setTxtProgressBar(pb, ll)}
+    }
   }
   
   # eliminate saturated lambda values, if any
@@ -236,7 +259,7 @@ new.penalty.factor <- c(0, penalty.factor)
   loss <- loss[ind]
   if (warn & sum(iter) == max.iter) warning("\nMaximum number of iterations reached")
   if(fbm_flag){
-    
+    warning("\nNo convexmin() call is added in FBM fitting method yet!")
   } else {
     convex.min <- if (convex) convexMin(b = b,
                                         X = stdrot_X,
@@ -247,7 +270,7 @@ new.penalty.factor <- c(0, penalty.factor)
                                         penalty.factor = new.penalty.factor) else NULL
     
   }
-
+  browser()
   # un-standardizing -------
   # reverse the POST-ROTATION standardization on estimated betas  
   untransformed_b1 <- b # create placeholder vector
@@ -256,7 +279,7 @@ new.penalty.factor <- c(0, penalty.factor)
                                  MARGIN = 1, # beta values are on rows 
                                  STATS = stdrot_X_scale ,
                                  FUN = "/")
-
+  
   
   ret <- structure(list(
     y = prep$y,

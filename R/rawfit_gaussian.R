@@ -54,13 +54,14 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
   v <- rep(NA_integer_, )
   if (is.na(xtx[1])){
     # create v for case where xtx is NA 
-    # GOAL: function(X, n, j) {
-    #   nn <- n * j
-    #   val <- sum(X[nn + (1:n)]^2)
-    #   return(val)
-    # }
-    # TODO: translate the above into a big_apply() call
-    #  big_apply()
+    v <- bigstatsr::big_apply(X,
+                   a.FUN = function(X, ind, n){
+                     sum(X[,ind]^2)/n
+                   },
+                   a.combine = c,
+                   ind = bigstatsr::cols_along(X),
+                   ncores = bigstatsr::nb_cores(),
+                   n = X$nrow)
     
   } else {
     v <- xtx 
@@ -72,7 +73,8 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
   
   # take gaussian loss of y
   gl <- sum(y^2)
-  # gl <- .Call("g_loss", y, n) # TODO: maybe move to C in future version 
+  # TODO: maybe move to C in future version
+  # gl <- .Call("g_loss", y, n)  
   sd_y <- sqrt(gl/n)
   maxchange <- 0 
   
@@ -94,19 +96,29 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
                          a = a,
                          res = z)
     
-    # update beta 
-    b <- update_beta(active, lambda, alpha, b, z, gamma, v, penalty)
+    # update beta ind, lam, multiplier, alpha, b, z, gamma, v, penalty
+    b <- update_beta(ind = active, lam = lambda, alpha = alpha, b = b,
+                     z = z, gamma = gamma, v = v, penalty = penalty,
+                     multiplier = multiplier)
     
     # update r 
-    r <- update_r(n, active, b, a, r)
+    r <- update_r(n = X$nrow, ind = active, b = b, a = a, r = r)
     
     
   } 
   
   # check for convergence 
-  for (j in 1:p){
-    a[j] <- b[j]
-    if(maxchange < eps*sd_y) break;
+  a[active] <- b[active]
+  if(maxchange < eps*sd_y){
+  
+    res <- list(
+      beta = b,
+      loss = sum(r^2),
+      resid = r
+    )
+    
+    return(res)
+    
   }
   
   ## scan for violations -----------------------------------------------
@@ -126,7 +138,9 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
   
   
   # update beta 
-  b <- update_beta(nonactive, lam = lambda, alpha, b, z, gamma, v)
+  b <- update_beta(ind = inactive, lam = lambda, alpha = alpha, b = b,
+                   z = z, gamma = gamma, v = v, penalty = penalty,
+                   multiplier = multiplier)
   browser()
   # if something enters, update active set & residuals
   nz_beta <- which(b != 0)
