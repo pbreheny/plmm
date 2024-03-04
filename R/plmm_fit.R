@@ -141,14 +141,25 @@ plmm_fit <- function(prep,
   
   # calculate population var without mean 0; will need this for call to ncvfit()
   if('matrix' %in% class(prep$std_X)){
-    xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
+    xtx <- rep(1, ncol(stdrot_X))
+    # TODO: is the below appropriate? This is what I used to have...
+    # xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
   } else if('FBM' %in% class(prep$std_X)){
-    xtx <- bigstatsr::big_apply(X = stdrot_X,
-                                a.FUN = function(X, ind){
-                                  mean(X[,ind]^2, na.rm = TRUE)
-                                })
+    xtx <- rep(1, ncol(stdrot_X))
+    # TODO: is the below appropriate? This is what I used to have...
+    # xtx <- rep(NA_integer_, stdrot_X$ncol)
+    # xtx <- bigstatsr::big_apply(X = stdrot_X,
+    #                             a.FUN = function(X, ind, res){
+    #                               res[ind] <- apply(X[,ind],
+    #                                                 2,
+    #                                                 function(col){mean(col^2,
+    #                                                                    na.rm = TRUE)})
+    #                             },
+    #                             a.combine = c,
+    #                             ncores = bigstatsr::nb_cores(),
+    #                             res = xtx)
+    # xtx[1] <- 1 # for intercept
   }
-  
   if(prep$trace){cat("\nRotation complete. Beginning model fitting.")}
   
   # set up lambda -------------------------------------------------------
@@ -170,13 +181,10 @@ plmm_fit <- function(prep,
     user.lambda <- TRUE
   }
   
-  
-  # keep only those penalty factors which penalize non-singular values 
-  penalty.factor <- penalty.factor[std_X_details$ns]
   # make sure to *not* penalize the intercept term 
   new.penalty.factor <- c(0, penalty.factor)
   
-  # placeholders for results
+  # placeholders for results ---------------------------------
   init <- c(0, init) # add initial value for intercept
   
   if('matrix' %in% class(stdrot_X)){
@@ -236,7 +244,7 @@ plmm_fit <- function(prep,
                              eps = eps,
                              max_iter = max.iter, 
                              gamma = gamma,
-                             multiplier = penalty.factor,
+                             multiplier = new.penalty.factor,
                              alpha = alpha)
       # TODO: add a way to pass additional args to this function via '...'
       b[,ll] <- init <- res$beta

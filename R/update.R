@@ -10,34 +10,31 @@
 #' @param v       
 #' @param lam     A single value of lambda 
 update_beta <- function(ind, lam, multiplier, alpha, b, z, gamma, v, penalty){
-  browser()
-    l1 <- lam * multiplier[active] * alpha
-    l2 <- lam * multiplier[active] * (1-alpha)
-    
-    if (penalty == "MCP"){b[ind] <- MCP(z[ind], l1, l2, gamma, v[ind])} 
-    if (penalty == "SCAD") {b[ind] <- SCAD(z[ind], l1, l2, gamma, v[ind])}
-    if (penalty == "lasso") {b[ind] <- lasso(z[ind], l1, l2, v[ind])}
+  
+  l1 <- (lam*alpha)*multiplier[ind]
+  l2 <- (lam*(1-alpha))*multiplier[ind]
+  
+  if(any(is.na(l1))){
+    stop("\nMissing values in l1 arg of update beta")
+  }
+  
+  if (penalty == "MCP"){b[ind] <- MCP(z[ind], l1, l2, gamma, v[ind])} 
+  if (penalty == "SCAD") {b[ind] <- SCAD(z[ind], l1, l2, gamma, v[ind])}
+  if (penalty == "lasso") {b[ind] <- lasso(z[ind], l1, l2, v[ind])}
+  
+  return(b)
 }
 
 #' a function to update r 
-#'
-#' @param n Number of observations 
-#' @param ind Indices of features 
-#' @param b Vector of estimated coefficients
-#' @param a Vector of initial values
 #' @param r Vector of residuals
+#' @param ind Indicies for which features to use in update (e.g., indicies for active set)
 #' @param X A file-backed data frame 
-update_r <- function(n, ind, b, a, r, X){
-  shift <- b[ind] - a[ind]
-  
-  if (shift !=0) {
-    for (i in 1:n){
-      r[i] = r[i] - shift*X[j*n+i]
-    }
-    
-    if(abs(shift)*sqrt(v[j]) > maxChange)maxChange <- abs(shift)*sqrt(v[j])
-  }
-  
+#' @param shift A vector of the same length of `r`, indicating how much to shift/change `X`
+update_r <- function(r, X, shift, ind){
+  change <- rep(0, length(r))
+  change[ind] <- bigstatsr::big_prodVec(X, shift[ind], ind.col = ind)
+  r - change
+  # return(r)
 }
   
 

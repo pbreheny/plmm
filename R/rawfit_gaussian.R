@@ -17,7 +17,7 @@
 #' 
 rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter, 
                             gamma, multiplier, alpha){
-  
+
   # error checking ---------------------------
   # TODO: come back and add steps similar to ncvreg::ncvfit()
   
@@ -76,16 +76,19 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
   # TODO: maybe move to C in future version
   # gl <- .Call("g_loss", y, n)  
   sd_y <- sqrt(gl/n)
+  
   maxchange <- 0 
   
   # fit the model ------------------------------
   
   ## solve over the active set -----------------------------------------
   if(length(active) != 0){
-    bigstatsr::big_apply(X = X,
-                         a.FUN = function(X, ind, r, n, v, a, res){
-                           cp <- crossprod(X[,ind], r)
-                           res[ind] <- cp/n + (v[ind]*a[ind])
+    cat("\nSolving over active features")
+    browser()
+    z[active] <- bigstatsr::big_apply(X = X,
+                         a.FUN = function(X, ind, r, n, v, a){
+                           cp <- crossprod(r[ind],X[,ind])
+                           cp/n + (v[ind]*a[ind])
                          },
                          a.combine = c,
                          ind = active, # this is the key line here
@@ -93,65 +96,60 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
                          r = r_new,
                          n = n,
                          v = drop(xtx),
-                         a = a,
-                         res = z)
+                         a = a)
     
     # update beta ind, lam, multiplier, alpha, b, z, gamma, v, penalty
     b <- update_beta(ind = active, lam = lambda, alpha = alpha, b = b,
                      z = z, gamma = gamma, v = v, penalty = penalty,
                      multiplier = multiplier)
-    
+    bigstatsr::big_prodVec(X, shift[ind], ind.col = ind)
     # update r 
-    r <- update_r(n = X$nrow, ind = active, b = b, a = a, r = r)
+    r_new <- update_r(r = r_new, X = X, shift = b - a, ind = active)
     
+    # update maxchange
+    check1 <- abs(b - a)*sqrt(v) > maxchange
+    maxchange[check1] <- (abs(b - a)*sqrt(v))[check1]
     
   } 
   
   # check for convergence 
   a[active] <- b[active]
   if(maxchange < eps*sd_y){
-  
-    res <- list(
-      beta = b,
-      loss = sum(r^2),
-      resid = r
-    )
-    
-    return(res)
+  warning("\nConvergence issue")
     
   }
   
   ## scan for violations -----------------------------------------------
-  nonactive <- which(a == 0)
+  inactive <- which(a == 0)
   violations <- 0
-  z <- bigstatsr::big_apply(X = X,
-                       a.FUN = function(X, ind, r, n, res){
+  z[inactive] <- bigstatsr::big_apply(X = X,
+                       a.FUN = function(X, ind, r, n){
                          cp <- crossprod(X[,ind], r) # note: no 'v' and 'a' here
-                         res[ind] <- cp/n 
+                         cp/n 
                        },
                        a.combine = c,
-                       ind = nonactive, # note: this is the key change from above
+                       ind = inactive, # note: this is the key change from above
                        ncores = bigstatsr::nb_cores(),
                        r = r_new,
-                       n = n,
-                       res = z)
+                       n = n)
   
   
   # update beta 
+  cat("\nSolving over inactive features")
   b <- update_beta(ind = inactive, lam = lambda, alpha = alpha, b = b,
                    z = z, gamma = gamma, v = v, penalty = penalty,
                    multiplier = multiplier)
-  browser()
+  
   # if something enters, update active set & residuals
   nz_beta <- which(b != 0)
   active[nz_beta] <- 1
-  bigstatsr::big_apply(X = X,
-                       a.FUN = function(X, ind, b, res){
-                         res[ind] <- res[ind] - b[ind]*X[ind,]},
-                       a.combine = c,
-                       ind = rows.along(X),
-                       b = b,
-                       res = r)
+  r_new <- update_r(r_new, X, shift = b, ind = inactive)
+  
+  # update coefficient estimates
+  a[inactive] <- b[inactive]
+  
+  # update violation count 
+  violations <- violations + length(nz_beta) 
   
   
 # return result to plmm_fit
