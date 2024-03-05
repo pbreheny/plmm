@@ -163,6 +163,7 @@ plmm_prep <- function(std_X,
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
     # include std_X and y here b/c I will need them for cross validation 
+    p = p,
     std_X = std_X,
     y = y,
     s = s,

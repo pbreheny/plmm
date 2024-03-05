@@ -51,7 +51,8 @@
 #' \dontrun{
 #' 
 #' # file-backed example
-#' plmm(X = "~/Desktop/temp_files/penncath_lite", fbm = TRUE, trace = TRUE)
+#' plmm(X = "~/tmp_files/penncath_lite", # adjust this line to fit current machine
+#'  fbm = TRUE, trace = TRUE)
 #' 
 #' penncath_mid <- process_plink(prefix = "penncath_mid", dataDir = plink_example(path="penncath_mid.fam", parent=T))
 #' penncath_clinical <- read.csv(plink_example(path="penncath_clinical.csv"))

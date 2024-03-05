@@ -23,7 +23,7 @@ plmm_format <- function(fit, X){
   
   # get beta values back in original scale; reverse the PRE-ROTATION standardization 
   untransformed_b2 <- untransform(untransformed_b1 = fit$untransformed_b1,
-                                  ns = fit$ns,
+                                  # ns = fit$ns,
                                   std_X_details = fit$std_X_details,
                                   p = fit$p)
   

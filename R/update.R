@@ -32,7 +32,8 @@ update_beta <- function(ind, lam, multiplier, alpha, b, z, gamma, v, penalty){
 #' @param shift A vector of the same length of `r`, indicating how much to shift/change `X`
 update_r <- function(r, X, shift, ind){
   change <- rep(0, length(r))
-  change[ind] <- bigstatsr::big_prodVec(X, shift[ind], ind.col = ind)
+  X <- bigstatsr::big_copy(X, ind.col = ind)
+  change <- bigstatsr::big_prodVec(X, shift[ind])
   r - change
   # return(r)
 }

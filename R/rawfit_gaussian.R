@@ -28,7 +28,7 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
   ## initialize 'b' (new beta) --------------------
   b <- rep(0, p)
   
-  ## setup 'a' (use beta from previous iteration)----------------
+  ## setup 'a' (beta from previous iteration)----------------
   a <- init
   
   # initialize indicators for active set 
@@ -69,7 +69,7 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
   
   
   # setup z 
-  z <- rep(NA_integer_, p)
+  z <- rep(0, p)
   
   # take gaussian loss of y
   gl <- sum(y^2)
@@ -77,18 +77,23 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
   # gl <- .Call("g_loss", y, n)  
   sd_y <- sqrt(gl/n)
   
-  maxchange <- 0 
+  maxchange <- rep(0, length(y)) 
   
   # fit the model ------------------------------
   
   ## solve over the active set -----------------------------------------
   if(length(active) != 0){
     cat("\nSolving over active features")
-    browser()
     z[active] <- bigstatsr::big_apply(X = X,
                          a.FUN = function(X, ind, r, n, v, a){
-                           cp <- crossprod(r[ind],X[,ind])
-                           cp/n + (v[ind]*a[ind])
+                           # cp = cross product 
+                           cp <- apply(X = X[,ind],
+                                       MARGIN = 2,
+                                       FUN = function(j){
+                                         crossprod(j, r)/n
+                                       })
+                           
+                           cp + (v[ind]*a[ind]) -> foo
                          },
                          a.combine = c,
                          ind = active, # this is the key line here
@@ -102,7 +107,7 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
     b <- update_beta(ind = active, lam = lambda, alpha = alpha, b = b,
                      z = z, gamma = gamma, v = v, penalty = penalty,
                      multiplier = multiplier)
-    bigstatsr::big_prodVec(X, shift[ind], ind.col = ind)
+    
     # update r 
     r_new <- update_r(r = r_new, X = X, shift = b - a, ind = active)
     
@@ -112,9 +117,10 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
     
   } 
   
-  # check for convergence 
+  # update coefficient estimates 
   a[active] <- b[active]
-  if(maxchange < eps*sd_y){
+  # check for convergence 
+  if(any(maxchange > eps*sd_y)){
   warning("\nConvergence issue")
     
   }

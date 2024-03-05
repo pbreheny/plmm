@@ -200,7 +200,7 @@ plmm_fit <- function(prep,
   iter <- integer(nlambda)
   converged <- logical(nlambda)
   loss <- numeric(nlambda)
-  
+
   # main attraction -----------------------------------------------------------
   # set up progress bar -- this can take a while
   if(prep$trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
@@ -278,14 +278,13 @@ plmm_fit <- function(prep,
                                         penalty.factor = new.penalty.factor) else NULL
     
   }
-  browser()
   # un-standardizing -------
   # reverse the POST-ROTATION standardization on estimated betas  
   untransformed_b1 <- b # create placeholder vector
   untransformed_b1[-1,] <- sweep(x = b[-1, , drop=FALSE], 
                                  # un-scale the non-intercept values & fill in the placeholder
                                  MARGIN = 1, # beta values are on rows 
-                                 STATS = stdrot_X_scale ,
+                                 STATS = stdrot_X_scale[-1] ,
                                  FUN = "/")
   
   
@@ -293,7 +292,7 @@ plmm_fit <- function(prep,
     y = prep$y,
     p = prep$p, 
     n = prep$n, 
-    std_X_details = prep$std_X_details,
+    std_X_details = std_X_details,
     stdrot_X_scale = stdrot_X_scale,
     s = prep$s,
     U = prep$U,

@@ -48,9 +48,9 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   # set up a fit using non-penalized covariates -- use this to derive residuals 
   if (length(p_ind) != (p-1)) { # case 1: not all `p` columns are to be penalized
     if('matrix' %in% class(X)){
-      fit <- stats::glm(y ~ X[, -p_ind, drop = FALSE], family='gaussian')
+      fit <- stats::glm(y ~  X[, -p_ind, drop = FALSE], family='gaussian')
     } else if ('FBM' %in% class(X)){
-      fit <- stats::glm(y ~ X[, -p_ind, drop = FALSE], family='gaussian')
+      fit <- stats::glm(y ~  X[, -p_ind, drop = FALSE], family='gaussian')
       # TODO: think about how to make this glm() run file-backed;
       # marginal method below will not work...
       # fit <- bigstatsr::big_univLinReg(X = X,
