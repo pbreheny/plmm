@@ -261,6 +261,7 @@ plmm <- function(X,
   the_prep <- plmm_prep(std_X = std_X,
                         std_X_n = std_X_n,
                         std_X_p = std_X_p,
+                        n = dat$n,
                         p = dat$p,
                         y = y,
                         K = K,
@@ -292,12 +293,17 @@ plmm <- function(X,
   # format results ---------------------------------------------------
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   if(fbm_flag){
-    # TODO: work format through for FBM case 
-  } else {
-    the_final_product <- plmm_format(fit = the_fit, 
+    # TODO: work format through for FBM case
+    the_final_product <- plmm_format(fit = the_fit
                                      # convex = convex,
                                      # dfmax = dfmax, 
-                                     X = X)
+                                     )
+    
+  } else {
+    the_final_product <- plmm_format(fit = the_fit
+                                     # convex = convex,
+                                     # dfmax = dfmax, 
+                                     )
     
   }
 

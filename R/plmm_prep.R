@@ -4,6 +4,7 @@
 #' @param std_X Column standardized design matrix. May include clinical covariates and other non-SNP data.
 #' @param std_X_n The number of observations in std_X (integer)
 #' @param std_X_p The number of features in std_X (integer)
+#' @param n The number of instances in the *original* design matrix X. This should not be altered by standardization.
 #' @param p The number of features in the *original* design matrix X, including constant features
 #' @param y Continuous outcome vector.
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
@@ -33,6 +34,7 @@
 plmm_prep <- function(std_X,
                       std_X_n,
                       std_X_p,
+                      n,
                       p,
                       y,
                       k = NULL,
@@ -171,14 +173,7 @@ plmm_prep <- function(std_X,
     eta = eta, # carry eta over to fit 
     trace = trace))
   
-  # label SNPs, if applicable
-    if (is.null(colnames(std_X))){
-      snp_names <- paste("snp", 1:std_X_p, sep="") 
-    } else {
-      snp_names <- std_X_p
-      }
-  ret$snp_names <- snp_names
-  
+ 
   return(ret)
   
   

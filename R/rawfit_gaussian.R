@@ -77,7 +77,7 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
   # gl <- .Call("g_loss", y, n)  
   sd_y <- sqrt(gl/n)
   
-  maxchange <- rep(0, length(y)) 
+  maxchange <- rep(0, p) 
   
   # fit the model ------------------------------
   
