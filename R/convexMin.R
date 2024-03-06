@@ -37,6 +37,7 @@ convexMin <- function(b, X, penalty, gamma, l2, family = "gaussian", penalty.fac
       U <- A1&A2
       L2 <- l2[i+1]
     }
+  
     if (sum(!U)==0) next
     Xu <- X[,!U]
     p.. <- k*(penalty.factor[!U]!=0) - L2*penalty.factor[!U]

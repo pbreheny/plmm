@@ -11,7 +11,7 @@
 
 untransform <- function(untransformed_b1, p, std_X_details){
   # goal: reverse the PRE-ROTATION standardization #
-  
+ 
   # partition the values from Step 1 into intercept and non-intercept parts
   a <- untransformed_b1[1, , drop = FALSE] # this is the intercept 
   b <- untransformed_b1[-1, , drop=FALSE]
@@ -21,16 +21,17 @@ untransform <- function(untransformed_b1, p, std_X_details){
   untransformed_beta <- matrix(0,
                                nrow = (p + 1), # + 1 is for the intercept
                                ncol = ncol(untransformed_b1))
-  
+
   # unscale the beta values for non-singular, non-intercept columns
   untransformed_b2 <- sweep(x = b,
                             MARGIN = 1,
-                            STATS = std_X_details$scale,
+                            STATS = std_X_details$scale[std_X_details$ns],
                             FUN = "/")
   
   # fill in the un-transformed values
   untransformed_beta[std_X_details$ns+1,] <- untransformed_b2 # again, the + 1 is for the intercept
-  untransformed_beta[1,] <- a - crossprod(std_X_details$center, untransformed_b2)
+  untransformed_beta[1,] <- a - crossprod(std_X_details$center[std_X_details$ns],
+                                          untransformed_b2)
   
   
   # Final step: return un-transformed beta values 

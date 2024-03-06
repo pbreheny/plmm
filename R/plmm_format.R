@@ -18,8 +18,6 @@
 plmm_format <- function(fit, snp_names = NULL){
 
   # reverse the transformations of the beta values ----------------------
-  if (fit$trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
-  
   # get beta values back in original scale; reverse the PRE-ROTATION standardization 
   untransformed_b2 <- untransform(untransformed_b1 = fit$untransformed_b1,
                                   # ns = fit$ns,

@@ -77,7 +77,7 @@ plmm_fit <- function(prep,
     stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
     stdrot_X_noInt <- stdrot_X_temp$scaled_X
     stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
-    attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
+    stdrot_X_scale <- stdrot_X_temp$scale_vals
   } else if ('FBM' %in% class(prep$std_X)){
     w <- (prep$eta * prep$s + (1 - prep$eta))^(-1/2)
     Ut <- bigstatsr::big_transpose(prep$U)
@@ -209,6 +209,7 @@ plmm_fit <- function(prep,
   if('matrix' %in% class(stdrot_X)){
     for (ll in 1:nlambda){
       lam <- lambda[ll]
+      browser()
       res <- ncvreg::ncvfit(stdrot_X,
                             rot_y, 
                             init,
@@ -281,10 +282,11 @@ plmm_fit <- function(prep,
   # un-standardizing -------
   # reverse the POST-ROTATION standardization on estimated betas  
   untransformed_b1 <- b # create placeholder vector
+  
   untransformed_b1[-1,] <- sweep(x = b[-1, , drop=FALSE], 
                                  # un-scale the non-intercept values & fill in the placeholder
                                  MARGIN = 1, # beta values are on rows 
-                                 STATS = stdrot_X_scale[-1] ,
+                                 STATS = stdrot_X_scale ,
                                  FUN = "/")
   
   

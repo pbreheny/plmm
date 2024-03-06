@@ -18,6 +18,7 @@
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
 #' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
 #' @param outfile Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.
+#' @param std_bk_extension Optional: the file name of the backing file ".bk" to be created for quality controlled, standardized data. Defaults to "std_X" (i.e., default will create std_X.bk in the directory supplied to `data_dir`)
 #' @param ... Optional: additional arguments to `bigsnpr::snp_fastImpute()` (relevant only if impute_method = "xgboost")
 #' 
 #' @export
@@ -38,6 +39,7 @@ process_plink <- function(data_dir,
                           quiet = FALSE,
                           gz = FALSE,
                           outfile,
+                          std_bk_extension = NULL,
                           ...){
   
   # start log ------------------------------------------
@@ -75,6 +77,17 @@ process_plink <- function(data_dir,
     bigsnpr::snp_readBed(bedfile = paste0(data_dir, "/", prefix, ".bed"))
     obj <- bigsnpr::snp_attach(path)
   }
+  
+# set object names --------------------------------
+  obj$colnames <- obj$map$marker.ID
+  
+  if (length(unique(obj$fam$family.ID)) == nrow(obj$fam)){
+    obj$rownames <- obj$fam$family.ID
+  } else {
+    obj$rownames <- obj$fam$sample.ID
+  }
+  
+  
 # chromosome check ---------------------------------
 # only consider SNPs on chromosomes 1-22
 
@@ -147,18 +160,20 @@ process_plink <- function(data_dir,
     cat("\nOf these, ", sum(prop_na > 0.5), " are missing in at least 50% of the samples")
   }
 
-# handle missing phenotypes ---------------------------------------
-  # make missing phenotypes explicit 
-  na_vals <- which(obj$fam$affection %in% na_phenotype_vals)
+  # handle missing phenotypes ---------------------------------------
+  # make missing phenotypes explicit (need both of the following because 
+  # bigstatsr::big_cop() does not handle negative indices)
+  complete_phen <- which(!(obj$fam$affection %in% na_phenotype_vals))
+  na_phen <- which(obj$fam$affection %in% na_phenotype_vals)
+  
   if (handle_missing_phen == 'prune'){
     if(!quiet){
-      cat("\nPruning out ", length(na_vals), " samples/observations with missing phenotype data.")
+      cat("\nWill prune out ", length(na_phen), " samples/observations with missing phenotype data.")
     }
-    complete_cases <- bigsnpr::snp_subset(obj, ind.row = -na_vals)
-    obj <- bigsnpr::snp_attach(complete_cases)
+    obj$fam <- obj$fam[complete_phen,]
   } else if (handle_missing_phen == 'asis'){
     if(!quiet){
-      cat("\nMarking ", length(na_vals), " samples/observations as having missing phenotype data.")
+      cat("\nWill mark ", length(na_phen), " samples/observations as having missing phenotype data.")
     }
     obj$fam$affection[na_vals] <- NA_integer_
   } else {
@@ -166,14 +181,11 @@ process_plink <- function(data_dir,
       cat("\nImputing phenotype data for ", length(na_vals), " samples/observations.")
     }
     obj$fam$affection[na_vals] <- switch(handle_missing_phen,
-                                         median = median(obj$fam$affection[-na_vals]),
-                                         mean = mean(obj$fam$affection[-na_vals]))
+                                         median = median(obj$fam$affection[complete_phen]),
+                                         mean = mean(obj$fam$affection[complete_phen]))
   }
   
-  
-  
-  
-# imputation -------------------------------------------------
+  # imputation -------------------------------------------------
   if(!quiet & impute){
     # catch for misspellings
     if(!(impute_method %in% c('mode', 'random', 'mean0', 'mean2', 'xgboost'))){
@@ -240,13 +252,24 @@ process_plink <- function(data_dir,
                            center = scale_info$center,
                            scale = scale_info$scale,
                            ns = obj$ns)
+  if(is.null(std_bk_extension)) std_bk_extension <- paste0("std_", prefix) 
+  
   # subset the features so that constant features (monomorphic SNPs) are not 
   # included in analysis
-  obj$std_X <- bigstatsr::big_copy(tmp,
-                                   ind.col = ns,
-                                   backingfile = paste0(getwd(),"/std_X"))
+  # this is also where we remove observations with missing phenotypes, if that was requested
+  if (handle_missing_phen == "prune"){
+    obj$std_X <- bigstatsr::big_copy(tmp,
+                                     ind.row = complete_phen, # filters out rows with missing phenotypes
+                                     ind.col = ns,
+                                     backingfile = paste0(data_dir,"/", std_bk_extension))
+  } else {
+    obj$std_X <- bigstatsr::big_copy(tmp,
+                                     ind.col = ns,
+                                     backingfile = paste0(data_dir,"/", std_bk_extension))
+  }
   
-
+  obj$std_X_colnames <- obj$colnames[ns]
+  obj$std_X_rownames <- obj$rownames[complete_phen]
   obj <- bigsnpr::snp_save(obj)
   
   cat("\nDone with standardization. File formatting in progress.",

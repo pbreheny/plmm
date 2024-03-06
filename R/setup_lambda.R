@@ -47,32 +47,9 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   # np_ind <- which(penalty.factor == 0) # np = not penalized 
   # set up a fit using non-penalized covariates -- use this to derive residuals 
   if (length(p_ind) != (p-1)) { # case 1: not all `p` columns are to be penalized
-    if('matrix' %in% class(X)){
-      fit <- stats::glm(y ~  X[, -p_ind, drop = FALSE], family='gaussian')
-    } else if ('FBM' %in% class(X)){
-      fit <- stats::glm(y ~  X[, -p_ind, drop = FALSE], family='gaussian')
-      # TODO: think about how to make this glm() run file-backed;
-      # marginal method below will not work...
-      # fit <- bigstatsr::big_univLinReg(X = X,
-      #                                  y.train = y, 
-      #                                  ind.col = np_ind,
-      #                                  ncores = bigstatsr::nb_cores())
-      # # calculate linear predictor (not done by default)
-      # fit$linear_predictor <- bigstatsr::big_prodVec(X = X,
-      #                                                y.col = fit$estim,
-      #                                                ind.col = np_ind,
-      #                                                ncores = bigstatsr::nb_cores())
-      # # assess residuals 
-      # fit$residuals <- y - fit$linear_predictor
-    }
-    
+    fit <- stats::glm(y ~ -1 + X[, -p_ind, drop = FALSE], family='gaussian')
   } else { # case 2: all columns are penalized (here, intercept is the only 'np_ind')
-    if('matrix' %in% class(X)){
-      fit <- stats::glm(y ~ X[, 1, drop = FALSE], family='gaussian')
-    } else if ('FBM' %in% class(X)){
-      fit <- stats::glm(y ~ X[,1], family='gaussian')
-    }
-    
+    fit <- stats::glm(y ~ -1 + X[, 1, drop = FALSE], family='gaussian')
   }
 
   # determine the maximum value for lambda

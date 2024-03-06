@@ -19,7 +19,8 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
                             gamma, multiplier, alpha){
 
   # error checking ---------------------------
-  # TODO: come back and add steps similar to ncvreg::ncvfit()
+  # TODO: come back and add steps similar to ncvreg::ncvfit(); note that some 
+  #   of these error checks are already run in plmm()
   
   # setup steps -------------------------------
   n <- length(y)
@@ -84,6 +85,7 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
   ## solve over the active set -----------------------------------------
   if(length(active) != 0){
     cat("\nSolving over active features")
+
     z[active] <- bigstatsr::big_apply(X = X,
                          a.FUN = function(X, ind, r, n, v, a){
                            # cp = cross product 
@@ -92,8 +94,8 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
                                        FUN = function(j){
                                          crossprod(j, r)/n
                                        })
+                           cp + (v[ind]*a[ind])
                            
-                           cp + (v[ind]*a[ind]) -> foo
                          },
                          a.combine = c,
                          ind = active, # this is the key line here
@@ -102,7 +104,7 @@ rawfit_gaussian <- function(X, y, init, r, xtx, penalty, lambda, eps, max_iter,
                          n = n,
                          v = drop(xtx),
                          a = a)
-    
+    browser()
     # update beta ind, lam, multiplier, alpha, b, z, gamma, v, penalty
     b <- update_beta(ind = active, lam = lambda, alpha = alpha, b = b,
                      z = z, gamma = gamma, v = v, penalty = penalty,

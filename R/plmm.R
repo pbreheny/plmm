@@ -6,6 +6,7 @@
 #' * Note: X may include clinical covariates and other non-SNP data, but no missing values are allowed.
 #' @param fbm Logical: should X be treated as filebacked? Relevant only when X is a string to be passed to `get_data()`. Defaults to NULL, using the default setttings of `get_data()` to determine whether X should be stored in memory.
 #' @param std_needed Logical: does the supplied X need to be standardized? Defaults to FALSE, since `process_plink()` standardizes the design matrix by default. 
+#' By default, X will be standardized internally.
 #' @param y Continuous outcome vector. Defaults to NULL, assuming that the outcome is the 6th column in the .fam PLINK file data. Can also be a user-supplied numeric vector. 
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list with components 'd' and 'u', as returned by choose_k().
@@ -156,16 +157,19 @@ plmm <- function(X,
     if (typeof(X)=="integer") storage.mode(X) <- "double"
     if (typeof(X)=="character") stop("if X is a matrix, it must be a numeric matrix", call.=FALSE)
     
+    # designate the dimensions of the original design matrix 
+    n <- nrow(X)
+    p <- ncol(X) 
+     
+    ### handle standardization ---------------------------------------------
     if(std_needed){
-      # designate the dimensions of the original design matrix 
-      n <- nrow(X)
-      p <- ncol(X) 
       std_X <- ncvreg::std(X)
-      std_X_center <- attr(std_X, 'center')
-      std_X_scale <- attr(std_X, 'scale')
-      ns <- attr(std_X, 'nonsingular')
+      std_X_details <- list(center = attr(std_X, 'center'),
+                            scale = attr(std_X, 'scale'),
+                            ns = attr(std_X, 'nonsingular'))
+      
       # designate the dimensions of the standardized design matrix, with only ns columns
-    }
+    } 
     
   }
   # designate dimensions of the 
@@ -246,29 +250,38 @@ plmm <- function(X,
       scale = dat$std_X_scale,
       ns = dat$ns
     )
-  } else {
-    std_X_details <- list(
-      center = attr(std_X, 'center'), # singular columns have center = 0
-      scale = attr(std_X, 'scale'), # singular columns have scale = 0
-      ns = attr(std_X, "nonsingular")
-    )
-  }
+  } 
   
 
 
   # prep (SVD)-------------------------------------------------
   if(trace){cat("\nInput data passed all checks.")}
-  the_prep <- plmm_prep(std_X = std_X,
-                        std_X_n = std_X_n,
-                        std_X_p = std_X_p,
-                        n = dat$n,
-                        p = dat$p,
-                        y = y,
-                        K = K,
-                        k = k,
-                        diag_K = diag_K,
-                        fbm_flag = fbm_flag,
-                        trace = trace)
+  if (fbm_flag){
+    the_prep <- plmm_prep(std_X = std_X,
+                          std_X_n = std_X_n,
+                          std_X_p = std_X_p,
+                          n = dat$n,
+                          p = dat$p,
+                          y = y,
+                          K = K,
+                          k = k,
+                          diag_K = diag_K,
+                          fbm_flag = fbm_flag,
+                          trace = trace)
+  } else {
+    the_prep <- plmm_prep(std_X = std_X,
+                          std_X_n = std_X_n,
+                          std_X_p = std_X_p,
+                          n = n,
+                          p = p,
+                          y = y,
+                          K = K,
+                          k = k,
+                          diag_K = diag_K,
+                          fbm_flag = fbm_flag,
+                          trace = trace)
+  }
+  
 
   # rotate & fit -------------------------------------------------------------
   if(trace){cat("\nBeginning model fitting.\n")}
@@ -290,6 +303,7 @@ plmm <- function(X,
                       init = init)
 
   if(trace){cat("\nBeta values are estimated -- almost done!")}
+  
   # format results ---------------------------------------------------
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   if(fbm_flag){
