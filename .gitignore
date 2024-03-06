@@ -4,6 +4,7 @@
 penncath_*.bed
 penncath_*.bim
 penncath_*.fam
+data-raw/admix.rds
 *.log
 *.o
 *.so
