@@ -1,9 +1,9 @@
 .Rproj.user
 *\.rds$
 *.bk
-*.bed
-*.bim
-*.fam
+penncath_*.bed
+penncath_*.bim
+penncath_*.fam
 *.log
 *.o
 *.so
