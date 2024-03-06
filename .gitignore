@@ -16,6 +16,7 @@ docs
 inst/doc
 inst/extdata/og_cad.*
 inst/extdata/cad_mid.*
+inst/extdata/*.rds
 R/_*
 README.html
 Rprof.*

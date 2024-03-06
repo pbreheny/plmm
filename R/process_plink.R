@@ -9,6 +9,12 @@
 #'  * mean0: Imputes the rounded mean.
 #'  * mean2: Imputes the mean rounded to 2 decimal places.
 #'  * xgboost: Imputes using an algorithm based on local XGBoost models. See `bigsnpr::snp_fastImpute()` for details. Note: this can take several minutes, even for a relatively small data set. 
+#' @param na_phenotype_vals A vector of numeric values used to code NA values in the phenotype/outcome (this is the 'affection' column in a `bigSNP` object, or the last column of a `.fam` file). Defaults to -9 (matching PLINK conventions).
+#' @param handle_missing_phen A string indicating how missing phenotypes should be handled: 
+#'  * "prune" (default): observations with missing phenotype are removed
+#'  * "asis": leaves missing phenotypes as NA (this is fine if outcome will be supplied later from a separate file)
+#'  * "median": impute missing phenotypes using the median (warning: this is overly simplistic in many cases).
+#'  * "mean": impute missing phenotypes using the mean (warning: this is overly simplistic in many cases).
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
 #' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
 #' @param outfile Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.
@@ -27,6 +33,8 @@ process_plink <- function(data_dir,
                           prefix,
                           impute = TRUE,
                           impute_method = 'mode',
+                          na_phenotype_vals = c(-9),
+                          handle_missing_phen = "prune",
                           quiet = FALSE,
                           gz = FALSE,
                           outfile,
@@ -125,7 +133,7 @@ process_plink <- function(data_dir,
   }
   
 
-# notify about missing values ----------------------------
+# notify about missing (genotype) values ----------------------------
   na_idx <- counts[4,] > 0
   prop_na <- counts[4,]/nrow(X)
   
@@ -139,6 +147,32 @@ process_plink <- function(data_dir,
     cat("\nOf these, ", sum(prop_na > 0.5), " are missing in at least 50% of the samples")
   }
 
+# handle missing phenotypes ---------------------------------------
+  # make missing phenotypes explicit 
+  na_vals <- which(obj$fam$affection %in% na_phenotype_vals)
+  if (handle_missing_phen == 'prune'){
+    if(!quiet){
+      cat("\nPruning out ", length(na_vals), " samples/observations with missing phenotype data.")
+    }
+    complete_cases <- bigsnpr::snp_subset(obj, ind.row = -na_vals)
+    obj <- bigsnpr::snp_attach(complete_cases)
+  } else if (handle_missing_phen == 'asis'){
+    if(!quiet){
+      cat("\nMarking ", length(na_vals), " samples/observations as having missing phenotype data.")
+    }
+    obj$fam$affection[na_vals] <- NA_integer_
+  } else {
+    if(!quiet){
+      cat("\nImputing phenotype data for ", length(na_vals), " samples/observations.")
+    }
+    obj$fam$affection[na_vals] <- switch(handle_missing_phen,
+                                         median = median(obj$fam$affection[-na_vals]),
+                                         mean = mean(obj$fam$affection[-na_vals]))
+  }
+  
+  
+  
+  
 # imputation -------------------------------------------------
   if(!quiet & impute){
     # catch for misspellings
@@ -146,7 +180,7 @@ process_plink <- function(data_dir,
       stop("\nImpute method is misspecified or misspelled. Please use one of the 
            \n5 options listed in the documentation.")
     }
-    cat("\nImputing the missing values using ", impute_method, " method\n")
+    cat("\nImputing the missing (genotype) values using ", impute_method, " method\n")
   }
   
   if(impute){
