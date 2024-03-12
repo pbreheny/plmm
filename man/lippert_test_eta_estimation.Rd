@@ -11,6 +11,7 @@ lippert_test_eta_estimation(
   intercept = TRUE,
   center_y = FALSE,
   y_skew = 0,
+  prop_skew = 0,
   return_y = FALSE,
   ...
 )
@@ -27,6 +28,8 @@ lippert_test_eta_estimation(
 \item{center_y}{Logical: should y be centered? Defaults to FALSE. (Note: this option only makes sense if intercept = TRUE)}
 
 \item{y_skew}{Numeric value: if nonzero, this will control how much skewness will be added to the noise. Defaults to 0.}
+
+\item{prop_skew}{Proportion (value between 0 and 1) that indicates the proportion of outcome values to be skewed right. Only makes sense if \code{y_skew} is nonzero.}
 
 \item{return_y}{Logical: should simulated outcome values be returned? Defaults to FALSE.}
 

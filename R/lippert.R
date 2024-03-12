@@ -45,11 +45,13 @@ lippert_loglik <- function(eta, rot_y, s, n){
 #' @param intercept Logical: should the outcome be simulated with an intercept? Defaults to TRUE. 
 #' @param center_y  Logical: should y be centered? Defaults to FALSE. (Note: this option only makes sense if intercept = TRUE)
 #' @param y_skew Numeric value: if nonzero, this will control how much skewness will be added to the noise. Defaults to 0. 
+#' @param prop_skew Proportion (value between 0 and 1) that indicates the proportion of outcome values to be skewed right. Only makes sense if `y_skew` is nonzero.
 #' @param return_y Logical: should simulated outcome values be returned? Defaults to FALSE.
 #' @param ... Additional args to pass into `estimate_eta()`
 #' @keywords internal
 lippert_test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
                                         center_y = FALSE,  y_skew = 0,
+                                        prop_skew = 0,
                                         return_y = FALSE, ...){
   
   # Note: true_eta <- sig_s/(sig_s + sig_eps)
@@ -58,18 +60,17 @@ lippert_test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
   u <- mvtnorm::rmvnorm(n = 1,
                         sigma = sig_s*K) |> drop()
   
-  if (!(y_skew == 0)) {
-    t <- runif(1)
-    if (t <= 0.1) {
-      eps <- mvtnorm::rmvnorm(n = 1,
-                              sigma = sig_eps*diag(nrow = nrow(K))) |> drop()
+  
+  eps <- mvtnorm::rmvnorm(n = 1,
+                          sigma = sig_eps*diag(nrow = nrow(K))) |> drop()
+  
+  if (y_skew != 0) {
+    t <- runif(1) # make 10% of values have skewness 
+    if (t <= prop_skew) {
       eps <- eps + y_skew
     }
-  } else {
-    eps <- mvtnorm::rmvnorm(n = 1,
-                            sigma = sig_eps*diag(nrow = nrow(K))) |> drop()
-  }
-
+  } 
+  
   y <- u + eps 
   if (intercept){
     intcpt <- rep(1, nrow(K))
