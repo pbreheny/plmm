@@ -50,7 +50,7 @@ test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
   
   if (prop_skew != 0) {
     t <- runif(1) 
-    if (t <= prop_skew) {
+    if (t <= prop_skew/2 | t >= prop_skew/2) {
       y <- y^2
     }
   } 
