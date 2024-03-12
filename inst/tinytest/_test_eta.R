@@ -56,7 +56,8 @@ for(i in 1:100){
   res <- test_eta_estimation(sig_s = 2,
                              sig_eps = 1,
                              K = K,
-                             y_dist = "skewed",
+                             y_skew = 3,
+                             prop_skew = 0.3,
                              return_y = TRUE)
   
   y_skew[i,] <- res$y
@@ -64,8 +65,9 @@ for(i in 1:100){
   setTxtProgressBar(pb, i)
 }
 
-# hist(y_skew[2,])
-# summary(hat_eta)
+hist(y_skew[2,])
+qqnorm(y_skew[2,]);qqline(y_skew[2,])
+summary(hat_eta)
 
 # Look at a toy K matrix --------------------------------------------
 # TODO: is this a sensible way to test eta estimation?? Still thinking about this...

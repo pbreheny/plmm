@@ -27,13 +27,12 @@ estimate_eta <- function(n, s, U, y, eta_star){
 #' @param K Matrix to use as relatedness matrix.
 #' @param intercept Logical: should the outcome be simulated with an intercept? Defaults to TRUE. 
 #' @param center_y  Logical: should y be centered? Defaults to FALSE. (Note: this option only makes sense if intercept = TRUE)
-#' @param y_skew Numeric value: if nonzero, this will control how much skewness will be added to the noise. Defaults to 0. 
-#' @param prop_skew Proportion (value between 0 and 1) that indicates the probability of an outcome value being skewed right. Only makes sense if `y_skew` is nonzero.
+#' @param prop_skew Proportion (value between 0 and 1) that indicates the probability of an outcome value being skewed. Skewed outcomes are generate from a Chi-squared distribution (i.e., the square of the model's normal distribution). 
 #' @param return_y Logical: should simulated outcome values be returned? Defaults to FALSE.
 #' @param ... Additional args to pass into `estimate_eta()`
 #' @keywords internal
 test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
-                                center_y = FALSE, y_skew = 0, prop_skew = 0, 
+                                center_y = FALSE, prop_skew = 0, 
                                 return_y = FALSE, ...){
   
   # Note: true_eta <- sig_s/(sig_s + sig_eps)
@@ -46,14 +45,16 @@ test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
   eps <- mvtnorm::rmvnorm(n = 1,
                           sigma = sig_eps*diag(nrow = nrow(K))) |> drop()
   
-  if (y_skew != 0) {
+  
+  y <- u + eps
+  
+  if (prop_skew != 0) {
     t <- runif(1) 
     if (t <= prop_skew) {
-      eps <- eps + y_skew
+      y <- y^2
     }
   } 
   
-  y <- u + eps
   if (intercept){
     intcpt <- rep(1, nrow(K))
     y <- y + intcpt
