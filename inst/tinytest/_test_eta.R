@@ -38,63 +38,6 @@ for(i in 1:100){
 
 summary(lippert_hat_eta); boxplot(lippert_hat_eta) # compare to true eta of sig_s/(sig_eps + sig_s)
 
-
-### try out different scenarios for variance --------------------
-### comparisons with intercept ----------------------------------------
-equal_part_variance <- compare_variances(nrep = 100, K = K,
-                                         sig_s = 1, sig_eps = 1)
-
-summary(equal_part_variance$intercept)
-summary(equal_part_variance$zero_mean)
-
-heavy_structure <- compare_variances(nrep = 100, K = K,
-                                     sig_s = 3, sig_eps = 1)
-
-summary(heavy_structure$intercept)
-summary(heavy_structure$zero_mean)
-
-light_structure <- compare_variances(nrep = 100, K = K,
-                                     sig_s = 1, sig_eps = 2)
-
-
-summary(light_structure$intercept)
-summary(light_structure$zero_mean)
-
-no_structure <- compare_variances(nrep = 100, K = K,
-                                  sig_s = 0.01, sig_eps = 1)
-
-summary(no_structure$intercept)
-summary(no_structure$zero_mean)
-
-# what if y is centered? 
-
-equal_part_variance_centered <- compare_variances(nrep = 100, 
-                                                  K = K,
-                                                  sig_s = 1,
-                                                  sig_eps = 1,
-                                                  intercept = TRUE,
-                                                  center_y = TRUE)
-
-summary(equal_part_variance_centered$intercept)
-summary(equal_part_variance_centered$zero_mean)
-
-test <- compare_variances(nrep = 100, 
-                          K = K_hd,
-                          sig_s = 0.5,
-                          sig_eps = 1,
-                          intercept = TRUE,
-                          center_y = TRUE)
-summary(test$intercept)
-summary(test$zero_mean)
-### comparisons with no intercept ---------------------------
-eq_var_no_int <- compare_variances(nrep = 100,
-                                   K = K,
-                                   sig_s = 1,
-                                   sig_eps = 1,
-                                   intercept = FALSE)
-summary(eq_var_no_int$intercept)
-summary(eq_var_no_int$zero_mean)
-
 ## compare using the real outcome --------
 fit1 <- plmm(X = admix$X, y = admix$y); fit1$eta
 fit2 <- plmm(X = admix$X, y = admix$y, lippert_eta = TRUE); fit2$eta
@@ -127,23 +70,23 @@ for(i in 1:100){
 # Look at a toy K matrix --------------------------------------------
 # TODO: is this a sensible way to test eta estimation?? Still thinking about this...
 # create a K matrix with clear structure 
-group_struct <- matrix(0.3, nrow = 3, ncol = 3)
-diag(group_struct) <- 0.9
-K <- Matrix::bdiag(group_struct, group_struct, group_struct,
-                   group_struct, group_struct, group_struct,
-                   group_struct, group_struct, group_struct,
-                   group_struct, group_struct, group_struct)
-corrplot::corrplot(as.matrix(K), is.corr = F)
-# corrplot::corrplot(as.matrix(K) |> cov2cor())
-hat_eta <- rep(NA_integer_, 100)
-pb <- txtProgressBar(0, 100, style = 3)
-for(i in 1:100){
-  res <- test_eta_estimation(sig_s = 2,
-                             sig_eps = 1,
-                             K = as.matrix(K))
-  hat_eta[i] <- res
-  setTxtProgressBar(pb, i)
-}
-
-summary(hat_eta); boxplot(hat_eta)
-
+# group_struct <- matrix(0.3, nrow = 3, ncol = 3)
+# diag(group_struct) <- 0.9
+# K <- Matrix::bdiag(group_struct, group_struct, group_struct,
+#                    group_struct, group_struct, group_struct,
+#                    group_struct, group_struct, group_struct,
+#                    group_struct, group_struct, group_struct)
+# corrplot::corrplot(as.matrix(K), is.corr = F)
+# # corrplot::corrplot(as.matrix(K) |> cov2cor())
+# hat_eta <- rep(NA_integer_, 100)
+# pb <- txtProgressBar(0, 100, style = 3)
+# for(i in 1:100){
+#   res <- test_eta_estimation(sig_s = 2,
+#                              sig_eps = 1,
+#                              K = as.matrix(K))
+#   hat_eta[i] <- res
+#   setTxtProgressBar(pb, i)
+# }
+# 
+# summary(hat_eta); boxplot(hat_eta)
+# 
