@@ -103,7 +103,28 @@ fit2 <- plmm(X = admix$X, y = admix$y, lippert_eta = TRUE); fit2$eta
 fit3 <- plmm(X = admix_hd$X, y = admix_hd$y); fit3$eta
 fit4 <- plmm(X = admix_hd$X, y = admix_hd$y, lippert_eta = TRUE); fit4$eta
 
-# Look at a toy K matrix -------------
+
+# construct an example with skewed y -------------------------------
+K <- relatedness_mat(admix$X)
+hat_eta <- rep(NA_integer_, 100)
+y_skew <- matrix(nrow = 100, ncol = nrow(K))
+pb <- txtProgressBar(0, 100, style = 3)
+for(i in 1:100){
+  res <- test_eta_estimation(sig_s = 2,
+                             sig_eps = 1,
+                             K = K,
+                             y_dist = "skewed",
+                             return_y = TRUE)
+  
+  y_skew[i,] <- res$y
+  hat_eta[i] <- res$eta
+  setTxtProgressBar(pb, i)
+}
+
+# hist(y_skew[2,])
+# summary(hat_eta)
+
+# Look at a toy K matrix --------------------------------------------
 # TODO: is this a sensible way to test eta estimation?? Still thinking about this...
 # create a K matrix with clear structure 
 group_struct <- matrix(0.3, nrow = 3, ncol = 3)

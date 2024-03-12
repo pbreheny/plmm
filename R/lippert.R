@@ -47,7 +47,8 @@ lippert_loglik <- function(eta, rot_y, s, n){
 #' @param ... Additional args to pass into `estimate_eta()`
 #' @keywords internal
 lippert_test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE, 
-                                        center_y = FALSE, ...){
+                                        center_y = FALSE, y_dist = "normal" ,
+                                        return_y = FALSE, ...){
   
   # Note: true_eta <- sig_s/(sig_s + sig_eps)
   
@@ -66,6 +67,12 @@ lippert_test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
     if (center_y){
       y <- y - mean(y)
     }
+  }
+  
+  if (y_dist == "skewed") {
+    
+    y <- (y + intcpt)^2
+    
   }
   
   eig_K <- eigen(K)

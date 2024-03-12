@@ -27,10 +27,12 @@ estimate_eta <- function(n, s, U, y, eta_star){
 #' @param K Matrix to use as relatedness matrix.
 #' @param intercept Logical: should the outcome be simulated with an intercept? Defaults to TRUE. 
 #' @param center_y  Logical: should y be centered? Defaults to FALSE. (Note: this option only makes sense if intercept = TRUE)
+#' @param y_dist Distribution from which to simulate y. Defaults to 'normal.' Other option is "skewed."
+#' @param return_y Logical: should simulated outcome values be returned? Defaults to FALSE.
 #' @param ... Additional args to pass into `estimate_eta()`
 #' @keywords internal
 test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
-                                center_y = FALSE,...){
+                                center_y = FALSE, y_dist = "normal" , return_y = FALSE, ...){
   
   # Note: true_eta <- sig_s/(sig_s + sig_eps)
   
@@ -40,7 +42,7 @@ test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
   
   eps <- mvtnorm::rmvnorm(n = 1,
                           sigma = sig_eps*diag(nrow = nrow(K))) |> drop()
-  
+
   y <- u + eps
   if (intercept){
     intcpt <- rep(1, nrow(K))
@@ -51,6 +53,11 @@ test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
     }
   }
 
+  if (y_dist == "skewed") {
+    
+    y <- (y + intcpt)^2
+    
+  }
   eig_K <- eigen(K)
   
   # check signs 
@@ -68,6 +75,10 @@ test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
                       U = eig_K$vectors,
                       y = y,
                        ...)
+  if (return_y){
+    return(structure(list(y = y, eta = eta)))
+  } else {
+    return(eta)
+  }
   
-  return(eta)
 }
