@@ -89,5 +89,9 @@ lippert_test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
                       U = eig_K$vectors,
                       y = y)
   
-  return(eta)
+  if (return_y){
+    return(structure(list(y = y, eta = eta)))
+  } else {
+    return(eta)
+  }
 }

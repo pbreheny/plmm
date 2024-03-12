@@ -27,7 +27,7 @@ lippert_test_eta_estimation(
 
 \item{center_y}{Logical: should y be centered? Defaults to FALSE. (Note: this option only makes sense if intercept = TRUE)}
 
-\item{prop_skew}{Proportion (value between 0 and 1) that indicates the proportion of outcome values to be skewed right. Only makes sense if \code{y_skew} is nonzero.}
+\item{prop_skew}{Proportion (value between 0 and 1) that indicates the proportion of outcome values to be skewed. Skewed outcomes are generate from a Chi-squared distribution (i.e., the square of the model's normal distribution).}
 
 \item{return_y}{Logical: should simulated outcome values be returned? Defaults to FALSE.}
 
