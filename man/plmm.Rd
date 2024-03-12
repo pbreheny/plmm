@@ -24,7 +24,8 @@ plmm(
   warn = TRUE,
   penalty.factor = rep(1, ncol(X)),
   init = rep(0, ncol(X)),
-  trace = FALSE
+  trace = FALSE,
+  lippert_eta = FALSE
 )
 }
 \arguments{
@@ -71,6 +72,8 @@ Note: plmm() does not check to see if a matrix is diagonal. If you want to use a
 \item{init}{Initial values for coefficients. Default is 0 for all columns of X.}
 
 \item{trace}{If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.}
+
+\item{lippert_eta}{Logical: if TRUE, use Lippert (2011) method for estimating eta. This should be set to TRUE only for simulation purposes.}
 }
 \value{
 A list including the estimated coefficients on the original scale, as well as other model fitting details

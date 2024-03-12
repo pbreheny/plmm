@@ -14,6 +14,7 @@ plmm_prep(
   eta_star = NULL,
   penalty.factor = rep(1, ncol(X)),
   trace = NULL,
+  lippert_eta = NULL,
   ...
 )
 }
@@ -33,6 +34,8 @@ plmm_prep(
 \item{penalty.factor}{A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.}
 
 \item{trace}{If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.}
+
+\item{lippert_eta}{Logical: if TRUE, use Lippert (2011) method for estimating eta. This should be set to TRUE only for simulation purposes.}
 
 \item{...}{Not used yet}
 }
