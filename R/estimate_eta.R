@@ -27,12 +27,12 @@ estimate_eta <- function(n, s, U, y, eta_star){
 #' @param K Matrix to use as relatedness matrix.
 #' @param intercept Logical: should the outcome be simulated with an intercept? Defaults to TRUE. 
 #' @param center_y  Logical: should y be centered? Defaults to FALSE. (Note: this option only makes sense if intercept = TRUE)
-#' @param y_dist Distribution from which to simulate y. Defaults to 'normal.' Other option is "skewed."
+#' @param y_skew Numeric value: if nonzero, this will control how much skewness will be added to the noise. Defaults to 0. 
 #' @param return_y Logical: should simulated outcome values be returned? Defaults to FALSE.
 #' @param ... Additional args to pass into `estimate_eta()`
 #' @keywords internal
 test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
-                                center_y = FALSE, y_dist = "normal" , return_y = FALSE, ...){
+                                center_y = FALSE, y_skew = 0, return_y = FALSE, ...){
   
   # Note: true_eta <- sig_s/(sig_s + sig_eps)
   
@@ -40,9 +40,19 @@ test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
   u <- mvtnorm::rmvnorm(n = 1,
                         sigma = sig_s*K) |> drop()
   
-  eps <- mvtnorm::rmvnorm(n = 1,
-                          sigma = sig_eps*diag(nrow = nrow(K))) |> drop()
-
+  
+  if (!(y_skew == 0)) {
+    t <- runif(1)
+    if (t <= 0.1) {
+      eps <- mvtnorm::rmvnorm(n = 1,
+                              sigma = sig_eps*diag(nrow = nrow(K))) |> drop()
+      eps <- eps + y_skew
+    }
+  } else {
+    eps <- mvtnorm::rmvnorm(n = 1,
+                            sigma = sig_eps*diag(nrow = nrow(K))) |> drop()
+  }
+  
   y <- u + eps
   if (intercept){
     intcpt <- rep(1, nrow(K))
@@ -53,11 +63,6 @@ test_eta_estimation <- function(sig_s, sig_eps, K, intercept = TRUE,
     }
   }
 
-  if (y_dist == "skewed") {
-    
-    y <- (y + intcpt)^2
-    
-  }
   eig_K <- eigen(K)
   
   # check signs 
