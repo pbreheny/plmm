@@ -2,7 +2,7 @@ url: ~
 
 template:
     bootstrap: 5
-    bootswatch: minty
+    bootswatch: pulse
     bslib:
       pkgdown-nav-height: 100px
 

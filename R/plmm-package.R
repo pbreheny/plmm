@@ -2,7 +2,7 @@
 #' @aliases plmm-package NULL
 "_PACKAGE"
 
-#' @useDynLib plmm, .registration=TRUE
+#' @useDynLib plmmr, .registration=TRUE
 
 #' @import methods
 #' @import stats
