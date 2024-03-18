@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="penalizedLMM">
-<title>Inference with marginal false discovery rates • penalizedLMM</title>
+<meta name="description" content="plmmr">
+<title>Inference with marginal false discovery rates • plmmr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Inference with marginal false discovery rates">
-<meta property="og:description" content="penalizedLMM">
+<meta property="og:description" content="plmmr">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -24,9 +24,9 @@
 
     <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
-    <a class="navbar-brand me-2" href="../index.html">penalizedLMM</a>
+    <a class="navbar-brand me-2" href="../index.html">plmmr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,11 +44,14 @@
     <a class="dropdown-item" href="../articles/A-plink-files.html">Processing PLINK files</a>
     <a class="dropdown-item" href="../articles/B-choose_k.html">Choosing k -- an eigenproblem</a>
     <a class="dropdown-item" href="../articles/C-explore_options.html">Exploring different modeling options</a>
-    <a class="dropdown-item" href="../articles/D-deconfounding.html">deconfounding</a>
+    <a class="dropdown-item" href="../articles/D-deconfounding.html">Deconfounding</a>
     <a class="dropdown-item" href="../articles/E-mfdr.html">Inference with marginal false discovery rates</a>
-    <a class="dropdown-item" href="../articles/getting-started.html">Getting started with penalizedLMM</a>
+    <a class="dropdown-item" href="../articles/getting-started.html">Getting started with plmm</a>
     <a class="dropdown-item" href="../articles/notation.html">Notes on notation</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -77,22 +80,9 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">penalizedLMM</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">plmm</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span> <span class="co"># for fread()</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span> <span class="co"># for mutate() and bind_rows()</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:data.table':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     between, first, last</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span> <span class="co"># for rownames_to_column() and other data cleaning funs.</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yihui.org/knitr/" class="external-link">knitr</a></span><span class="op">)</span></span></code></pre></div>
 <p><strong>Note</strong>: once again, this is a work in progress. I do
 not recommend blindly follow this like a tutorial!</p>
@@ -156,12 +146,6 @@ prediction.</p>
 <span><span class="co"># look at results </span></span>
 <span><span class="va">fit1</span> <span class="op">&lt;-</span> <span class="va">cv_fit1</span><span class="op">$</span><span class="va">fit</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_fit1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; lasso-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.0699):</span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 67</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.68</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.638</span></span>
 <span><span class="co"># Calculate mFdr</span></span>
 <span><span class="co"># head(mfdr(fit1))</span></span>
 <span><span class="va">mfdr1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span><span class="op">[</span><span class="va">cv_fit1</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span></span></code></pre></div>
@@ -172,32 +156,16 @@ prediction.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># choose k </span></span>
 <span><span class="va">admix</span><span class="op">$</span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/choose_k.html">choose_k</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, returnKapprox <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Starting k value is 19</span></span>
-<span><span class="co">#&gt; Step size is 19</span></span>
-<span><span class="co">#&gt; Calcuating the relatedness matrix</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 38</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 57</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 76</span></span>
-<span><span class="co">#&gt; K approximation within specified epsilon reached at k = 76</span></span>
 <span></span>
 <span><span class="co"># construct the model </span></span>
 <span><span class="va">cv_fit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.plmm.html">cv.plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>,</span>
 <span>                   y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>,</span>
 <span>                   K <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">k</span><span class="op">$</span><span class="va">K_svd</span>,</span>
 <span>                   seed <span class="op">=</span> <span class="fl">26</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in set.seed(seed): '.Random.seed' is not an integer vector but of type</span></span>
-<span><span class="co">#&gt; 'NULL', so ignored</span></span>
 <span></span>
 <span><span class="co"># look at results </span></span>
 <span><span class="va">fit2</span> <span class="op">&lt;-</span> <span class="va">cv_fit2</span><span class="op">$</span><span class="va">fit</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_fit2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1488):</span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 31</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 2.97</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.723</span></span>
 <span><span class="co"># Calculate mFdr</span></span>
 <span><span class="co"># head(mfdr(fit2))</span></span>
 <span><span class="va">mfdr2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span><span class="op">[</span><span class="va">cv_fit2</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span></span></code></pre></div>
@@ -216,18 +184,14 @@ prediction.</p>
 <span>     type <span class="op">=</span> <span class="st">'b'</span>,</span>
 <span>     ylab <span class="op">=</span> <span class="st">'Proportion of variance explained'</span>,</span>
 <span>     xlab <span class="op">=</span> <span class="st">'PC'</span>,</span>
-<span>     main <span class="op">=</span> <span class="st">'Scree Plot'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="E-mfdr_files/figure-html/pca-1.png" width="700"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># first 4 PCs explain most of the variance, so we will use these as fixed effects; this makes sense given the ancestry of the participants </span></span>
+<span>     main <span class="op">=</span> <span class="st">'Scree Plot'</span><span class="op">)</span></span>
+<span><span class="co"># first 4 PCs explain most of the variance, so we will use these as fixed effects; this makes sense given the ancestry of the participants </span></span>
 <span><span class="va">pca_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>race <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">race</span>, PC1 <span class="op">=</span> <span class="va">pca</span><span class="op">$</span><span class="va">x</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>, PC2 <span class="op">=</span> <span class="va">pca</span><span class="op">$</span><span class="va">x</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">pca_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">pca_dat</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">PC1</span>, y <span class="op">=</span> <span class="va">PC2</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">race</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_fixed</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pca_plot</span><span class="op">)</span></span></code></pre></div>
-<p><img src="E-mfdr_files/figure-html/pca-2.png" width="700"></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pca_plot</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">PCs</span> <span class="op">&lt;-</span> <span class="va">pca</span><span class="op">$</span><span class="va">x</span></span>
 <span><span class="co"># look at the PCs </span></span>
 <span><span class="co"># pca$x[1:5, 1:4]</span></span>
@@ -235,7 +199,7 @@ prediction.</p>
 <span><span class="va">admix</span><span class="op">$</span><span class="va">X_plus_PCs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">PCs</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, <span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span></span></code></pre></div>
 <p>With the principal components calculated, we can now fit our third
 model:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># construct the model </span></span>
 <span><span class="va">cv_fit3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.plmm.html">cv.plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X_plus_PCs</span>,</span>
 <span>                   y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>,</span>
@@ -244,18 +208,10 @@ model:</p>
 <span>                   <span class="co">#  these in the model!</span></span>
 <span>                   penalty.factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                   seed <span class="op">=</span> <span class="fl">26</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in set.seed(seed): '.Random.seed' is not an integer vector but of type</span></span>
-<span><span class="co">#&gt; 'NULL', so ignored</span></span>
 <span></span>
 <span><span class="co"># look at results </span></span>
 <span><span class="va">fit3</span> <span class="op">&lt;-</span> <span class="va">cv_fit3</span><span class="op">$</span><span class="va">fit</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_fit3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.2058):</span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 16</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 1.81</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.346</span></span>
 <span><span class="co"># Calculate mFdr</span></span>
 <span><span class="co"># head(mfdr(fit3))</span></span>
 <span><span class="va">mfdr3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">fit3</span><span class="op">)</span><span class="op">[</span><span class="va">cv_fit3</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span></span></code></pre></div>
@@ -266,53 +222,17 @@ model:</p>
 </h3>
 <p>Let’s compare the results from these three models using the admix
 data:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># columns are ordered by models 1-3</span></span>
 <span><span class="co"># rows are CV plots &amp; coefficient path plots</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_fit1</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_fit2</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_fit3</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="E-mfdr_files/figure-html/admix_comparison-1.png" width="700"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">admix_comparison</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">mfdr1</span>, <span class="va">mfdr2</span>, <span class="va">mfdr3</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span>.cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">EF</span>, <span class="va">mFDR</span><span class="op">)</span>,</span>
-<span>                .fns <span class="op">=</span> <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">.x</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>         model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Model "</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">EF</span>, <span class="va">S</span>, <span class="va">mFDR</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">admix_comparison</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">admix_comparison</span>,</span>
-<span>      caption <span class="op">=</span> <span class="st">"Comparing 3 models at their respective lambda.min values"</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<caption>Comparing 3 models at their respective lambda.min
-values</caption>
-<thead><tr class="header">
-<th align="left">model</th>
-<th align="right">EF</th>
-<th align="right">S</th>
-<th align="right">mFDR</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Model 1</td>
-<td align="right">9.344</td>
-<td align="right">66</td>
-<td align="right">0.142</td>
-</tr>
-<tr class="even">
-<td align="left">Model 2</td>
-<td align="right">1.470</td>
-<td align="right">30</td>
-<td align="right">0.049</td>
-</tr>
-<tr class="odd">
-<td align="left">Model 3</td>
-<td align="right">0.217</td>
-<td align="right">11</td>
-<td align="right">0.020</td>
-</tr>
-</tbody>
-</table>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit1</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit2</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit3</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">admix_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">mfdr1</span>, <span class="va">mfdr2</span>, <span class="va">mfdr3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">admix_comparison</span><span class="op">[</span>, <span class="va">model</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Model "</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">admix_comparison</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">model</span>, <span class="va">EF</span>, <span class="va">S</span>, <span class="va">mFDR</span><span class="op">)</span><span class="op">]</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>digits<span class="op">=</span><span class="fl">2</span>, caption <span class="op">=</span> <span class="st">"Comparing 3 models at their respective lambda.min values"</span><span class="op">)</span></span></code></pre></div>
 <p>Some observations based on the plots and output above: * In the
 simulated outcome, only 2 <span class="math inline">\(\beta\)</span>
 values are truly nonzero (i.e., only 2 SNPs (SNPs 17 and 85) are
@@ -326,7 +246,7 @@ how to explain this phenomena.</p>
 validation error, I could choose the value that limits the mFdr at a
 certain level. We can examine this approach for the models we fit
 above:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># let's look at lambda where mFDR is smallest, instead of mFDR where lambda = lambda.min (minimum CVE)</span></span>
 <span></span>
 <span><span class="co"># fit 1 </span></span>
@@ -343,7 +263,8 @@ above:</p>
 </h3>
 <p>Let’s do a similar model comparison, this time using the
 <code>penncath_lite</code> data.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<p>TODO: Will come back and finish adding the output here later;</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># preprocess PLINK files</span></span>
 <span><span class="va">penncath_lite</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/process_plink.html">process_plink</a></span><span class="op">(</span></span>
 <span>  data_dir <span class="op">=</span> <span class="fu"><a href="../reference/plink_example.html">plink_example</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
@@ -351,37 +272,17 @@ above:</p>
 <span>  gz <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># NB: PLINK data that ships with package comes gzipped</span></span>
 <span>  impute <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># mode imputation is default </span></span>
 <span>  outfile <span class="op">=</span> <span class="st">"process_penncath"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read in the data to global environment </span></span>
 <span><span class="co"># NB: this assumes article A ('Plink Files') has already been run. </span></span>
+<span><span class="co"># read in the data to global environment</span></span>
 <span><span class="va">pen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_data.html">get_data</a></span><span class="op">(</span>path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="../reference/plink_example.html">plink_example</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="st">"/penncath_lite"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in extract_matrix(x, transform_ind(i, n), transform_ind(j, m)):</span></span>
-<span><span class="co">#&gt; '.Random.seed' is not an integer vector but of type 'NULL', so ignored</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pen</span><span class="op">)</span> <span class="co"># Three objects here</span></span>
-<span><span class="co">#&gt; List of 3</span></span>
-<span><span class="co">#&gt;  $ X  : num [1:1401, 1:4367] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "dimnames")=List of 2</span></span>
-<span><span class="co">#&gt;   .. ..$ : chr [1:1401] "1" "2" "3" "4" ...</span></span>
-<span><span class="co">#&gt;   .. ..$ : chr [1:4367] "rs3107153" "rs2455124" "rs10915476" "rs4592237" ...</span></span>
-<span><span class="co">#&gt;  $ fam:'data.frame': 1401 obs. of  6 variables:</span></span>
-<span><span class="co">#&gt;   ..$ family.ID  : int [1:1401] 10002 10004 10005 10007 10008 10009 10010 10011 10012 10013 ...</span></span>
-<span><span class="co">#&gt;   ..$ sample.ID  : int [1:1401] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
-<span><span class="co">#&gt;   ..$ paternal.ID: int [1:1401] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;   ..$ maternal.ID: int [1:1401] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;   ..$ sex        : int [1:1401] 1 2 1 1 1 1 1 2 1 2 ...</span></span>
-<span><span class="co">#&gt;   ..$ affection  : int [1:1401] 1 1 2 1 2 2 2 1 2 -9 ...</span></span>
-<span><span class="co">#&gt;  $ map:'data.frame': 4367 obs. of  6 variables:</span></span>
-<span><span class="co">#&gt;   ..$ chromosome  : int [1:4367] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
-<span><span class="co">#&gt;   ..$ marker.ID   : chr [1:4367] "rs3107153" "rs2455124" "rs10915476" "rs4592237" ...</span></span>
-<span><span class="co">#&gt;   ..$ genetic.dist: int [1:4367] 0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;   ..$ physical.pos: int [1:4367] 2056735 3188505 4275291 4280630 4286036 4302161 4364564 4388885 4606471 4643688 ...</span></span>
-<span><span class="co">#&gt;   ..$ allele1     : chr [1:4367] "C" "T" "T" "G" ...</span></span>
-<span><span class="co">#&gt;   ..$ allele2     : chr [1:4367] "T" "C" "C" "A" ...</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pen</span><span class="op">)</span> <span class="co"># Three objects here</span></span></code></pre></div>
 <p>These data represent 1,401 individuals and 4,367 SNPs from a GWAS
 study. For the sake of example, let’s use <a href="https://www.cdc.gov/cholesterol/ldl_hdl.htm#:~:text=HDL%20(high%2Ddensity%20lipoprotein),for%20heart%20disease%20and%20stroke." class="external-link">hdl</a>
 (high-density lipoprotein cholesterol) as our outcome.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># NB: the 'quiet' option in process_plink()  will silence the printed messages</span></span>
 <span><span class="va">pen_cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="../reference/plink_example.html">plink_example</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">'penncath_clinical.csv'</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -391,7 +292,7 @@ study. For the sake of example, let’s use <a href="https://www.cdc.gov/cholest
 <div class="section level4">
 <h4 id="fit-1-1">fit 1<a class="anchor" aria-label="anchor" href="#fit-1-1"></a>
 </h4>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># construct a cross-validated lasso model </span></span>
 <span><span class="va">cv_pen1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.plmm.html">cv.plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">pen</span><span class="op">$</span><span class="va">X</span>,</span>
 <span>              y <span class="op">=</span> <span class="va">pen</span><span class="op">$</span><span class="va">y</span>,</span>
@@ -402,17 +303,9 @@ study. For the sake of example, let’s use <a href="https://www.cdc.gov/cholest
 <span><span class="co"># look at results </span></span>
 <span><span class="va">pen1</span> <span class="op">&lt;-</span> <span class="va">cv_pen1</span><span class="op">$</span><span class="va">fit</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_pen1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; lasso-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.8758):</span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 27</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 155.86</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 12.484</span></span>
 <span><span class="co"># Calculate mFdr</span></span>
 <span><span class="co"># head(mfdr(pen1))</span></span>
-<span><span class="op">(</span><span class="va">pen_mfdr1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen1</span><span class="op">)</span><span class="op">[</span><span class="va">cv_pen1</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        EF  S mFDR</span></span>
-<span><span class="co">#&gt; 0.8758 26 26    1</span></span></code></pre></div>
+<span><span class="op">(</span><span class="va">pen_mfdr1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen1</span><span class="op">)</span><span class="op">[</span><span class="va">cv_pen1</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p>Hmm – we found an mFdr of 1 in fit 1, which is not great from an
 application standpoint. While this could be due to a true lack of
 association between any SNPs and the HDL outcome, this may also be an
@@ -422,21 +315,8 @@ estimation issue. Remember, these articles are a work in progress…</p>
 <div class="section level4">
 <h4 id="fit-2-1">fit 2<a class="anchor" aria-label="anchor" href="#fit-2-1"></a>
 </h4>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pen</span><span class="op">$</span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/choose_k.html">choose_k</a></span><span class="op">(</span><span class="va">pen</span><span class="op">$</span><span class="va">X</span>, returnKapprox <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Starting k value is 140</span></span>
-<span><span class="co">#&gt; Step size is 140</span></span>
-<span><span class="co">#&gt; Calcuating the relatedness matrix</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 280</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 420</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 560</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 700</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 840</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 980</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 1120</span></span>
-<span><span class="co">#&gt; Stepping up to next k value: k = 1260</span></span>
-<span><span class="co">#&gt; K approximation within specified epsilon reached at k = 1260</span></span>
 <span></span>
 <span><span class="va">cv_pen2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.plmm.html">cv.plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">pen</span><span class="op">$</span><span class="va">X</span>,</span>
 <span>        y <span class="op">=</span> <span class="va">pen</span><span class="op">$</span><span class="va">y</span>,</span>
@@ -445,22 +325,14 @@ estimation issue. Remember, these articles are a work in progress…</p>
 <span></span>
 <span><span class="va">pen2</span> <span class="op">&lt;-</span> <span class="va">cv_pen2</span><span class="op">$</span><span class="va">fit</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_pen2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.9304):</span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 19</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 156.05</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 12.492</span></span>
-<span><span class="op">(</span><span class="va">pen_mfdr2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen2</span><span class="op">)</span><span class="op">[</span><span class="va">cv_pen2</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        EF  S mFDR</span></span>
-<span><span class="co">#&gt; 0.9304 18 18    1</span></span></code></pre></div>
+<span><span class="op">(</span><span class="va">pen_mfdr2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen2</span><span class="op">)</span><span class="op">[</span><span class="va">cv_pen2</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="fit-3-1">fit 3<a class="anchor" aria-label="anchor" href="#fit-3-1"></a>
 </h4>
 <p>Finally, we will model the ‘penncath’ data one more time using sex
 and the first few principal components</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pen</span><span class="op">$</span><span class="va">std_X</span> <span class="op">&lt;-</span> <span class="fu">ncvreg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ncvreg/man/std.html" class="external-link">std</a></span><span class="op">(</span><span class="va">pen</span><span class="op">$</span><span class="va">X</span><span class="op">)</span></span>
 <span><span class="va">pen_pca</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">prcomp</a></span><span class="op">(</span><span class="va">pen</span><span class="op">$</span><span class="va">std_X</span>, center <span class="op">=</span> <span class="cn">F</span>, scale. <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
 <span></span>
@@ -470,13 +342,11 @@ and the first few principal components</p>
 <span>     type <span class="op">=</span> <span class="st">'b'</span>,</span>
 <span>     ylab <span class="op">=</span> <span class="st">'Proportion of variance explained'</span>,</span>
 <span>     xlab <span class="op">=</span> <span class="st">'PC'</span>,</span>
-<span>     main <span class="op">=</span> <span class="st">'Scree Plot'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="E-mfdr_files/figure-html/pen_pca-1.png" width="700"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span>     main <span class="op">=</span> <span class="st">'Scree Plot'</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># will use 10 PCs as fixed effects </span></span>
 <span><span class="va">pen_PCs</span> <span class="op">&lt;-</span> <span class="va">pen_pca</span><span class="op">$</span><span class="va">x</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pen</span><span class="op">$</span><span class="va">X_plus_fixed_eff</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">pen</span><span class="op">$</span><span class="va">fam</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sex"</span><span class="op">)</span><span class="op">]</span>, <span class="va">pen_PCs</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>, <span class="va">pen</span><span class="op">$</span><span class="va">X</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">cv_pen3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.plmm.html">cv.plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">pen</span><span class="op">$</span><span class="va">X_plus_fixed_eff</span>,</span>
@@ -488,16 +358,8 @@ and the first few principal components</p>
 <span></span>
 <span><span class="va">pen3</span> <span class="op">&lt;-</span> <span class="va">cv_pen3</span><span class="op">$</span><span class="va">fit</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv_pen3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; MCP-penalized model with n=and p=</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=1.1913):</span></span>
-<span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 15</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 138.90</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 11.786</span></span>
 <span></span>
-<span><span class="op">(</span><span class="va">pen_mfdr3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen3</span><span class="op">)</span><span class="op">[</span><span class="va">cv_pen3</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;        EF S mFDR</span></span>
-<span><span class="co">#&gt; 1.1913  2 2    1</span></span></code></pre></div>
+<span><span class="op">(</span><span class="va">pen_mfdr3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen3</span><span class="op">)</span><span class="op">[</span><span class="va">cv_pen3</span><span class="op">$</span><span class="va">min</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -505,63 +367,27 @@ and the first few principal components</p>
 </h3>
 <p>Comparing the three fits with the ‘penncath’ data, we can observe the
 following:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_pen1</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_pen2</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_pen3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pen1</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pen2</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pen3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="E-mfdr_files/figure-html/pen_compare-1.png" width="700"></p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pen_comparison</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">pen_mfdr1</span>, <span class="va">pen_mfdr2</span>, <span class="va">pen_mfdr3</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"lambda"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span>.cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">EF</span>, <span class="va">mFDR</span><span class="op">)</span>,</span>
-<span>                .fns <span class="op">=</span> <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">.x</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">pen_comparison</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left">lambda</th>
-<th align="right">EF</th>
-<th align="right">S</th>
-<th align="right">mFDR</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">0.8758</td>
-<td align="right">26</td>
-<td align="right">26</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">0.9304</td>
-<td align="right">18</td>
-<td align="right">18</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">1.1913</td>
-<td align="right">2</td>
-<td align="right">2</td>
-<td align="right">1</td>
-</tr>
-</tbody>
-</table>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pen_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">pen_mfdr1</span>, <span class="va">pen_mfdr2</span>, <span class="va">pen_mfdr3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span>keep.rownames<span class="op">=</span><span class="st">'lambda'</span><span class="op">)</span></span>
+<span><span class="va">pen_comparison</span><span class="op">[</span>, <span class="va">model</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Model "</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">pen_comparison</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">model</span>, <span class="va">EF</span>, <span class="va">S</span>, <span class="va">mFDR</span><span class="op">)</span><span class="op">]</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>digits<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p>We can also look at how mFDR changes among the three models:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">compare_mfdr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen1</span><span class="op">)</span>, <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen2</span><span class="op">)</span>, <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen3</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"lambda"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"lasso"</span>, <span class="fl">100</span><span class="op">)</span>,</span>
-<span>         <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"MCP + trunc. SVD"</span>, <span class="fl">100</span><span class="op">)</span>,</span>
-<span>         <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">'MCP + trunc. SVD + fixed eff'</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>         log_lam <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: There was 1 warning in `mutate()`.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `log_lam = log(as.numeric(lambda))`.</span></span>
-<span><span class="co">#&gt; Caused by warning:</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> NAs introduced by coercion</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">compare_mfdr</span>, </span>
-<span>       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">log_lam</span>, y <span class="op">=</span> <span class="va">mFDR</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">compare_mfdr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen1</span><span class="op">)</span>, <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen2</span><span class="op">)</span>, <span class="fu"><a href="../reference/mfdr.html">mfdr</a></span><span class="op">(</span><span class="va">pen3</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span>keep.rownames<span class="op">=</span><span class="st">'lambda'</span><span class="op">)</span></span>
+<span><span class="va">compare_mfdr</span><span class="op">[</span>, <span class="va">model</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"lasso"</span>, <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                          <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"MCP + trunc. SVD"</span>, <span class="fl">100</span><span class="op">)</span>,</span>
+<span>                          <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">'MCP + trunc. SVD + fixed eff'</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">compare_mfdr</span><span class="op">[</span>, <span class="va">log_lam</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">compare_mfdr</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">log_lam</span>, y <span class="op">=</span> <span class="va">mFDR</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">model</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 200 rows containing missing values (`geom_line()`).</span></span></code></pre></div>
-<p><img src="E-mfdr_files/figure-html/pen_mfdr_graph-1.png" width="700"></p>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">lambda</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -589,10 +415,10 @@ probably a false discovery.</p>
 <h2 id="references-acknowledgements">References &amp; acknowledgements<a class="anchor" aria-label="anchor" href="#references-acknowledgements"></a>
 </h2>
 <p>The <code><a href="../reference/mfdr.html">mfdr()</a></code> function I have incorporated here in our
-<code>penalizedLMM</code> package is based on Ryan Miller’s joint work
-with Patrick Breheny in the <code><a href="https://rdrr.io/pkg/ncvreg/man/mfdr.html" class="external-link">ncvreg::mfdr()</a></code> package. To read
-more about their work, see <a href="https://doi.org/10.1002/sim.9678" class="external-link">Miller &amp; Breheny (2023) in
-Stats in Medicine</a>.</p>
+<code>plmm</code> package is based on Ryan Miller’s joint work with
+Patrick Breheny in the <code><a href="https://rdrr.io/pkg/ncvreg/man/mfdr.html" class="external-link">ncvreg::mfdr()</a></code> package. To read more
+about their work, see <a href="https://doi.org/10.1002/sim.9678" class="external-link">Miller
+&amp; Breheny (2023) in Stats in Medicine</a>.</p>
 <p>Penncath data: These data describe coronary artery disease outcomes
 from the <a href="https://pubmed.ncbi.nlm.nih.gov/21239051/" class="external-link">PennCath
 study</a>). This data set is a subset of a much larger data set (the
@@ -609,7 +435,7 @@ publication</a>.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter, Yujiing Lu.</p>
+<p>Developed by Anna C. Reisetter, Patrick J. Breheny, Tabitha K. Peter, Yujing Lu.</p>
 </div>
 
 <div class="pkgdown-footer-right">
