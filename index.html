@@ -85,20 +85,20 @@
 <div class="section level2">
 <h2 id="welcome">Welcome<a class="anchor" aria-label="anchor" href="#welcome"></a>
 </h2>
-<p>The <code>plmm</code> package contains functions that fit penalized linear mixed models to correct for unobserved confounding effects. Documentation for this package is in progress.</p>
+<p>The <code>plmmr</code> package contains functions that fit penalized linear mixed models to correct for unobserved confounding effects. Documentation for this package is in progress.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>To install the latest version of the package:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"pbreheny/plmm"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"pbreheny/plmmr"</span><span class="op">)</span></span></code></pre></div>
 <p>For a description of the motivation of the functions in this package (along with examples) refer to the second module of <a href="https://pbreheny.github.io/adv-gwas-tutorial/index.html" class="external-link">this GWAS data tutorial</a></p>
 </div>
 <div class="section level2">
 <h2 id="latest-changes">Latest changes<a class="anchor" aria-label="anchor" href="#latest-changes"></a>
 </h2>
-<p>The newest features of <code>plmm</code> are: - version 2.2.0: parameter <span class="math inline"><em>η</em></span> is no longer estimated in each fold of cross-validation</p>
+<p>The newest features of <code>plmmr</code> are: - version 2.2.0: parameter <span class="math inline"><em>η</em></span> is no longer estimated in each fold of cross-validation</p>
 <ul>
 <li><p>version 2.1.0: A new function <code><a href="reference/mfdr.html">mfdr()</a></code> for inference on model coefficients.</p></li>
 <li><p>version 2.0.3: An <code>xgboost</code> method is now available in <code><a href="reference/process_plink.html">process_plink()</a></code>. Check out the documentation for details. This option should be regarded as being in ‘beta-testing’ mode.</p></li>
@@ -110,7 +110,8 @@
 <p>The branches of this repo are organized in the following way:</p>
 <ul>
 <li><p><code>master</code> is the main branch with all the latest updates</p></li>
-<li><p><code>estimate_eta</code> is a development branch where we are working through an alternative approach for estimating <span class="math inline"><em>η</em></span>.</p></li>
+<li><p><code>prep_for_cran</code> is the development branch where we are doing some bug fixes/polishing things up in preparation for our first CRAN submission (coming up soon!)</p></li>
+<li><p><code>estimate_eta</code> is a development branch where we worked through our alternative approach for estimating <span class="math inline"><em>η</em></span>. We’re keeping this around for reference as we are writing.</p></li>
 <li><p><code>fbm</code> is a development branch where I am working to extend our current methods to analyze data from a design matrix stored as a file-backed object (a Filebacked Big Matrix, or FBM). See package <a href="https://privefl.github.io/bigstatsr/" class="external-link">bigstatsr</a> for more info on these objects.</p></li>
 <li><p><code>sign_flip</code> is a development branch where I am toying with how to handle the issues caused by +/- signs being flipped as part of truncated SVD.</p></li>
 <li><p><code>refine_workflow</code> is an <strong>archived</strong> branch in which I explored changing the workflow to make cross validation more efficient. This change involved moving the rotation step into <code><a href="reference/plmm_prep.html">plmm_prep()</a></code>, instead of having that step as part of model fitting in <code><a href="reference/plmm_fit.html">plmm_fit()</a></code>. I found that this change was not compatible with cross validation, for reasons that I am currently writing up as part of a paper. Once that paper is done, I will delete this branch.</p></li>
