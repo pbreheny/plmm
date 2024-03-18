@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(plmm)
+library(plmmr)
 ```
 
 **NOTE**: This vignette is under development -- not all of the examples here are fully worked through. My work here is an example of [working with the garage door open](https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu).

@@ -162,7 +162,7 @@ tinytest::expect_equivalent(R, ncv_R)
 K8 <- relatedness_mat(admix$X)
 hat_eta <- rep(NA_integer_, 100)
 for(i in 1:100){
-  hat_eta[i] <- plmm:::test_eta_estimation(sig_s = 2,
+  hat_eta[i] <- plmmr:::test_eta_estimation(sig_s = 2,
                              sig_eps = 1,
                              K = K8)
 }

@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(plmm)
+library(plmmr)
 library(corrplot)
 ```
 
