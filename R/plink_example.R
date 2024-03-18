@@ -12,9 +12,9 @@
 plink_example <- function(path, parent=FALSE) {
   if(parent){
     # if parent option selected, will return path to folder 
-    system.file("extdata", package = "plmm", mustWork = TRUE)
+    system.file("extdata", package = "plmmr", mustWork = TRUE)
   } else {
     # if parent option not selected, will return path to folder WITH file name
-    system.file("extdata", path, package = "plmm", mustWork = TRUE)
+    system.file("extdata", path, package = "plmmr", mustWork = TRUE)
   }
 }
