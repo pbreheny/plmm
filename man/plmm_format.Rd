@@ -14,13 +14,25 @@ plmm_format(fit, X)
 \value{
 A list with the components:
 \itemize{
-\item beta_vals: The estimated beta values at each value of lambda
-\item eta: The estimated eta value
-\item lambda: The sequence of lambda values used in model fitting
-\item penalty: A string indicating the type of penalty used to fit the model
-\item ns_idx: COME BACK HERE
-\item iter: The number of iterations at each value of lambda (MAYBE take this out)
-\item converged: The convergence status at each value of lambda
+\item \code{beta_vals}: the matrix of estimated coefficients on the original scale. Rows are predictors, columns are values of \code{lambda}
+\item \code{rotated_scale_beta_vals}: the matrix of estimated coefficients on the ~rotated~ scale. This is the scale on which the model was fit.
+\item \code{lambda}: a numeric vector of the lasso tuning parameter values used in model fitting.
+\item \code{eta}: a number (double) between 0 and 1 representing the estimated proportion of the variance in the outcome attributable to population/correlation structure.
+\item \code{s}: a vectof of the eigenvalues of relatedness matrix \code{K}; see \code{relatedness_mat()} for details.
+\item \code{U}: a matrix of the eigenvalues of relatedness matrix \code{K}
+\item \code{rot_y}: the vector of outcome values on the rotated scale. This is the scale on which the model was fit.
+\item \code{linear.predictors}: the matrix resulting from the product of \code{stdrot_X} and the estimated coefficients on the ~rotated~ scale.
+\item \code{penalty}: character string indicating the penalty with which the model was fit (e.g., 'MCP')
+\item \code{gamma}: numeric value indicating the tuning parameter used for the SCAD or lasso penalties was used. Not relevant for lasso models.
+\item \code{alpha}: numeric value indicating the elastic net tuning parameter.
+\item \code{convex.min}: NULL (This is an option we will add in the future!)
+\item \code{loss}: vector with the numeric values of the loss at each value of \code{lambda} (calculated on the ~rotated~ scale)
+\item \code{penalty.factor}: vector of indicators corresponding to each predictor, where 1 = predictor was penalized.
+\item \code{ns_idx}: vector with the indicies of predictors which were constant features (i.e., had no variation).
+\item \code{p}: the number of features
+\item \code{n}: the number of observations (instances)
+\item \code{iter}: numeric vector with the number of iterations needed in model fitting for each value of \code{lambda}
+\item \code{converged}: vector of logical values indicating whether the model fitting converged at each value of \code{lambda}
 }
 }
 \description{

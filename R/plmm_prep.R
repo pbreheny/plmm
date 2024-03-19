@@ -21,9 +21,9 @@
 #'    * 'scale' (values used to scale X)
 #' * s: vector with the eigenvalues of K 
 #' * U: the eigenvectors of K (same as left singular values of X). 
-#' * ns: the indices for the nonsingular values of std_X
+#' * ns: the indices for the nonsingular values of X
 #' * penalty.factor: the penalty factors for the penalized non-singular values 
-#' * snp_names: Formatted column names of the design matrix 
+#' * snp_names: formatted column names of the design matrix 
 #'
 #' @keywords internal
 #'

@@ -15,7 +15,6 @@ reference:
   - title: Fitting penalized linear mixed models (PLMMs - the featured presentation) 
     contents:
     - choose_k
-    - lmm
     - plmm
     
   - title: Inference for PLMMs
@@ -32,7 +31,6 @@ reference:
     
   - title: Coefficient methods for LMMs and PLMMs
     contents:
-    - coef.lmm
     - coef.cv.plmm
     - coef.plmm
     
@@ -67,7 +65,6 @@ reference:
   - title: Prediction
     contents: 
     - predict.plmm
-    - predict.lmm
     
   - title: Data sets
     contents:
@@ -81,6 +78,7 @@ reference:
     - eigen_K
     - estimate_eta
     - lamNames
+    - lmm_ggmix
     - plmm_format
     - plmm_prep
     - predict.list

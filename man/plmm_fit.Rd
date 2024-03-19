@@ -54,19 +54,45 @@ plmm_fit(
 \value{
 A list with these components:
 \itemize{
-\item std_X: The standardized design matrix
-\item rot_X: first partial result of data rotation
-\item rot_y: second partial result of data rotation
-\item eta: numeric value representing the ratio of variances.
-\item std_rot_X: re-standardized rotated design matrix. This is 'fed' into \code{plmm_fit()}.
-\item b: The values returned in the 'beta' argument of the ncvfit() object
-\item lambda: The sequence of lambda values used in model fitting
-\item iter: The number of iterations at each given lambda value
-\item converged: The convergence status at each given lambda value
-\item penalty: The type of penalty used in model fitting
-\item penalty.factor: A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
-\item ns: The indices of the non-singular columns of the ORIGINAL design matrix
-\item ncol_X: The number of columns in the ORIGINAL design matrix
+\item n: # of rows in X
+\item p: # of columns in X (including constant features)
+\item y: outcome on original scale
+\item std_X_details: list with 'center' and 'scale' vectors, same as \code{plmm_prep()}
+\item s: eigenvalues of K
+\item U: eigenvectors of K
+\item rot_X: X on the rotated (i.e., transformed) scale.
+Note that the dimensions of \code{rot_X} are likely to be different than those of X.
+\item rot_y: y on the rotated scale
+\item stdrot_X: X on the rotated scale once it has been re-standardized.
+\item lambda: vector of tuning parameter values
+\item b: the coefficients estimated on the scale of \code{stdrot_X}
+\item untransformed_b1: the coefficients estimated on the scale of \code{std_X}
+\item linear.predictors: the product of \code{stdrot_X} and \code{b}
+(linear predictors on the transformed and restandardized scale)
+\item eta: a number (double) between 0 and 1 representing the estimated
+proportion of the variance in the outcome attributable to population/correlation
+structure.
+\item iter: numeric vector with the number of iterations needed in model fitting
+for each value of \code{lambda}
+\item converged: vector of logical values indicating whether the model fitting
+converged at each value of \code{lambda}
+\item loss: vector with the numeric values of the loss at each value of \code{lambda}
+(calculated on the ~rotated~ scale)
+\item penalty: character string indicating the penalty with which the model was
+fit (e.g., 'MCP')
+\item penalty.factor: vector of indicators corresponding to each predictor,
+where 1 = predictor was penalized.
+\item gamma: numeric value indicating the tuning parameter used for the SCAD or
+lasso penalties was used. Not relevant for lasso models.
+\item alpha: numeric value indicating the elastic net tuning parameter.
+\item ns: the indices for the nonsingular values of X
+\item snp_names: ormatted column names of the design matrix
+\item nlambda: number of lambda values used in model fitting
+\item eps: tolerance ('epsilon') used for model fitting
+\item max.iter: max. number of iterations per model fit
+\item warn: logical - should warnings be given if model fit does not converge?
+\item init: initial values for model fitting
+\item trace: logical - should messages be printed to the console while models are fit?
 }
 }
 \description{
