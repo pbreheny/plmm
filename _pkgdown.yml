@@ -3,13 +3,10 @@ url: ~
 template:
     bootstrap: 5
     bootswatch: pulse
-    bslib:
-      pkgdown-nav-height: 100px
-      # bg: "#ffffff"
-      # fg: "#B8BCC2"
-      # primary: "#306cc9"
-    # navbar:
-    #   bg: primary
+navbar:
+    type: light
+    bg: light
+    
 
 reference:
   - title: Fitting penalized linear mixed models (PLMMs - the featured presentation) 

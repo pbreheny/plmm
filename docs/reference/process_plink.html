@@ -108,6 +108,15 @@
 <dd><p>Optional: additional arguments to <code><a href="https://privefl.github.io/bigsnpr/reference/snp_fastImpute.html" class="external-link">bigsnpr::snp_fastImpute()</a></code> (relevant only if impute_method = "xgboost")</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>Nothing is returned by this function; instead, files 'prefix.rds' and
+'prefix.bk' are created in the location specified by data_dir. Note that this
+this function need only be run once; in subsequent data analysis/scripts,
+<code><a href="get_data.html">get_data()</a></code> will access the '.rds' file.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

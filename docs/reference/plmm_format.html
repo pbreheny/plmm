@@ -74,13 +74,25 @@
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A list with the components:</p><ul><li><p>beta_vals: The estimated beta values at each value of lambda</p></li>
-<li><p>eta: The estimated eta value</p></li>
-<li><p>lambda: The sequence of lambda values used in model fitting</p></li>
-<li><p>penalty: A string indicating the type of penalty used to fit the model</p></li>
-<li><p>ns_idx: COME BACK HERE</p></li>
-<li><p>iter: The number of iterations at each value of lambda (MAYBE take this out)</p></li>
-<li><p>converged: The convergence status at each value of lambda</p></li>
+<p>A list with the components:</p><ul><li><p><code>beta_vals</code>: the matrix of estimated coefficients on the original scale. Rows are predictors, columns are values of <code>lambda</code></p></li>
+<li><p><code>rotated_scale_beta_vals</code>: the matrix of estimated coefficients on the ~rotated~ scale. This is the scale on which the model was fit.</p></li>
+<li><p><code>lambda</code>: a numeric vector of the lasso tuning parameter values used in model fitting.</p></li>
+<li><p><code>eta</code>: a number (double) between 0 and 1 representing the estimated proportion of the variance in the outcome attributable to population/correlation structure.</p></li>
+<li><p><code>s</code>: a vectof of the eigenvalues of relatedness matrix <code>K</code>; see <code><a href="relatedness_mat.html">relatedness_mat()</a></code> for details.</p></li>
+<li><p><code>U</code>: a matrix of the eigenvalues of relatedness matrix <code>K</code></p></li>
+<li><p><code>rot_y</code>: the vector of outcome values on the rotated scale. This is the scale on which the model was fit.</p></li>
+<li><p><code>linear.predictors</code>: the matrix resulting from the product of <code>stdrot_X</code> and the estimated coefficients on the ~rotated~ scale.</p></li>
+<li><p><code>penalty</code>: character string indicating the penalty with which the model was fit (e.g., 'MCP')</p></li>
+<li><p><code>gamma</code>: numeric value indicating the tuning parameter used for the SCAD or lasso penalties was used. Not relevant for lasso models.</p></li>
+<li><p><code>alpha</code>: numeric value indicating the elastic net tuning parameter.</p></li>
+<li><p><code>convex.min</code>: NULL (This is an option we will add in the future!)</p></li>
+<li><p><code>loss</code>: vector with the numeric values of the loss at each value of <code>lambda</code> (calculated on the ~rotated~ scale)</p></li>
+<li><p><code>penalty.factor</code>: vector of indicators corresponding to each predictor, where 1 = predictor was penalized.</p></li>
+<li><p><code>ns_idx</code>: vector with the indicies of predictors which were constant features (i.e., had no variation).</p></li>
+<li><p><code>p</code>: the number of features</p></li>
+<li><p><code>n</code>: the number of observations (instances)</p></li>
+<li><p><code>iter</code>: numeric vector with the number of iterations needed in model fitting for each value of <code>lambda</code></p></li>
+<li><p><code>converged</code>: vector of logical values indicating whether the model fitting converged at each value of <code>lambda</code></p></li>
 </ul></div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
