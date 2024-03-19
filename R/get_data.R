@@ -5,13 +5,10 @@
 #' @param returnX Logical: Should the design matrix be returned as a numeric matrix that will be stored in memory. By default, this will be FALSE if the object sizes exceeds 100 Mb.
 #' @param trace Logical: Should trace messages be shown? Default is TRUE. 
 #' 
-#' @return A list with four components: 
-#'  * X, the design matrix as either (1) a numeric matrix or (2) a filebacked matrix (FBM). See `bigstatsr::FBM()` and `bigsnpr::bigSnp-class` documentation for details. 
-#'  * fam, a data frame containing the pedigree information (like a .fam file in PLINK)
-#'  * map, a data frame containing the feature information (like a .bim file in PLINK)
-#'  * constants_idx A vector indicating the which columns of X contain constant features (features with no variance). 
-#' 
-#' @importFrom data.table setorderv
+#' @returns A list with four components: 
+#'  * `X`, the design matrix as either (1) a numeric matrix or (2) a filebacked matrix (FBM). See `bigstatsr::FBM()` and `bigsnpr::bigSnp-class` documentation for details. 
+#'  * `fam`, a data frame containing the pedigree information (like a .fam file in PLINK)
+#'  * `map`, a data frame containing the feature information (like a .bim file in PLINK)
 #' 
 #' @export
 #' 
@@ -48,18 +45,13 @@ get_data <- function(path, returnX, trace = TRUE){
   }
   
   # TODO: should I order fam data by FID and IID? 
-  # obj$fam <- data.table::setorderv(x = obj$fam, 
-  #                                  cols = c('family.ID', 'sample.ID'))
-  # 
 
   if(returnX){
     X <- obj$genotypes[,]
     dimnames(X) <- list(obj$fam$sample.ID, obj$map$marker.ID)
     
-    # order rows of X to match fam file
-    # X <- X[match(rownames(X), obj$fam$sample.ID), ]
-    # TODO: is this ordering something that is wise to do? 
-    # TODO: is there a better way to do this other than 'match()'? 
+    # TODO: think about ordering the rows of X to match fam file. 
+    # Is this ordering something that is wise to do? 
     
     # if(!(all.equal(obj$fam$sample.ID, as.numeric(rownames(X))))){
     #   stop("\nThere is an issue with the alignment between the rownames of the genotype data and the sample IDs. 
@@ -79,7 +71,7 @@ get_data <- function(path, returnX, trace = TRUE){
     # warning("\nSorting the returned X matrix is not yet implemented for file-backed data.
     #         \nFor analyses, remember to sort to sort the rows of the genotype data 
     #         in the same order as the rows of the family data, so that matrices X and Z have same pattern!")
-    # 
+    
     return(list(X = obj$genotypes,
                 fam = obj$fam,
                 map = obj$map))

@@ -61,3 +61,4 @@ fit2 <- lmm(X = pedigree$X, y = pedigree$clinical$y, K = pedigree$K)
 fit1$beta_vals; fit2$beta_vals
 }
 }
+\keyword{internal}

@@ -14,6 +14,12 @@
 #' @param outfile Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.
 #' @param ... Optional: additional arguments to `bigsnpr::snp_fastImpute()` (relevant only if impute_method = "xgboost")
 #' 
+#' @returns Nothing is returned by this function; instead, files 'prefix.rds' and 
+#'  'prefix.bk' are created in the location specified by data_dir. Note that this 
+#'  this function need only be run once; in subsequent data analysis/scripts, 
+#'  `get_data()` will access the '.rds' file. 
+#'    
+#' 
 #' @export
 #' 
 #' @examples 
@@ -93,11 +99,9 @@ process_plink <- function(data_dir,
   # TODO: figure out how to add a 'sexcheck' with bigsnpr functions
   # e.g., if sexcheck = TRUE, remove subjects with sex discrepancies
    
-  
   chr <- obj$map$chromosome
   X   <- obj$genotypes
   pos <- obj$map$physical.pos
-  
   
   # save these counts (like 'col_summary' obj from snpStats package)
   counts <- bigstatsr::big_counts(X) # NB this is a matrix 

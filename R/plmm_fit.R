@@ -14,20 +14,37 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
-#' @return A list with these components: 
-#' * std_X: The standardized design matrix 
-#' * rot_X: first partial result of data rotation 
-#' * rot_y: second partial result of data rotation 
-#' * eta: numeric value representing the ratio of variances. 
-#' * std_rot_X: re-standardized rotated design matrix. This is 'fed' into \code{plmm_fit()}. 
-#' * b: The values returned in the 'beta' argument of the ncvfit() object
-#' * lambda: The sequence of lambda values used in model fitting 
-#' * iter: The number of iterations at each given lambda value 
-#' * converged: The convergence status at each given lambda value 
-#' * penalty: The type of penalty used in model fitting
-#' * penalty.factor: A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
-#' * ns: The indices of the non-singular columns of the ORIGINAL design matrix
-#' * ncol_X: The number of columns in the ORIGINAL design matrix 
+#' @returns  A list with these components: 
+#' @return
+#'   * n: 
+#'   * p: 
+#'   * y: 
+#'   * std_X_details: 
+#'   * s: 
+#'   * U: 
+#'   * rot_X: 
+#'   * rot_y: 
+#'   * stdrot_X: 
+#'   * lambda: 
+#'   * b: 
+#'   * untransformed_b1: 
+#'   * linear.predictors: 
+#'   * eta: 
+#'   * iter: 
+#'   * converged: 
+#'   * loss: 
+#'   * penalty: 
+#'   * penalty.factor: 
+#'   * gamma: 
+#'   * alpha: 
+#'   * ns: 
+#'   * snp_names: 
+#'   * nlambda: 
+#'   * eps: 
+#'   * max.iter: 
+#'   * warn: 
+#'   * init: 
+#'   * trace: 
 #' 
 #' @keywords internal 
 #'
@@ -156,9 +173,9 @@ plmm_fit <- function(prep,
   
   
   ret <- structure(list(
+    n = prep$n,
+    p = prep$p,
     y = prep$y,
-    p = prep$p, 
-    n = prep$n, 
     std_X_details = prep$std_X_details,
     s = prep$s,
     U = prep$U,

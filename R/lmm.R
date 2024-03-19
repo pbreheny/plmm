@@ -17,7 +17,7 @@
 #' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
 #' 
 #' @importFrom zeallot %<-%
-#' @export
+#' @keywords internal
 #' 
 #' @examples 
 #' \dontrun{

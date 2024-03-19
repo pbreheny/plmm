@@ -24,9 +24,27 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
-#' @return A list including the estimated coefficients on the original scale, as well as other model fitting details 
+#' @return A list which includes: 
+#'  * `beta_vals`: the matrix of estimated coefficients on the original scale. Rows are predictors, columns are values of `lambda`
+#'  * `rotated_scale_beta_vals`: the matrix of estimated coefficients on the ~rotated~ scale. This is the scale on which the model was fit. 
+#'  * `lambda`: a numeric vector of the lasso tuning parameter values used in model fitting. 
+#'  * `eta`: a number (double) between 0 and 1 representing the estimated proportion of the variance in the outcome attributable to population/correlation structure.
+#'  * `s`: a vectof of the eigenvalues of relatedness matrix `K`; see `relatedness_mat()` for details.
+#'  * `U`: a matrix of the eigenvalues of relatedness matrix `K`
+#'  * `rot_y`: the vector of outcome values on the rotated scale. This is the scale on which the model was fit. 
+#'  * `linear.predictors`: the matrix resulting from the product of `stdrot_X` and the estimated coefficients on the ~rotated~ scale.
+#'  * `penalty`: character string indicating the penalty with which the model was fit (e.g., 'MCP')
+#'  * `gamma`: numeric value indicating the tuning parameter used for the SCAD or lasso penalties was used. Not relevant for lasso models.
+#'  * `alpha`: numeric value indicating the elastic net tuning parameter. 
+#'  * `convex.min`: NULL (This is an option we will add in the future!)
+#'  * `loss`: vector with the numeric values of the loss at each value of `lambda` (calculated on the ~rotated~ scale)
+#'  * `penalty.factor`: vector of indicators corresponding to each predictor, where 1 = predictor was penalized. 
+#'  * `ns_idx`: vector with the indicies of predictors which were constant features (i.e., had no variation).
+#'  * `p`: the number of features 
+#'  * `n`: the number of observations (instances)
+#'  * `iter`: numeric vector with the number of iterations needed in model fitting for each value of `lambda`
+#'  * `converged`: vector of logical values indicating whether the model fitting converged at each value of `lambda`
 #' 
-#' @importFrom zeallot %<-%
 #' @export
 #' 
 #' @examples 
@@ -36,34 +54,12 @@
 #' print(s1)
 #' plot(fit_admix1)
 #' 
-#' # using admix data and k = 50 
-#' fit_admix2 <- plmm(X = admix$X, y = admix$y, k = 50)
+#' # an example with p > n:
+#' fit_admix2 <- plmm(X = admix$X[1:50, ], y = admix$y[1:50])
 #' s2 <- summary(fit_admix2, idx = 99)
 #' print(s2)
+#' plot(fit_admix2) # notice: the default penalty is MCP
 #' 
-#' # an example with p > n:
-#' fit_admix3 <- plmm(X = admix$X[1:50, ], y = admix$y[1:50])
-#' 
-#' # now use PLINK data files
-#' \dontrun{
-#' 
-#' penncath_mid <- process_plink(prefix = "penncath_mid", dataDir = plink_example(path="penncath_mid.fam", parent=T))
-#' penncath_clinical <- read.csv(plink_example(path="penncath_clinical.csv"))
-#' # for the sake of illustration, I use a simple mean imputation for the outcome 
-#' penncath_clinical$hdl_impute <- ifelse(is.na(penncath_clinical$hdl), mean(penncath_clinical$hdl, na.rm = T), penncath_clinical$hdl)
-#' 
-#' # fit with no 'k' specified
-#' fit_plink1 <- plmm(X = penncath_mid$X, y = penncath_clinical$hdl_impute, trace = TRUE)
-#' summary(fit_plink1, idx = 5)
-#' # Runs in ~219 seconds (3.65 mins) on my 2015 MacBook Pro
-#' 
-#' # fit with 'k = 5' specified (so using RSpectra::svds())
-#' fit_plink2 <- plmm(X = penncath_mid$X, y = penncath_clinical$hdl_impute, k = 5, trace = TRUE)
-#' # Runs in ~44 seconds on my 2015 MacBook Pro
-#' summary(fit_plink2, idx = 5);summary(fit_plink2, idx = 95)
-#' }
-
-
 plmm <- function(X,
                  y,
                  k = NULL, 

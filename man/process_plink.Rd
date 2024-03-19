@@ -39,6 +39,12 @@ process_plink(
 
 \item{...}{Optional: additional arguments to \code{bigsnpr::snp_fastImpute()} (relevant only if impute_method = "xgboost")}
 }
+\value{
+Nothing is returned by this function; instead, files 'prefix.rds' and
+'prefix.bk' are created in the location specified by data_dir. Note that this
+this function need only be run once; in subsequent data analysis/scripts,
+\code{get_data()} will access the '.rds' file.
+}
 \description{
 Preprocess PLINK files using the \code{bigsnpr} package
 }

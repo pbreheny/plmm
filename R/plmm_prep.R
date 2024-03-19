@@ -12,16 +12,20 @@
 #' @param ... Not used yet
 #'
 #' @return List with these components: 
-#' * ncol_X: The number of columns in the original design matrix 
+#' * n: the number of rows in the original design matrix
+#' * p: the number of columns in the original design matrix 
+#' * y: The vector of outcomes
 #' * std_X: standardized design matrix 
-#' * y: The vector of outcomes 
-#' * S: The singular values of K 
-#' * U: the left singular values of K (same as left singular values of X). 
+#' * std_X_details: a list with 2 vectors: 
+#'    * 'center' (values used to center X)
+#'    * 'scale' (values used to scale X)
+#' * s: vector with the eigenvalues of K 
+#' * U: the eigenvectors of K (same as left singular values of X). 
 #' * ns: the indices for the nonsingular values of std_X
 #' * penalty.factor: the penalty factors for the penalized non-singular values 
 #' * snp_names: Formatted column names of the design matrix 
 #'
-#'@keywords internal
+#' @keywords internal
 #'
 #' @examples
 #' 
@@ -181,8 +185,8 @@ plmm_prep <- function(X,
 
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
+    n = n,
     p = p,
-    n = n, 
     y = y,
     std_X = std_X,
     std_X_details = std_X_details,
