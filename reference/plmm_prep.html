@@ -10,7 +10,7 @@ This is an internal function for cv.plmm"><!-- mathjax --><script src="https://c
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">plmmr</a>
 
@@ -118,14 +118,18 @@ This is an internal function for <code>cv.plmm</code></p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>List with these components:</p><ul><li><p>ncol_X: The number of columns in the original design matrix</p></li>
-<li><p>std_X: standardized design matrix</p></li>
+<p>List with these components:</p><ul><li><p>n: the number of rows in the original design matrix</p></li>
+<li><p>p: the number of columns in the original design matrix</p></li>
 <li><p>y: The vector of outcomes</p></li>
-<li><p>S: The singular values of K</p></li>
-<li><p>U: the left singular values of K (same as left singular values of X).</p></li>
-<li><p>ns: the indices for the nonsingular values of std_X</p></li>
+<li><p>std_X: standardized design matrix</p></li>
+<li><p>std_X_details: a list with 2 vectors:</p><ul><li><p>'center' (values used to center X)</p></li>
+<li><p>'scale' (values used to scale X)</p></li>
+</ul></li>
+<li><p>s: vector with the eigenvalues of K</p></li>
+<li><p>U: the eigenvectors of K (same as left singular values of X).</p></li>
+<li><p>ns: the indices for the nonsingular values of X</p></li>
 <li><p>penalty.factor: the penalty factors for the penalized non-singular values</p></li>
-<li><p>snp_names: Formatted column names of the design matrix</p></li>
+<li><p>snp_names: formatted column names of the design matrix</p></li>
 </ul></div>
 
     <div class="section level2">

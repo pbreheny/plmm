@@ -46,9 +46,6 @@
     <loc>/reference/coef.cv.plmm.html</loc>
   </url>
   <url>
-    <loc>/reference/coef.lmm.html</loc>
-  </url>
-  <url>
     <loc>/reference/coef.plmm.html</loc>
   </url>
   <url>
@@ -88,22 +85,7 @@
     <loc>/reference/lamNames.html</loc>
   </url>
   <url>
-    <loc>/reference/lmm.html</loc>
-  </url>
-  <url>
-    <loc>/reference/lmm_fit.html</loc>
-  </url>
-  <url>
-    <loc>/reference/lmm_format.html</loc>
-  </url>
-  <url>
     <loc>/reference/lmm_ggmix.html</loc>
-  </url>
-  <url>
-    <loc>/reference/lmm_prep.html</loc>
-  </url>
-  <url>
-    <loc>/reference/lmm_untransform.html</loc>
   </url>
   <url>
     <loc>/reference/log_lik.html</loc>
@@ -146,9 +128,6 @@
   </url>
   <url>
     <loc>/reference/predict.list.html</loc>
-  </url>
-  <url>
-    <loc>/reference/predict.lmm.html</loc>
   </url>
   <url>
     <loc>/reference/predict.plmm.html</loc>

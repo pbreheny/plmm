@@ -10,7 +10,7 @@ This is an internal function for cv.plmm"><!-- mathjax --><script src="https://c
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">plmmr</a>
 
@@ -143,19 +143,45 @@ This is an internal function for <code>cv.plmm</code></p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A list with these components:</p><ul><li><p>std_X: The standardized design matrix</p></li>
-<li><p>rot_X: first partial result of data rotation</p></li>
-<li><p>rot_y: second partial result of data rotation</p></li>
-<li><p>eta: numeric value representing the ratio of variances.</p></li>
-<li><p>std_rot_X: re-standardized rotated design matrix. This is 'fed' into <code>plmm_fit()</code>.</p></li>
-<li><p>b: The values returned in the 'beta' argument of the ncvfit() object</p></li>
-<li><p>lambda: The sequence of lambda values used in model fitting</p></li>
-<li><p>iter: The number of iterations at each given lambda value</p></li>
-<li><p>converged: The convergence status at each given lambda value</p></li>
-<li><p>penalty: The type of penalty used in model fitting</p></li>
-<li><p>penalty.factor: A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.</p></li>
-<li><p>ns: The indices of the non-singular columns of the ORIGINAL design matrix</p></li>
-<li><p>ncol_X: The number of columns in the ORIGINAL design matrix</p></li>
+<p>A list with these components:</p><ul><li><p>n: # of rows in X</p></li>
+<li><p>p: # of columns in X (including constant features)</p></li>
+<li><p>y: outcome on original scale</p></li>
+<li><p>std_X_details: list with 'center' and 'scale' vectors, same as <code><a href="plmm_prep.html">plmm_prep()</a></code></p></li>
+<li><p>s: eigenvalues of K</p></li>
+<li><p>U: eigenvectors of K</p></li>
+<li><p>rot_X: X on the rotated (i.e., transformed) scale.
+Note that the dimensions of <code>rot_X</code> are likely to be different than those of X.</p></li>
+<li><p>rot_y: y on the rotated scale</p></li>
+<li><p>stdrot_X: X on the rotated scale once it has been re-standardized.</p></li>
+<li><p>lambda: vector of tuning parameter values</p></li>
+<li><p>b: the coefficients estimated on the scale of <code>stdrot_X</code></p></li>
+<li><p>untransformed_b1: the coefficients estimated on the scale of <code>std_X</code></p></li>
+<li><p>linear.predictors: the product of <code>stdrot_X</code> and <code>b</code>
+(linear predictors on the transformed and restandardized scale)</p></li>
+<li><p>eta: a number (double) between 0 and 1 representing the estimated
+proportion of the variance in the outcome attributable to population/correlation
+structure.</p></li>
+<li><p>iter: numeric vector with the number of iterations needed in model fitting
+for each value of <code>lambda</code></p></li>
+<li><p>converged: vector of logical values indicating whether the model fitting
+converged at each value of <code>lambda</code></p></li>
+<li><p>loss: vector with the numeric values of the loss at each value of <code>lambda</code>
+(calculated on the ~rotated~ scale)</p></li>
+<li><p>penalty: character string indicating the penalty with which the model was
+fit (e.g., 'MCP')</p></li>
+<li><p>penalty.factor: vector of indicators corresponding to each predictor,
+where 1 = predictor was penalized.</p></li>
+<li><p>gamma: numeric value indicating the tuning parameter used for the SCAD or
+lasso penalties was used. Not relevant for lasso models.</p></li>
+<li><p>alpha: numeric value indicating the elastic net tuning parameter.</p></li>
+<li><p>ns: the indices for the nonsingular values of X</p></li>
+<li><p>snp_names: ormatted column names of the design matrix</p></li>
+<li><p>nlambda: number of lambda values used in model fitting</p></li>
+<li><p>eps: tolerance ('epsilon') used for model fitting</p></li>
+<li><p>max.iter: max. number of iterations per model fit</p></li>
+<li><p>warn: logical - should warnings be given if model fit does not converge?</p></li>
+<li><p>init: initial values for model fitting</p></li>
+<li><p>trace: logical - should messages be printed to the console while models are fit?</p></li>
 </ul></div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

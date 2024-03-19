@@ -6,7 +6,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">plmmr</a>
 
@@ -78,27 +78,34 @@
 
 
 <dt>newX</dt>
-<dd><p>Design matrix used for computing predicted values if requested.</p></dd>
+<dd><p>Design matrix used for computing predicted values if requested.
+<strong>Columns must be named!</strong></p></dd>
 
 
 <dt>type</dt>
-<dd><p>A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details.</p></dd>
+<dd><p>A character argument indicating what type of prediction should be
+returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details.</p></dd>
 
 
 <dt>lambda</dt>
-<dd><p>A numeric vector of regularization parameter <code>lambda</code> values at which predictions are requested.</p></dd>
+<dd><p>A numeric vector of regularization parameter <code>lambda</code> values
+at which predictions are requested.</p></dd>
 
 
 <dt>idx</dt>
-<dd><p>Vector of indices of the penalty parameter <code>lambda</code> at which predictions are required. By default, all indices are returned.</p></dd>
+<dd><p>Vector of indices of the penalty parameter <code>lambda</code> at which
+predictions are required. By default, all indices are returned.</p></dd>
 
 
 <dt>X</dt>
-<dd><p>Optional argument. Original design matrix (not including intercept column) from object. Required if <code>type == 'blup'</code> and object is too large to be returned in <code>plmm</code> object.</p></dd>
+<dd><p>Optional argument. Original design matrix (not including intercept column)
+from object. Required if <code>type == 'blup'</code> and object is too large to be
+returned in <code>plmm</code> object. Again, <strong>columns must be named!</strong></p></dd>
 
 
 <dt>y</dt>
-<dd><p>Optional argument. Original continuous outcome vector from object. Required if <code>type == 'blup'</code>.</p></dd>
+<dd><p>Optional argument. Original continuous outcome vector from object.
+Required if <code>type == 'blup'</code>.</p></dd>
 
 
 <dt>K</dt>
@@ -124,17 +131,23 @@ the estimated correlation structure of data into our prediction of the outcome.<
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co"># fit a model </span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">train_idx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>, <span class="fl">100</span><span class="op">)</span> <span class="co"># shuffling is important here! Keeps test and train groups comparable.</span></span></span>
+<span class="r-in"><span><span class="va">train</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">[</span><span class="va">train_idx</span>,<span class="op">]</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="va">train_idx</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">[</span><span class="op">-</span><span class="va">train_idx</span>,<span class="op">]</span>, y <span class="op">=</span> <span class="va">admix</span><span class="op">$</span><span class="va">y</span><span class="op">[</span><span class="op">-</span><span class="va">train_idx</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="plmm.html">plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">y</span>, K <span class="op">=</span> <span class="fu"><a href="relatedness_mat.html">relatedness_mat</a></span><span class="op">(</span><span class="va">train</span><span class="op">$</span><span class="va">X</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># simulate new data </span></span></span>
-<span class="r-in"><span><span class="va">newX</span> <span class="op">&lt;-</span> <span class="fu">sim_ps_x</span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>, nJ <span class="op">=</span> <span class="fl">4</span>, p <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">admix</span><span class="op">$</span><span class="va">X</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span> structureX <span class="op">=</span> <span class="st">"independent"</span>, inbr <span class="op">=</span> <span class="st">"heterogeneous"</span>, standardizeX <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span> </span></span>
 <span class="r-in"><span> <span class="co"># make predictions for all lambda values </span></span></span>
-<span class="r-in"><span> <span class="va">pred1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"lp"</span><span class="op">)</span></span></span>
-<span class="r-in"><span> </span></span>
-<span class="r-in"><span> <span class="co"># make predictions for a select number of lambda values </span></span></span>
-<span class="r-in"><span> <span class="va">pred2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">newX</span>, type <span class="op">=</span> <span class="st">"lp"</span>, idx<span class="op">=</span><span class="fl">98</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="va">pred1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">X</span>, type <span class="op">=</span> <span class="st">"blup"</span>, X <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span> <span class="co"># make predictions for a select number of lambda values</span></span></span>
+<span class="r-in"><span> <span class="co"># use cv to choose a best lambda</span></span></span>
+<span class="r-in"><span> <span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.plmm.html">cv.plmm</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">y</span><span class="op">)</span> </span></span>
+<span class="r-in"><span> <span class="va">pred2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">fit</span>, newX <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">X</span>, type <span class="op">=</span> <span class="st">"blup"</span>, idx<span class="op">=</span><span class="va">cv</span><span class="op">$</span><span class="va">min</span>,</span></span>
+<span class="r-in"><span>  X <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">X</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># examine prediction error </span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/crossprod.html" class="external-link">crossprod</a></span><span class="op">(</span><span class="va">y</span> <span class="op">-</span> <span class="va">pred2</span><span class="op">)</span><span class="op">)</span> <span class="co"># almost all 0 -- predictions are good! </span></span></span>
 <span class="r-in"><span> <span class="op">}</span></span></span>
 <span class="r-in"><span> </span></span>
 <span class="r-in"><span> </span></span>
