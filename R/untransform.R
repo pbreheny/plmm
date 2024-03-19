@@ -12,7 +12,7 @@
 
 untransform <- function(untransformed_b1, ns, p, std_X_details){
   # goal: reverse the PRE-ROTATION standardization #
-  
+
   # partition the values from Step 1 into intercept and non-intercept parts
   a <- untransformed_b1[1, , drop = FALSE] # this is the intercept 
   b <- untransformed_b1[-1, , drop=FALSE]
