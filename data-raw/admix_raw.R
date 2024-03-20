@@ -1,7 +1,7 @@
 ## code to prepare `admix_raw` dataset goes here
 # load libraries
 library(dplyr)
-library(plmm)
+library(plmmr)
 # read in data for examples 
 admix_raw <- read.delim("https://s3.amazonaws.com/pbreheny-data-sets/admixture.txt")
 # str(admix_raw) # includes 197 obs., 100 SNPs, and racial category 

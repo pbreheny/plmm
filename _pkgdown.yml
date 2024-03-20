@@ -2,9 +2,14 @@ url: ~
 
 template:
     bootstrap: 5
-    bootswatch: minty
+    bootswatch: pulse
     bslib:
       pkgdown-nav-height: 100px
+      # bg: "#ffffff"
+      # fg: "#B8BCC2"
+      # primary: "#306cc9"
+    # navbar:
+    #   bg: primary
 
 reference:
   - title: Fitting penalized linear mixed models (PLMMs - the featured presentation) 
@@ -86,3 +91,4 @@ reference:
     - varp
     
   
+

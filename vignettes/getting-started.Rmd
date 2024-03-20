@@ -20,31 +20,31 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(plmm)
+library(plmmr)
 ```
 
 **NOTE**: This vignette is under development -- not all of the examples here are fully worked through. My work here is an example of [working with the garage door open](https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu).
 
 ## Introduction 
 
-`plmm` is an `R` package created for the purpose of fitting penalized regression models to high dimensional data, particularly that in which the observations are not independent. This kind of data arises often in the context of genetics (*e.g.* GWAS dealing with population structure), and this will be the motivation for the examples presented here.
+`plmmr` (which stands for **P**enalized **L**inear **M**ixed **M**odels for **R**) is an `R` package created for the purpose of fitting penalized regression models to high dimensional data, particularly in which the observations are correlated. This kind of data arises often in the context of genetics (*e.g.* GWAS dealing with population structure/family structure), and this will be the motivation for the examples presented here.
 
-At this time, the package is designed for linear regression only -- that is, we are considering only continuous (numeric) outcomes. In the future, I would like to extend this package to handle logistic regression (to handle dichotomous outcomes). 
+At this time, the package is designed for linear regression only -- that is, we are considering only continuous (numeric) outcomes. In many applications with high dimensional data, the objective of statistical models is to identify signals - for example, many GWAS are interested in identifying a set of variants that show evidence of association with an outcome. Practitioners in these situations are often more interested identifying biological pathways than in estimating odds ratios for individual variants. For these applications, treating binary or categorical outcomes as numeric values is a possibility. In the future, we would like to extend this package to handle logistic regression (to handle dichotomous outcomes). 
 
-Since we are focused on penalized regression in this package, `plmm` offers 3 choices of penalty: the minimax concave (MCP), the smoothly clipped absolute deviation (SCAD), and the least absolute shrinkage and selection operator (LASSO).  Much of the work in this package is built on the concepts/techniques provided in the `ncvreg` [package](https://github.com/pbreheny/ncvreg), whose author is [my dissertation advisor](https://myweb.uiowa.edu/pbreheny/). 
+Since we are focused on penalized regression in this package, `plmmr` offers 3 choices of penalty: the minimax concave (MCP), the smoothly clipped absolute deviation (SCAD), and the least absolute shrinkage and selection operator (LASSO). ^[For data running filebacked, only the LASSO is currently implemented (we are working to expand this)] Much of the work in this package is built on the concepts/techniques provided in the `ncvreg` [package](https://github.com/pbreheny/ncvreg) by [Patrick Breheny](https://myweb.uiowa.edu/pbreheny/). The filebacked computation relies on the `bigsnpr` [package](https://privefl.github.io/bigsnpr/) by [Florian Privé](https://privefl.github.io/) and the `biglasso` [package](https://github.com/YaohuiZeng/biglasso) by [Yaohui Zeng](https://scholar.google.com/citations?user=jpEmf04AAAAJ&hl=en) & Patrick Breheny. 
 
-`plmm` currently includes two example data sets: 
+`plmmr` currently includes two example data sets: 
 
-  * `admix` is a small data set (197 observations, 100 SNPs) that describes individuals of different racial backgrounds. The outcome of `admix` is simulated to include population structure effects (*i.e.* race/ethnicity have an impact on the SNP associations). 
+  * `admix` is a small data set (197 observations, 100 SNPs) that describes individuals of different ancestry groups. The outcome of `admix` is simulated to include population structure effects (*i.e.* race/ethnicity have an impact on the SNP associations). This data set is available as `.rda` object under the `data/` folder. 
   
   * `penncath_lite` (data on coronary artery disease from the [PennCath study](https://pubmed.ncbi.nlm.nih.gov/21239051/)) is a mid-sized, high dimensional data set (1401 observations, 4217 SNPs) with several health outcomes as well as age and sex information. This data set is a subset of a much larger data set (the original data has over 800K SNPs). For for information on this data set, refer to the [original publication](https://pubmed.ncbi.nlm.nih.gov/21239051/).
   
-In this overview, I will provide a demo of the main functions in `plmm` using the `admix` data. Checkout the 'Working with PLINK files' vignette to see a demo of processing the `penncath_lite` data from the original PLINK file formats. 
+In this overview, I will provide a demo of the main functions in `plmmr` using the `admix` data. Checkout the 'Working with PLINK files' vignette to see a demo of processing the `penncath_lite` data from the original PLINK file formats. 
 
 
 ## Basic model fitting 
 
-The `admix` data is already formatted to have elements $X$ and $y$, so I can jump right in with a call to `plmm`:
+The `admix` data is already formatted to have elements $X$ and $y$, so I can jump right in with a call to `plmmr::plmm()` (our main function):
 
 ```{r admix_fit}
 admix_fit <- plmm(X = admix$X, y = admix$y)
@@ -54,7 +54,10 @@ summary(admix_fit, lambda = admix_fit$lambda[95])
 The returned `beta_vals` item is a matrix whose rows are $\beta$ coefficients and whose columns represent values of the penalization parameter $\lambda$. By default, `plmm` fits 100 values of $\lambda$ (see the `setup_lambda` function for details). 
 
 ```{r}
-admix_fit$beta_vals[1:10, 97:100]
+admix_fit$beta_vals[1:10, 97:100] |> 
+  knitr::kable(digits = 3,
+               format = "html",
+               col.names = )
 ```
 
 Note that for all values of $\lambda$, SNP 8 has $\hat \beta = 0$. This is because SNP 8 is a constant feature, a feature (column) whose values do not vary among the members of this population.
@@ -68,7 +71,7 @@ summary(admix_fit, lambda = admix_fit$lambda[25])
 
 We can also plot the path of the fit to see how model coefficients vary with $\lambda$:
 
-```{r admix_plots}
+```{r admix_plots, fig.align='center', fig.width=8, fig.cap="Plot of path for model fit"}
 plot(admix_fit)
 ```
 
@@ -84,21 +87,21 @@ print(admix_cv_s)
 
 We can also plot the cross-validation error (CVE) versus $\lambda$ (on the log scale):
 
-```{r}
+```{r cvplot, fig.align='center', fig.width=8, fig.cap="Plot of CVE"}
 plot(admix_cv)
 ```
 
+
+```{r admix_pred, include=FALSE, eval=FALSE}
 ## Predicted values 
 
-The `predict()` methods for PLMMs are in development (we are working on a Best Linear Unbiased Predictor); below is an example of where we are for now: 
+# The `predict()` methods for PLMMs are in development (we are working on a Best Linear Unbiased Predictor); below is an example of where we are for now: 
 
-```{r admix_pred}
 # make predictions for select lambda value(s)
 admix_pred1 <- predict(object = admix_fit,
                        newX = admix$X,
                        type = "lp",
-                       idx=98)
+                       X = admix$X,
+                       y = admix$y)
 ```
 
-
-More to come.... 

@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(plmm)
+library(plmmr)
 library(data.table) # for fread()
 library(ggplot2)
 library(knitr)
