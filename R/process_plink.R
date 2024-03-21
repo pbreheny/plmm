@@ -21,6 +21,12 @@
 #' @param std_bk_extension Optional: the file name of the backing file ".bk" to be created for quality controlled, standardized data. Defaults to "std_X" (i.e., default will create std_X.bk in the directory supplied to `data_dir`)
 #' @param ... Optional: additional arguments to `bigsnpr::snp_fastImpute()` (relevant only if impute_method = "xgboost")
 #' 
+#' @returns Nothing is returned by this function; instead, files 'prefix.rds' and 
+#'  'prefix.bk' are created in the location specified by data_dir. Note that this 
+#'  this function need only be run once; in subsequent data analysis/scripts, 
+#'  `get_data()` will access the '.rds' file. 
+#'    
+#' 
 #' @export
 #' 
 #' @examples 
@@ -114,11 +120,9 @@ process_plink <- function(data_dir,
   # TODO: figure out how to add a 'sexcheck' with bigsnpr functions
   # e.g., if sexcheck = TRUE, remove subjects with sex discrepancies
    
-  
   chr <- obj$map$chromosome
   X   <- obj$genotypes
   pos <- obj$map$physical.pos
-  
   
   # save these counts (like 'col_summary' obj from snpStats package)
   counts <- bigstatsr::big_counts(X) # NB this is a matrix 

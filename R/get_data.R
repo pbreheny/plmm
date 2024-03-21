@@ -5,16 +5,13 @@
 #' @param row_id Character string indicating which IDs to use for the rownames of the genotype matrix. Can choose "fid" or "iid", corresponding to the first or second columns in the PLINK .fam file. Defaults to "iid". 
 #' @param returnX Logical: Should the design matrix be returned as a numeric matrix that will be stored in memory. By default, this will be FALSE if the object sizes exceeds 100 Mb.
 #' @param trace Logical: Should trace messages be shown? Default is TRUE. 
-#' 
-#' @return A list with these components: 
+#' @returns A list with these components: 
 #'  * std_X, the column-standardized design matrix as either (1) a numeric matrix or (2) a filebacked matrix (FBM). See `bigstatsr::FBM()` and `bigsnpr::bigSnp-class` documentation for details. 
 #'  * fam, a data frame containing the pedigree information (like a .fam file in PLINK)
 #'  * map, a data frame containing the feature information (like a .bim file in PLINK)
 #'  * ns: A vector indicating the which columns of X contain nonsingular features (i.e., features with variance != 0. 
 #'  * center: A vector of values for centering each column in X
 #'  * scale: A vector of values for scaling each column in X 
-#' 
-#' @importFrom data.table setorderv
 #' 
 #' @export
 #' 
@@ -52,7 +49,7 @@ get_data <- function(path, row_id = "iid", returnX, trace = TRUE){
       returnX <- FALSE
     }
   }
-  
+
   if(returnX){
     # get std_X as a matrix 
     std_X <- obj$std_X[,]
@@ -60,7 +57,9 @@ get_data <- function(path, row_id = "iid", returnX, trace = TRUE){
     # set row names 
     if(row_id == "iid"){row_names <- obj$fam$sample.ID}
     if(row_id == "fid"){row_names <- obj$fam$family.ID}
-    
+
+    # TODO: think about ordering the rows of X to match fam file. 
+    # Is this ordering something that is wise to do? 
     
     dimnames(std_X) <- list(row_names,
                             obj$map$marker.ID[obj$ns])

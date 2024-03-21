@@ -1,6 +1,6 @@
 # Test 1 - sanity check -----------------------------------------
 # 'blup' and 'response' should not give the same result 
-cv1 <- cv.plmm(X = admix$X, y = admix$y, seed = 321)
+cv1 <- cv.plmm(X = admix$X, y = admix$y, seed = 321, type = 'lp')
 cv2 <- cv.plmm(X = admix$X, y = admix$y, seed = 321, type='blup')
 if(identical(cv1$cve, cv2$cve))stop("BLUP and response types give same result")
 

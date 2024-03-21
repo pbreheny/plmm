@@ -39,14 +39,20 @@ plmm_prep(
 \value{
 List with these components:
 \itemize{
-\item ncol_X: The number of columns in the original design matrix
-\item std_X: standardized design matrix
+\item n: the number of rows in the original design matrix
+\item p: the number of columns in the original design matrix
 \item y: The vector of outcomes
-\item S: The singular values of K
-\item U: the left singular values of K (same as left singular values of X).
-\item ns: the indices for the nonsingular values of std_X
+\item std_X: standardized design matrix
+\item std_X_details: a list with 2 vectors:
+\itemize{
+\item 'center' (values used to center X)
+\item 'scale' (values used to scale X)
+}
+\item s: vector with the eigenvalues of K
+\item U: the eigenvectors of K (same as left singular values of X).
+\item ns: the indices for the nonsingular values of X
 \item penalty.factor: the penalty factors for the penalized non-singular values
-\item snp_names: Formatted column names of the design matrix
+\item snp_names: formatted column names of the design matrix
 }
 }
 \description{

@@ -17,10 +17,9 @@ get_data(path, returnX, trace = TRUE)
 \value{
 A list with four components:
 \itemize{
-\item X, the design matrix as either (1) a numeric matrix or (2) a filebacked matrix (FBM). See \code{bigstatsr::FBM()} and \code{bigsnpr::bigSnp-class} documentation for details.
-\item fam, a data frame containing the pedigree information (like a .fam file in PLINK)
-\item map, a data frame containing the feature information (like a .bim file in PLINK)
-\item constants_idx A vector indicating the which columns of X contain constant features (features with no variance).
+\item \code{X}, the design matrix as either (1) a numeric matrix or (2) a filebacked matrix (FBM). See \code{bigstatsr::FBM()} and \code{bigsnpr::bigSnp-class} documentation for details.
+\item \code{fam}, a data frame containing the pedigree information (like a .fam file in PLINK)
+\item \code{map}, a data frame containing the feature information (like a .bim file in PLINK)
 }
 }
 \description{

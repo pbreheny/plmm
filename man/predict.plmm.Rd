@@ -19,17 +19,24 @@
 \arguments{
 \item{object}{An object of class \code{plmm}.}
 
-\item{newX}{Design matrix used for computing predicted values if requested.}
+\item{newX}{Design matrix used for computing predicted values if requested.
+\strong{Columns must be named!}}
 
-\item{type}{A character argument indicating what type of prediction should be returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details.}
+\item{type}{A character argument indicating what type of prediction should be
+returned. Options are "lp," "coefficients," "vars," "nvars," and "blup." See details.}
 
-\item{lambda}{A numeric vector of regularization parameter \code{lambda} values at which predictions are requested.}
+\item{lambda}{A numeric vector of regularization parameter \code{lambda} values
+at which predictions are requested.}
 
-\item{idx}{Vector of indices of the penalty parameter \code{lambda} at which predictions are required. By default, all indices are returned.}
+\item{idx}{Vector of indices of the penalty parameter \code{lambda} at which
+predictions are required. By default, all indices are returned.}
 
-\item{X}{Optional argument. Original design matrix (not including intercept column) from object. Required if \code{type == 'blup'} and object is too large to be returned in \code{plmm} object.}
+\item{X}{Optional argument. Original design matrix (not including intercept column)
+from object. Required if \code{type == 'blup'} and object is too large to be
+returned in \code{plmm} object. Again, \strong{columns must be named!}}
 
-\item{y}{Optional argument. Original continuous outcome vector from object. Required if \code{type == 'blup'}.}
+\item{y}{Optional argument. Original continuous outcome vector from object.
+Required if \code{type == 'blup'}.}
 
 \item{K}{An optional list or matrix as returned by \code{choose_K()}.}
 
@@ -53,17 +60,23 @@ the estimated correlation structure of data into our prediction of the outcome.
 \examples{
 \dontrun{
 # fit a model 
-fit <- plmm(X = admix$X, y = admix$y, K = relatedness_mat(admix$X))
+set.seed(123)
+train_idx <- sample(1:nrow(admix$X), 100) # shuffling is important here! Keeps test and train groups comparable.
+train <- list(X = admix$X[train_idx,], y = admix$y[train_idx])
+test <- list(X = admix$X[-train_idx,], y = admix$y[-train_idx])
+fit <- plmm(X = train$X, y = train$y, K = relatedness_mat(train$X))
 
-# simulate new data 
-newX <- sim_ps_x(n = nrow(admix$X), nJ = 4, p = ncol(admix$X),
- structureX = "independent", inbr = "heterogeneous", standardizeX = FALSE)
- 
  # make predictions for all lambda values 
- pred1 <- predict(object = fit, newX = newX, type = "lp")
- 
- # make predictions for a select number of lambda values 
- pred2 <- predict(object = fit, newX = newX, type = "lp", idx=98)
+ pred1 <- predict(object = fit, newX = test$X, type = "blup", X = train$X, y = train$y)
+
+ # make predictions for a select number of lambda values
+ # use cv to choose a best lambda
+ cv <- cv.plmm(X = train$X, y = train$y) 
+ pred2 <- predict(object = fit, newX = test$X, type = "blup", idx=cv$min,
+  X = train$X, y = train$y)
+  
+  # examine prediction error 
+  summary(crossprod(y - pred2)) # almost all 0 -- predictions are good! 
  }
  
  

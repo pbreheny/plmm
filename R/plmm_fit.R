@@ -18,20 +18,46 @@
 #' @param init Initial values for coefficients. Default is 0 for all columns of X. 
 #' @param warn Return warning messages for failures to converge and model saturation? Default is TRUE.
 #' @param returnX Return the standardized design matrix along with the fit? By default, this option is turned on if X is under 100 MB, but turned off for larger matrices to preserve memory.
-#' @return A list with these components: 
-#' * std_X: The standardized design matrix 
-#' * rot_X: first partial result of data rotation 
-#' * rot_y: second partial result of data rotation 
-#' * eta: numeric value representing the ratio of variances. 
-#' * std_rot_X: re-standardized rotated design matrix. This is 'fed' into \code{plmm_fit()}. 
-#' * b: The values returned in the 'beta' argument of the ncvfit() object
-#' * lambda: The sequence of lambda values used in model fitting 
-#' * iter: The number of iterations at each given lambda value 
-#' * converged: The convergence status at each given lambda value 
-#' * penalty: The type of penalty used in model fitting
-#' * penalty.factor: A multiplicative factor for the penalty applied to each coefficient. If supplied, penalty.factor must be a numeric vector of length equal to the number of columns of X. The purpose of penalty.factor is to apply differential penalization if some coefficients are thought to be more likely than others to be in the model. In particular, penalty.factor can be 0, in which case the coefficient is always in the model without shrinkage.
-#' * ns: The indices of the non-singular columns of the ORIGINAL design matrix
-#' * ncol_X: The number of columns in the ORIGINAL design matrix 
+#' @returns  A list with these components: 
+#'   * n: # of rows in X
+#'   * p: # of columns in X (including constant features)
+#'   * y: outcome on original scale 
+#'   * std_X_details: list with 'center' and 'scale' vectors, same as `plmm_prep()`
+#'   * s: eigenvalues of K
+#'   * U: eigenvectors of K
+#'   * rot_X: X on the rotated (i.e., transformed) scale. 
+#'    Note that the dimensions of `rot_X` are likely to be different than those of X.
+#'   * rot_y: y on the rotated scale 
+#'   * stdrot_X: X on the rotated scale once it has been re-standardized. 
+#'   * lambda: vector of tuning parameter values 
+#'   * b: the coefficients estimated on the scale of `stdrot_X`
+#'   * untransformed_b1: the coefficients estimated on the scale of `std_X`
+#'   * linear.predictors: the product of `stdrot_X` and `b` 
+#'    (linear predictors on the transformed and restandardized scale)
+#'   * eta: a number (double) between 0 and 1 representing the estimated 
+#'    proportion of the variance in the outcome attributable to population/correlation 
+#'    structure.
+#'   * iter: numeric vector with the number of iterations needed in model fitting 
+#'    for each value of `lambda`
+#'   * converged: vector of logical values indicating whether the model fitting 
+#'    converged at each value of `lambda`
+#'   * loss: vector with the numeric values of the loss at each value of `lambda` 
+#'    (calculated on the ~rotated~ scale)
+#'   * penalty: character string indicating the penalty with which the model was 
+#'    fit (e.g., 'MCP')
+#'   * penalty.factor: vector of indicators corresponding to each predictor, 
+#'    where 1 = predictor was penalized. 
+#'   * gamma: numeric value indicating the tuning parameter used for the SCAD or 
+#'    lasso penalties was used. Not relevant for lasso models.
+#'   * alpha: numeric value indicating the elastic net tuning parameter. 
+#'   * ns: the indices for the nonsingular values of X
+#'   * snp_names: ormatted column names of the design matrix
+#'   * nlambda: number of lambda values used in model fitting 
+#'   * eps: tolerance ('epsilon') used for model fitting 
+#'   * max.iter: max. number of iterations per model fit 
+#'   * warn: logical - should warnings be given if model fit does not converge? 
+#'   * init: initial values for model fitting 
+#'   * trace: logical - should messages be printed to the console while models are fit?
 #' 
 #' @keywords internal 
 #'
@@ -291,11 +317,10 @@ plmm_fit <- function(prep,
   
   
   ret <- structure(list(
+    n = prep$n,
+    p = prep$p,
     y = prep$y,
-    p = prep$p, 
-    n = prep$n, 
-    std_X_details = std_X_details,
-    stdrot_X_scale = stdrot_X_scale,
+    std_X_details = prep$std_X_details,
     s = prep$s,
     U = prep$U,
     rot_X = rot_X,

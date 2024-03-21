@@ -15,12 +15,21 @@
 #' @param trace If set to TRUE, inform the user of progress by announcing the beginning of each step of the modeling process. Default is FALSE.
 #' @param ... Not used yet
 #'
-#' @return List with these components: 
-#' * S: The singular values of K 
-#' * U: the left singular values of K (same as left singular values of X). 
-#' * snp_names: Formatted column names of the design matrix 
+#' @returns List with these components: 
+#' * n: the number of rows in the original design matrix
+#' * p: the number of columns in the original design matrix 
+#' * y: The vector of outcomes
+#' * std_X: standardized design matrix 
+#' * std_X_details: a list with 2 vectors: 
+#'    * 'center' (values used to center X)
+#'    * 'scale' (values used to scale X)
+#' * s: vector with the eigenvalues of K 
+#' * U: the eigenvectors of K (same as left singular values of X). 
+#' * ns: the indices for the nonsingular values of X
+#' * penalty.factor: the penalty factors for the penalized non-singular values 
+#' * snp_names: formatted column names of the design matrix 
 #'
-#'@keywords internal
+#' @keywords internal
 #'
 #' @examples
 #' 
@@ -164,8 +173,9 @@ plmm_prep <- function(std_X,
 
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
-    # include std_X and y here b/c I will need them for cross validation 
+    n = n,
     p = p,
+    y = y,
     std_X = std_X,
     y = y,
     s = s,

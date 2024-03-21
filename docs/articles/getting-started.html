@@ -82,7 +82,7 @@ Peter</h4>
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">plmm</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">plmmr</span><span class="op">)</span></span></code></pre></div>
 <p><strong>NOTE</strong>: This vignette is under development – not all
 of the examples here are fully worked through. My work here is an
 example of <a href="https://notes.andymatuschak.org/About_these_notes?stackedNotes=z21cgR9K3UcQ5a7yPsj2RUim3oM2TzdBByZu" class="external-link">working
@@ -392,11 +392,11 @@ error:</p>
 <span><span class="va">admix_cv_s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">admix_cv</span>, lambda <span class="op">=</span> <span class="st">"min"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">admix_cv_s</span><span class="op">)</span></span>
 <span><span class="co">#&gt; MCP-penalized model with n=197 and p=100</span></span>
-<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1298):</span></span>
+<span><span class="co">#&gt; At minimum cross-validation error (lambda=0.1556):</span></span>
 <span><span class="co">#&gt; -------------------------------------------------</span></span>
-<span><span class="co">#&gt;   Nonzero coefficients: 44</span></span>
-<span><span class="co">#&gt;   Cross-validation error (deviance): 3.44</span></span>
-<span><span class="co">#&gt;   Scale estimate (sigma): 1.855</span></span></code></pre></div>
+<span><span class="co">#&gt;   Nonzero coefficients: 31</span></span>
+<span><span class="co">#&gt;   Cross-validation error (deviance): 2.74</span></span>
+<span><span class="co">#&gt;   Scale estimate (sigma): 1.655</span></span></code></pre></div>
 <p>We can also plot the cross-validation error (CVE) versus <span class="math inline">\(\lambda\)</span> (on the log scale):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">admix_cv</span><span class="op">)</span></span></code></pre></div>
