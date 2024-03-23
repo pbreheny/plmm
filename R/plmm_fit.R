@@ -100,91 +100,33 @@ plmm_fit <- function(prep,
     rot_X <- wUt %*% cbind(1, prep$std_X)
     rot_y <- wUt %*% prep$y
     # re-standardize rot_X
-    stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
+    stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE]) # NB: we're not scaling the intercept 
     stdrot_X_noInt <- stdrot_X_temp$scaled_X
     stdrot_X <- cbind(rot_X[,1, drop = FALSE], stdrot_X_noInt) # re-attach intercept
     stdrot_X_scale <- stdrot_X_temp$scale_vals
   } else if ('FBM' %in% class(prep$std_X)){
-    w <- (prep$eta * prep$s + (1 - prep$eta))^(-1/2)
-    Ut <- bigstatsr::big_transpose(prep$U)
-    wUt <- bigstatsr::FBM(Ut$nrow, Ut$ncol)
-    bigstatsr::big_apply(Ut,
-                         a.FUN = function(X, ind, w, res){
-                           res[,ind] <- sweep(x = X[,ind],
-                                              MARGIN = 1,
-                                              STATS = w,
-                                              "*")},
-                         a.combine = cbind,
-                         w = w,
-                         res = wUt)
-    
-    # add column of 1s for intercept
-    std_X_with_intcpt <- matrix(data = 0,
-                                nrow = prep$std_X$nrow,
-                                ncol = prep$std_X$ncol + 1) 
-    std_X_with_intcpt[,1] <- rep(1, prep$std_X$nrow)
-    std_X_with_intcpt <- std_X_with_intcpt |> bigstatsr::as_FBM()
-    # fill in other columns with values of std_X
-    bigstatsr::big_apply(prep$std_X,
-                         a.FUN = function(X, ind, res){
-                           res[,ind+1] <- X[,ind]
-                         },
-                         a.combine = cbind,
-                         res = std_X_with_intcpt)
-    # rotate X and y
-    rot_X <- bigstatsr::FBM(nrow = wUt$nrow, ncol = std_X_with_intcpt$ncol)
-    bigstatsr::big_apply(X = std_X_with_intcpt,
-                         a.FUN = function(X,
-                                          ind,
-                                          wUt,
-                                          res){
-                           # TODO: revisit this to improve computational efficiency
-                           for(i in 1:nrow(wUt)){
-                             r <- wUt[i,,drop=FALSE]
-                             v <- bigstatsr::big_cprodVec(X = X, y.row = r)
-                             # browser()
-                             res[i, ind] <- t(v)
-                           }
-                           
-                         },
-                         a.combine = rbind,
-                         wUt = wUt,
-                         res = rot_X)
-    
-    rot_y <- bigstatsr::big_prodVec(X = wUt, 
-                                    y.col = prep$y)
-    
-    # re-scale rot_X
-    rot_X_scale_info <- bigstatsr::big_scale()(rot_X)
-    # stdrot_X_center <- rot_X_scale_info$center
-    stdrot_X_scale <- rot_X_scale_info$scale
-    stdrot_X <- big_std(X = rot_X,
-                        # center = stdrot_X_center, # NB: do not re-center rotated data
-                        scale = stdrot_X_scale,
-                        ns = 2:rot_X$ncol)
-    
+    rot_res <- rotate_filebacked(prep)
+    rot_X <- rot_res$rot_X
+    rot_y <- rot_res$rot_y
+    stdrot_X <- rot_res$stdrot_X 
+    stdrot_X_scale <- rot_res$stdrot_X_scale
   }
-  
   # calculate population var without mean 0; will need this for call to ncvfit()
   if('matrix' %in% class(prep$std_X)){
-    xtx <- rep(1, ncol(stdrot_X))
-    # TODO: is the below appropriate? This is what I used to have...
-    # xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
+    # TODO: unpack with PB why we are standardizing this way? 
+    xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
   } else if('FBM' %in% class(prep$std_X)){
-    xtx <- rep(1, ncol(stdrot_X))
-    # TODO: is the below appropriate? This is what I used to have...
-    # xtx <- rep(NA_integer_, stdrot_X$ncol)
-    # xtx <- bigstatsr::big_apply(X = stdrot_X,
-    #                             a.FUN = function(X, ind, res){
-    #                               res[ind] <- apply(X[,ind],
-    #                                                 2,
-    #                                                 function(col){mean(col^2,
-    #                                                                    na.rm = TRUE)})
-    #                             },
-    #                             a.combine = c,
-    #                             ncores = bigstatsr::nb_cores(),
-    #                             res = xtx)
-    # xtx[1] <- 1 # for intercept
+    # TODO: unpack with PB why we are standardizing this way? 
+    
+    xtx <- bigstatsr::big_apply(X = stdrot_X,
+                                a.FUN = function(X, ind){
+                                  apply(X[,ind], 2,
+                                        function(col){mean(col^2,
+                                                           na.rm = TRUE)})
+                                },
+                                a.combine = c,
+                                ncores = bigstatsr::nb_cores())
+
   }
   if(prep$trace){cat("\nRotation complete. Beginning model fitting.")}
   
@@ -211,14 +153,23 @@ plmm_fit <- function(prep,
   new.penalty.factor <- c(0, penalty.factor)
   
   # placeholders for results ---------------------------------
-  init <- c(0, init) # add initial value for intercept
-  
+  # setting up 'init' as below is not needed when this is called from plmm or cv.plmm
+  # as those user-facing functions set up 'init' as a vector of zeroes
+  if (is.null(init)){
+    init <- rep(0, ncol(stdrot_X))
+  } else {
+    init <- c(0, init) # add one for intercept
+  }
+
   if('matrix' %in% class(stdrot_X)){
     r <- drop(rot_y - stdrot_X %*% init)
     linear.predictors <- matrix(NA, nrow = nrow(stdrot_X), ncol=nlambda)
     b <- matrix(NA, nrow=ncol(stdrot_X), ncol=nlambda) 
-  } else if ("FBM" %in% class(stdrot_X)){
-    r <- rot_y - bigstatsr::big_prodVec(X = stdrot_X, y.col = init)
+  } else {
+    r <- rot_y - bigstatsr::big_prodVec(X = stdrot_X, y.col = init,
+                                        center = rep(0, ncol(stdrot_X)),
+                                        scale = rep(1, ncol(stdrot_X)),
+                                        ncores = bigstatsr::nb_cores())
     linear.predictors <- matrix(NA, nrow = stdrot_X$nrow, ncol = nlambda)
     b <- matrix(NA, nrow = stdrot_X$ncol, ncol = nlambda)
   }
@@ -232,10 +183,10 @@ plmm_fit <- function(prep,
   if(prep$trace){pb <- txtProgressBar(min = 0, max = nlambda, style = 3)}
   # TODO: think about putting this loop in C
   # TODO: change this condition to depend on fbm_flag
+
   if('matrix' %in% class(stdrot_X)){
     for (ll in 1:nlambda){
       lam <- lambda[ll]
-      browser()
       res <- ncvreg::ncvfit(stdrot_X,
                             rot_y, 
                             init,
@@ -256,22 +207,23 @@ plmm_fit <- function(prep,
       loss[ll] <- res$loss
       r <- res$resid
       if(prep$trace){setTxtProgressBar(pb, ll)}
+      
     }
     
-  } else if ('FBM' %in% class(stdrot_X)){
+  } else {
     for (ll in 1:nlambda){
       lam <- lambda[ll]
-      res <- rawfit_gaussian(X = stdrot_X,
+      res <- biglasso::biglasso_fit(X = fbm2bm(stdrot_X),
                              y = rot_y,
                              init = init,
                              r = r,
                              xtx = xtx,
-                             penalty = penalty,
+                             # penalty = penalty, # TODO: will add this later
+                             # gamma = gamma,
                              lambda = lam,
                              eps = eps,
-                             max_iter = max.iter, 
-                             gamma = gamma,
-                             multiplier = new.penalty.factor,
+                             max.iter = max.iter, 
+                             penalty.factor = new.penalty.factor,
                              alpha = alpha)
       # TODO: add a way to pass additional args to this function via '...'
       b[,ll] <- init <- res$beta
@@ -283,6 +235,7 @@ plmm_fit <- function(prep,
       loss[ll] <- res$loss
       r <- res$resid
       if(prep$trace){setTxtProgressBar(pb, ll)}
+      
     }
   }
   
@@ -293,34 +246,33 @@ plmm_fit <- function(prep,
   lambda <- lambda[ind]
   loss <- loss[ind]
   if (warn & sum(iter) == max.iter) warning("\nMaximum number of iterations reached")
-  if(fbm_flag){
-    warning("\nNo convexmin() call is added in FBM fitting method yet!")
-  } else {
-    convex.min <- if (convex) convexMin(b = b,
-                                        X = stdrot_X,
-                                        penalty = penalty,
-                                        gamma = gamma, 
-                                        l2 = lambda*(1-alpha),
-                                        family = 'gaussian',
-                                        penalty.factor = new.penalty.factor) else NULL
-    
-  }
+
+  convex.min <- if (convex) convexMin(b = b,
+                                      X = stdrot_X,
+                                      penalty = penalty,
+                                      gamma = gamma, 
+                                      l2 = lambda*(1-alpha),
+                                      family = 'gaussian',
+                                      penalty.factor = new.penalty.factor) else NULL
+  
+  
+
   # un-standardizing -------
   # reverse the POST-ROTATION standardization on estimated betas  
   untransformed_b1 <- b # create placeholder vector
-  
+
   untransformed_b1[-1,] <- sweep(x = b[-1, , drop=FALSE], 
                                  # un-scale the non-intercept values & fill in the placeholder
                                  MARGIN = 1, # beta values are on rows 
-                                 STATS = stdrot_X_scale ,
+                                 STATS = stdrot_X_scale , # TODO: check these dimensions
                                  FUN = "/")
   
-  
+
   ret <- structure(list(
     n = prep$n,
     p = prep$p,
+    std_X_p = prep$std_X_p,
     y = prep$y,
-    std_X_details = prep$std_X_details,
     s = prep$s,
     U = prep$U,
     rot_X = rot_X,

@@ -35,7 +35,7 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   if('matrix' %in% class(X)){
     n <- nrow(X)
     p <- ncol(X) # including intercept 
-  } else if ('FBM' %in% class(X)){
+  } else {
     n <- X$nrow
     p <- X$ncol 
   }
@@ -55,7 +55,7 @@ setup_lambda <- function(X, y, alpha, lambda.min, nlambda, penalty.factor, inter
   # determine the maximum value for lambda
   if('matrix' %in% class(X)){
     decomp_backsolve <- abs(crossprod(X[,p_ind], fit$residuals))/penalty.factor[p_ind]
-  } else if ('FBM' %in% class(X)){
+  } else {
     # TODO: check this calculation of cprod
     cprod <- bigstatsr::big_cprodVec(X = X, y.row = fit$residuals, ind.col = p_ind)
     decomp_backsolve <- abs(cprod)/penalty.factor[p_ind]

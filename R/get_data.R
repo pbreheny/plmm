@@ -17,7 +17,7 @@
 #' 
 #' @examples
 #' \dontrun{
-#' pen <- get_data(path = "../temp_files/penncath_lite", trace = TRUE)
+#' pen <- get_data(path = "../tmp_files/penncath_lite", trace = TRUE)
 #' }
 #' 
 #' @details
@@ -87,7 +87,7 @@ get_data <- function(path, row_id = "iid", returnX, trace = TRUE){
     
     cat("\nReminder: the X that is returned here is column-standardized.
         \nA copy of the original data is available via the 'genotypes' matrix in the .rds object")
-    
+
     return(list(n = obj$n,
                 p = obj$p,
                 std_X = obj$std_X,

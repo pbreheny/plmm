@@ -89,8 +89,10 @@ process_plink <- function(data_dir,
   
   if (length(unique(obj$fam$family.ID)) == nrow(obj$fam)){
     obj$rownames <- obj$fam$family.ID
-  } else {
+  } else if (length(unique(obj$fam$family.ID)) == nrow(obj$fam)) {
     obj$rownames <- obj$fam$sample.ID
+  } else {
+    obj$rownames <- paste0("row_", 1:nrow(obj$fam))
   }
   
   
@@ -99,8 +101,8 @@ process_plink <- function(data_dir,
 
   chr_range <- range(obj$map$chromosome)
   if(chr_range[1] < 1 | chr_range[2] > 22){
-    cat("PLMM only analyzes autosomes -- removing chromosomes outside 1-22")
-    cat("PLMM only analyzes autosomes -- removing chromosomes outside 1-22",
+    cat("\nplmmr only analyzes autosomes -- removing chromosomes outside 1-22")
+    cat("\nplmmr only analyzes autosomes -- removing chromosomes outside 1-22",
         file = outfile, append = TRUE)
     
     original_dim <- dim(obj$genotypes)[2]
@@ -124,8 +126,8 @@ process_plink <- function(data_dir,
   X   <- obj$genotypes
   pos <- obj$map$physical.pos
   
-  # save these counts (like 'col_summary' obj from snpStats package)
-  counts <- bigstatsr::big_counts(X) # NB this is a matrix 
+  # save these counts 
+  counts <- bigstatsr::big_counts(X) # NB: this is a matrix 
   
 
 # identify monomorphic SNPs --------------------------------
@@ -218,9 +220,10 @@ process_plink <- function(data_dir,
                                      ...) # dots can pass other args
       
       cat("\n ***************** NOTE ********************************
-          \n August 2023: With the xgboost imputation method, there have been some issues (particularly
-          \n on Mac OS) with warnings that appear saying 'NA or NaN values in the 
-          \n resulting correlation matrix.' However, we (plmm authors) have
+          \nAugust 2023: With the xgboost imputation method, there 
+          \nhave been some issues (particularly on Mac OS) with warnings 
+          \nthat appear saying 'NA or NaN values in the resulting correlation matrix.' 
+          \nHowever, we (plmm authors) have 
           \n not seen missing values appear in the results -- the imputed data
           \n does not show any NA or NaN values, and models fit on these data run without issue. 
           \n We are actively investigating this warning message, and will
@@ -235,14 +238,14 @@ process_plink <- function(data_dir,
     obj$constants_idx <- constants_idx
     obj <- bigsnpr::snp_save(obj)
     
-    cat("\nDone with imputation. File formatting in progress.",
+    cat("\nDone with imputation.",
         file = outfile, append = TRUE)
     
 
   }
   
 # standardization ------------------------------------------------
-  cat("\nDone with imputation. Now, column-standardizing the design matrix...")
+  cat("\nColumn-standardizing the design matrix...")
   # add centering & scaling info
   scale_info <- bigstatsr::big_scale()(obj$genotypes)
   # now, save the new object -- this will have imputed values and constants_idx
@@ -250,7 +253,7 @@ process_plink <- function(data_dir,
   # naming these center and scale values so that I know they relate to the first
   # standardization; there will be another standardization after the rotation
   # in plmm_fit().
-  obj$std_X_center <- scale_info$center[obj$ns]
+  obj$std_X_center <- scale_info$center[obj$ns] # TODO: should this be subset to ns columns only? Think about this...
   obj$std_X_scale <- scale_info$scale[obj$ns]
   tmp <- big_std(X = obj$genotypes,
                            center = scale_info$center,

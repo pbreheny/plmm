@@ -24,12 +24,12 @@ untransform <- function(untransformed_b1, p, std_X_details){
   # unscale the beta values for non-singular, non-intercept columns
   untransformed_b2 <- sweep(x = b,
                             MARGIN = 1,
-                            STATS = std_X_details$scale[std_X_details$ns],
+                            STATS = std_X_details$scale,
                             FUN = "/")
   
   # fill in the un-transformed values
   untransformed_beta[std_X_details$ns+1,] <- untransformed_b2 # again, the + 1 is for the intercept
-  untransformed_beta[1,] <- a - crossprod(std_X_details$center[std_X_details$ns],
+  untransformed_beta[1,] <- a - crossprod(std_X_details$scale,
                                           untransformed_b2)
   
   

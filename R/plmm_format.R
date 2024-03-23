@@ -1,6 +1,10 @@
 #' PLMM format: a function to format the output of a model constructed with \code{plmm_fit}
 #' 
 #' @param fit A list of parameters describing the output of a model constructed with \code{plmm_fit}
+#' @param std_X_details A list with 3 items: 
+#'  * 'center': the centering values for the columns of `X` 
+#'  * 'scale': the scaling values for the non-singular columns of `X` 
+#'  * 'ns': indicies of nonsingular columns in `std_X`
 #' @param snp_names A vector of names for features, passed internally if such names are included with the data `X` passed to `plmm()`
 #' 
 #' @returns A list with the components: 
@@ -26,13 +30,12 @@
 #' @keywords internal
 #'
 
-plmm_format <- function(fit, snp_names = NULL){
-
+plmm_format <- function(fit, std_X_details, snp_names = NULL){
+  
   # reverse the transformations of the beta values ----------------------
   # get beta values back in original scale; reverse the PRE-ROTATION standardization 
   untransformed_b2 <- untransform(untransformed_b1 = fit$untransformed_b1,
-                                  # ns = fit$ns,
-                                  std_X_details = fit$std_X_details,
+                                  std_X_details = std_X_details,
                                   p = fit$p)
   
   # give the matrix of beta_values readable names ----------------------------

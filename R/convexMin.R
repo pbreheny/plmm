@@ -27,6 +27,7 @@ convexMin <- function(b, X, penalty, gamma, l2, family = "gaussian", penalty.fac
   if (l==0) return(NULL)
 
   val <- NULL
+  # TODO: handle cases below for models running filebacked that have MCP/SCAD penalties
   for (i in 1:l) {
     A1 <- if (i==1) rep(1,p) else b[,i]==0
     if (i==l) {

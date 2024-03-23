@@ -175,6 +175,7 @@ plmm_prep <- function(std_X,
   ret <- structure(list(
     n = n,
     p = p,
+    std_X_p = std_X_p,
     y = y,
     std_X = std_X,
     y = y,

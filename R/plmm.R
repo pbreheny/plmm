@@ -101,7 +101,7 @@ plmm <- function(X,
                  K = NULL,
                  diag_K = NULL,
                  eta_star = NULL,
-                 penalty = c("MCP", "SCAD", "lasso"),
+                 penalty = c("MCP", "SCAD", "lasso"), # TODO: think about making lasso default
                  gamma,
                  alpha = 1,
                  # lambda.min = ifelse(n>p, 0.001, 0.05),
@@ -160,10 +160,10 @@ plmm <- function(X,
     
   }
   # if FBM flag is not 'on' by now, set it 'off'
-  if(!exists('fbm_flag')){fbm_flag <- FALSE}
-
+  if (!exists('fbm_flag')){fbm_flag <- FALSE}
+  
   ## matrix -------------------------------
-  if(!fbm_flag){
+  if (!fbm_flag){
     if (!inherits(X, "matrix")) {
       tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
       if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
@@ -217,6 +217,14 @@ plmm <- function(X,
   
   # coercion for penalty
   penalty <- match.arg(penalty)
+  # for now, filebacked data are limited to lasso only (until biglasso gets another upgrade)
+  if (fbm_flag & penalty != "lasso") {
+    if (trace) cat("\nFor now, filebacked data must be analyzed with penalty=lasso 
+                   \n (we are working to expand this). Changing the penalty to 
+                   lasso.")
+    
+    penalty <- 'lasso'
+  }
   
   # set default gamma
   if (missing(gamma)) gamma <- switch(penalty, SCAD = 3.7, 3)
@@ -322,13 +330,16 @@ plmm <- function(X,
   if(trace){cat("\nFormatting results (backtransforming coefs. to original scale).\n")}
   if(fbm_flag){
     # TODO: work format through for FBM case
-    the_final_product <- plmm_format(fit = the_fit
+    the_final_product <- plmm_format(fit = the_fit,
+                                     std_X_details = std_X_details,
+                                     snp_names = dat$map$marker.ID
                                      # convex = convex,
                                      # dfmax = dfmax, 
                                      )
     
   } else {
-    the_final_product <- plmm_format(fit = the_fit
+    the_final_product <- plmm_format(fit = the_fit,
+                                     std_X_details = std_X_details
                                      # convex = convex,
                                      # dfmax = dfmax, 
                                      )
