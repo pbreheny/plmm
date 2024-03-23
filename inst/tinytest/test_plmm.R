@@ -170,3 +170,7 @@ for(i in 1:100){
 tinytest::expect_equivalent(current = mean(hat_eta), 
                             target = 2/3,
                             tolerance = 0.05)
+
+
+# Test 9: make sure plmm() runs in-memory and filebacked ---------------------
+

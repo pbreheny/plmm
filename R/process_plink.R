@@ -18,11 +18,11 @@
 #' @param quiet Logical: should messages be printed to the console? Defaults to TRUE
 #' @param gz Logical: are the bed/bim/fam files g-zipped? Defaults to FALSE. NOTE: if TRUE, process_plink will unzip your zipped files.
 #' @param outfile Optional: the name (character string) of the prefix of the logfile to be written. Defaults to 'process_plink', i.e. you will get 'process_plink.log' as the outfile.
-#' @param std_bk_extension Optional: the file name of the backing file ".bk" to be created for quality controlled, standardized data. Defaults to "std_X" (i.e., default will create std_X.bk in the directory supplied to `data_dir`)
+#' @param overwrite Logical: if existing `.bk`/`.rds` files exist for the specified directory/prefix, should these be overwritten? Defaults to FALSE. Set to TRUE if you want to change the imputation method you're using, etc. 
 #' @param ... Optional: additional arguments to `bigsnpr::snp_fastImpute()` (relevant only if impute_method = "xgboost")
 #' 
-#' @returns Nothing is returned by this function; instead, files 'prefix.rds' and 
-#'  'prefix.bk' are created in the location specified by data_dir. Note that this 
+#' @returns Nothing is returned by this function; instead, files 'prefix.rds',
+#'  'prefix.bk', and std_prefix.bk are created in the location specified by data_dir. Note that this 
 #'  this function need only be run once; in subsequent data analysis/scripts, 
 #'  `get_data()` will access the '.rds' file. 
 #'    
@@ -46,6 +46,7 @@ process_plink <- function(data_dir,
                           gz = FALSE,
                           outfile,
                           std_bk_extension = NULL,
+                          overwrite = FALSE,
                           ...){
   
   # start log ------------------------------------------
@@ -66,6 +67,30 @@ process_plink <- function(data_dir,
   
   # read in PLINK files --------------------------------
   path <- paste0(data_dir, "/", prefix, ".rds")
+  bk_path <- paste0(data_dir, "/", prefix, ".bk")
+  std_bk_path <- paste0(data_dir, "/std_", prefix, ".bk")
+  
+  # check for overwrite: 
+  if (file.exists(bk_path)){
+    if (overwrite){
+      # notify 
+      cat("\nOverwriting existing files: ", prefix, ".bk/.rds\n",
+          file = outfile, append = TRUE)
+      
+      if (!quiet){
+        cat("\nOverwriting existing files: ", prefix, ".bk/.rds\n")
+      }
+      
+      # overwrite existing files 
+      system(paste0("rm ", bk_path))
+      system(paste0("rm ", std_bk_path))
+      system(paste0("rm ", path))
+    } else {
+      stop("\nThere are existing prefix.rds and prefix.bk files in the specified directory.  
+           \nIf you want to overwrite these existing files, set 'overwrite = TRUE'. 
+           \nOtherwise, choose a different prefix.")
+    }
+  }
   
   
   # Create the RDS file first ------------------------
@@ -259,7 +284,7 @@ process_plink <- function(data_dir,
                            center = scale_info$center,
                            scale = scale_info$scale,
                            ns = obj$ns)
-  if(is.null(std_bk_extension)) std_bk_extension <- paste0("std_", prefix) 
+  std_bk_extension <- paste0("std_", prefix) 
   
   # subset the features so that constant features (monomorphic SNPs) are not 
   # included in analysis
