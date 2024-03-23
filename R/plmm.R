@@ -332,14 +332,16 @@ plmm <- function(X,
     # TODO: work format through for FBM case
     the_final_product <- plmm_format(fit = the_fit,
                                      std_X_details = std_X_details,
-                                     snp_names = dat$map$marker.ID
+                                     snp_names = dat$map$marker.ID,
+                                     fbm_flag = fbm_flag
                                      # convex = convex,
                                      # dfmax = dfmax, 
                                      )
     
   } else {
     the_final_product <- plmm_format(fit = the_fit,
-                                     std_X_details = std_X_details
+                                     std_X_details = std_X_details,
+                                     fbm_flag = fbm_flag
                                      # convex = convex,
                                      # dfmax = dfmax, 
                                      )

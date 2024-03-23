@@ -5,6 +5,7 @@
 #'  * 'center': the centering values for the columns of `X` 
 #'  * 'scale': the scaling values for the non-singular columns of `X` 
 #'  * 'ns': indicies of nonsingular columns in `std_X`
+#' @param fbm_flag Logical: is the corresponding design matrix filebacked? Passed from `plmm()`. 
 #' @param snp_names A vector of names for features, passed internally if such names are included with the data `X` passed to `plmm()`
 #' 
 #' @returns A list with the components: 
@@ -30,13 +31,14 @@
 #' @keywords internal
 #'
 
-plmm_format <- function(fit, std_X_details, snp_names = NULL){
-  
+plmm_format <- function(fit, std_X_details, fbm_flag, snp_names = NULL){
+
   # reverse the transformations of the beta values ----------------------
   # get beta values back in original scale; reverse the PRE-ROTATION standardization 
   untransformed_b2 <- untransform(untransformed_b1 = fit$untransformed_b1,
                                   std_X_details = std_X_details,
-                                  p = fit$p)
+                                  p = fit$p,
+                                  fbm_flag = fbm_flag)
   
   # give the matrix of beta_values readable names ----------------------------
   # SNPs (or covariates) on the rows, lambda values on the columns
