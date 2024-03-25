@@ -151,7 +151,7 @@ plmm_fit <- function(prep,
   
   # make sure to *not* penalize the intercept term 
   new.penalty.factor <- c(0, penalty.factor)
-  
+
   # placeholders for results ---------------------------------
   # setting up 'init' as below is not needed when this is called from plmm or cv.plmm
   # as those user-facing functions set up 'init' as a vector of zeroes

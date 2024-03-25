@@ -329,7 +329,7 @@ plmm <- function(X,
                           fbm_flag = fbm_flag,
                           trace = trace)
   }
-  browser()
+
   # rotate & fit -------------------------------------------------------------
   if(trace){cat("\nBeginning model fitting.\n")}
   

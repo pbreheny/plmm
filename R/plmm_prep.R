@@ -170,7 +170,7 @@ plmm_prep <- function(std_X,
   if(fbm_flag){
     U <- bigstatsr::as_FBM(U)
   }
-browser()
+
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
     n = n,
