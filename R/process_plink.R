@@ -1,7 +1,7 @@
 #' Preprocess PLINK files using the `bigsnpr` package
 #' 
-#' @param data_dir The path to the bed/bim/fam data files 
-#' @param prefix The prefix (as a character string) of the bed/fam data files 
+#' @param data_dir The path to the bed/bim/fam data files, *without* a trailing "/" (e.g., use `data_dir = '~/my_dir'`, **not** `data_dir = '~/my_dir/'`)
+#' @param prefix The prefix (as a character string) of the bed/fam data files (e.g., `prefix = 'mydata'`)
 #' @param impute Logical: should data be imputed? Default to TRUE.
 #' @param impute_method If 'impute' = TRUE, this argument will specify the kind of imputation desired. Options are: 
 #'  * mode (default): Imputes the most frequent call. See `bigsnpr::snp_fastImputeSimple()` for details. 
@@ -31,6 +31,9 @@
 #' 
 #' @examples 
 #' \dontrun{
+#' 
+#' process_plink(data_dir = "inst/extdata", prefix = "admix")
+#' 
 #' process_plink(data_dir = "../temp_files",
 #'  prefix = "penncath_lite",
 #'   impute = T,
@@ -108,7 +111,7 @@ process_plink <- function(data_dir,
     bigsnpr::snp_readBed(bedfile = paste0(data_dir, "/", prefix, ".bed"))
     obj <- bigsnpr::snp_attach(path)
   }
-  
+  browser()
 # set object names --------------------------------
   obj$colnames <- obj$map$marker.ID
   
@@ -126,23 +129,27 @@ process_plink <- function(data_dir,
 
   chr_range <- range(obj$map$chromosome)
   if(chr_range[1] < 1 | chr_range[2] > 22){
-    cat("\nplmmr only analyzes autosomes -- removing chromosomes outside 1-22")
-    cat("\nplmmr only analyzes autosomes -- removing chromosomes outside 1-22",
-        file = outfile, append = TRUE)
-    
-    original_dim <- dim(obj$genotypes)[2]
-    chr_filtered <- bigsnpr::snp_subset(obj,
-                                        ind.col = obj$map$chromosome %in% 1:22)
-    obj <- bigsnpr::snp_attach(chr_filtered)
-    new_dim <- dim(obj$genotypes)[2]
-    
-    cat("\nRemoved ", original_dim - new_dim, "SNPs that are outside of chromosomes 1-22.",
-        file = outfile, append = TRUE)
-    if(!quiet){
-      cat("\nRemoved ", original_dim - new_dim, "SNPs that are outside of chromosomes 1-22.")
-      
-    }
+    stop("\nplmmr only analyzes autosomes -- please remove variants on chromosomes outside 1-22")
   }
+    
+  #   # TODO: below is an idea for future development: 
+  #   cat("\nplmmr only analyzes autosomes -- removing chromosomes outside 1-22")
+  #   cat("\nplmmr only analyzes autosomes -- removing chromosomes outside 1-22",
+  #       file = outfile, append = TRUE)
+  #   
+  #   original_dim <- dim(obj$genotypes)[2]
+  #   chr_filtered <- bigsnpr::snp_subset(obj,
+  #                                       ind.col = obj$map$chromosome %in% 1:22)
+  #   obj <- bigsnpr::snp_attach(chr_filtered)
+  #   new_dim <- dim(obj$genotypes)[2]
+  #   
+  #   cat("\nRemoved ", original_dim - new_dim, "SNPs that are outside of chromosomes 1-22.",
+  #       file = outfile, append = TRUE)
+  #   if(!quiet){
+  #     cat("\nRemoved ", original_dim - new_dim, "SNPs that are outside of chromosomes 1-22.")
+  #     
+  #   }
+  # }
   
   # TODO: figure out how to add a 'sexcheck' with bigsnpr functions
   # e.g., if sexcheck = TRUE, remove subjects with sex discrepancies
@@ -169,6 +176,7 @@ process_plink <- function(data_dir,
   if(!quiet){
   cat("\nThere are ", obj$genotypes$nrow, " observations and ",
       obj$genotypes$ncol, " features in the specified PLINK files.")
+
   ns <- which(!constants_idx) # need this for analysis downstream
   cat("\nOf these, there are ", sum(constants_idx), " constant features in the data",
       file = outfile, append = TRUE)
@@ -268,7 +276,7 @@ process_plink <- function(data_dir,
     
 
   }
-  
+  browser()
 # standardization ------------------------------------------------
   cat("\nColumn-standardizing the design matrix...")
   # add centering & scaling info

@@ -6,7 +6,8 @@
 #' * Note: X may include clinical covariates and other non-SNP data, but no missing values are allowed.
 #' @param fbm Logical: should X be treated as filebacked? Relevant only when X is a string to be passed to `get_data()`. Defaults to NULL, using the default setttings of `get_data()` to determine whether X should be stored in memory.
 #' @param std_needed Logical: does the supplied X need to be standardized? Defaults to FALSE, since `process_plink()` standardizes the design matrix by default. 
-#' By default, X will be standardized internally.
+#' By default, X will be standardized internally. For data processed from PLINK files, standardization happens in `process_plink()`. For data supplied as a matrix, standardization happens here in `plmm()`. If you know your data are already standardized, set `std_needed = FALSE` -- this would be an atypical case. **Note**: failing to standardize data will lead to incorrect analyses. 
+#' @param col_names Optional vector of column names for design matrix. Defaults to NULL.
 #' @param y Continuous outcome vector. Defaults to NULL, assuming that the outcome is the 6th column in the .fam PLINK file data. Can also be a user-supplied numeric vector. 
 #' @param k An integer specifying the number of singular values to be used in the approximation of the rotated design matrix. This argument is passed to `RSpectra::svds()`. Defaults to `min(n, p) - 1`, where n and p are the dimensions of the _standardized_ design matrix.
 #' @param K Similarity matrix used to rotate the data. This should either be (1) a known matrix that reflects the covariance of y, (2) an estimate (Default is \eqn{\frac{1}{p}(XX^T)}), or (3) a list with components 'd' and 'u', as returned by choose_k().
@@ -95,7 +96,8 @@
 #' 
 plmm <- function(X,
                  fbm = NULL,
-                 std_needed = FALSE,
+                 std_needed = NULL,
+                 col_names = NULL,
                  y = NULL,
                  k = NULL, 
                  K = NULL,
@@ -150,7 +152,7 @@ plmm <- function(X,
       std_X_n <- std_X$nrow
       std_X_p <- std_X$ncol
       fbm_flag <- TRUE
-    } else{
+    } else {
       std_X <- obj$std_X
       std_X_n <- std_X$nrow
       std_X_p <- std_X$ncol
@@ -159,11 +161,17 @@ plmm <- function(X,
     }
     
   }
-  # if FBM flag is not 'on' by now, set it 'off'
-  if (!exists('fbm_flag')){fbm_flag <- FALSE}
+  
+  ## set fbm flag ---------------------------
+  # if FBM flag is not 'on' by now, set it 'off' & turn on standardization
+  if (!exists('fbm_flag')){
+    fbm_flag <- FALSE
+    std_needed <- TRUE
+  }
   
   ## matrix -------------------------------
   if (!fbm_flag){
+    
     if (!inherits(X, "matrix")) {
       tmp <- try(X <- stats::model.matrix(~0+., data=X), silent=TRUE)
       if (inherits(tmp, "try-error")) stop("X must be a matrix or able to be coerced to a matrix", call.=FALSE)
@@ -183,7 +191,27 @@ plmm <- function(X,
                             ns = attr(std_X, 'nonsingular'))
       
       # designate the dimensions of the standardized design matrix, with only ns columns
-    } 
+    } else if (is.null(std_needed) & !fbm_flag){
+      std_X <- ncvreg::std(X)
+      std_X_details <- list(center = attr(std_X, 'center'),
+                            scale = attr(std_X, 'scale'),
+                            ns = attr(std_X, 'nonsingular'))
+    } else if (!std_needed) {
+      std_X <- X
+      # TODO: may need to change this default setting 
+      
+      if (trace) { 
+        cat("\nYou have set std_needed = FALSE; this means you are assuming that 
+            all columns in X have mean 0 and variance 1. This also means 
+            you are assuming that none of the columns in X are constant features. 
+            \n If this is not what you want to assume, leave std_needed = NULL (default).")  
+        
+      }
+      
+      std_X_details <- list(center = rep(0, ncol(X)),
+                            scale = rep(1, ncol(X)),
+                            ns = 1:ncol(X))
+    }
     
   }
   # designate dimensions of the 
@@ -273,8 +301,6 @@ plmm <- function(X,
       ns = dat$ns
     )
   } 
-  
-
 
   # prep (SVD)-------------------------------------------------
   if(trace){cat("\nInput data passed all checks.")}
@@ -303,8 +329,7 @@ plmm <- function(X,
                           fbm_flag = fbm_flag,
                           trace = trace)
   }
-  
-
+  browser()
   # rotate & fit -------------------------------------------------------------
   if(trace){cat("\nBeginning model fitting.\n")}
   
@@ -341,7 +366,8 @@ plmm <- function(X,
   } else {
     the_final_product <- plmm_format(fit = the_fit,
                                      std_X_details = std_X_details,
-                                     fbm_flag = fbm_flag
+                                     fbm_flag = fbm_flag,
+                                     snp_names = col_names
                                      # convex = convex,
                                      # dfmax = dfmax, 
                                      )

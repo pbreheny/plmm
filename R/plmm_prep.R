@@ -120,7 +120,7 @@ plmm_prep <- function(std_X,
       if(trace){cat("\nSince n > p, PLMM is calculating the SVD of X.")}
         svd_res <- svd_X(std_X = std_X, k = k, trunc_flag = trunc_flag,
                          fbm_flag = fbm_flag, trace = trace)
-        s <- (svd_res$d^2)*(1/std_X_p)
+        s <- (svd_res$d^2)*(1/p)
         U <- svd_res$U
       
       } else if (std_X_n <= std_X_p){
@@ -129,14 +129,14 @@ plmm_prep <- function(std_X,
         s <- eigen_res$s
         U <- eigen_res$U
         # check signs 
-        # sign_check <- flip_signs(X = eigen_res$K, U = U, V = U, d = s)
-        # U <- sign_check$U
+        sign_check <- flip_signs(X = eigen_res$K, U = U, V = U, d = s)
+        U <- sign_check$U
       }
       
     } else {
       # last case: K is a user-supplied matrix 
       eigen_res <- eigen(K)
-      s <- eigen_res$values*(1/std_X_p) # note: our definition of the RRM averages over the number of features
+      s <- eigen_res$values*(1/p) # note: our definition of the RRM averages over the number of features
       U <- eigen_res$vectors
       # check signs
       # sign_check <- flip_signs(X = K, U = U, V = U, d = s)
@@ -170,7 +170,7 @@ plmm_prep <- function(std_X,
   if(fbm_flag){
     U <- bigstatsr::as_FBM(U)
   }
-
+browser()
   # return values to be passed into plmm_fit(): 
   ret <- structure(list(
     n = n,

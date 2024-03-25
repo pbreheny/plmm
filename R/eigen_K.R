@@ -21,7 +21,7 @@ eigen_K <- function(std_X, p, fbm_flag){
   }
   # take eigendecomposition
   decomp <- eigen(K)
-  return(list(s = decomp$values,
+  return(list(s = decomp$values/p,
               U = decomp$vectors,
               K = K))
 }

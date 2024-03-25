@@ -27,6 +27,8 @@ a1_alleles <-  admix$X |>
   ))) 
 
 colnames(a1_alleles) <- paste0(colnames(admix$X), "_A1")
+# check: snp8 should be constant 
+# table(a1_alleles$Snp8_A1) # correct
 
 # major alleles
 a2_alleles <-  admix$X |> 
@@ -39,8 +41,20 @@ a2_alleles <-  admix$X |>
                 ))) 
 
 colnames(a2_alleles) <- paste0(colnames(admix$X), "_A2")
+# check: snp8 should be constant 
+# table(a2_alleles$Snp8_A2) # correct
 
-alleles <- bind_cols(a1_alleles, a2_alleles)
+# combine toy allele data 
+alleles <- bind_cols(a1_alleles, a2_alleles) 
+
+# PLINK expects that these columns are ordered like Snp1_A1, Snp1_A2, Snp2_A1, Snp2_A2, etc
+snp_names <- sub("_A1", "", names(a1_alleles))
+ordered_columns <- sapply(snp_names, function(snp) {
+  paste0(snp, c("_A1", "_A2")) 
+}) |> as.vector()
+allele_data <- alleles |> dplyr::select(all_of(ordered_columns))
+# check 
+glimpse(allele_data)
 
 admix_ped <- cbind(ped, alleles)
 write.table(admix_ped,
@@ -49,14 +63,15 @@ write.table(admix_ped,
             quote = FALSE,
             row.names = FALSE,
             col.names = FALSE)
+# check 
+# read.delim("data-raw/admix.ped", header = F) |> View()
 
 # step 2: create .map file by hand ----------------------------------------
-set.seed(123)
 admix_map <- data.frame(
-  CHR = sample(1:22, ncol(admix$X), replace = T),
+  CHR = rep(1:20, each=5),
   SNP = colnames(admix$X),
   CM = 0,
-  BP = sample(15518262:218890256, ncol(admix$X)) # fake BP values
+  BP = 1:ncol(admix$X) # fake BP values
 )
 write.table(admix_map,
             "data-raw/admix.map",
@@ -65,5 +80,9 @@ write.table(admix_map,
             row.names = FALSE,
             col.names = FALSE)
 
+
+# check 
+# read.delim("data-raw/admix.map", header = F) |> View()
+
 # step 3: convert .ped/.map to .bed/.bim/.fam, and make 'y' our outcome ----
-system("plink --file data-raw/admix --make-bed --out data-raw/admix")
+system("plink --file data-raw/admix --make-bed --out inst/extdata/admix")

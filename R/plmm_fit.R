@@ -91,8 +91,8 @@ plmm_fit <- function(prep,
   # TODO: adjust line below to accommodate FBM 
   # if (length(init)!=prep$std_X$ncol) stop("Dimensions of init and X do not match", call.=FALSE)
   
-  if(prep$trace){cat("Beginning standardization + rotation.")}
-  
+  if(prep$trace){cat("\nBeginning rotation ('preconditioning').")}
+
   # rotate data ----------------------------------------------------------------
   if('matrix' %in% class(prep$std_X)) {
     w <- (prep$eta * prep$s + (1 - prep$eta))^(-1/2)
