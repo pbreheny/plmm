@@ -17,9 +17,6 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   # subset std_X, and y to match fold indices 
   #   (and in so doing, leave out the ith fold)
   cv.args$prep$std_X <- full_cv_prep$std_X[fold!=i, ,drop=FALSE]
-  # NB: need center & scale values here! Will pass this to untransform() via predict.list
-  # attr(cv.args$prep$std_X, "center") <- attr(full_cv_prep$std_X[fold!=i, ,drop=FALSE], "center")
-  # attr(cv.args$prep$std_X, "scale") <- attr(full_cv_prep$std_X[fold!=i, ,drop=FALSE], "scale")
   cv.args$prep$U <- full_cv_prep$U[fold!=i, , drop=FALSE]
   cv.args$prep$y <- full_cv_prep$y[fold!=i] 
   
@@ -38,7 +35,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
   # fit a plmm within each fold 
   # lambda stays the same for each fold; comes from the overall fit in cv_plmm()
   fit.i <- do.call("plmm_fit", cv.args)
-  
+
   if(type == "lp"){
     yhat <- predict.list(fit = fit.i,
                           oldX = cv.args$prep$std_X,
@@ -60,7 +57,7 @@ cvf <- function(i, fold, type, cv.args, estimated_V, ...) {
                          V21 = V21, ...)
     
   }
-  
+
   loss <- sapply(1:ncol(yhat), function(ll) loss.plmm(test_y, yhat[,ll]))
   list(loss=loss, nl=length(fit.i$lambda), yhat=yhat)
 }

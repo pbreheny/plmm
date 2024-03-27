@@ -43,7 +43,7 @@ predict.list <- function(fit,
   # calculate the estimated mean values for test data 
   a <- beta_vals[1,]
   b <- beta_vals[-1,,drop=FALSE]
-  
+ 
   Xb <- sweep(newX %*% b, 2, a, "+")
   
   # for linear predictor, return mean values 

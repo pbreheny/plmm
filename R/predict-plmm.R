@@ -9,10 +9,10 @@
 #' at which predictions are requested.
 #' @param idx Vector of indices of the penalty parameter \code{lambda} at which 
 #' predictions are required. By default, all indices are returned.
-#' @param X Optional argument. Original design matrix (not including intercept column) 
+#' @param X Original design matrix (not including intercept column) 
 #' from object. Required if \code{type == 'blup'} and object is too large to be 
 #' returned in `plmm` object. Again, **columns must be named!**
-#' @param y Optional argument. Original continuous outcome vector from object. 
+#' @param y Original continuous outcome vector from object. 
 #' Required if \code{type == 'blup'}. 
 #' @param K An optional list or matrix as returned by `choose_K()`. 
 #' @param ... Additional optional arguments
@@ -50,17 +50,23 @@
 #'
 #'  # make predictions for a select number of lambda values
 #'  # use cv to choose a best lambda
-#'  cv <- cv.plmm(X = train$X, y = train$y) 
-#'  pred2 <- predict(object = fit, newX = test$X, type = "blup", idx=cv$min,
+#'  cvfit <- cv.plmm(X = train$X, y = train$y) 
+#'  pred2 <- predict(object = fit, newX = test$X, type = "blup", idx=cvfit$min,
 #'   X = train$X, y = train$y)
-#'   
+#'  pred3 <- predict(object = fit, newX = test$X, type = "lp", idx=cvfit$min) 
+#'  
 #'   # examine prediction error 
-#'   summary(crossprod(y - pred2)) # almost all 0 -- predictions are good! 
+#'   summary(crossprod(test$y - pred2))  # for BLUP method 
+#'   summary(crossprod(test$y - pred3)) # for LP method 
+#'   
+#'   # which was best prediction?
+#'   mspe <- apply(pred1, 2, function(c){crossprod(test$y - c)})
+#'   which.min(mspe) # not anywhere near the 'best lambda' chosen in cross validation...
+#'   mspe[which.min(mspe)]
+#'   min(cvfit$cve)
 #'  }
 #'  
 #'  
-
-
 predict.plmm <- function(object,
                          newX,
                          type=c("lp", "coefficients", "vars", "nvars", "blup"),
@@ -75,7 +81,7 @@ predict.plmm <- function(object,
   beta_vals <- coef.plmm(object, lambda, which=idx, drop=FALSE) # includes intercept 
   p <- object$p 
   n <- object$n 
-  
+
   # addressing each type: 
   
   if (type=="coefficients") return(beta_vals)
@@ -83,7 +89,12 @@ predict.plmm <- function(object,
   if (type=="nvars") return(apply(beta_vals[-1, , drop=FALSE]!=0, 2, sum)) # don't count intercept
   
   if (type=="vars") return(drop(apply(beta_vals[-1, , drop=FALSE]!=0, 2, FUN=which))) # don't count intercept
-  Xb <- cbind(1, newX) %*% beta_vals
+  
+  a <- beta_vals[1,]
+  b <- beta_vals[-1,,drop=FALSE]
+
+  Xb <- sweep(newX %*% b, 2, a, "+")
+  # Xb <- cbind(1, newX) %*% beta_vals # old way 
   
   if (type=="lp") return(drop(Xb))
   
@@ -95,32 +106,36 @@ predict.plmm <- function(object,
     if (!is.null(object$y)) y <- object$y
     
     if (is.null(K)){
-      V11 <- object$eta*relatedness_mat(X) + (1 - object$eta)*diag(object$n)
+      V11 <- object$eta*relatedness_mat(X, std = FALSE) + (1 - object$eta)*diag(object$n)
     } else {
       V11 <- object$eta*K + (1 - object$eta)*diag(object$n)
     }
 
     # standardize (this won't affect predicted y)
-    std_X <- ncvreg::std(X)
-    std_newX <- ncvreg::std(newX)
-    std_X_details <- list(ns = attr(std_X, 'nonsingular'),
-                          scale = attr(std_X, 'scale'),
-                          center = attr(std_X, 'center'))
+    # std_X <- ncvreg::std(X)
+    # std_newX <- ncvreg::std(newX)
+    # std_X_details <- list(ns = attr(std_X, 'nonsingular'),
+    #                       scale = attr(std_X, 'scale'),
+    #                       center = attr(std_X, 'center'))
     
     # check dimensions -- must have same number of features
     # even from the same dataset, this can be an issue with features 'becoming' constant...
-    p1 <- ncol(std_X)
-    p2 <- ncol(std_newX)
-    if (p1 != p2) {
-      shared_p <- intersect(colnames(std_X), colnames(std_newX)) # this is why we need column names
-      std_X <- std_X[,shared_p]
-      std_newX <- std_newX[,shared_p]
+    p1 <- ncol(X)+1
+    p2 <- ncol(newX)+1
+    p3 <- nrow(beta_vals)
+    if (!identical(p1, p2) | !identical(p1, p3)) {
+      shared_p <- intersect(colnames(X), colnames(newX)) # this is why we need column names
+      X <- X[,shared_p]
+      newX <- newX[,shared_p]
       beta_vals <- beta_vals[c("(Intercept)",shared_p),]
     }
     
     # cannot use U, S when computing V21, because nv=0. V is needed to restore X 
-    V21 <- object$eta * (1/p) * tcrossprod(std_newX, std_X) # same as V21_check 
-    ranef <- V21 %*% chol2inv(chol(V11)) %*% (drop(y) - cbind(1, std_X) %*% beta_vals)
+    V21 <- object$eta * (1/p) * tcrossprod(newX,X) # same as V21_check 
+    Xb_old <- sweep(X %*% b, 2, a, "+")
+    resid_old <- drop(y) - Xb_old
+    
+    ranef <- V21 %*% (chol2inv(chol(V11)) %*% resid_old)
     blup <- drop(Xb + ranef)
 
 

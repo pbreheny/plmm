@@ -6,9 +6,7 @@
 #' @export
 #' 
 v_hat <- function(fit, K = NULL){
-  
-  if(is.null(fit) & is.null(K))stop("Either fit or K must be specified")
-  
+ 
   # if K is supplied:
   if (!is.null(K)) {
     # case 1: K is from K_svd list 

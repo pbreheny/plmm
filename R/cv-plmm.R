@@ -124,7 +124,7 @@ cv.plmm <- function(X,
   
   estimated_V <- NULL 
   if (type == 'blup') {
-    estimated_V <- v_hat(fit, K)
+    estimated_V <- v_hat(fit, K) # TODO: make this more efficient by passing the K calculated in the prep step (in high dim case)
   }
 
   # initialize objects to hold CV results 

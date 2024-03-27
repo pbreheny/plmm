@@ -142,7 +142,7 @@ colnames(test) <- c('y',
                  'y_hat_glmnet0.1',
                  'y_hat_glmnet0.01')
 # test[1:10,] # in plmm method, all rows of X have same predicted value! 
-if(mean(test[,2] - test[,4]) > 5) stop("PLMM and GLMNET predictions are far off for the test model.")
+if(abs(mean(test[,2] - test[,4])) > 5) stop("PLMM and GLMNET predictions are far off for the test model.")
 # NB: the 5 above is chosen arbitrarily, based on my experience with the admix data 
 
 

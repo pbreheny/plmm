@@ -3,9 +3,12 @@ url: ~
 template:
     bootstrap: 5
     bootswatch: pulse
+    bslib:
+    pkgdown-nav-height: 100px
+    
 navbar:
     type: light
-    bg: light
+    # bg: light
     
 
 reference:

@@ -51,13 +51,12 @@ admix_fit <- plmm(X = admix$X, y = admix$y)
 summary(admix_fit, lambda = admix_fit$lambda[95])
 ```
 
-The returned `beta_vals` item is a matrix whose rows are $\beta$ coefficients and whose columns represent values of the penalization parameter $\lambda$. By default, `plmm` fits 100 values of $\lambda$ (see the `setup_lambda` function for details). 
+The returned `beta_vals` item is a matrix whose rows are $\hat\beta$ coefficients and whose columns represent values of the penalization parameter $\lambda$. By default, `plmm` fits 100 values of $\lambda$ (see the `setup_lambda` function for details). 
 
 ```{r}
 admix_fit$beta_vals[1:10, 97:100] |> 
   knitr::kable(digits = 3,
-               format = "html",
-               col.names = )
+               format = "html")
 ```
 
 Note that for all values of $\lambda$, SNP 8 has $\hat \beta = 0$. This is because SNP 8 is a constant feature, a feature (column) whose values do not vary among the members of this population.
@@ -100,8 +99,11 @@ plot(admix_cv)
 # make predictions for select lambda value(s)
 admix_pred1 <- predict(object = admix_fit,
                        newX = admix$X,
-                       type = "lp",
+                       type = "blup",
                        X = admix$X,
-                       y = admix$y)
+                       y = admix$y,
+                       idx = admix_cv$min)
+
+admix_pred1[,admix_cv$min] -> y_hat
 ```
 

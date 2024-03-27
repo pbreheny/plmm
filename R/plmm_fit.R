@@ -91,9 +91,10 @@ plmm_fit <- function(prep,
 
   # rotate data
   w <- (prep$eta * prep$s + (1 - prep$eta))^(-1/2)
-  wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*")
+  wUt <- sweep(x = t(prep$U), MARGIN = 1, STATS = w, FUN = "*") 
   rot_X <- wUt %*% cbind(1, prep$std_X)
   rot_y <- wUt %*% prep$y
+
   # re-standardize rotated rot_X, *without* rescaling the intercept!
   stdrot_X_temp <- scale_varp(rot_X[,-1, drop = FALSE])
   stdrot_X_noInt <- stdrot_X_temp$scaled_X
