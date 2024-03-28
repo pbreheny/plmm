@@ -103,8 +103,11 @@ plmm_fit <- function(prep,
   attr(stdrot_X,'scale') <- stdrot_X_temp$scale_vals
 
   # calculate population var without mean 0; will need this for call to ncvfit()
+  # this needs to be done for cross validation; once we subset the data, 
+  #   this will not be a vector of 1s (remember: plmm does *not* restandardize
+  #   within each fold)
   xtx <- apply(stdrot_X, 2, function(x) mean(x^2, na.rm = TRUE)) 
-  
+
   
   if(prep$trace){cat("\nSetup complete. Beginning model fitting.")}
   
