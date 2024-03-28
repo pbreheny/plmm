@@ -1,12 +1,9 @@
-url: ~
-
 template:
-    bootstrap: 5
-    bootswatch: pulse
+  bootstrap: 5
+  bootswatch: pulse
+
 navbar:
-    type: light
-    bg: light
-    
+  type: dark
 
 reference:
   - title: Fitting penalized linear mixed models (PLMMs - the featured presentation) 
